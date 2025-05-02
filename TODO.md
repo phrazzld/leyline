@@ -29,7 +29,7 @@
 ## Governance
 - [x] Create a CONTRIBUTING.md file with guidelines for proposing new tenets/bindings
 - [x] Set up GitHub repository labels for tenet/binding PRs
-- [ ] Add contributing team members to core-maintainers team
+- [x] Add contributing team members to core-maintainers team
 
 ## Documentation
 - [ ] Document migration process for new repositories
