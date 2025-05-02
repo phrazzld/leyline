@@ -1,0 +1,14 @@
+# Handle line endings automatically for files detected as text
+* text=auto
+
+# Explicitly declare text files and enforce consistent line endings
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.rb text eol=lf
+
+# Denote all files that are truly binary and should not be modified
+*.png binary
+*.jpg binary
+*.gif binary

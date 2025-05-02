@@ -1,0 +1,6 @@
+# Default ownership for the entire repository
+* @phaedrus @claude
+
+# Core maintainers must review all changes to tenets and bindings
+/tenets/ @core-maintainers
+/bindings/ @core-maintainers

@@ -1,0 +1,34 @@
+name: release
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  notify-consumers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup environment
+        run: |
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          
+      - name: Dispatch vendor workflows
+        run: |
+          if [ ! -f targets.txt ]; then
+            echo "No targets.txt file found. Skipping workflow dispatch."
+            exit 0
+          fi
+          
+          while IFS= read -r repo || [ -n "$repo" ]; do
+            # Skip comments and empty lines
+            [[ "$repo" =~ ^#.*$ || -z "$repo" ]] && continue
+            
+            echo "Dispatching to: $repo"
+            gh workflow dispatch vendor-docs.yml \
+              -R "$repo" \
+              -f ref=${{ env.TAG }}
+          done < targets.txt
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}

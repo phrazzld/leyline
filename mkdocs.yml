@@ -1,0 +1,5 @@
+site_name: Leyline – Tenets & Bindings
+nav:
+  - Tenets: tenets/
+  - Bindings: bindings/
+theme: material

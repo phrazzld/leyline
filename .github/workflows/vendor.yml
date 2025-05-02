@@ -1,0 +1,37 @@
+name: vendor-docs
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Leyline tag"
+        required: true
+        type: string
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4   # consumer repo
+    - name: Clone Leyline
+      uses: actions/checkout@v4
+      with:
+        repository: phrazzld/leyline
+        ref: ${{ inputs.ref }}
+        path: _leyline
+    - name: Rsync
+      run: |
+        mkdir -p docs/tenets docs/bindings
+        rsync -a --delete _leyline/tenets docs/tenets
+        rsync -a --delete _leyline/bindings docs/bindings
+    - name: Commit
+      run: |
+        git config user.name  "Leyline Warden"
+        git config user.email "leyline-warden@users.noreply.github.com"
+        git add docs/tenets docs/bindings || true
+        if ! git diff --cached --quiet; then
+          git commit -m "docs: sync Leyline ${{ inputs.ref }}"
+        fi
+    - name: Push PR
+      uses: peter-evans/create-pull-request@v6
+      with:
+        title: "docs: sync Leyline ${{ inputs.ref }}"
+        body: "Automated vendor update by Leyline Warden."

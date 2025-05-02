@@ -1,0 +1,6 @@
+# List of repositories that should receive automated Leyline updates
+# Format: user/repo
+
+# Example (uncomment to use):
+# phrazzld/example-project-1
+# phrazzld/example-project-2

@@ -1,0 +1,21 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  lint-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: pip install mdformat markdown-link-check
+    - name: Format + link check
+      run: |
+        mdformat --check .
+        markdown-link-check -q -c ./.mlc-config '**/*.md'
+    - name: Schema validate
+      run: ruby tools/validate_front_matter.rb
+  build-site:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: |
+        pip install mkdocs mkdocs-material
+        mkdocs build --strict
