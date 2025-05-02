@@ -1,0 +1,48 @@
+# GitHub repository labels for Leyline
+# This file defines the labels used for PR categorization and workflow
+# Can be used with GitHub label management tools like github-label-sync
+
+# Core content type labels (required for governance workflow)
+- name: "tenet"
+  color: "0366d6"
+  description: "Changes to tenets - requires 2 core maintainer approvals"
+
+- name: "binding"
+  color: "5319e7"
+  description: "Changes to bindings - requires 1 core maintainer approval"
+
+# Change type labels
+- name: "new-content"
+  color: "0e8a16"
+  description: "Adds new tenet or binding"
+
+- name: "content-update"
+  color: "fbca04"
+  description: "Updates existing tenet or binding"
+
+- name: "breaking-change"
+  color: "d93f0b"
+  description: "Breaking change requiring MAJOR version bump"
+
+# PR status labels
+- name: "ready-for-review"
+  color: "0075ca"
+  description: "Pull request is ready for maintainer review"
+
+- name: "needs-revision"
+  color: "e99695"
+  description: "Changes requested before approval"
+
+# Automation labels
+- name: "leyline-sync"
+  color: "c5def5"
+  description: "Automated PR from Warden for syncing repositories"
+
+# Process labels
+- name: "documentation"
+  color: "0075ca"
+  description: "Changes to README, CONTRIBUTING or other documentation"
+
+- name: "tooling"
+  color: "bfdadc"
+  description: "Changes to validation tools or workflows"
