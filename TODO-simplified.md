@@ -2,7 +2,7 @@
 
 ## Essential Setup
 - [x] Create GitHub repository `phrazzld/leyline`
-- [ ] Set up basic branch protection (require PRs, no force push)
+- [x] Set up basic branch protection (require PRs, no force push)
 - [ ] Create v0.1.0 initial tag when ready
 
 ## Basic Documentation
