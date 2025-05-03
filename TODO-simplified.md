@@ -6,17 +6,12 @@
 - [ ] Create v0.1.0 initial tag when ready
 
 ## Basic Documentation
-- [ ] Finalize README.md (already mostly done)
+- [x] Finalize README.md (already mostly done)
 - [ ] Set up GitHub Pages for browsable docs
 
 ## Integration (Future)
 - [ ] Populate example repositories in targets.txt (when ready)
 - [ ] Add examples of workflow files for consumers
-
-## Deferred / Optional
-- [ ] Advanced governance features (when/if team grows)
-- [ ] Cross-repo automation refinements
-- [ ] Legacy symlink migration planning
 
 ## Notes
 * Initial focus should be on content quality and structure
