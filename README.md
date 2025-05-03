@@ -82,5 +82,3 @@ Here are some example tenets and their derived bindings:
 ## Documentation
 
 Visit the [static site](https://phrazzld.github.io/leyline/) for browsable documentation of all tenets and bindings.
-
-For details about repository setup and team management, see [MAINTAINERS.md](./MAINTAINERS.md).

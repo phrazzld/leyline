@@ -13,7 +13,7 @@ nav:
   - Tenets: tenets/
   - Bindings: bindings/
   - Contributing: CONTRIBUTING.md
-  - Maintainers: MAINTAINERS.md
+  - Implementation Guide: implementation-guide.md
 
 # Theme
 theme:

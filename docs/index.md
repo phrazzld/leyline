@@ -72,5 +72,3 @@ Here are some example tenets and their derived bindings:
 ## Documentation
 
 Browse through the documentation for a complete listing of all tenets and bindings.
-
-For details about repository setup and team management, see the [Maintainers](../MAINTAINERS.md) section.
