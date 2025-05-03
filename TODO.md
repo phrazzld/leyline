@@ -1,7 +1,7 @@
 # Todo: Natural Language Rewrite of Tenets and Bindings
 
 ## Phase 1: Framework, Templates & Prototypes
-- [ ] **T001 · Feature · P1: create natural language tenet template**
+- [x] **T001 · Feature · P1: create natural language tenet template**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template Documents
     - **Action:**
         1. Create `docs/templates/tenet_template.md` adhering to the revised tenet structure (Front-Matter, Core Belief, Practical Guidelines, Warning Signs, Related Tenets).
