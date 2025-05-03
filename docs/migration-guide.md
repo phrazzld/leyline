@@ -15,16 +15,15 @@
      pull_request:
      push:
        branches:
-         - master
+         - master  # Change this if your default branch has a different name
+   permissions:
+     contents: write
+     pull-requests: write
    jobs:
      docs:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: actions/checkout@v4
-         - name: Sync Leyline Docs
-           uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.0
-           with:
-             ref: v0.1.0
+       uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.0
+       with:
+         ref: v0.1.0
    ```
 
 3. **Push these changes**
@@ -49,7 +48,22 @@ Your repository will now use the vendored tenets and bindings from Leyline inste
 
 ## Troubleshooting
 
+### Common Issues
+
+**Workflow fails with "This run likely failed because of a workflow file issue"**
+- Check that you're using `uses` correctly. It should be at the job level, not the step level.
+- Make sure to add the `permissions` section as shown above.
+
+**No PR is created after the workflow runs**
+- Check if your repository allows GitHub Actions to create pull requests. Go to Settings > Actions > General and ensure "Workflow permissions" is set to "Read and write permissions".
+- Verify that the permissions are correctly set in the workflow file.
+
+**Error about "not finding ref" or similar reference errors**
+- The Leyline repository must have the `v0.1.0` tag (or whichever tag you're referencing) published on GitHub.
+- Check available tags at https://github.com/phrazzld/leyline/tags
+- If you need to use the latest version, use `v0.1.1` which contains improved documentation.
+
 If files aren't created correctly:
-1. Check the GitHub Actions logs
+1. Check the GitHub Actions logs for specific error messages
 2. Verify the workflow file is in the correct location
 3. Ensure your GitHub token has proper permissions
