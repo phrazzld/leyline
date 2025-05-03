@@ -1,7 +1,7 @@
 # Leyline Implementation TODOs (Simplified)
 
 ## Essential Setup
-- [ ] Create GitHub repository `phrazzld/leyline`
+- [x] Create GitHub repository `phrazzld/leyline`
 - [ ] Set up basic branch protection (require PRs, no force push)
 - [ ] Create v0.1.0 initial tag when ready
 
