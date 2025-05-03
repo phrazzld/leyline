@@ -11,7 +11,7 @@
 
 ## Integration (Future)
 - [x] Populate example repositories in targets.txt (when ready)
-- [ ] Add examples of workflow files for consumers
+- [x] Add examples of workflow files for consumers
 
 ## Notes
 * Initial focus should be on content quality and structure

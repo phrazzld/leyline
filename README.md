@@ -52,6 +52,8 @@ jobs:
 
 2. The first time the workflow runs, it will create `/docs/tenets` and `/docs/bindings` directories in your repository.
 
+For complete integration examples, including pre-commit hooks and Renovate configurations, see the [examples directory](./examples/). These examples provide templates and best practices for maintaining synchronized copies of tenets and bindings.
+
 ## Contributing
 
 We welcome contributions to both tenets and bindings:
