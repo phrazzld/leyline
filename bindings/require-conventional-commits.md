@@ -3,6 +3,8 @@ id: require-conventional-commits
 last_modified: "2025-05-02"
 derived_from: automation
 enforced_by: commit hooks & CI checks
+applies_to:
+  - all
 ---
 
 # Binding: Use Conventional Commits

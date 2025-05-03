@@ -6,6 +6,14 @@ on:
         description: "Leyline tag"
         required: true
         type: string
+      override_languages:
+        description: "Override language detection (comma-separated list)"
+        required: false
+        type: string
+      override_contexts:
+        description: "Override context detection (comma-separated list)"
+        required: false
+        type: string
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -17,11 +25,76 @@ jobs:
         repository: phrazzld/leyline
         ref: ${{ inputs.ref }}
         path: _leyline
-    - name: Rsync
+    
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq ruby
+
+    - name: Detect Languages and Contexts
+      run: |
+        # Copy detection script to workspace
+        cp _leyline/.github/scripts/detect-languages.sh .
+        chmod +x detect-languages.sh
+        
+        # Run detection
+        ./detect-languages.sh
+        
+        # Handle overrides if provided
+        if [ -n "${{ inputs.override_languages }}" ]; then
+          echo "Overriding detected languages with: ${{ inputs.override_languages }}"
+          languages=$(echo "${{ inputs.override_languages }}" | tr ',' '\n' | jq -R . | jq -s .)
+          jq --argjson langs "$languages" '.languages = $langs' repo-context.json > repo-context.json.tmp
+          mv repo-context.json.tmp repo-context.json
+        fi
+        
+        if [ -n "${{ inputs.override_contexts }}" ]; then
+          echo "Overriding detected contexts with: ${{ inputs.override_contexts }}"
+          contexts=$(echo "${{ inputs.override_contexts }}" | tr ',' '\n' | jq -R . | jq -s .)
+          jq --argjson ctxs "$contexts" '.contexts = $ctxs' repo-context.json > repo-context.json.tmp
+          mv repo-context.json.tmp repo-context.json
+        fi
+        
+        # Show final configuration
+        echo "Final repository context configuration:"
+        cat repo-context.json
+    
+    - name: Filter Bindings
+      run: |
+        # Copy filter script to workspace
+        cp _leyline/.github/scripts/filter-bindings.rb .
+        chmod +x filter-bindings.rb
+        
+        # Run filtering
+        ./filter-bindings.rb
+    
+    - name: Sync Files
       run: |
         mkdir -p docs/tenets docs/bindings
-        rsync -a --delete _leyline/tenets docs/tenets
-        rsync -a --delete _leyline/bindings docs/bindings
+        
+        # Always sync all tenets (they're language-agnostic)
+        rsync -a --delete _leyline/tenets/ docs/tenets/
+        
+        # Sync filtered bindings
+        rsync -a --delete filtered_bindings/ docs/bindings/
+    
+    - name: Create Summary
+      run: |
+        echo "# Leyline Sync Summary" > sync-summary.md
+        echo "" >> sync-summary.md
+        echo "## Repository Context" >> sync-summary.md
+        echo "" >> sync-summary.md
+        echo "Detected languages: $(jq -r '.languages | join(", ")' repo-context.json)" >> sync-summary.md
+        echo "Detected contexts: $(jq -r '.contexts | join(", ")' repo-context.json)" >> sync-summary.md
+        echo "" >> sync-summary.md
+        
+        echo "## Synced Files" >> sync-summary.md
+        echo "" >> sync-summary.md
+        echo "- Tenets: $(find docs/tenets -type f -name "*.md" | wc -l)" >> sync-summary.md
+        echo "- Bindings: $(find docs/bindings -type f -name "*.md" | wc -l)" >> sync-summary.md
+        
+        cat sync-summary.md
+    
     - name: Commit
       run: |
         git config user.name  "Leyline Warden"
@@ -30,8 +103,12 @@ jobs:
         if ! git diff --cached --quiet; then
           git commit -m "docs: sync Leyline ${{ inputs.ref }}"
         fi
+    
     - name: Push PR
       uses: peter-evans/create-pull-request@v6
       with:
         title: "docs: sync Leyline ${{ inputs.ref }}"
-        body: "Automated vendor update by Leyline Warden."
+        body: |
+          Automated vendor update by Leyline Warden.
+          
+          $(cat sync-summary.md)

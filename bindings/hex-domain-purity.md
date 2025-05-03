@@ -3,6 +3,8 @@ id: hex-domain-purity
 last_modified: "2025-05-02"
 derived_from: simplicity
 enforced_by: import graph analysis & code review
+applies_to:
+  - all
 ---
 
 # Binding: Domain Core Must Remain Pure

@@ -3,6 +3,8 @@ id: no-lint-suppression
 last_modified: "2025-05-02"
 derived_from: no-secret-suppression
 enforced_by: code review & custom linters
+applies_to:
+  - all
 ---
 
 # Binding: No Lint Suppression Without Justification

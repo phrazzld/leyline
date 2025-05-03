@@ -10,6 +10,23 @@ REQUIRED_KEYS = {
   'bindings' => %w[id last_modified derived_from enforced_by]
 }
 
+# Optional keys that have validation rules when present
+OPTIONAL_KEYS = {
+  'bindings' => {
+    'applies_to' => ->(value) { value.is_a?(Array) && value.all? { |v| v.is_a?(String) } }
+  }
+}
+
+# Valid values for applies_to field
+VALID_CONTEXTS = [
+  # Languages
+  'typescript', 'javascript', 'go', 'rust', 'python', 'java', 'csharp', 'ruby',
+  # Environments
+  'frontend', 'backend', 'mobile', 'desktop', 'cli', 'library', 'service',
+  # Special values
+  'all'
+]
+
 # Track all ids to ensure uniqueness
 all_ids = {}
 
@@ -65,6 +82,38 @@ all_ids = {}
         unless tenet_file
           puts "  [ERROR] #{file}: References non-existent tenet '#{front_matter['derived_from']}'"
           exit 1
+        end
+      end
+      
+      # Validate optional keys if present
+      if dir == 'bindings' && OPTIONAL_KEYS['bindings']
+        OPTIONAL_KEYS['bindings'].each do |key, validator|
+          if front_matter.key?(key)
+            unless validator.call(front_matter[key])
+              puts "  [ERROR] #{file}: Invalid format for '#{key}'"
+              exit 1
+            end
+            
+            # Additional validation for applies_to values
+            if key == 'applies_to'
+              invalid_contexts = front_matter[key] - VALID_CONTEXTS
+              unless invalid_contexts.empty?
+                puts "  [WARNING] #{file}: Unknown context(s) in 'applies_to': #{invalid_contexts.join(', ')}"
+                puts "  Valid contexts are: #{VALID_CONTEXTS.join(', ')}"
+              end
+              
+              # Auto-detect language specific bindings without proper applies_to
+              if file =~ /\/(ts|js|go|rust|py|java|cs|rb)-/ && !front_matter[key].any? { |v| v =~ /^(typescript|javascript|go|rust|python|java|csharp|ruby)$/ }
+                prefix = $1
+                language_map = {
+                  'ts' => 'typescript', 'js' => 'javascript', 'go' => 'go', 
+                  'rust' => 'rust', 'py' => 'python', 'java' => 'java', 
+                  'cs' => 'csharp', 'rb' => 'ruby'
+                }
+                puts "  [WARNING] #{file}: Has prefix '#{prefix}-' but doesn't include '#{language_map[prefix]}' in applies_to"
+              end
+            end
+          end
         end
       end
       

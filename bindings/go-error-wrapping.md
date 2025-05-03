@@ -3,6 +3,8 @@ id: go-error-wrapping
 last_modified: "2025-05-02"
 derived_from: automation
 enforced_by: golangci-lint("wrapcheck") & code review
+applies_to:
+  - go
 ---
 
 # Binding: Wrap Errors with Context

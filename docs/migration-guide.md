@@ -21,9 +21,13 @@
      pull-requests: write
    jobs:
      docs:
-       uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.0
+       uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.1
        with:
-         ref: v0.1.0
+         ref: v0.1.1
+         # Optional: Override auto-detected languages
+         # override_languages: typescript,javascript
+         # Optional: Override auto-detected contexts
+         # override_contexts: frontend,backend
    ```
 
 3. **Push these changes**
@@ -45,6 +49,32 @@
 ## That's it!
 
 Your repository will now use the vendored tenets and bindings from Leyline instead of the old symlinks. When Leyline is updated, you'll automatically receive a PR with the updates.
+
+## Language-Specific Filtering
+
+The Leyline workflow now automatically detects the languages and contexts in your repository and only syncs the relevant bindings:
+
+1. **Auto-detection**:
+   - Languages are detected based on file extensions and config files
+   - Contexts (frontend, backend, etc.) are inferred from code patterns
+   - All tenets are always synced, as they are language-agnostic
+
+2. **Overriding detection**:
+   If you need to override the automatic detection, add parameters to the workflow:
+   ```yaml
+   jobs:
+     docs:
+       uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.1
+       with:
+         ref: v0.1.1
+         override_languages: typescript,go  # Only sync TypeScript and Go bindings
+         override_contexts: frontend,cli    # Only sync frontend and CLI contexts
+   ```
+
+3. **Pull Request Summary**:
+   The PR created by the workflow will include a summary of:
+   - Detected languages and contexts
+   - Number of synced tenets and bindings
 
 ## Troubleshooting
 

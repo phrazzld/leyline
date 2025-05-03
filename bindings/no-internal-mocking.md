@@ -3,6 +3,8 @@ id: no-internal-mocking
 last_modified: "2025-05-02"
 derived_from: testability
 enforced_by: code review & linters
+applies_to:
+  - all
 ---
 
 # Binding: No Mocking Internal Components

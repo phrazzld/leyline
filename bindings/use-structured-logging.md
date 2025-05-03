@@ -3,6 +3,11 @@ id: use-structured-logging
 last_modified: "2025-05-02"
 derived_from: automation
 enforced_by: linters & code review
+applies_to:
+  - all
+  - typescript
+  - javascript
+  - go
 ---
 
 # Binding: Use Structured Logging Only

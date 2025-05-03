@@ -3,6 +3,8 @@ id: ts-no-any
 last_modified: "2025-05-02"
 derived_from: simplicity
 enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
+applies_to:
+  - typescript
 ---
 
 # Binding: No `any` in TypeScript
