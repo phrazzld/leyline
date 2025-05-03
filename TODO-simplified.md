@@ -10,7 +10,7 @@
 - [x] Set up GitHub Pages for browsable docs
 
 ## Integration (Future)
-- [ ] Populate example repositories in targets.txt (when ready)
+- [x] Populate example repositories in targets.txt (when ready)
 - [ ] Add examples of workflow files for consumers
 
 ## Notes

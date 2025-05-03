@@ -1,6 +1,17 @@
 # List of repositories that should receive automated Leyline updates
 # Format: user/repo
+# 
+# These repositories will be updated automatically when new versions of Leyline are released.
+# The Warden system will create pull requests to update the tenets and bindings in each repository.
 
-# Example (uncomment to use):
-# phrazzld/example-project-1
-# phrazzld/example-project-2
+# Code repositories that will benefit from consistent development standards
+phrazzld/thinktank             # Programmable cognition platform
+phrazzld/gitpulse              # Git activity summaries and insights tool
+phrazzld/timeismoney           # Chrome extension for price-to-work-time conversion
+
+# Web applications and sites that can adopt consistent frontend standards
+phrazzld/timeismoneycc         # Promotional site for Time Is Money
+phrazzld/scry-splash           # Landing page for Scry product
+
+# Add more repositories as they are created or identified as good candidates
+# for standardization. Remove repositories that are no longer actively maintained.
