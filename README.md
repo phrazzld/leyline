@@ -54,6 +54,14 @@ jobs:
 
 For complete integration examples, including pre-commit hooks and Renovate configurations, see the [examples directory](./examples/). These examples provide templates and best practices for maintaining synchronized copies of tenets and bindings.
 
+#### Language-Specific Integration
+
+To ensure repositories only receive relevant bindings (e.g., TypeScript projects don't pull Go bindings), Leyline provides language-specific integration options:
+
+- Binding files use language prefixes (e.g., `ts-`, `go-`, `rust-`) for easy filtering
+- The [language-specific workflow example](./examples/github-workflows/language-specific-sync.yml) detects repository languages and syncs only relevant bindings
+- See the [implementation guide](./docs/implementation-guide.md) for detailed instructions on language-specific integration
+
 ## Contributing
 
 We welcome contributions to both tenets and bindings:

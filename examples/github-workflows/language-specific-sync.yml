@@ -1,0 +1,132 @@
+# Language-specific Leyline sync workflow
+# Place this file in your repository at .github/workflows/leyline-sync.yml
+
+name: Leyline Sync (Language-Specific)
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  detect-language:
+    name: Detect Project Languages
+    runs-on: ubuntu-latest
+    outputs:
+      has_typescript: ${{ steps.detect.outputs.has_typescript }}
+      has_go: ${{ steps.detect.outputs.has_go }}
+      has_rust: ${{ steps.detect.outputs.has_rust }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Detect Languages
+        id: detect
+        run: |
+          # Check for TypeScript/JavaScript
+          if find . -type f -name "*.ts" -o -name "*.tsx" -o -name "package.json" | grep -q .; then
+            echo "has_typescript=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_typescript=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check for Go
+          if find . -type f -name "*.go" -o -name "go.mod" | grep -q .; then
+            echo "has_go=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_go=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check for Rust
+          if find . -type f -name "*.rs" -o -name "Cargo.toml" | grep -q .; then
+            echo "has_rust=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_rust=false" >> $GITHUB_OUTPUT
+          fi
+
+  sync-docs:
+    name: Sync Relevant Leyline Docs
+    needs: detect-language
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Clone Leyline
+        uses: actions/checkout@v4
+        with:
+          repository: phrazzld/leyline
+          ref: v0.1.0
+          path: _leyline
+      
+      # Always sync all tenets (language-agnostic)
+      - name: Sync Tenets
+        run: |
+          mkdir -p docs/tenets
+          rsync -a --delete _leyline/tenets/ docs/tenets/
+      
+      # Setup the bindings directory
+      - name: Setup Bindings Directory
+        run: |
+          mkdir -p docs/bindings
+      
+      # Sync TypeScript bindings
+      - name: Sync TypeScript Bindings
+        if: ${{ needs.detect-language.outputs.has_typescript == 'true' }}
+        run: |
+          mkdir -p _ts_bindings
+          grep -l "ts-" _leyline/bindings/*.md > _ts_files.txt || true
+          while read file; do
+            cp "$file" _ts_bindings/
+          done < _ts_files.txt
+          rsync -a _ts_bindings/ docs/bindings/
+      
+      # Sync Go bindings
+      - name: Sync Go Bindings
+        if: ${{ needs.detect-language.outputs.has_go == 'true' }}
+        run: |
+          mkdir -p _go_bindings
+          grep -l "go-" _leyline/bindings/*.md > _go_files.txt || true
+          while read file; do
+            cp "$file" _go_bindings/
+          done < _go_files.txt
+          rsync -a _go_bindings/ docs/bindings/
+      
+      # Sync Rust bindings
+      - name: Sync Rust Bindings
+        if: ${{ needs.detect-language.outputs.has_rust == 'true' }}
+        run: |
+          mkdir -p _rust_bindings
+          grep -l "rust-" _leyline/bindings/*.md > _rust_files.txt || true
+          while read file; do
+            cp "$file" _rust_bindings/
+          done < _rust_files.txt
+          rsync -a _rust_bindings/ docs/bindings/
+      
+      # Sync language-agnostic bindings (always)
+      - name: Sync Common Bindings
+        run: |
+          mkdir -p _common_bindings
+          # Copy bindings that don't have a language prefix
+          find _leyline/bindings/ -name "*.md" -not -name "00-index.md" | grep -v -E '(ts-|go-|rust-)' > _common_files.txt || true
+          while read file; do
+            cp "$file" _common_bindings/
+          done < _common_files.txt
+          cp _leyline/bindings/00-index.md _common_bindings/ || true
+          rsync -a _common_bindings/ docs/bindings/
+      
+      # Regenerate the index file
+      - name: Generate Bindings Index
+        run: |
+          cd _leyline
+          ruby tools/reindex.rb bindings
+          cp bindings/00-index.md ../docs/bindings/
+      
+      # Create PR with changes
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          title: "docs: sync language-specific Leyline docs"
+          body: "Automatically synced relevant Leyline tenets and bindings based on repository language detection."
+          branch: leyline-sync
+          commit-message: "docs: sync language-specific Leyline docs"
