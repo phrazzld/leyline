@@ -71,4 +71,4 @@ Here are some example tenets and their derived bindings:
 
 ## Documentation
 
-Browse through the documentation for a complete listing of all tenets and bindings.
+Browse through the tenets and bindings sections for a complete listing of all available standards.

@@ -6,6 +6,26 @@ This document explains how the GitHub Pages documentation site for Leyline is se
 
 The Leyline documentation site is built using [MkDocs](https://www.mkdocs.org/) with the [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) theme and deployed to GitHub Pages.
 
+## Enabling GitHub Pages (Required after pushing to GitHub)
+
+After pushing this repository to GitHub, you need to:
+
+1. Wait for the GitHub Actions workflow to run
+   - The workflow will create a `gh-pages` branch
+   - The site will be built and pushed to this branch
+
+2. Enable GitHub Pages in repository settings:
+   - Go to the repository on GitHub
+   - Navigate to Settings > Pages
+   - Under "Source", select "Deploy from a branch"
+   - Under "Branch", select "gh-pages" and "/ (root)"
+   - Click "Save"
+
+3. After a few minutes, the site will be available at:
+   https://phrazzld.github.io/leyline/
+
+Until these steps are completed, the site will show a 404 error.
+
 ## Structure
 
 - Documentation source files are in the `docs/` directory
