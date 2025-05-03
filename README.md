@@ -33,7 +33,13 @@ The Leyline Warden is an automated system that synchronizes tenets and bindings 
 
 ### Integration
 
-To integrate a repository with Leyline:
+### Migrating from Symlinks
+
+**Are you using symlinked philosophy documents?** See the [Migration Guide](./docs/migration-guide.md) for a simple 5-step process to switch to Leyline.
+
+### New Repository Integration
+
+To integrate a new repository with Leyline:
 
 1. Add this repository as a GitHub Actions workflow caller:
 
@@ -54,7 +60,7 @@ jobs:
 
 For complete integration examples, including pre-commit hooks and Renovate configurations, see the [examples directory](./examples/). These examples provide templates and best practices for maintaining synchronized copies of tenets and bindings.
 
-#### Language-Specific Integration
+### Language-Specific Integration
 
 To ensure repositories only receive relevant bindings (e.g., TypeScript projects don't pull Go bindings), Leyline provides language-specific integration options:
 

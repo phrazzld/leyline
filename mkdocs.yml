@@ -12,8 +12,10 @@ nav:
   - Home: index.md
   - Tenets: tenets/
   - Bindings: bindings/
+  - Integration:
+    - Migration Guide: migration-guide.md
+    - Implementation Guide: implementation-guide.md
   - Contributing: CONTRIBUTING.md
-  - Implementation Guide: implementation-guide.md
 
 # Theme
 theme:
