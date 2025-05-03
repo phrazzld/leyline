@@ -11,7 +11,7 @@
     - **Verification:**
         1. Manually inspect template against PLAN.md structure.
     - **Depends‑on:** none
-- [ ] **T002 · Feature · P1: create natural language binding template**
+- [x] **T002 · Feature · P1: create natural language binding template**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template Documents
     - **Action:**
         1. Create `docs/templates/binding_template.md` adhering to the revised binding structure (Front-Matter, Rationale, Rule Definition, Practical Implementation, Examples, Related Bindings).
