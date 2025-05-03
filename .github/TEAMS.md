@@ -1,56 +1,46 @@
-# GitHub Teams Configuration
+# GitHub Repository Setup
 
-This document defines the teams needed for the Leyline repository governance model.
+This document provides simplified guidance for setting up the Leyline GitHub repository.
 
-## Core Maintainers Team
+## Basic Repository Setup
 
-### Team Configuration
-- **Name**: `core-maintainers`
-- **Visibility**: Visible
-- **Permission Level**: Maintain
-- **Parent Team**: None
+### Repository Settings
+- **Name**: `leyline`
+- **Visibility**: Public
+- **Description**: "Tenets & Bindings for development standards"
 
-### Repository Access
-The core-maintainers team should be granted the following permissions:
-- **Repo Permissions**: Maintain
-- **Code Review Limits**: Can be review approvers for PRs that modify tenets and bindings
+### Branch Protection (Simplified)
+Set up basic branch protection for the master branch:
+- Require pull requests before merging
+- Require status checks to pass before merging
+- Do not allow force pushes
 
-### Required Settings
-To implement the governance model described in PLAN.md, ensure:
+### CODEOWNERS File (Optional)
+For future use as the team grows, you can define code ownership:
+```
+/tenets/ @phrazzld
+/bindings/ @phrazzld
+```
 
-1. Branch protection rules reference this team for:
-   - Required reviews on tenets (minimum 2 approvals from team members)
-   - Required reviews on bindings (minimum 1 approval from team members)
+## Implementation
 
-2. A CODEOWNERS file designates this team as owners for critical paths:
-   ```
-   /tenets/ @phrazzld/core-maintainers
-   /bindings/ @phrazzld/core-maintainers
-   ```
+When creating the repository:
 
-## Implementation Instructions
+```bash
+# Create the repository
+gh repo create phrazzld/leyline --public --description "Tenets & Bindings for development standards"
 
-When creating the GitHub repository:
+# Clone and push initial content
+git remote add origin https://github.com/phrazzld/leyline.git
+git push -u origin master
 
-1. Create the organization team:
-   ```
-   gh api -X POST orgs/phrazzld/teams \
-      -f name='core-maintainers' \
-      -f description='Core maintainers for Leyline tenets and bindings' \
-      -f privacy='closed' \
-      -f permission='maintain'
-   ```
+# Enable GitHub Pages (after repository exists)
+gh api -X PUT repos/phrazzld/leyline/pages -f source='{"branch":"gh-pages","path":"/"}'
+```
 
-2. Add the team to the repository:
-   ```
-   gh api -X PUT teams/phrazzld/core-maintainers/repos/phrazzld/leyline \
-      -f permission='maintain'
-   ```
+## Labels
 
-3. Add members to the team:
-   ```
-   gh api -X PUT teams/phrazzld/core-maintainers/memberships/USERNAME \
-      -f role='maintainer'
-   ```
-
-Replace `USERNAME` with the GitHub usernames of team members listed in MAINTAINERS.md.
+A simplified set of labels can be created to track changes:
+- `tenet`: Changes to tenets
+- `binding`: Changes to bindings
+- `documentation`: Documentation changes

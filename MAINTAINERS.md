@@ -1,24 +1,21 @@
 # Leyline Maintainers
 
-This document lists the core maintainers for the Leyline project and outlines the responsibilities and processes related to maintainership.
+This document lists the maintainers for the Leyline project and outlines the repository maintenance approach.
 
-## Core Maintainers Team
-
-The following individuals are members of the `core-maintainers` team:
+## Maintainers
 
 | GitHub Username | Name | Role |
 |-----------------|------|------|
-| phrazzld | Phaedrus | Lead Maintainer |
-| claude | Claude | Core Maintainer |
+| phrazzld | Phaedrus | Maintainer |
 | *Add additional maintainers as needed* | | |
 
-## Maintainer Responsibilities
+## Maintenance Approach
 
-Core maintainers are responsible for:
+The maintainer is responsible for:
 
 1. **Reviewing Pull Requests**:
-   - Tenet changes require approval from at least 2 core maintainers
-   - Binding changes require approval from at least 1 core maintainer
+   - Reviewing and merging changes to tenets and bindings
+   - Ensuring quality and consistency of documentation
 
 2. **Repository Governance**:
    - Enforcing code quality standards

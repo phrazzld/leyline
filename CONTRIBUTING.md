@@ -9,8 +9,6 @@ Leyline maintains two types of documents:
 1. **Tenets**: Immutable truths and principles that guide our development philosophy
 2. **Bindings**: Enforceable rules derived from tenets, with specific implementation guidance
 
-Changes to these documents are subject to different review requirements based on their fundamental nature.
-
 ## Proposing Changes
 
 ### Process Overview
@@ -19,7 +17,7 @@ Changes to these documents are subject to different review requirements based on
 2. Create a branch with a descriptive name
 3. Make your changes following the guidelines below
 4. Run validation tools locally
-5. Submit a pull request with the appropriate label
+5. Submit a pull request with the appropriate label (`tenet` or `binding`)
 
 ### Validation
 
@@ -42,7 +40,6 @@ mdformat --check .
 
 **Requirements:**
 - PR must have the "tenet" label
-- Requires approval from at least 2 Core Maintainers
 - Must represent a fundamental, enduring principle
 
 **File Structure:**
@@ -85,7 +82,6 @@ mdformat --check .
 
 **Requirements:**
 - PR must have the "binding" label
-- Requires approval from at least 1 Core Maintainer
 - Must be derived from an existing tenet
 - Must be enforceable (through tools, reviews, etc.)
 
@@ -142,19 +138,17 @@ mdformat --check .
 
 **For Tenets:**
 - Changes should be clarifications, not fundamental alterations
-- Requires 2 Core Maintainer approvals
 - Update `last_modified` date
 
 **For Bindings:**
 - Can evolve more freely as implementation practices change
-- Requires 1 Core Maintainer approval
 - Update `last_modified` date
 
 ## Release Process
 
-- **Patch Releases** (typo fixes, clarifications): Auto-merge when CI passes
-- **MINOR Releases** (new bindings): Normal review process
-- **MAJOR Releases** (new/changed tenets, breaking binding changes): Extended review
+- **Patch Releases** (typo fixes, clarifications): Quick review and merge
+- **MINOR Releases** (new bindings): Standard review process
+- **MAJOR Releases** (new/changed tenets, breaking binding changes): More thorough review
 
 ## Code of Conduct
 
