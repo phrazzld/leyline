@@ -21,7 +21,7 @@
     - **Verification:**
         1. Manually inspect template against PLAN.md structure.
     - **Depends‑on:** none
-- [ ] **T003 · Feature · P1: document style guide for natural language approach**
+- [x] **T003 · Feature · P1: document style guide for natural language approach**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template Documents & Natural Language Guidelines
     - **Action:**
         1. Create `docs/STYLE_GUIDE_NATURAL_LANGUAGE.md` detailing conversational tone, principle-first approach, context/connections, and narrative structure.
