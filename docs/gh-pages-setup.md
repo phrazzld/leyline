@@ -1,0 +1,59 @@
+# GitHub Pages Setup
+
+This document explains how the GitHub Pages documentation site for Leyline is set up and deployed.
+
+## Overview
+
+The Leyline documentation site is built using [MkDocs](https://www.mkdocs.org/) with the [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/) theme and deployed to GitHub Pages.
+
+## Structure
+
+- Documentation source files are in the `docs/` directory
+- Tenets and bindings in their respective directories are included in the documentation
+- Configuration is defined in `mkdocs.yml` at the repository root
+
+## Deployment
+
+The documentation site is automatically deployed to GitHub Pages whenever changes are pushed to the `master` branch:
+
+1. The GitHub Action workflow (`.github/workflows/gh-pages.yml`) is triggered
+2. The workflow builds the site using MkDocs
+3. The built site is deployed to the `gh-pages` branch
+4. GitHub Pages serves the content from the `gh-pages` branch
+
+## Local Development
+
+To work on the documentation locally:
+
+1. Install MkDocs and the Material theme:
+   ```bash
+   pip install mkdocs mkdocs-material
+   ```
+
+2. Run the local development server:
+   ```bash
+   mkdocs serve
+   ```
+
+3. Open `http://127.0.0.1:8000/` in your browser
+
+4. Make changes to the documentation and see them instantly
+
+## Configuration
+
+The site configuration is defined in `mkdocs.yml` and includes:
+
+- Site metadata (name, description, author)
+- Navigation structure
+- Theme configuration
+- Markdown extensions
+- Plugins
+
+## Adding New Content
+
+New documentation pages can be added by:
+
+1. Creating Markdown files in the `docs/` directory
+2. Updating the navigation in `mkdocs.yml` if needed
+
+The documentation site automatically includes all tenets and bindings from their respective directories.

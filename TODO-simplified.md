@@ -7,7 +7,7 @@
 
 ## Basic Documentation
 - [x] Finalize README.md (already mostly done)
-- [ ] Set up GitHub Pages for browsable docs
+- [x] Set up GitHub Pages for browsable docs
 
 ## Integration (Future)
 - [ ] Populate example repositories in targets.txt (when ready)

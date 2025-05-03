@@ -1,5 +1,40 @@
 site_name: Leyline – Tenets & Bindings
+site_description: Centralized development standards as tenets and bindings
+site_author: Phaedrus
+site_url: https://phrazzld.github.io/leyline/
+
+# Repository
+repo_name: phrazzld/leyline
+repo_url: https://github.com/phrazzld/leyline
+
+# Navigation
 nav:
+  - Home: index.md
   - Tenets: tenets/
   - Bindings: bindings/
-theme: material
+  - Contributing: CONTRIBUTING.md
+  - Maintainers: MAINTAINERS.md
+
+# Theme
+theme:
+  name: material
+  palette:
+    primary: deep purple
+    accent: indigo
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - toc.follow
+    - search.suggest
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - admonition
+  - toc:
+      permalink: true
+
+plugins:
+  - search
