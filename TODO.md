@@ -228,7 +228,7 @@
         1. `bindings/hex-domain-purity.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T024 · Feature · P2: rewrite binding 'immutable-by-default.md'**
+- [x] **T024 · Feature · P2: rewrite binding 'immutable-by-default.md'**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 1. Rewrite Language-Agnostic Bindings
     - **Action:**
         1. Apply finalized binding template (T008) and style guide (T003) to rewrite `bindings/immutable-by-default.md`.
