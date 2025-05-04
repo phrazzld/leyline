@@ -1,7 +1,7 @@
 ---
 id: binding-id  # Unique identifier for this binding (kebab-case)
 last_modified: "2025-05-04"  # ISO format date of last modification (YYYY-MM-DD)
-derived_from: simplicity  # ID of the parent tenet this binding implements (must be an existing tenet ID)
+derived_from: tenet-id  # ID of the parent tenet this binding implements (must be an existing tenet ID, e.g., simplicity, modularity, etc.)
 enforced_by: [enforcement mechanism]  # Tool, rule, or process that enforces this binding
 applies_to:  # Languages or contexts where this binding applies
   - typescript  # Valid values: typescript, javascript, go, rust, python, java, csharp, ruby, frontend, backend, mobile, desktop, cli, library, service, all
@@ -15,39 +15,53 @@ applies_to:  # Languages or contexts where this binding applies
 
 [Write a 2-3 paragraph natural language explanation of why this rule exists and the benefits it provides. This section should:
 
-1. Connect explicitly to the parent tenet, explaining how this binding serves the tenet's principle
+1. Connect explicitly to the parent tenet, explaining how this binding serves the tenet's principle (e.g., "This binding directly implements our simplicity tenet by eliminating a major source of accidental complexity...")
 2. Focus on the problems this rule solves and the value it delivers
 3. Explain the reasoning in terms of patterns and principles rather than just technical details
 
-Use a conversational tone that helps the reader understand not just what the rule is, but why it matters and how it contributes to the overall quality of the codebase.]
+Consider using analogies to make abstract concepts more relatable (e.g., "Think of TypeScript's type system as a safety net that catches errors before they reach production..."). Analogies help readers connect technical concepts to familiar experiences.
+
+Use a conversational tone that helps the reader understand not just what the rule is, but why it matters and how it contributes to the overall quality of the codebase. Address the consequences of not following this rule in terms of maintenance burden, cognitive overhead, or other real costs.]
 
 ## Rule Definition
 
 [Provide a clear, conversational explanation of the rule itself. Rather than just listing technical specifications, explain concepts with examples and analogies where appropriate. When technical specifics are needed, explain the "why" behind them.
 
-This section should define the scope and boundaries of the rule, clarifying what is included and excluded. It should make the rule unambiguous while still keeping the focus on principles rather than syntax alone.]
+Consider using bullet points to clearly outline different aspects of the rule, which forms it takes, or what specifically is prohibited or required. For example:
+- What the rule applies to
+- What is explicitly prohibited
+- Common forms of violation to watch for
+
+This section should define the scope and boundaries of the rule, clarifying what is included and excluded. It should make the rule unambiguous while still keeping the focus on principles rather than syntax alone.
+
+Include guidance on exceptions if they exist, and how to handle edge cases where the rule might reasonably be bent. Explain when exceptions might be appropriate and how to minimize their impact (e.g., "In the rare case where you genuinely cannot follow this rule, contain the exception to the smallest possible scope and document clearly why it's necessary.").]
 
 ## Practical Implementation
 
-[Offer actionable guidelines for implementing the rule in different contexts. This may include:
+[Offer actionable guidelines for implementing the rule in different contexts. Structure this as a numbered list with bold headings for each implementation strategy. This may include:]
 
-1. Language-specific approaches, but focused on patterns rather than just syntax
-2. Common scenarios developers will encounter and how to handle them
-3. Strategies for migrating existing code to comply with the rule
-4. Tooling, configuration, or automation that can help enforce the rule
+1. **[Implementation Strategy]**: [Explanation of how to implement this aspect of the rule. Be specific about tooling, configuration, or patterns to use. Include code snippets where appropriate to illustrate the approach.]
 
-Focus on providing practical, principle-based guidance that helps developers apply the rule effectively in their daily work.]
+2. **[Implementation Strategy]**: [Explanation of another approach, potentially for a different scenario or context. Focus on patterns rather than just syntax, but provide enough technical detail to be actionable.]
+
+3. **[Alternative Approach]**: [Explanation of alternatives to common anti-patterns. Show how to accomplish the same goal while following the rule. Include code examples where helpful.]
+
+4. **[Migration Strategy]**: [Guidance on how to migrate existing non-compliant code. Suggest incremental approaches that prioritize high-impact areas first.]
+
+5. **[Tooling and Enforcement]**: [Information about how to configure tools, linters, or processes to enforce this rule automatically where possible.]
+
+[Focus on providing practical, principle-based guidance that helps developers apply the rule effectively in their daily work. Include enough detail to be immediately useful without requiring further research.]
 
 ## Examples
 
-[Provide concrete examples that illustrate both good and bad implementations. For each example:
+[Provide 2-3 pairs of concrete examples that illustrate both good and bad implementations. For each example:
 
 1. Show the problematic code or pattern first, labeling it clearly as an anti-pattern
 2. Show the improved approach that follows the binding
 3. Explain why each example is good or bad from a principle perspective, not just technical correctness
 4. Where possible, demonstrate the real-world benefits or consequences of following or violating the rule
 
-Code examples should be clear, focused, and representative of real-world scenarios developers are likely to encounter.]
+Choose examples that represent different scenarios or aspects of the rule. Start with simpler examples and progress to more complex ones. Code examples should be clear, focused, and representative of real-world scenarios developers are likely to encounter.]
 
 ```language
 // ❌ BAD: Brief description of what's wrong
@@ -57,9 +71,26 @@ Code examples should be clear, focused, and representative of real-world scenari
 // Positive example that follows the binding
 ```
 
+```language
+// ❌ BAD: Brief description of another common issue
+// Another anti-pattern example that shows a different aspect of the rule
+
+// ✅ GOOD: Brief description of the proper approach
+// Positive example showing how to address this issue correctly
+```
+
+```language
+// ❌ BAD: Brief description of a more subtle or complex violation
+// More complex anti-pattern example
+
+// ✅ GOOD: Brief description of the comprehensive solution
+// More complex positive example that demonstrates best practices
+```
+
 ## Related Bindings
 
-[List links to related bindings with brief explanations of the relationships. Explain how this binding connects to, complements, or is distinguished from other bindings. This helps create a network of understanding across the binding system.]
+[List links to related bindings with brief explanations of the relationships. Explain how this binding connects to, complements, or is distinguished from other bindings. Focus on how they work together functionally to achieve broader goals.]
 
-- [binding-name.md](./binding-filename.md): [Brief explanation of relationship]
-- [binding-name.md](./binding-filename.md): [Brief explanation of how these rules interact]
+- [binding-name.md](/bindings/binding-filename.md): [Explanation of relationship that focuses on how these bindings work together or complement each other. Explain how following both leads to better outcomes.]
+
+- [binding-name.md](/bindings/binding-filename.md): [Explanation of how these rules interact functionally, including any potential tensions and how to balance them effectively.]

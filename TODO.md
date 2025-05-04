@@ -82,7 +82,7 @@
         1. Run `tools/validate_front_matter.rb` on the rewritten file.
         2. Peer review prototype for clarity and adherence to guidelines.
     - **Depends‑on:** [T002, T003, T004]
-- [ ] **T008 · Chore · P1: review and refine templates based on prototypes**
+- [x] **T008 · Chore · P1: review and refine templates based on prototypes**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 2. Prototype Rewrites
     - **Action:**
         1. Review prototype tenet (T006) and binding (T007) against templates (T001, T002).
