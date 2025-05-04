@@ -294,7 +294,7 @@
     - **Verification:**
         1. Check validation logs for success.
     - **Depends‑on:** [T009, T021, T022, T023, T024, T025, T026, T027, T028, T029, T030]
-- [ ] **T032 · Chore · P2: perform peer review of rewritten bindings**
+- [x] **T032 · Chore · P2: perform peer review of rewritten bindings**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 3. Review and Validation
     - **Action:**
         1. Conduct peer reviews for each rewritten binding (T021-T030).
