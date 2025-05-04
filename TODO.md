@@ -318,7 +318,7 @@
     - **Depends‑on:** [T005, T031, T032]
 
 ## Phase 4: Documentation and Finalization
-- [ ] **T034 · Chore · P2: update CONTRIBUTING.md with new standards**
+- [x] **T034 · Chore · P2: update CONTRIBUTING.md with new standards**
     - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 1. Update Documentation
     - **Action:**
         1. Edit `CONTRIBUTING.md` to reflect new natural language standards, referencing style guide (T003) and templates (T008).

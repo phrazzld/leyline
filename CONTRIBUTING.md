@@ -9,6 +9,16 @@ Leyline maintains two types of documents:
 1. **Tenets**: Immutable truths and principles that guide our development philosophy
 2. **Bindings**: Enforceable rules derived from tenets, with specific implementation guidance
 
+## Natural Language First Approach
+
+Leyline adopts a "natural language first" approach to documentation. This means our tenets and bindings are written to be:
+
+1. **Accessible to humans** with different technical backgrounds
+2. **Effective as context for large language models (LLMs)**
+3. **Principle-focused** rather than implementation-focused
+
+All new tenets and bindings should follow this approach. Please refer to our [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md) for detailed writing guidelines and examples.
+
 ## Proposing Changes
 
 ### Process Overview
@@ -41,9 +51,11 @@ mdformat --check .
 **Requirements:**
 - PR must have the "tenet" label
 - Must represent a fundamental, enduring principle
+- Must follow the natural language style guidance
 
 **File Structure:**
 - Create file in `tenets/` directory with a descriptive slug (e.g., `simplicity.md`)
+- Use the [tenet template](/docs/templates/tenet_template.md) as your starting point
 - Follow front-matter format:
   ```yaml
   ---
@@ -55,26 +67,26 @@ mdformat --check .
   ```markdown
   # Tenet: Your Tenet Title
 
-  A concise description of the principle (≤ 150 chars).
+  [A concise 1-2 sentence principle statement that captures the essence of this tenet in plain, accessible language.]
 
   ## Core Belief
 
-  Detailed explanation of the underlying belief.
+  [2-4 paragraphs explaining why this principle matters, using a conversational tone and relatable analogies.]
 
   ## Practical Guidelines
 
-  1. **First Guideline**: Explanation
-  2. **Second Guideline**: Explanation
+  1. **First Guideline**: [Explanation of how to apply the principle in practical terms]
+  2. **Second Guideline**: [Another practical application of the principle]
   ...
 
   ## Warning Signs
 
-  - Signs that this principle is being violated
+  - **First Warning Sign**: [Description of behavior indicating the principle is being violated]
   ...
 
   ## Related Tenets
 
-  - [Other Tenet](/tenets/other-tenet.md): Brief connection
+  - [Other Tenet](/tenets/other-tenet.md): [Explanation of how these tenets relate to each other]
   ...
   ```
 
@@ -84,9 +96,11 @@ mdformat --check .
 - PR must have the "binding" label
 - Must be derived from an existing tenet
 - Must be enforceable (through tools, reviews, etc.)
+- Must follow the natural language style guidance
 
 **File Structure:**
 - Create file in `bindings/` directory with a descriptive slug (e.g., `ts-no-any.md`)
+- Use the [binding template](/docs/templates/binding_template.md) as your starting point
 - Follow front-matter format:
   ```yaml
   ---
@@ -94,29 +108,27 @@ mdformat --check .
   last_modified: "YYYY-MM-DD"
   derived_from: parent-tenet-id
   enforced_by: description of enforcement mechanism
+  applies_to:
+    - language or context
   ---
   ```
 - Use the standard markdown structure:
   ```markdown
   # Binding: Your Binding Title
 
-  A concise description of the rule (≤ 150 chars).
+  [A concise 1-2 sentence statement of the rule in plain language.]
 
   ## Rationale
 
-  Detailed explanation of why this rule matters.
+  [2-3 paragraphs explaining why this rule exists and how it connects to the parent tenet. Include analogies where appropriate to make abstract concepts more relatable.]
 
-  ## Enforcement
+  ## Rule Definition
 
-  This binding is enforced by:
+  [Clear, conversational explanation of the rule, its scope, and boundaries.]
 
-  1. Mechanism one
-  2. Mechanism two
-  ...
+  ## Practical Implementation
 
-  ## Guidelines
-
-  Specific implementation guidance.
+  [Actionable guidelines for implementing the rule in different contexts.]
 
   ## Examples
 
@@ -130,7 +142,7 @@ mdformat --check .
 
   ## Related Bindings
 
-  - [Other Binding](/bindings/other-binding.md): Brief connection
+  - [Other Binding](/bindings/other-binding.md): [Explanation of how these bindings work together or complement each other]
   ...
   ```
 
@@ -139,10 +151,27 @@ mdformat --check .
 **For Tenets:**
 - Changes should be clarifications, not fundamental alterations
 - Update `last_modified` date
+- Ensure changes maintain or improve natural language quality
+- Follow the [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
 
 **For Bindings:**
 - Can evolve more freely as implementation practices change
 - Update `last_modified` date
+- Ensure changes maintain or improve natural language quality
+- Follow the [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
+
+## Writing Effective Natural Language Documentation
+
+To create effective documentation that works well for both humans and LLMs, follow these key principles:
+
+1. **Principle-First Approach**: Start with the "why" before moving to the "how"
+2. **Conversational Tone**: Use active voice and direct address
+3. **Relatable Analogies**: Use analogies to explain complex concepts
+4. **Clear Connections**: Establish explicit relationships between related concepts
+5. **Narrative Structure**: Follow a problem → principle → solution → examples flow
+6. **Balanced Detail**: Provide enough detail for understanding without overwhelming
+
+For detailed guidance with examples, see the [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md).
 
 ## Release Process
 
