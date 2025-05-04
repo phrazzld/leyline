@@ -356,7 +356,7 @@
     - **Verification:**
         1. Peer review audit for completeness.
     - **Depends‑on:** [T020, T033]
-- [ ] **T038 · Chore · P2: document needed additions for future work**
+- [x] **T038 · Chore · P2: document needed additions for future work**
     - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 2. Audit for Completeness
     - **Action:**
         1. Document any gaps identified in T037 as future work items.
@@ -366,6 +366,164 @@
         2. Issues are created for significant gaps.
     - **Verification:**
         1. Review document for clarity and actionability.
+    - **Depends‑on:** [T037]
+
+## Future Binding Work (Based on Audit)
+
+### Core Bindings
+
+- [ ] **T041 · Feature · P3: create binding 'api-design.md'**
+    - **Context:** Audit Gap > Core Philosophy Gaps > API Design
+    - **Action:**
+        1. Create new binding `bindings/api-design.md` using the binding template (T002) and style guide (T003).
+        2. Cover best practices for defining clear, explicit, robust contracts for all APIs.
+    - **Done‑when:**
+        1. Binding exists and covers interface design for internal module interfaces, external REST/gRPC/GraphQL APIs, and CLIs.
+        2. Front-matter is valid and derives from `explicit-over-implicit` tenet.
+    - **Depends‑on:** [T037]
+
+- [ ] **T042 · Feature · P3: create binding 'pure-functions.md'**
+    - **Context:** Audit Gap > Core Philosophy Gaps > Pure Functions
+    - **Action:**
+        1. Create new binding `bindings/pure-functions.md` using the binding template (T002) and style guide (T003).
+        2. Focus on implementation of core logic as pure functions that isolate side effects.
+    - **Done‑when:**
+        1. Binding exists with clear definition of pure functions, their benefits, and practical implementation patterns.
+        2. Front-matter is valid and derives from `simplicity` and `testability` tenets.
+    - **Depends‑on:** [T037]
+
+- [ ] **T043 · Feature · P3: create binding 'dependency-management.md'**
+    - **Context:** Audit Gap > Core Philosophy Gaps > Dependency Management
+    - **Action:**
+        1. Create new binding `bindings/dependency-management.md` using the binding template (T002) and style guide (T003).
+        2. Cover practices for minimizing third-party dependencies and keeping them updated.
+    - **Done‑when:**
+        1. Binding exists with guidance on dependency evaluation, security auditing, and maintenance.
+        2. Front-matter is valid and derives from `simplicity` and `automation` tenets.
+    - **Depends‑on:** [T037]
+
+- [ ] **T044 · Feature · P3: create binding 'code-size.md'**
+    - **Context:** Audit Gap > Core Philosophy Gaps > Length Guidelines
+    - **Action:**
+        1. Create new binding `bindings/code-size.md` using the binding template (T002) and style guide (T003).
+        2. Provide clear guidelines on function, method, and file size limits.
+    - **Done‑when:**
+        1. Binding exists with specific, measurable criteria for appropriate code size and refactoring signals.
+        2. Front-matter is valid and derives from `simplicity` and `modularity` tenets.
+    - **Depends‑on:** [T037]
+
+- [ ] **T045 · Feature · P3: enhance binding 'use-structured-logging.md' for observability**
+    - **Context:** Audit Gap > Core Philosophy Gaps > Design for Observability
+    - **Action:**
+        1. Expand existing binding `bindings/use-structured-logging.md` to include metrics and tracing.
+        2. Add comprehensive guidance on the three pillars of observability.
+    - **Done‑when:**
+        1. Enhanced binding covers structured logging, metrics collection, and distributed tracing.
+        2. Front-matter remains valid.
+    - **Depends‑on:** [T037]
+
+### Language-Specific Bindings
+
+- [ ] **T046 · Feature · P3: create binding 'go-package-design.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Go-Specific Practices
+    - **Action:**
+        1. Create new binding `bindings/go-package-design.md` using the binding template (T002) and style guide (T003).
+        2. Focus on Go-specific package organization, naming, and structure.
+    - **Done‑when:**
+        1. Binding exists with clear guidance on Go package design aligned with the Go appendix.
+        2. Front-matter is valid and applies to Go.
+    - **Depends‑on:** [T037]
+
+- [ ] **T047 · Feature · P3: create binding 'go-interface-design.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Go-Specific Practices
+    - **Action:**
+        1. Create new binding `bindings/go-interface-design.md` using the binding template (T002) and style guide (T003).
+        2. Cover Go-specific interface design principles (small interfaces, consumer-defined, etc.).
+    - **Done‑when:**
+        1. Binding exists with practical guidance on Go interface design patterns.
+        2. Front-matter is valid and applies to Go.
+    - **Depends‑on:** [T037]
+
+- [ ] **T048 · Feature · P3: create binding 'go-concurrency-patterns.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Go-Specific Practices
+    - **Action:**
+        1. Create new binding `bindings/go-concurrency-patterns.md` using the binding template (T002) and style guide (T003).
+        2. Detail Go-specific concurrency best practices (goroutines, channels, context).
+    - **Done‑when:**
+        1. Binding exists with guidelines for safe, effective concurrency in Go.
+        2. Front-matter is valid and applies to Go.
+    - **Depends‑on:** [T037]
+
+- [ ] **T049 · Feature · P3: create binding 'ts-module-organization.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > TypeScript-Specific Practices
+    - **Action:**
+        1. Create new binding `bindings/ts-module-organization.md` using the binding template (T002) and style guide (T003).
+        2. Focus on TypeScript-specific module, import/export, and project organization.
+    - **Done‑when:**
+        1. Binding exists with guidance on TypeScript module structure aligned with the TypeScript appendix.
+        2. Front-matter is valid and applies to TypeScript.
+    - **Depends‑on:** [T037]
+
+- [ ] **T050 · Feature · P3: create binding 'ts-async-patterns.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > TypeScript-Specific Practices
+    - **Action:**
+        1. Create new binding `bindings/ts-async-patterns.md` using the binding template (T002) and style guide (T003).
+        2. Cover TypeScript-specific async/await patterns and error handling.
+    - **Done‑when:**
+        1. Binding exists with best practices for working with asynchronous code in TypeScript.
+        2. Front-matter is valid and applies to TypeScript.
+    - **Depends‑on:** [T037]
+
+- [ ] **T051 · Feature · P3: create binding 'rust-ownership-patterns.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Rust-Specific Practices
+    - **Action:**
+        1. Create new binding `bindings/rust-ownership-patterns.md` using the binding template (T002) and style guide (T003).
+        2. Focus on Rust-specific ownership, borrowing, and lifetime patterns.
+    - **Done‑when:**
+        1. Binding exists with practical guidance on effective ownership management in Rust.
+        2. Front-matter is valid and applies to Rust.
+    - **Depends‑on:** [T037]
+
+- [ ] **T052 · Feature · P3: create binding 'rust-error-handling.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Rust-Specific Practices
+    - **Action:**
+        1. Create new binding `bindings/rust-error-handling.md` using the binding template (T002) and style guide (T003).
+        2. Detail Rust-specific error handling patterns and types.
+    - **Done‑when:**
+        1. Binding exists with guidance on Result, Option, error types, and propagation in Rust.
+        2. Front-matter is valid and applies to Rust.
+    - **Depends‑on:** [T037]
+
+### Frontend-Specific Bindings
+
+- [ ] **T053 · Feature · P3: create binding 'component-architecture.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Frontend Practices
+    - **Action:**
+        1. Create new binding `bindings/component-architecture.md` using the binding template (T002) and style guide (T003).
+        2. Focus on Atomic Design principles for component organization.
+    - **Done‑when:**
+        1. Binding exists with clear component architectural principles aligned with the Frontend appendix.
+        2. Front-matter is valid and applies to frontend technologies.
+    - **Depends‑on:** [T037]
+
+- [ ] **T054 · Feature · P3: create binding 'frontend-state-management.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Frontend Practices
+    - **Action:**
+        1. Create new binding `bindings/frontend-state-management.md` using the binding template (T002) and style guide (T003).
+        2. Cover state management approaches and best practices.
+    - **Done‑when:**
+        1. Binding exists with practical guidance on different state management approaches and when to use each.
+        2. Front-matter is valid and applies to frontend technologies.
+    - **Depends‑on:** [T037]
+
+- [ ] **T055 · Feature · P3: create binding 'web-accessibility.md'**
+    - **Context:** Audit Gap > Language-Specific Gaps > Frontend Practices
+    - **Action:**
+        1. Create new binding `bindings/web-accessibility.md` using the binding template (T002) and style guide (T003).
+        2. Detail accessibility (a11y) requirements and implementation.
+    - **Done‑when:**
+        1. Binding exists with concrete requirements for meeting WCAG standards and implementation patterns.
+        2. Front-matter is valid and applies to frontend technologies.
     - **Depends‑on:** [T037]
 - [ ] **T039 · Test · P2: test effectiveness of rewritten documents with LLMs**
     - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 3. User Testing
