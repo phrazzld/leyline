@@ -170,7 +170,7 @@
         1. `tenets/no-secret-suppression.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T018 · Test · P2: run validation tools on all rewritten tenets**
+- [x] **T018 · Test · P2: run validation tools on all rewritten tenets**
     - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 2. Review and Validation
     - **Action:**
         1. Execute `tools/validate_front_matter.rb` against all rewritten tenet files (T010-T017).
