@@ -1,98 +1,156 @@
 ---
 id: ts-no-any
 last_modified: "2025-05-04"
-derived_from: simplicity
+derived_from: explicit-over-implicit
 enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
 applies_to:
   - typescript
 ---
 
-# Binding: No `any` in TypeScript
+# Binding: Make Types Explicit, Never Use `any`
 
-Never use the `any` type in TypeScript code. It defeats TypeScript's type safety system, undermines the compiler's ability to catch errors, and introduces unnecessary complexity and uncertainty into your codebase.
+Never use the `any` type in TypeScript code. Instead, always create proper type definitions that accurately describe your data structures and API contracts. The `any` type defeats TypeScript's safety mechanisms and undermines the compiler's ability to catch errors.
 
 ## Rationale
 
-This binding directly implements our simplicity tenet by eliminating a major source of accidental complexity in TypeScript codebases. When you use `any`, you're essentially creating a "type hole" that undermines TypeScript's primary benefit: static type checking. This introduces uncertainty and cognitive overhead for every developer who interacts with that code.
+This binding implements our explicit-over-implicit tenet by requiring you to clearly express types rather than hiding them behind an escape hatch.
 
-Think of TypeScript's type system as a safety net that catches errors before they reach production. When you use `any`, you're cutting holes in that safety net. These holes not only allow errors to slip through where `any` is used, but they can spread throughout your codebase as untyped values propagate, creating a cascade of uncertainty. What seems like a quick convenience in the moment becomes a significant maintenance burden over time.
+Think of TypeScript's type system like a detailed map for your code. When you mark something as `any`, it's like drawing a blank area on that map labeled "here be dragons." While explorers once used this phrase to mark unknown territories, modern software doesn't have room for such uncertainty. Each `any` type creates a blind spot where TypeScript can't provide guidance, intellisense help, or error checking. These blind spots don't stay contained—they spread outward as untyped values flow through your system, eventually affecting parts of your code that you thought were safe.
 
-The complexity cost of `any` isn't just about potential bugs. It's also about the mental overhead required to work with the code. Without proper types, developers must constantly keep implementation details in their head rather than relying on the compiler to verify correctness. This contradicts our simplicity principle by making code harder to reason about, maintain, and extend.
+Just as experienced travelers prefer detailed maps with clearly marked roads and landmarks, experienced developers prefer a codebase where types are explicit and well-defined. This clarity isn't just about preventing errors—it's about creating a self-documenting codebase where intentions and constraints are visible to everyone.
 
 ## Rule Definition
 
-The `any` type in TypeScript is essentially an escape hatch from the type system. When you declare a variable, parameter, or return type as `any`, you're telling the TypeScript compiler to stop checking types for that piece of code. This means:
+The `any` type in TypeScript is an escape hatch that effectively opts out of type checking. When you use `any`, you're telling the compiler to trust you blindly, regardless of what operations you perform. Specifically:
 
-- The compiler won't validate operations on that value
-- Properties and methods can be accessed without verification
-- The value can be assigned to any other type without warning
-- Type errors involving that value won't be caught until runtime (if ever)
+- A value of type `any` can be assigned to any other type without type checking
+- Any property can be accessed on an `any` value, regardless of whether it exists
+- Any method can be called on an `any` value, regardless of whether it's defined
+- Type errors involving `any` values are only discovered at runtime, if at all
 
-This binding prohibits using `any` in all its forms, including:
+This binding prohibits all uses of `any`, including:
 
-- Explicit declarations (`let x: any`)
-- Implicit use through disabled configuration (`noImplicitAny: false`)
-- Type assertions to `any` (`as any`)
-- Generic instantiations with `any` (`Map<string, any>`)
+- Explicit type annotations (`let x: any`)
+- Type assertions to `any` (`someValue as any`)
+- Generic type parameters using `any` (`Array<any>`)
+- Implicit `any` from disabled configuration (`noImplicitAny: false`)
 
-Consider `any` as a last resort that should trigger an immediate refactoring. In the rare case where you genuinely cannot type something (such as when interfacing with untyped third-party code), contain the `any` to the smallest possible scope and document clearly why it's necessary.
+Instead, you must use precise types like:
+
+- Concrete types (`string`, `number`, custom interfaces)
+- Union types (`string | number`) for values that could be one of several types
+- Generic types (`Array<T>`, `Map<K, V>`) for collections with consistent element types
+- `unknown` when you need a top type but want to maintain type safety
 
 ## Practical Implementation
 
-To effectively implement this binding in your TypeScript projects:
+### TypeScript Configuration
 
-1. **Configure your tooling** to prevent `any` from being introduced:
-   - Enable the TypeScript compiler option `"noImplicitAny": true` in your `tsconfig.json`
-   - Add the ESLint rule `"@typescript-eslint/no-explicit-any": "error"` to your linting configuration
-
-2. **Prefer `unknown` for top-type needs**. When you need a type that can hold any value but want to maintain type safety, use `unknown` instead of `any`. Unlike `any`, `unknown` requires type checking before you can perform operations on it:
-   ```typescript
-   // With unknown, you must verify the type before using it
-   function processInput(input: unknown): string {
-     if (typeof input === 'string') {
-       return input.toUpperCase(); // Type-safe because we've verified it's a string
+1. **Enable strict type checking** in your `tsconfig.json`:
+   ```json
+   {
+     "compilerOptions": {
+       "strict": true,
+       "noImplicitAny": true
      }
-     return String(input);
    }
    ```
 
-3. **Use union types for values that could be one of several specific types**:
-   ```typescript
-   // Union types are more precise than 'any'
-   function formatValue(value: string | number | boolean): string {
-     return String(value);
+2. **Add ESLint rules** to prevent explicit `any`:
+   ```json
+   {
+     "rules": {
+       "@typescript-eslint/no-explicit-any": "error"
+     }
    }
    ```
 
-4. **Leverage generics for flexible, type-safe functions and interfaces**:
+### Alternative Approaches
+
+1. **Use `unknown` instead of `any` for values of uncertain type**:
    ```typescript
-   // Generics preserve type information
-   function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
-     return obj[key];
+   // Instead of:
+   function process(data: any): void { /* ... */ }
+
+   // Use:
+   function process(data: unknown): void {
+     // Must verify type before using
+     if (typeof data === 'string') {
+       console.log(data.toUpperCase());
+     } else if (Array.isArray(data)) {
+       data.forEach(item => console.log(item));
+     }
    }
    ```
 
-5. **Create proper interfaces** for structured data. When working with objects, define interfaces that accurately describe their structure:
+2. **Create proper interfaces for structured data**:
    ```typescript
+   // Instead of:
+   function processUser(user: any): void { /* ... */ }
+
+   // Use:
    interface User {
      id: string;
      name: string;
      email?: string;
    }
-   
-   function processUser(user: User): void {
-     // TypeScript ensures we're using valid properties
+
+   function processUser(user: User): void { /* ... */ }
+   ```
+
+3. **Use union types for values that could be one of several types**:
+   ```typescript
+   // Instead of:
+   function getLength(value: any): number { /* ... */ }
+
+   // Use:
+   function getLength(value: string | Array<unknown>): number {
+     return value.length;
    }
    ```
 
-6. **For existing code with `any`**, incrementally refactor using the strategies above. Start with the most critical paths and areas with the most reuse, as these will give the biggest return on investment.
+4. **Use generics for flexible, type-safe functions**:
+   ```typescript
+   // Instead of:
+   function getProperty(obj: any, key: string): any { /* ... */ }
+
+   // Use:
+   function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+     return obj[key];
+   }
+   ```
+
+5. **For third-party libraries without types, use declaration files or minimally-scoped type assertions**:
+   ```typescript
+   // Instead of:
+   import * as untyped from 'untyped-library';
+   const result = untyped.someFunction() as any;
+
+   // Create types:
+   declare module 'untyped-library' {
+     export function someFunction(): SomeReturnType;
+   }
+   
+   // Or use type assertions scoped to the minimum needed interface:
+   import * as untyped from 'untyped-library';
+   interface SomeReturnType { id: string; value: number; }
+   const result = untyped.someFunction() as SomeReturnType;
+   ```
+
+### Key Benefits
+
+- **Better error detection** — Catch type errors at compile time instead of runtime
+- **Improved IDE support** — Get accurate autocomplete and inline documentation
+- **Self-documenting code** — Types serve as live documentation that can't get outdated
+- **Safer refactoring** — The compiler will flag affected areas when you change types
+- **Fewer runtime bugs** — Many common errors become impossible when proper typing is enforced
 
 ## Examples
 
 ```typescript
-// ❌ BAD: Using 'any' creates type holes
+// ❌ BAD: Using 'any' creates dangerous type holes
 function processData(data: any): any {
-  return data.value * 2; // No type checking! This could easily crash
+  return data.value * 2; // No type checking! This could crash at runtime
 }
 
 const result = processData("not an object"); // Runtime error: Cannot read property 'value' of undefined
@@ -109,12 +167,12 @@ function processData(data: DataWithValue): number {
   return data.value * 2; // Type safe!
 }
 
-// TypeScript would catch this error during compilation
+// This would error during compilation, preventing runtime issues
 // const result = processData("not an object"); // Error: Argument of type 'string' is not assignable to parameter of type 'DataWithValue'
 
 const validData = { value: 5 };
-const result = processData(validData); // Works as expected
-const total: number = result + 10; // Type safe
+const result = processData(validData); // Works as expected: result = 10
+const total: number = result + 10; // Total = 20, type safe
 ```
 
 ```typescript
@@ -159,7 +217,7 @@ function handleEvent(event: any) {
 ```typescript
 // ✅ GOOD: Using 'unknown' with type guards for uncertain parameters
 function handleEvent(event: unknown) {
-  // We need to check what kind of event this is
+  // Type guard to check what kind of event this is
   if (isMouseEvent(event)) {
     event.stopPropagation();
     console.log('Mouse position:', event.clientX, event.clientY);
@@ -179,10 +237,45 @@ function isKeyboardEvent(event: unknown): event is KeyboardEvent {
 }
 ```
 
+## Real-World Impact Example
+
+Here's a subtle bug that TypeScript's type system would catch if you avoid `any`:
+
+```typescript
+// With 'any', this silent bug makes it to production:
+function processUserInput(input: any) {
+  if (input.isValid) {
+    saveToDatabase(input.userData);
+  }
+}
+
+// Someone calls the function with a typo:
+processUserInput({ isvalid: true, userData: { name: "User" } }); // Note lowercase 'v' in 'isvalid'
+
+// Result: Nothing gets saved, but no errors are thrown - silent failure!
+```
+
+With proper typing, this bug would be caught at compile time:
+
+```typescript
+interface UserInput {
+  isValid: boolean;
+  userData: { name: string };
+}
+
+function processUserInput(input: UserInput) {
+  if (input.isValid) {
+    saveToDatabase(input.userData);
+  }
+}
+
+// TypeScript error: Property 'isValid' is missing in type '{ isvalid: boolean; userData: { name: string; }; }'
+processUserInput({ isvalid: true, userData: { name: "User" } });
+```
+
 ## Related Bindings
 
-- [immutable-by-default](/bindings/immutable-by-default.md): Works together with this binding to reduce complexity by making data flow more predictable; both bindings eliminate common sources of runtime errors.
-
-- [hex-domain-purity](/bindings/hex-domain-purity.md): Complements this binding by ensuring domain logic remains pure and well-typed, further enhancing code safety and simplicity.
-
-- [no-lint-suppression](/bindings/no-lint-suppression.md): Reinforces this binding by preventing teams from bypassing type checking rules with lint suppressions or similar mechanisms.
+- [external-configuration](./external-configuration.md) - Type safety extends to configuration, preventing undefined configuration values from causing runtime failures
+- [immutable-by-default](./immutable-by-default.md) - Type safety works best with immutable data, creating a stronger guarantee of correctness
+- [no-lint-suppression](./no-lint-suppression.md) - Enforces that developers don't suppress TypeScript type errors or linter warnings without documented justification
+- [hex-domain-purity](./hex-domain-purity.md) - Well-typed domain code ensures business logic operates on valid, properly structured data

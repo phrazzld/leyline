@@ -276,7 +276,7 @@
         1. `bindings/go-error-wrapping.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T030 · Feature · P2: rewrite binding 'ts-no-any.md'**
+- [x] **T030 · Feature · P2: rewrite binding 'ts-no-any.md'**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 2. Rewrite Language-Specific Bindings
     - **Action:**
         1. Apply finalized binding template (T008) and style guide (T003) to rewrite `bindings/ts-no-any.md`.
