@@ -56,7 +56,7 @@
     - **Verification:**
         1. Run script against sample files and confirm correct index output.
     - **Depends‑on:** [T001, T002]
-- [ ] **T006 · Feature · P1: rewrite tenet 'simplicity.md' as prototype**
+- [x] **T006 · Feature · P1: rewrite tenet 'simplicity.md' as prototype**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 2. Prototype Rewrites
     - **Action:**
         1. Rewrite content of `tenets/simplicity.md` using the tenet template (T001) and style guide (T003).
