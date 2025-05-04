@@ -220,7 +220,7 @@
         1. `bindings/external-configuration.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T023 · Feature · P2: rewrite binding 'hex-domain-purity.md'**
+- [x] **T023 · Feature · P2: rewrite binding 'hex-domain-purity.md'**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 1. Rewrite Language-Agnostic Bindings
     - **Action:**
         1. Apply finalized binding template (T008) and style guide (T003) to rewrite `bindings/hex-domain-purity.md`.
