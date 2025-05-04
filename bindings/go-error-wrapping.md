@@ -1,34 +1,112 @@
 ---
 id: go-error-wrapping
-last_modified: "2025-05-02"
-derived_from: automation
+last_modified: "2025-05-04"
+derived_from: explicit-over-implicit
 enforced_by: golangci-lint("wrapcheck") & code review
 applies_to:
   - go
 ---
 
-# Binding: Wrap Errors with Context
+# Binding: Add Context to Errors as They Travel Upward
 
-All errors propagated across package boundaries must be wrapped with contextual information using `fmt.Errorf("context: %w", err)` or a custom error type. This provides critical context for debugging and error handling.
+When errors cross package boundaries in Go, wrap them with contextual information using `fmt.Errorf("context: %w", err)` or custom error types. Never return raw errors from exported functions.
 
 ## Rationale
 
-Raw unwrapped errors lack context about what operation failed, making debugging difficult. By systematically wrapping errors with context about the operation that failed, we create more actionable error messages that include the chain of operations leading to the failure, while preserving the ability to check error types.
+This binding implements our explicit-over-implicit tenet by making error context and propagation paths visible rather than hidden.
 
-## Enforcement
+Think of error wrapping like a travel journal for an error's journey through your codebase. When a raw error travels across your application without being wrapped, it's like a mysterious visitor with no record of where they've been or what they were trying to do. By wrapping the error at each significant boundary—adding an entry to its travel journal—you create a clear path of breadcrumbs showing exactly where it originated and what operations failed along the way.
 
-This binding is enforced by:
+## Rule Definition
 
-1. The `wrapcheck` linter in golangci-lint
-2. Code review requiring proper error wrapping
+Error wrapping means adding contextual information to an error as it travels up the call stack, while preserving the original error for type checking and root cause analysis. At minimum, this context should include:
 
-## Guidelines
+1. The operation that was attempted (e.g., "fetching user profile")
+2. Any relevant identifiers (e.g., user IDs, record numbers)
+3. Additional information that would help with debugging
 
-1. **Add meaningful context**: Include what operation was attempted and relevant identifiers.
-2. **Use the `%w` verb**: Always use `fmt.Errorf("context: %w", err)` to preserve the original error for unwrapping.
-3. **Wrap at package boundaries**: Always wrap errors when returning them from exported functions.
-4. **Don't wrap internal errors**: Generally avoid wrapping within private functions of the same package.
-5. **Use custom error types** when additional structured data is needed.
+This binding specifically requires:
+
+- **Always wrap errors at package boundaries**: Any error returned from an exported function must be wrapped with context
+- **Use the `%w` verb with fmt.Errorf**: This preserves the original error for later unwrapping and type checking
+- **Custom error types must implement Unwrap()**: If using custom error types, they must properly implement the Unwrap() method
+- **Don't wrap errors within package internals**: Internal functions generally don't need to wrap errors unless additional context is truly valuable
+
+## Practical Implementation
+
+### When to Wrap Errors
+
+Always wrap errors when:
+- Returning an error from an exported function
+- Crossing major component boundaries
+- Adding significant context would help with debugging
+
+Generally avoid wrapping when:
+- The error is already wrapped with the same context
+- The function is internal to a package and doesn't add meaningful context
+- Creating sentinel errors meant to be checked by type/value (these should be returned directly)
+
+### Implementation Patterns
+
+1. **Simple wrapping with fmt.Errorf**:
+   ```go
+   if err != nil {
+       return fmt.Errorf("operation description: %w", err)
+   }
+   ```
+
+2. **Custom error types** (when you need to include structured data):
+   ```go
+   type MyError struct {
+       Operation string
+       ResourceID string
+       Err error
+   }
+
+   func (e *MyError) Error() string {
+       return fmt.Sprintf("%s %s: %v", e.Operation, e.ResourceID, e.Err)
+   }
+
+   func (e *MyError) Unwrap() error {
+       return e.Err
+   }
+   ```
+
+3. **Error handling with wrapping**:
+   ```go
+   // Working with wrapped errors
+   if errors.Is(err, sql.ErrNoRows) {
+       // Handle specific error type
+   }
+   
+   var myErr *MyError
+   if errors.As(err, &myErr) {
+       // Access fields in custom error
+   }
+   ```
+
+### Common Mistakes to Avoid
+
+1. **Losing the original error**:
+   ```go
+   // ❌ BAD: Lost original error
+   return fmt.Errorf("operation failed: %v", err) // Using %v loses error type
+   ```
+
+2. **Wrapping with insufficient context**:
+   ```go
+   // ❌ BAD: Too generic
+   return fmt.Errorf("failed: %w", err) // Not enough context
+   ```
+
+3. **Duplicate wrapping**:
+   ```go
+   // ❌ BAD: Duplicate context
+   if err != nil {
+       wrappedErr := fmt.Errorf("getting user: %w", err)
+       return fmt.Errorf("getting user: %w", wrappedErr) // Redundant
+   }
+   ```
 
 ## Examples
 
@@ -40,6 +118,7 @@ func ProcessOrder(id string) error {
         return err // No context about what failed
     }
     // ...
+    return nil
 }
 
 // ✅ GOOD: Wrapping with context 
@@ -48,17 +127,27 @@ func ProcessOrder(id string) error {
     if err != nil {
         return fmt.Errorf("fetching order %s: %w", id, err)
     }
-    // ...
+    
+    if err := order.Validate(); err != nil {
+        return fmt.Errorf("validating order %s: %w", id, err)
+    }
+    
+    if err := payment.Process(order); err != nil {
+        return fmt.Errorf("processing payment for order %s: %w", id, err)
+    }
+    
+    return nil
 }
 
-// ✅ ALSO GOOD: Custom error type with context
+// ✅ GOOD: Custom error type with structured context
 type OrderError struct {
     OrderID string
-    Err     error
+    Operation string
+    Err error
 }
 
 func (e *OrderError) Error() string {
-    return fmt.Sprintf("order %s: %v", e.OrderID, e.Err)
+    return fmt.Sprintf("order %s - %s: %v", e.OrderID, e.Operation, e.Err)
 }
 
 func (e *OrderError) Unwrap() error {
@@ -68,13 +157,36 @@ func (e *OrderError) Unwrap() error {
 func ProcessOrder(id string) error {
     order, err := db.GetOrder(id)
     if err != nil {
-        return &OrderError{OrderID: id, Err: err}
+        return &OrderError{
+            OrderID: id,
+            Operation: "database fetch",
+            Err: err,
+        }
     }
     // ...
+    return nil
 }
 ```
 
+### Error Trace Example
+
+Here's how a wrapped error trace might look with proper context added at each level:
+
+```
+failed to process customer request: fetching order details for order 12345: connecting to order database: dial tcp: connection refused
+```
+
+This error trace tells us:
+1. What high-level operation failed (processing customer request)
+2. What specific step failed (fetching order details)
+3. Which order was affected (12345)
+4. What lower-level operation failed (connecting to database)
+5. The root cause (connection refused)
+
+Without proper wrapping, we might only see "connection refused" with no context.
+
 ## Related Bindings
 
-- [go-error-handling.md](./go-error-handling.md) - General error handling patterns
-- [go-error-sentinel.md](./go-error-sentinel.md) - When to use sentinel errors
+- [use-structured-logging](./use-structured-logging.md) - Error context should be included in logs using structured formats
+- [external-configuration](./external-configuration.md) - Error messages shouldn't contain hardcoded configuration values
+- [hex-domain-purity](./hex-domain-purity.md) - Domain logic shouldn't depend on specific error implementation details

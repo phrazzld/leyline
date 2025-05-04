@@ -268,7 +268,7 @@
         1. `bindings/use-structured-logging.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T029 · Feature · P2: rewrite binding 'go-error-wrapping.md'**
+- [x] **T029 · Feature · P2: rewrite binding 'go-error-wrapping.md'**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 2. Rewrite Language-Specific Bindings
     - **Action:**
         1. Apply finalized binding template (T008) and style guide (T003) to rewrite `bindings/go-error-wrapping.md`.
