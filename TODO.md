@@ -327,7 +327,7 @@
     - **Verification:**
         1. Review contributing guide for accuracy and clarity.
     - **Depends‑on:** [T003, T008, T020, T033]
-- [ ] **T035 · Feature · P2: create documentation for LLM integration approaches**
+- [x] **T035 · Feature · P2: create documentation for LLM integration approaches**
     - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 1. Update Documentation
     - **Action:**
         1. Create `docs/LLM_INTEGRATION.md` outlining strategies for using rewritten documents as LLM context.
