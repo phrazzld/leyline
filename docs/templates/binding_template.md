@@ -1,10 +1,10 @@
 ---
 id: binding-id  # Unique identifier for this binding (kebab-case)
-last_modified: "YYYY-MM-DD"  # ISO format date of last modification
-derived_from: parent-tenet-id  # ID of the parent tenet this binding implements
+last_modified: "2025-05-04"  # ISO format date of last modification (YYYY-MM-DD)
+derived_from: simplicity  # ID of the parent tenet this binding implements (must be an existing tenet ID)
 enforced_by: [enforcement mechanism]  # Tool, rule, or process that enforces this binding
 applies_to:  # Languages or contexts where this binding applies
-  - language/context
+  - typescript  # Valid values: typescript, javascript, go, rust, python, java, csharp, ruby, frontend, backend, mobile, desktop, cli, library, service, all
 ---
 
 # Binding: [Rule Name]

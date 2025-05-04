@@ -1,6 +1,6 @@
 ---
 id: tenet-id  # Unique identifier for this tenet (kebab-case)
-last_modified: "YYYY-MM-DD"  # ISO format date of last modification
+last_modified: "2025-05-04"  # ISO format date of last modification (YYYY-MM-DD)
 ---
 
 # Tenet: [Principle Name]

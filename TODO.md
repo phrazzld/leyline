@@ -32,7 +32,7 @@
     - **Verification:**
         1. Peer review style guide against PLAN.md guidelines.
     - **Depends‑on:** none
-- [ ] **T004 · Chore · P1: review and update front-matter validation tool**
+- [x] **T004 · Chore · P1: review and update front-matter validation tool**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 3. Update Validation Tools & Risk Assessment (Breaking tooling)
     - **Action:**
         1. Review `tools/validate_front_matter.rb` for compatibility with new template front-matter.
