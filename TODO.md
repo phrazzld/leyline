@@ -204,7 +204,7 @@
     - **Depends‑on:** [T005, T018, T019]
 
 ## Phase 3: Binding Rewrites
-- [ ] **T021 · Feature · P2: rewrite binding 'dependency-inversion.md'**
+- [x] **T021 · Feature · P2: rewrite binding 'dependency-inversion.md'**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 1. Rewrite Language-Agnostic Bindings
     - **Action:**
         1. Apply finalized binding template (T008) and style guide (T003) to rewrite `bindings/dependency-inversion.md`.
