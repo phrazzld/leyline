@@ -146,7 +146,7 @@
         1. `tenets/explicit-over-implicit.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T015 · Feature · P2: rewrite tenet 'automation.md'**
+- [x] **T015 · Feature · P2: rewrite tenet 'automation.md'**
     - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
     - **Action:**
         1. Apply finalized tenet template (T008) and style guide (T003) to rewrite `tenets/automation.md`.
