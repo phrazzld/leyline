@@ -180,7 +180,7 @@
     - **Verification:**
         1. Check validation logs for success.
     - **Depends‑on:** [T009, T010, T011, T012, T013, T014, T015, T017]
-- [ ] **T019 · Chore · P2: perform peer review of rewritten tenets**
+- [x] **T019 · Chore · P2: perform peer review of rewritten tenets**
     - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 2. Review and Validation
     - **Action:**
         1. Conduct peer reviews for each rewritten tenet (T010-T017).
