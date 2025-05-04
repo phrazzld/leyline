@@ -191,7 +191,7 @@
     - **Verification:**
         1. Review comments addressed or documented.
     - **Depends‑on:** [T010, T011, T012, T013, T014, T015, T016, T017]
-- [ ] **T020 · Chore · P2: update tenet index**
+- [x] **T020 · Chore · P2: update tenet index**
     - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 2. Review and Validation
     - **Action:**
         1. Run the `tools/reindex.rb` script (T005) to update the tenet index file.

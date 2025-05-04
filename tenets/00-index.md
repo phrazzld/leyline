@@ -4,11 +4,11 @@ This file contains an automatically generated list of all tenets with their one-
 
 | ID | Summary |
 |---|---|
-| [automation](./automation.md) | Automation reduces manual error, ensures consistency, frees up developer time, provides faster feedback, and makes processes repeatable and reliabl... |
-| [document-decisions](./document-decisions.md) | Code mechanics change; comments detailing "how" quickly become outdated or redundant. The reasoning behind decisions provides enduring value. Self-... |
-| [explicit-over-implicit](./explicit-over-implicit.md) | Explicit code is easier to understand, reason about, debug, and refactor safely. Implicit behavior obscures dependencies, hinders tracing, and lead... |
-| [maintainability](./maintainability.md) | Most development time is spent reading/maintaining existing code, not writing new code. Premature optimization often adds complexity, obscures inte... |
-| [modularity](./modularity.md) | Modularity tames complexity, enables parallel development, independent testing/deployment, reuse, fault isolation, and easier evolution. Properly m... |
-| [no-secret-suppression](./no-secret-suppression.md) | Quality gates and static analysis tools are critical safeguards that help prevent defects and maintain consistent code quality. Suppressing these s... |
-| [simplicity](./simplicity.md) | Simplicity is not just a goal but a fundamental requirement for building high-quality, maintainable software. Simple code is easier to understand, ... |
-| [testability](./testability.md) | Automated tests build confidence, prevent regressions, enable safe refactoring, and act as executable documentation. Code difficult to test often i... |
+| [automation](./automation.md) | Automation is fundamentally about respecting the scarcity of human attention and creativity. When you automate repetitive tasks, you're making a st... |
+| [document-decisions](./document-decisions.md) | Software development is fundamentally a decision-making process. Each line of code represents a series of choices—about algorithms, data structures... |
+| [explicit-over-implicit](./explicit-over-implicit.md) | Software development is fundamentally about managing complexity, and explicitness is one of our most powerful tools for doing so. When code is expl... |
+| [maintainability](./maintainability.md) | Most of a software project's lifetime is spent in maintenance mode. The code you write today will be read, modified, and debugged dozens or hundred... |
+| [modularity](./modularity.md) | Modularity is the fundamental approach for taming complexity in software systems. When you design your code as a collection of well-defined, indepe... |
+| [no-secret-suppression](./no-secret-suppression.md) | Software quality tools—linters, type checkers, test suites, security scanners—represent your first and most reliable line of defense against defect... |
+| [simplicity](./simplicity.md) | Simplicity is a fundamental requirement for building high-quality, maintainable software, not just a nice-to-have goal. When you write simple code,... |
+| [testability](./testability.md) | Testable code is inherently better code. When you design your systems with testability in mind, you're not just making testing easier—you're creati... |
