@@ -69,7 +69,7 @@
         1. Run `tools/validate_front_matter.rb` on the rewritten file.
         2. Peer review prototype for clarity and adherence to guidelines.
     - **Depends‑on:** [T001, T003, T004]
-- [ ] **T007 · Feature · P1: rewrite binding 'ts-no-any.md' as prototype**
+- [x] **T007 · Feature · P1: rewrite binding 'ts-no-any.md' as prototype**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 2. Prototype Rewrites
     - **Action:**
         1. Rewrite content of `bindings/ts-no-any.md` using the binding template (T002) and style guide (T003).
