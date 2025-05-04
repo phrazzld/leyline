@@ -337,7 +337,7 @@
     - **Verification:**
         1. Peer review documentation for usefulness.
     - **Depends‑on:** [T020, T033]
-- [ ] **T036 · Feature · P2: document examples of tenet/binding usage in LLM prompts**
+- [x] **T036 · Feature · P2: document examples of tenet/binding usage in LLM prompts**
     - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 1. Update Documentation
     - **Action:**
         1. Add concrete examples of prompts using rewritten documents to `docs/LLM_INTEGRATION.md` (T035).

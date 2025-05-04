@@ -229,6 +229,295 @@ Consider integrating with development environments:
 4. **Context Collapse**: Very large contexts may cause models to lose focus on specific principles
 5. **Prioritization**: Models may struggle to prioritize when principles conflict
 
+## Concrete Examples
+
+Below are practical examples of how to use tenets and bindings effectively with LLMs for different use cases. These examples include actual content from Leyline documents with complete prompts you can adapt for your needs.
+
+### Example 1: Code Review Against Simplicity Tenet
+
+This example shows how to review code for compliance with the Simplicity tenet.
+
+```
+I'll provide you with code that needs review according to our development principles.
+First, I'll share our Simplicity tenet, then the code to review.
+
+TENET: # Tenet: Simplicity Above All
+
+Prefer the simplest design that solves the problem completely. Complexity is the root cause of most software defects, maintenance challenges, and cognitive overload. Rigorously seek solutions with the fewest moving parts.
+
+## Core Belief
+
+Simplicity is a fundamental requirement for building high-quality, maintainable software, not just a nice-to-have goal. When you write simple code, you're making an investment in the future health of your project. Simple code is easier to understand when you return to it months later, easier to debug when something goes wrong, and easier to extend when requirements change.
+
+## Warning Signs
+
+- **Over-engineering solutions** by creating elaborate frameworks or systems for simple problems. If you're building infrastructure that far exceeds current requirements, you're likely introducing unnecessary complexity.
+- **Designing for imagined future requirements** rather than actual needs. Focus on solving today's real problems, not tomorrow's hypothetical ones.
+- **Premature abstraction** before seeing multiple concrete use cases. Wait until you see the same pattern at least three times before abstracting.
+- **Implementing overly clever or obscure code** that requires significant mental effort to understand.
+- **Deep nesting (> 2-3 levels)** of conditionals, loops, or functions, creating code that requires keeping multiple contexts in mind simultaneously.
+
+CODE TO REVIEW:
+```typescript
+class DataProcessor {
+  private cache = new Map<string, any>();
+  private processors: Map<string, (data: any) => any> = new Map();
+  private static instance: DataProcessor;
+
+  private constructor() {
+    // Initialize with default processors
+    this.processors.set("uppercase", (data: string) => data.toUpperCase());
+    this.processors.set("lowercase", (data: string) => data.toLowerCase());
+    this.processors.set("reverse", (data: string) => data.split("").reverse().join(""));
+  }
+
+  public static getInstance(): DataProcessor {
+    if (!DataProcessor.instance) {
+      DataProcessor.instance = new DataProcessor();
+    }
+    return DataProcessor.instance;
+  }
+
+  public registerProcessor(name: string, processor: (data: any) => any): void {
+    this.processors.set(name, processor);
+  }
+
+  public process(data: any, operations: string[]): any {
+    const cacheKey = JSON.stringify({ data, operations });
+    
+    if (this.cache.has(cacheKey)) {
+      return this.cache.get(cacheKey);
+    }
+
+    let result = data;
+    
+    for (const op of operations) {
+      const processor = this.processors.get(op);
+      if (processor) {
+        result = processor(result);
+      }
+    }
+    
+    this.cache.set(cacheKey, result);
+    return result;
+  }
+
+  public clearCache(): void {
+    this.cache.clear();
+  }
+}
+
+// Usage
+const processor = DataProcessor.getInstance();
+processor.registerProcessor("double", (data: string) => data + data);
+const result = processor.process("hello", ["uppercase", "double"]);
+console.log(result); // HELLOHELLO
+```
+
+Please review this code based on the Simplicity tenet. For each issue:
+1. Identify the specific principle or rule that's violated
+2. Explain why it's problematic
+3. Suggest a concrete improvement
+```
+
+### Example 2: Error Handling Guidance with Go Error Wrapping Binding
+
+This example shows how to request guidance on implementing proper error handling in Go.
+
+```
+I'm implementing a Go service that interacts with a database and external API. 
+Please help me design proper error handling based on our binding document below.
+
+BINDING: # Binding: Add Context to Errors as They Travel Upward
+
+When errors cross package boundaries in Go, wrap them with contextual information using `fmt.Errorf("context: %w", err)` or custom error types. Never return raw errors from exported functions.
+
+## Rationale
+
+Think of error wrapping like a travel journal for an error's journey through your codebase. When a raw error travels across your application without being wrapped, it's like a mysterious visitor with no record of where they've been or what they were trying to do. By wrapping the error at each significant boundary—adding an entry to its travel journal—you create a clear path of breadcrumbs showing exactly where it originated and what operations failed along the way.
+
+## Rule Definition
+
+Error wrapping means adding contextual information to an error as it travels up the call stack, while preserving the original error for type checking and root cause analysis. At minimum, this context should include:
+
+1. The operation that was attempted (e.g., "fetching user profile")
+2. Any relevant identifiers (e.g., user IDs, record numbers)
+3. Additional information that would help with debugging
+
+## Practical Implementation
+
+### When to Wrap Errors
+
+Always wrap errors when:
+- Returning an error from an exported function
+- Crossing major component boundaries
+- Adding significant context would help with debugging
+
+Generally avoid wrapping when:
+- The error is already wrapped with the same context
+- The function is internal to a package and doesn't add meaningful context
+- Creating sentinel errors meant to be checked by type/value (these should be returned directly)
+
+I need to implement a function that:
+1. Fetches user data from a database
+2. Calls an external API to get additional user information
+3. Combines and returns the results
+
+Please provide a code example showing proper error handling according to our binding, including:
+- Appropriate error wrapping at package boundaries
+- Custom error types if beneficial
+- Examples of checking for specific error types
+```
+
+### Example 3: Refactoring TypeScript Code to Remove 'any' Types
+
+This example demonstrates using the ts-no-any binding to guide refactoring.
+
+```
+I need to refactor this TypeScript code to remove all uses of 'any' according to our binding.
+
+BINDING: # Binding: Make Types Explicit, Never Use `any`
+
+Never use the `any` type in TypeScript code. Instead, always create proper type definitions that accurately describe your data structures and API contracts. The `any` type defeats TypeScript's safety mechanisms and undermines the compiler's ability to catch errors.
+
+## Rationale
+
+Think of TypeScript's type system like a detailed map for your code. When you mark something as `any`, it's like drawing a blank area on that map labeled "here be dragons." While explorers once used this phrase to mark unknown territories, modern software doesn't have room for such uncertainty. Each `any` type creates a blind spot where TypeScript can't provide guidance, intellisense help, or error checking.
+
+## Alternative Approaches
+
+1. **Use `unknown` instead of `any` for values of uncertain type**
+2. **Create proper interfaces for structured data**
+3. **Use union types for values that could be one of several types**
+4. **Use generics for flexible, type-safe functions**
+5. **For third-party libraries without types, use declaration files or minimally-scoped type assertions**
+
+CODE TO REFACTOR:
+```typescript
+function processApiResponse(response: any): any {
+  const results = response.data || [];
+  return results.map((item: any) => {
+    return {
+      id: item.id,
+      name: item.name,
+      value: item.count * 2,
+      metadata: item.meta
+    };
+  });
+}
+
+async function fetchAndProcess(url: string): Promise<any> {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    return processApiResponse(data);
+  } catch (error: any) {
+    console.error("Error fetching data:", error.message);
+    return [];
+  }
+}
+
+function handleData(callback: (data: any) => any): void {
+  const data = { foo: "bar" };
+  const result = callback(data);
+  console.log(result);
+}
+```
+
+Please refactor this code to remove all 'any' types, following our binding principles. For each change:
+1. Explain what type you're using instead of 'any'
+2. Why that type is appropriate
+3. How it improves type safety
+```
+
+### Example 4: Architecture Evaluation with Explicit-over-Implicit Tenet
+
+This example shows how to evaluate an architecture design against the Explicit-over-Implicit tenet.
+
+```
+I'm designing an architecture for a new service and want to ensure it follows our Explicit-over-Implicit tenet. Please evaluate my approach and suggest improvements.
+
+TENET: # Tenet: Explicit is Better than Implicit
+
+Make code behavior obvious by clearly expressing dependencies, data flow, control flow, contracts, and side effects. Favor code that states its intentions directly over "magical" solutions, even when explicitness requires more code or initial effort.
+
+## Core Belief
+
+Software development is fundamentally about managing complexity, and explicitness is one of our most powerful tools for doing so. When code is explicit, its behavior, assumptions, and dependencies are visible on the surface rather than hidden beneath layers of abstraction or convention.
+
+## Practical Guidelines
+
+1. **Make Dependencies Explicit**: Express dependencies directly rather than accessing them through global state, ambient context, or hidden singletons.
+
+2. **Reveal Control Flow**: Structure code so the path of execution is clear and obvious.
+
+3. **Signal Side Effects**: Make it obvious when a function or method does more than compute a return value.
+
+4. **Express Contracts Clearly**: Define the expectations and guarantees of each component explicitly.
+
+5. **Choose Clarity Over Convenience**: Prioritize code that clearly communicates its intent over code that saves a few keystrokes.
+
+## Warning Signs
+
+- **"Magic" behavior** that happens automatically without clear indication in the code
+- **Global state or hidden singletons** that components access implicitly
+- **Undocumented assumptions about execution context** or environment
+- **Complex inheritance hierarchies or mixins** that make behavior difficult to trace
+
+MY ARCHITECTURE PROPOSAL:
+
+I'm designing a service that processes financial transactions with these components:
+
+1. HTTP API Layer: Express.js controllers that accept requests
+2. Service Layer: Contains business logic using a service locator pattern
+3. Data Access Layer: Repositories for database operations
+4. Shared Utilities: Global logger, config, and error handlers
+
+Key aspects:
+- Services discover dependencies through a central registry
+- Configuration loaded from environment variables at startup
+- Authentication middleware automatically attaches user info to request objects
+- Database connection managed by a singleton pool
+- Aspect-oriented programming for cross-cutting concerns like logging
+
+Please evaluate this architecture against our Explicit-over-Implicit tenet and suggest improvements to make it more explicit.
+```
+
+### Example 5: Combining Multiple Bindings for Code Generation
+
+This example demonstrates combining multiple bindings to guide code generation.
+
+```
+Please help me generate code for a new Go function based on several of our bindings.
+
+BINDING 1: # Binding: Add Context to Errors as They Travel Upward
+
+When errors cross package boundaries in Go, wrap them with contextual information using `fmt.Errorf("context: %w", err)` or custom error types. Never return raw errors from exported functions.
+
+BINDING 2: # Binding: Immutable by Default
+
+Design data structures to be immutable by default. Modification operations should return new copies rather than mutating existing data. Only permit mutation when there's a clear performance need and the scope of mutation is tightly controlled.
+
+BINDING 3: # Binding: Use Structured Logging
+
+Always use structured logging (with key-value pairs) instead of string interpolation or string concatenation in log messages. Every log statement must include appropriate context and correlation IDs to enable trace aggregation.
+
+TASK:
+I need to implement a function that processes a batch of customer records, validates them, and returns an error report. The function should:
+
+1. Accept a slice of customer records
+2. Validate each record against business rules
+3. Return a report containing invalid records and errors
+4. Follow all the bindings above
+
+Please generate the function with appropriate:
+- Error handling with proper context
+- Immutable data processing
+- Structured logging
+- Well-defined types
+- Documentation comments
+```
+
 ## Future Directions
 
 As LLM technology evolves, consider:
