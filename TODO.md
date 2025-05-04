@@ -305,7 +305,7 @@
     - **Verification:**
         1. Review comments addressed or documented.
     - **Depends‑on:** [T021, T022, T023, T024, T025, T026, T027, T028, T029, T030]
-- [ ] **T033 · Chore · P2: update binding index**
+- [x] **T033 · Chore · P2: update binding index**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 3. Review and Validation
     - **Action:**
         1. Run the `tools/reindex.rb` script (T005) to update the binding index file.
