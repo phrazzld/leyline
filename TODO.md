@@ -346,7 +346,7 @@
     - **Verification:**
         1. Test example prompts with an LLM to ensure they work as intended.
     - **Depends‑on:** [T035]
-- [ ] **T037 · Chore · P2: audit source philosophy documents for coverage**
+- [x] **T037 · Chore · P2: audit source philosophy documents for coverage**
     - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 2. Audit for Completeness
     - **Action:**
         1. Systematically compare rewritten tenets and bindings against original source philosophy documents.
