@@ -106,7 +106,7 @@
     - **Depends‑on:** [T004, T005, T006, T007, T008]
 
 ## Phase 2: Tenet Rewrites
-- [ ] **T010 · Feature · P2: rewrite tenet 'simplicity.md'**
+- [x] **T010 · Feature · P2: rewrite tenet 'simplicity.md'**
     - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
     - **Action:**
         1. Apply finalized tenet template (T008) and style guide (T003) to rewrite `tenets/simplicity.md`.
