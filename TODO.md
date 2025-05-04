@@ -93,7 +93,7 @@
     - **Verification:**
         1. Re-validate prototype documents against refined templates.
     - **Depends‑on:** [T006, T007]
-- [ ] **T009 · Test · P1: test validation and index tools with prototype documents**
+- [x] **T009 · Test · P1: test validation and index tools with prototype documents**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 3. Update Validation Tools
     - **Action:**
         1. Run updated `tools/validate_front_matter.rb` (T004) against prototypes (T006, T007).
