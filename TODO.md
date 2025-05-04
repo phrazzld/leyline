@@ -252,7 +252,7 @@
         1. `bindings/no-lint-suppression.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T027 · Feature · P2: rewrite binding 'require-conventional-commits.md'**
+- [x] **T027 · Feature · P2: rewrite binding 'require-conventional-commits.md'**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 1. Rewrite Language-Agnostic Bindings
     - **Action:**
         1. Apply finalized binding template (T008) and style guide (T003) to rewrite `bindings/require-conventional-commits.md`.
