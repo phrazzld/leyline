@@ -284,7 +284,7 @@
         1. `bindings/ts-no-any.md` is rewritten in the final new format.
         2. Front-matter is valid per T004.
     - **Depends‑on:** [T003, T008, T004]
-- [ ] **T031 · Test · P2: run validation tools on all rewritten bindings**
+- [x] **T031 · Test · P2: run validation tools on all rewritten bindings**
     - **Context:** PLAN.md > Phase 3: Binding Rewrites > 3. Review and Validation
     - **Action:**
         1. Execute `tools/validate_front_matter.rb` against all rewritten binding files (T021-T030).
