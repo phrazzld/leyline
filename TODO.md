@@ -44,7 +44,7 @@
     - **Verification:**
         1. Run script against template files and confirm correct validation/errors.
     - **Depends‑on:** [T001, T002]
-- [ ] **T005 · Chore · P1: review and update index generation tool**
+- [x] **T005 · Chore · P1: review and update index generation tool**
     - **Context:** PLAN.md > Phase 1: Framework and Templates > 3. Update Validation Tools & Risk Assessment (Breaking tooling)
     - **Action:**
         1. Review `tools/reindex.rb` for compatibility with new file structure and front-matter.

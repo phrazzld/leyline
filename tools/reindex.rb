@@ -17,6 +17,26 @@ require 'yaml'
       title = $2.strip
       first_para = $3.strip.gsub(/\s+/, ' ')
       
+      # Skip placeholder text that's enclosed in brackets
+      if first_para =~ /^\[.*\]$/
+        # Try to find the first real paragraph in the Core Belief/Rationale section
+        if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
+          section_text = $2.strip.gsub(/\s+/, ' ')
+          
+          # Skip if this is also a placeholder
+          if section_text =~ /^\[.*\]$/
+            first_para = "See document for details."
+          else
+            first_para = section_text
+          end
+        else
+          first_para = "See document for details."
+        end
+      # This handles the non-bracketed placeholder case that might appear in templates
+      elsif first_para.include?("Write a") && (first_para.include?("paragraph") || first_para.include?("explanation"))
+        first_para = "See document for details."
+      end
+      
       # Truncate if too long
       summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
       
