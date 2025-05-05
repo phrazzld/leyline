@@ -424,7 +424,7 @@
 
 ### Language-Specific Bindings
 
-- [ ] **T046 · Feature · P3: create binding 'go-package-design.md'**
+- [x] **T046 · Feature · P3: create binding 'go-package-design.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Go-Specific Practices
     - **Action:**
         1. Create new binding `bindings/go-package-design.md` using the binding template (T002) and style guide (T003).
