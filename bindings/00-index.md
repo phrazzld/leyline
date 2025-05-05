@@ -6,6 +6,7 @@ This file contains an automatically generated list of all bindings with their on
 |---|---|
 | [api-design](./api-design.md) | This binding directly implements our explicit-over-implicit tenet by ensuring that the contracts between components—the most critical communication... |
 | [dependency-inversion](./dependency-inversion.md) | This binding directly implements our testability tenet by making code inherently more testable through decoupling. When your business logic depends... |
+| [dependency-management](./dependency-management.md) | This binding implements our simplicity tenet by addressing a major source of hidden complexity: the sprawling dependency trees that frequently grow... |
 | [external-configuration](./external-configuration.md) | This binding directly implements our no-secret-suppression tenet by preventing one of its most dangerous forms: hardcoded secrets and configuration... |
 | [go-error-wrapping](./go-error-wrapping.md) | This binding implements our explicit-over-implicit tenet by making error context and propagation paths visible rather than hidden. |
 | [hex-domain-purity](./hex-domain-purity.md) | This binding directly implements our simplicity tenet by eliminating a major source of accidental complexity—the entanglement of business rules wit... |

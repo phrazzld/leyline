@@ -392,7 +392,7 @@
         2. Front-matter is valid and derives from `simplicity` and `testability` tenets.
     - **Depends‑on:** [T037]
 
-- [ ] **T043 · Feature · P3: create binding 'dependency-management.md'**
+- [x] **T043 · Feature · P3: create binding 'dependency-management.md'**
     - **Context:** Audit Gap > Core Philosophy Gaps > Dependency Management
     - **Action:**
         1. Create new binding `bindings/dependency-management.md` using the binding template (T002) and style guide (T003).
