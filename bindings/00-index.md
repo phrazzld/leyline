@@ -10,6 +10,7 @@ This file contains an automatically generated list of all bindings with their on
 | [dependency-inversion](./dependency-inversion.md) | This binding directly implements our testability tenet by making code inherently more testable through decoupling. When your business logic depends... |
 | [dependency-management](./dependency-management.md) | This binding implements our simplicity tenet by addressing a major source of hidden complexity: the sprawling dependency trees that frequently grow... |
 | [external-configuration](./external-configuration.md) | This binding directly implements our no-secret-suppression tenet by preventing one of its most dangerous forms: hardcoded secrets and configuration... |
+| [frontend-state-management](./frontend-state-management.md) | This binding directly implements our simplicity tenet by addressing one of the most common sources of frontend complexity: state management. As app... |
 | [go-concurrency-patterns](./go-concurrency-patterns.md) | This binding directly implements our simplicity tenet by protecting against one of the most challenging sources of complexity in software — uncontr... |
 | [go-error-wrapping](./go-error-wrapping.md) | This binding implements our explicit-over-implicit tenet by making error context and propagation paths visible rather than hidden. |
 | [go-interface-design](./go-interface-design.md) | This binding directly implements our testability tenet by enabling clean, flexible testing without over-mocking. When interfaces are small and defi... |

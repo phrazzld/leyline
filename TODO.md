@@ -506,7 +506,7 @@
         2. Front-matter is valid and applies to frontend technologies.
     - **Depends‑on:** [T037]
 
-- [ ] **T054 · Feature · P3: create binding 'frontend-state-management.md'**
+- [x] **T054 · Feature · P3: create binding 'frontend-state-management.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Frontend Practices
     - **Action:**
         1. Create new binding `bindings/frontend-state-management.md` using the binding template (T002) and style guide (T003).
