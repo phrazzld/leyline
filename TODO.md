@@ -382,7 +382,7 @@
         2. Front-matter is valid and derives from `explicit-over-implicit` tenet.
     - **Depends‑on:** [T037]
 
-- [ ] **T042 · Feature · P3: create binding 'pure-functions.md'**
+- [x] **T042 · Feature · P3: create binding 'pure-functions.md'**
     - **Context:** Audit Gap > Core Philosophy Gaps > Pure Functions
     - **Action:**
         1. Create new binding `bindings/pure-functions.md` using the binding template (T002) and style guide (T003).
