@@ -434,7 +434,7 @@
         2. Front-matter is valid and applies to Go.
     - **Depends‑on:** [T037]
 
-- [ ] **T047 · Feature · P3: create binding 'go-interface-design.md'**
+- [x] **T047 · Feature · P3: create binding 'go-interface-design.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Go-Specific Practices
     - **Action:**
         1. Create new binding `bindings/go-interface-design.md` using the binding template (T002) and style guide (T003).
