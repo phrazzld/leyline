@@ -474,7 +474,7 @@
         2. Front-matter is valid and applies to TypeScript.
     - **Depends‑on:** [T037]
 
-- [ ] **T051 · Feature · P3: create binding 'rust-ownership-patterns.md'**
+- [x] **T051 · Feature · P3: create binding 'rust-ownership-patterns.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Rust-Specific Practices
     - **Action:**
         1. Create new binding `bindings/rust-ownership-patterns.md` using the binding template (T002) and style guide (T003).
