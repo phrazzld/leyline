@@ -464,7 +464,7 @@
         2. Front-matter is valid and applies to TypeScript.
     - **Depends‑on:** [T037]
 
-- [ ] **T050 · Feature · P3: create binding 'ts-async-patterns.md'**
+- [x] **T050 · Feature · P3: create binding 'ts-async-patterns.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > TypeScript-Specific Practices
     - **Action:**
         1. Create new binding `bindings/ts-async-patterns.md` using the binding template (T002) and style guide (T003).
