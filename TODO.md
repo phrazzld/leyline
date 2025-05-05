@@ -372,7 +372,7 @@
 
 ### Core Bindings
 
-- [ ] **T041 · Feature · P3: create binding 'api-design.md'**
+- [x] **T041 · Feature · P3: create binding 'api-design.md'**
     - **Context:** Audit Gap > Core Philosophy Gaps > API Design
     - **Action:**
         1. Create new binding `bindings/api-design.md` using the binding template (T002) and style guide (T003).
