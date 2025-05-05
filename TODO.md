@@ -525,23 +525,3 @@
         1. Binding exists with concrete requirements for meeting WCAG standards and implementation patterns.
         2. Front-matter is valid and applies to frontend technologies.
     - **Depends‑on:** [T037]
-- [ ] **T039 · Test · P2: test effectiveness of rewritten documents with LLMs**
-    - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 3. User Testing
-    - **Action:**
-        1. Test rewritten tenets and bindings as context for popular LLMs (Claude, GPT-4, etc.).
-        2. Compare effectiveness of original vs. rewritten versions.
-    - **Done‑when:**
-        1. Test results document exists with concrete examples and comparisons.
-    - **Verification:**
-        1. Review test results for clarity and usefulness.
-    - **Depends‑on:** [T020, T033]
-- [ ] **T040 · Chore · P2: document patterns that work well for LLM context**
-    - **Context:** PLAN.md > Phase 4: Documentation and Finalization > 3. User Testing
-    - **Action:**
-        1. Based on results from T039, document patterns that work particularly well.
-        2. Update `docs/LLM_INTEGRATION.md` (T035) with these findings.
-    - **Done‑when:**
-        1. Documentation is updated with effective patterns.
-    - **Verification:**
-        1. Peer review documentation updates.
-    - **Depends‑on:** [T039]
