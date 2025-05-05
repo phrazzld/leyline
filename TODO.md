@@ -402,7 +402,7 @@
         2. Front-matter is valid and derives from `simplicity` and `automation` tenets.
     - **Depends‑on:** [T037]
 
-- [ ] **T044 · Feature · P3: create binding 'code-size.md'**
+- [x] **T044 · Feature · P3: create binding 'code-size.md'**
     - **Context:** Audit Gap > Core Philosophy Gaps > Length Guidelines
     - **Action:**
         1. Create new binding `bindings/code-size.md` using the binding template (T002) and style guide (T003).
