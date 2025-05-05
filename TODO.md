@@ -454,7 +454,7 @@
         2. Front-matter is valid and applies to Go.
     - **Depends‑on:** [T037]
 
-- [ ] **T049 · Feature · P3: create binding 'ts-module-organization.md'**
+- [x] **T049 · Feature · P3: create binding 'ts-module-organization.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > TypeScript-Specific Practices
     - **Action:**
         1. Create new binding `bindings/ts-module-organization.md` using the binding template (T002) and style guide (T003).

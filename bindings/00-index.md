@@ -19,5 +19,6 @@ This file contains an automatically generated list of all bindings with their on
 | [no-lint-suppression](./no-lint-suppression.md) | This binding directly implements our no-secret-suppression tenet by requiring transparency and justification when bypassing automated quality guard... |
 | [pure-functions](./pure-functions.md) | This binding implements our simplicity tenet by reducing complexity at its most fundamental level—predictable code execution. When a function is pu... |
 | [require-conventional-commits](./require-conventional-commits.md) | This binding directly implements our automation tenet by transforming commit messages from unstructured text into structured data that can drive au... |
+| [ts-module-organization](./ts-module-organization.md) | This binding implements our modularity tenet by defining how to create well-bounded, purpose-driven modules in TypeScript projects. Effective modul... |
 | [ts-no-any](./ts-no-any.md) | This binding implements our explicit-over-implicit tenet by requiring you to clearly express types rather than hiding them behind an escape hatch. |
 | [use-structured-logging](./use-structured-logging.md) | This binding directly implements our automation tenet by transforming system telemetry from human-readable outputs into machine-readable data that ... |
