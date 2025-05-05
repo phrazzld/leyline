@@ -6,6 +6,7 @@ This file contains an automatically generated list of all bindings with their on
 |---|---|
 | [api-design](./api-design.md) | This binding directly implements our explicit-over-implicit tenet by ensuring that the contracts between components—the most critical communication... |
 | [code-size](./code-size.md) | This binding implements our simplicity tenet by addressing the cognitive overhead created by large, sprawling code units. When functions, methods, ... |
+| [component-architecture](./component-architecture.md) | This binding directly implements our modularity tenet by establishing a systematic approach to frontend component organization. User interfaces are... |
 | [dependency-inversion](./dependency-inversion.md) | This binding directly implements our testability tenet by making code inherently more testable through decoupling. When your business logic depends... |
 | [dependency-management](./dependency-management.md) | This binding implements our simplicity tenet by addressing a major source of hidden complexity: the sprawling dependency trees that frequently grow... |
 | [external-configuration](./external-configuration.md) | This binding directly implements our no-secret-suppression tenet by preventing one of its most dangerous forms: hardcoded secrets and configuration... |

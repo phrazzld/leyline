@@ -496,7 +496,7 @@
 
 ### Frontend-Specific Bindings
 
-- [ ] **T053 · Feature · P3: create binding 'component-architecture.md'**
+- [x] **T053 · Feature · P3: create binding 'component-architecture.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Frontend Practices
     - **Action:**
         1. Create new binding `bindings/component-architecture.md` using the binding template (T002) and style guide (T003).
