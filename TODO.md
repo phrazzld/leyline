@@ -484,7 +484,7 @@
         2. Front-matter is valid and applies to Rust.
     - **Depends‑on:** [T037]
 
-- [ ] **T052 · Feature · P3: create binding 'rust-error-handling.md'**
+- [x] **T052 · Feature · P3: create binding 'rust-error-handling.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Rust-Specific Practices
     - **Action:**
         1. Create new binding `bindings/rust-error-handling.md` using the binding template (T002) and style guide (T003).

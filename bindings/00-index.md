@@ -19,6 +19,7 @@ This file contains an automatically generated list of all bindings with their on
 | [no-lint-suppression](./no-lint-suppression.md) | This binding directly implements our no-secret-suppression tenet by requiring transparency and justification when bypassing automated quality guard... |
 | [pure-functions](./pure-functions.md) | This binding implements our simplicity tenet by reducing complexity at its most fundamental level—predictable code execution. When a function is pu... |
 | [require-conventional-commits](./require-conventional-commits.md) | This binding directly implements our automation tenet by transforming commit messages from unstructured text into structured data that can drive au... |
+| [rust-error-handling](./rust-error-handling.md) | This binding directly implements our simplicity and explicit-over-implicit tenets by making errors a first-class concern in the type system instead... |
 | [rust-ownership-patterns](./rust-ownership-patterns.md) | This binding implements our simplicity tenet by leveraging Rust's ownership system to prevent entire categories of bugs that would otherwise add tr... |
 | [ts-async-patterns](./ts-async-patterns.md) | This binding implements our simplicity tenet by addressing one of the most common sources of complexity in modern JavaScript and TypeScript applica... |
 | [ts-module-organization](./ts-module-organization.md) | This binding implements our modularity tenet by defining how to create well-bounded, purpose-driven modules in TypeScript projects. Effective modul... |
