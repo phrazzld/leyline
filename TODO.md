@@ -412,7 +412,7 @@
         2. Front-matter is valid and derives from `simplicity` and `modularity` tenets.
     - **Depends‑on:** [T037]
 
-- [ ] **T045 · Feature · P3: enhance binding 'use-structured-logging.md' for observability**
+- [x] **T045 · Feature · P3: enhance binding 'use-structured-logging.md' for observability**
     - **Context:** Audit Gap > Core Philosophy Gaps > Design for Observability
     - **Action:**
         1. Expand existing binding `bindings/use-structured-logging.md` to include metrics and tracing.

@@ -17,4 +17,4 @@ This file contains an automatically generated list of all bindings with their on
 | [pure-functions](./pure-functions.md) | This binding implements our simplicity tenet by reducing complexity at its most fundamental level—predictable code execution. When a function is pu... |
 | [require-conventional-commits](./require-conventional-commits.md) | This binding directly implements our automation tenet by transforming commit messages from unstructured text into structured data that can drive au... |
 | [ts-no-any](./ts-no-any.md) | This binding implements our explicit-over-implicit tenet by requiring you to clearly express types rather than hiding them behind an escape hatch. |
-| [use-structured-logging](./use-structured-logging.md) | This binding directly implements our automation tenet by transforming logs from human-readable text into machine-readable data that can power autom... |
+| [use-structured-logging](./use-structured-logging.md) | This binding directly implements our automation tenet by transforming system telemetry from human-readable outputs into machine-readable data that ... |
