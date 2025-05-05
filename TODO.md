@@ -444,7 +444,7 @@
         2. Front-matter is valid and applies to Go.
     - **Depends‑on:** [T037]
 
-- [ ] **T048 · Feature · P3: create binding 'go-concurrency-patterns.md'**
+- [x] **T048 · Feature · P3: create binding 'go-concurrency-patterns.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Go-Specific Practices
     - **Action:**
         1. Create new binding `bindings/go-concurrency-patterns.md` using the binding template (T002) and style guide (T003).

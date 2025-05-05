@@ -9,7 +9,10 @@ This file contains an automatically generated list of all bindings with their on
 | [dependency-inversion](./dependency-inversion.md) | This binding directly implements our testability tenet by making code inherently more testable through decoupling. When your business logic depends... |
 | [dependency-management](./dependency-management.md) | This binding implements our simplicity tenet by addressing a major source of hidden complexity: the sprawling dependency trees that frequently grow... |
 | [external-configuration](./external-configuration.md) | This binding directly implements our no-secret-suppression tenet by preventing one of its most dangerous forms: hardcoded secrets and configuration... |
+| [go-concurrency-patterns](./go-concurrency-patterns.md) | This binding directly implements our simplicity tenet by protecting against one of the most challenging sources of complexity in software — uncontr... |
 | [go-error-wrapping](./go-error-wrapping.md) | This binding implements our explicit-over-implicit tenet by making error context and propagation paths visible rather than hidden. |
+| [go-interface-design](./go-interface-design.md) | This binding directly implements our testability tenet by enabling clean, flexible testing without over-mocking. When interfaces are small and defi... |
+| [go-package-design](./go-package-design.md) | This binding directly implements our modularity tenet by establishing clear, well-defined boundaries for Go code organization. Package design is th... |
 | [hex-domain-purity](./hex-domain-purity.md) | This binding directly implements our simplicity tenet by eliminating a major source of accidental complexity—the entanglement of business rules wit... |
 | [immutable-by-default](./immutable-by-default.md) | This binding directly implements our simplicity tenet by eliminating a major source of complexity—unpredictable state changes that are difficult to... |
 | [no-internal-mocking](./no-internal-mocking.md) | This binding directly implements our testability tenet by forcing you to design code that's genuinely testable rather than creating the illusion of... |
