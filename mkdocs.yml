@@ -10,8 +10,48 @@ repo_url: https://github.com/phrazzld/leyline
 # Navigation
 nav:
   - Home: index.md
-  - Tenets: tenets/
-  - Bindings: bindings/
+  - Tenets: 
+    - Overview: tenets/00-index.md
+    - Simplicity: tenets/simplicity.md
+    - Modularity: tenets/modularity.md
+    - Testability: tenets/testability.md
+    - Explicit Over Implicit: tenets/explicit-over-implicit.md
+    - Maintainability: tenets/maintainability.md
+    - Document Decisions: tenets/document-decisions.md
+    - Automation: tenets/automation.md
+    - No Secret Suppression: tenets/no-secret-suppression.md
+  - Bindings:
+    - Overview: bindings/00-index.md
+    - TypeScript: 
+      - No Any: bindings/ts-no-any.md
+      - Module Organization: bindings/ts-module-organization.md
+      - Async Patterns: bindings/ts-async-patterns.md
+    - Go:
+      - Error Wrapping: bindings/go-error-wrapping.md
+      - Interface Design: bindings/go-interface-design.md
+      - Package Design: bindings/go-package-design.md
+      - Concurrency Patterns: bindings/go-concurrency-patterns.md
+    - Rust:
+      - Error Handling: bindings/rust-error-handling.md
+      - Ownership Patterns: bindings/rust-ownership-patterns.md
+    - Frontend:
+      - State Management: bindings/frontend-state-management.md
+      - Web Accessibility: bindings/web-accessibility.md
+      - Component Architecture: bindings/component-architecture.md
+    - Architecture:
+      - Hex Domain Purity: bindings/hex-domain-purity.md
+      - Dependency Inversion: bindings/dependency-inversion.md
+      - External Configuration: bindings/external-configuration.md
+      - Code Size: bindings/code-size.md
+      - API Design: bindings/api-design.md
+    - Best Practices:
+      - Immutable By Default: bindings/immutable-by-default.md
+      - Pure Functions: bindings/pure-functions.md
+      - No Internal Mocking: bindings/no-internal-mocking.md
+      - No Lint Suppression: bindings/no-lint-suppression.md
+      - Require Conventional Commits: bindings/require-conventional-commits.md
+      - Use Structured Logging: bindings/use-structured-logging.md
+      - Dependency Management: bindings/dependency-management.md
   - Integration:
     - Migration Guide: migration-guide.md
     - Implementation Guide: implementation-guide.md

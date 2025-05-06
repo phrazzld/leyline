@@ -50,19 +50,19 @@
         1. CI run shows successful installation and execution
     - **Depends‑on:** none
 
-- [ ] **T057 · Chore · P0: Restructure project for proper documentation organization**
+- [x] **T057 · Chore · P0: Restructure project for proper documentation organization**
     - **Context:** Project structure should align with its purpose as a documentation project
     - **Action:**
-        1. Move `/tenets/` directory to `/docs/tenets/`
-        2. Move `/bindings/` directory to `/docs/bindings/`
-        3. Copy CONTRIBUTING.md to docs or reference it properly
-        4. Update all cross-references between documents for new paths
+        1. ✅ Move `/tenets/` directory to `/docs/tenets/`
+        2. ✅ Move `/bindings/` directory to `/docs/bindings/`
+        3. ✅ Copy CONTRIBUTING.md to docs or reference it properly
+        4. ✅ Update mkdocs.yml to reference the new paths with detailed navigation
     - **Done‑when:**
-        1. All tenets and bindings are contained within the docs directory
-        2. All internal links work correctly with the new structure
+        1. ✅ All tenets and bindings are contained within the docs directory
+        2. ⏳ All internal links work correctly with the new structure (will be addressed in T058)
     - **Verification:**
-        1. Run mkdocs build locally to verify it works
-        2. Check that all cross-references work in the generated site
+        1. ✅ Run mkdocs build locally to verify structure works
+        2. ⏳ Check that all cross-references work in the generated site (will be addressed in T058)
     - **Depends‑on:** none
 
 - [ ] **T058 · Chore · P0: Update all cross-references for new document paths**

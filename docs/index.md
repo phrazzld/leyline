@@ -9,7 +9,7 @@ Leyline provides a centralized system for defining, documenting, and enforcing d
 - **Tenets**: Immutable truths and principles that guide our development philosophy
 - **Bindings**: Enforceable rules derived from tenets, with specific implementation guidance
 
-For example, the [simplicity](../tenets/simplicity.md) tenet establishes the principle that we should "prefer the simplest design that works," while the [ts-no-any](../bindings/ts-no-any.md) binding is a specific, enforceable rule derived from that tenet.
+For example, the [simplicity](tenets/simplicity.md) tenet establishes the principle that we should "prefer the simplest design that works," while the [ts-no-any](bindings/ts-no-any.md) binding is a specific, enforceable rule derived from that tenet.
 
 ## Repository Structure
 
@@ -59,15 +59,15 @@ We welcome contributions to both tenets and bindings:
 1. **For tenets**: Focus on fundamental principles that stand the test of time
 2. **For bindings**: Create specific, enforceable rules that implement tenets
 
-See the [Contributing](../CONTRIBUTING.md) section for detailed guidelines on proposing changes.
+See the [Contributing](CONTRIBUTING.md) section for detailed guidelines on proposing changes.
 
 ## Examples
 
 Here are some example tenets and their derived bindings:
 
-- **[Simplicity](../tenets/simplicity.md)** → [hex-domain-purity](../bindings/hex-domain-purity.md), [ts-no-any](../bindings/ts-no-any.md)
-- **[Automation](../tenets/automation.md)** → [go-error-wrapping](../bindings/go-error-wrapping.md), [require-conventional-commits](../bindings/require-conventional-commits.md)
-- **[Testability](../tenets/testability.md)** → [no-internal-mocking](../bindings/no-internal-mocking.md)
+- **[Simplicity](tenets/simplicity.md)** → [hex-domain-purity](bindings/hex-domain-purity.md), [ts-no-any](bindings/ts-no-any.md)
+- **[Automation](tenets/automation.md)** → [go-error-wrapping](bindings/go-error-wrapping.md), [require-conventional-commits](bindings/require-conventional-commits.md)
+- **[Testability](tenets/testability.md)** → [no-internal-mocking](bindings/no-internal-mocking.md)
 
 ## Documentation
 
