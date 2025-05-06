@@ -31,8 +31,9 @@ VALID_CONTEXTS = [
 all_ids = {}
 
 # Process directories
-%w[tenets bindings].each do |dir|
-  puts "Validating #{dir}..."
+%w[docs/tenets docs/bindings].each do |dir|
+  dir_base = dir.split('/').last
+  puts "Validating #{dir_base}..."
   
   # Skip index files
   Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.each do |file|
@@ -55,7 +56,7 @@ all_ids = {}
       end
       
       # Check required keys
-      missing_keys = REQUIRED_KEYS[dir] - front_matter.keys
+      missing_keys = REQUIRED_KEYS[dir_base] - front_matter.keys
       unless missing_keys.empty?
         puts "  [ERROR] #{file}: Missing required keys: #{missing_keys.join(', ')}"
         exit 1
@@ -77,8 +78,8 @@ all_ids = {}
       end
       
       # For bindings, validate that derived_from exists
-      if dir == 'bindings' && front_matter['derived_from']
-        tenet_file = Dir.glob("tenets/#{front_matter['derived_from']}.md").first
+      if dir_base == 'bindings' && front_matter['derived_from']
+        tenet_file = Dir.glob("docs/tenets/#{front_matter['derived_from']}.md").first
         unless tenet_file
           puts "  [ERROR] #{file}: References non-existent tenet '#{front_matter['derived_from']}'"
           exit 1
@@ -86,7 +87,7 @@ all_ids = {}
       end
       
       # Validate optional keys if present
-      if dir == 'bindings' && OPTIONAL_KEYS['bindings']
+      if dir_base == 'bindings' && OPTIONAL_KEYS['bindings']
         OPTIONAL_KEYS['bindings'].each do |key, validator|
           if front_matter.key?(key)
             unless validator.call(front_matter[key])

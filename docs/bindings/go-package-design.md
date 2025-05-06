@@ -419,7 +419,7 @@ func (s *Service) CheckCredit(userID string, amount decimal.Decimal) bool {
 
 ## Related Bindings
 
-- [modularity](modularity.md): This binding is a Go-specific application of general modularity principles. While modularity establishes the conceptual foundation, go-package-design provides concrete rules for implementing modularity in Go codebases through package design.
+- [modularity](../tenets/modularity.md): This binding is a Go-specific application of general modularity principles. While modularity establishes the conceptual foundation, go-package-design provides concrete rules for implementing modularity in Go codebases through package design.
 
 - [dependency-inversion](dependency-inversion.md): Well-designed Go packages often use dependency inversion to manage coupling between packages. By defining interfaces in consumer packages rather than implementation packages, you create a more flexible, testable system with dependencies pointing in the right direction.
 

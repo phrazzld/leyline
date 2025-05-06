@@ -398,6 +398,6 @@ function Modal({ isOpen, onClose, title, children }) {
 
 - [frontend-state-management.md](frontend-state-management.md): Effective state management is crucial for tracking UI states that affect accessibility, such as whether a component is expanded, focused, or in an error state. The state management binding complements accessibility by providing patterns for managing these states.
 
-- [explicit-over-implicit.md](../tenets/explicit-over-implicit.md): This binding directly implements the explicit-over-implicit tenet by requiring developers to explicitly consider and implement accessibility features rather than making implicit assumptions about how users interact with interfaces.
+- [../tenets/explicit-over-implicit.md](../tenets/explicit-over-implicit.md): This binding directly implements the explicit-over-implicit tenet by requiring developers to explicitly consider and implement accessibility features rather than making implicit assumptions about how users interact with interfaces.
 
 - [api-design.md](api-design.md): For frontend components, the API is the props interface. Accessible components need well-designed, explicit APIs that provide all necessary properties for accessibility (labels, descriptions, ARIA attributes), connecting these two bindings.

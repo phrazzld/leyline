@@ -9,53 +9,53 @@ repo_url: https://github.com/phrazzld/leyline
 
 # Navigation
 nav:
-  - Home: docs/index.md
+  - Home: index.md
   - Tenets: 
-    - Overview: docs/tenets/00-index.md
-    - Simplicity: docs/tenets/simplicity.md
-    - Modularity: docs/tenets/modularity.md
-    - Testability: docs/tenets/testability.md
-    - Explicit Over Implicit: docs/tenets/explicit-over-implicit.md
-    - Maintainability: docs/tenets/maintainability.md
-    - Document Decisions: docs/tenets/document-decisions.md
-    - Automation: docs/tenets/automation.md
-    - No Secret Suppression: docs/tenets/no-secret-suppression.md
+    - Overview: tenets/00-index.md
+    - Simplicity: tenets/simplicity.md
+    - Modularity: tenets/modularity.md
+    - Testability: tenets/testability.md
+    - Explicit Over Implicit: tenets/explicit-over-implicit.md
+    - Maintainability: tenets/maintainability.md
+    - Document Decisions: tenets/document-decisions.md
+    - Automation: tenets/automation.md
+    - No Secret Suppression: tenets/no-secret-suppression.md
   - Bindings:
-    - Overview: docs/bindings/00-index.md
+    - Overview: bindings/00-index.md
     - TypeScript: 
-      - No Any: docs/bindings/ts-no-any.md
-      - Module Organization: docs/bindings/ts-module-organization.md
-      - Async Patterns: docs/bindings/ts-async-patterns.md
+      - No Any: bindings/ts-no-any.md
+      - Module Organization: bindings/ts-module-organization.md
+      - Async Patterns: bindings/ts-async-patterns.md
     - Go:
-      - Error Wrapping: docs/bindings/go-error-wrapping.md
-      - Interface Design: docs/bindings/go-interface-design.md
-      - Package Design: docs/bindings/go-package-design.md
-      - Concurrency Patterns: docs/bindings/go-concurrency-patterns.md
+      - Error Wrapping: bindings/go-error-wrapping.md
+      - Interface Design: bindings/go-interface-design.md
+      - Package Design: bindings/go-package-design.md
+      - Concurrency Patterns: bindings/go-concurrency-patterns.md
     - Rust:
-      - Error Handling: docs/bindings/rust-error-handling.md
-      - Ownership Patterns: docs/bindings/rust-ownership-patterns.md
+      - Error Handling: bindings/rust-error-handling.md
+      - Ownership Patterns: bindings/rust-ownership-patterns.md
     - Frontend:
-      - State Management: docs/bindings/frontend-state-management.md
-      - Web Accessibility: docs/bindings/web-accessibility.md
-      - Component Architecture: docs/bindings/component-architecture.md
+      - State Management: bindings/frontend-state-management.md
+      - Web Accessibility: bindings/web-accessibility.md
+      - Component Architecture: bindings/component-architecture.md
     - Architecture:
-      - Hex Domain Purity: docs/bindings/hex-domain-purity.md
-      - Dependency Inversion: docs/bindings/dependency-inversion.md
-      - External Configuration: docs/bindings/external-configuration.md
-      - Code Size: docs/bindings/code-size.md
-      - API Design: docs/bindings/api-design.md
+      - Hex Domain Purity: bindings/hex-domain-purity.md
+      - Dependency Inversion: bindings/dependency-inversion.md
+      - External Configuration: bindings/external-configuration.md
+      - Code Size: bindings/code-size.md
+      - API Design: bindings/api-design.md
     - Best Practices:
-      - Immutable By Default: docs/bindings/immutable-by-default.md
-      - Pure Functions: docs/bindings/pure-functions.md
-      - No Internal Mocking: docs/bindings/no-internal-mocking.md
-      - No Lint Suppression: docs/bindings/no-lint-suppression.md
-      - Require Conventional Commits: docs/bindings/require-conventional-commits.md
-      - Use Structured Logging: docs/bindings/use-structured-logging.md
-      - Dependency Management: docs/bindings/dependency-management.md
+      - Immutable By Default: bindings/immutable-by-default.md
+      - Pure Functions: bindings/pure-functions.md
+      - No Internal Mocking: bindings/no-internal-mocking.md
+      - No Lint Suppression: bindings/no-lint-suppression.md
+      - Require Conventional Commits: bindings/require-conventional-commits.md
+      - Use Structured Logging: bindings/use-structured-logging.md
+      - Dependency Management: bindings/dependency-management.md
   - Integration:
-    - Migration Guide: docs/migration-guide.md
-    - Implementation Guide: docs/implementation-guide.md
-  - Contributing: docs/CONTRIBUTING.md
+    - Migration Guide: migration-guide.md
+    - Implementation Guide: implementation-guide.md
+  - Contributing: CONTRIBUTING.md
 
 # Theme
 theme:
@@ -82,4 +82,5 @@ plugins:
   - search
 
 # Set docs directory
-docs_dir: .
+docs_dir: docs
+site_dir: site

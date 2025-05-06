@@ -4,7 +4,8 @@
 require 'yaml'
 
 # Process each directory
-%w[tenets bindings].each do |dir|
+%w[docs/tenets docs/bindings].each do |dir|
+  dir_base = dir.split('/').last
   entries = []
   
   # Get all markdown files except the index
@@ -49,8 +50,8 @@ require 'yaml'
   end
   
   # Generate index content
-  index_content = "# #{dir.capitalize} Index\n\n"
-  index_content += "This file contains an automatically generated list of all #{dir} with their one-line summaries.\n\n"
+  index_content = "# #{dir_base.capitalize} Index\n\n"
+  index_content += "This file contains an automatically generated list of all #{dir_base} with their one-line summaries.\n\n"
   
   # Add entries in a table
   if entries.any?
@@ -60,7 +61,7 @@ require 'yaml'
       index_content += "| [#{entry[:id]}](./#{entry[:id]}.md) | #{entry[:summary]} |\n"
     end
   else
-    index_content += "_No #{dir} defined yet._\n"
+    index_content += "_No #{dir_base} defined yet._\n"
   end
   
   # Write index file

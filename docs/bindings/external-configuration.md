@@ -320,7 +320,7 @@ def process_image(image_data, config):
 
 ## Related Bindings
 
-- [no-secret-suppression](no-secret-suppression.md): While no-secret-suppression focuses broadly on not bypassing quality safeguards, external configuration specifically addresses the practice of storing configuration and secrets directly in code. Both bindings work to prevent vulnerabilities and improve maintainability, but from different angles—implementing both creates multiple layers of protection against security issues.
+- [no-secret-suppression](../tenets/no-secret-suppression.md): While no-secret-suppression focuses broadly on not bypassing quality safeguards, external configuration specifically addresses the practice of storing configuration and secrets directly in code. Both bindings work to prevent vulnerabilities and improve maintainability, but from different angles—implementing both creates multiple layers of protection against security issues.
 
 - [dependency-inversion](dependency-inversion.md): Proper external configuration complements dependency inversion by creating a clean separation between business logic and its environmental dependencies. When configuration is injected rather than hardcoded, your domain logic becomes more testable and portable across different environments—key benefits that dependency inversion also promotes.
 

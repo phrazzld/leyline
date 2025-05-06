@@ -460,6 +460,6 @@ func Process[T constraints.Ordered](input T) T {
 
 - [go-package-design](go-package-design.md): Interface design and package design work together closely in Go. Well-designed interfaces define the boundaries between packages and enable clean dependency management. The consumer-defined interface approach helps prevent circular dependencies between packages, and clear interface boundaries promote better package organization.
 
-- [testability](testability.md): Small interfaces make testing dramatically easier, as they can be readily mocked with simple test implementations rather than complex mocking frameworks. This binding implements the "No Mocking Internal Components" guideline by providing natural seams for substituting test implementations at package boundaries.
+- [testability](../tenets/testability.md): Small interfaces make testing dramatically easier, as they can be readily mocked with simple test implementations rather than complex mocking frameworks. This binding implements the "No Mocking Internal Components" guideline by providing natural seams for substituting test implementations at package boundaries.
 
 - [hex-domain-purity](hex-domain-purity.md): Go interfaces are a key enabler for hexagonal architecture by providing the adapters between the domain and external concerns. Domain logic can remain pure by depending on interfaces rather than concrete implementations of infrastructure components, with the interfaces defined by the domain itself.

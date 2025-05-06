@@ -495,4 +495,4 @@ fn process_file(path: &str) -> Result<Vec<u8>, std::io::Error> {
 
 - [dependency-inversion](dependency-inversion.md): In Rust, dependency inversion is often implemented through traits, which pair naturally with the ownership system. The ownership constraints of trait objects add clarity about who owns what, making dependency relationships more explicit.
 
-- [simplicity](simplicity.md): Rust's ownership system might seem to add complexity at first, but it actually reduces accidental complexity by catching entire classes of bugs at compile time. What appears as additional syntax (borrowing, lifetimes) is actually a way to express constraints that would otherwise create hidden runtime complexity.
+- [simplicity](../tenets/simplicity.md): Rust's ownership system might seem to add complexity at first, but it actually reduces accidental complexity by catching entire classes of bugs at compile time. What appears as additional syntax (borrowing, lifetimes) is actually a way to express constraints that would otherwise create hidden runtime complexity.

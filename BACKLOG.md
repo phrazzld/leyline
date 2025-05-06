@@ -8,3 +8,10 @@
 - add tenets / bindings for the benefit of strongly opinionated design over endless configuration
   - is probably a binding tied to the simplicity tenet (at least) because it creates better ux and simplifies code if there aren't a gazillion knobs and levers
 - stronger storybook tenets / bindings
+- add bindings for preferred tools and packages etc
+  - pnpm > npm
+  - vitest > jest
+  - uv > pip
+  - playwright > cypress
+  - etc
+- more opinionated logging tenets/bindings; and really more generally around visibility. the best logging in the world is hardly helpful if they're not easy to visualize, if there's not clear transparency, if they're not accessible in a direct and actionable way. same goes for tests -- we love coverage maps, we love visualizations and articulations and various toolings and whatnot that make it clearer what is being tested and what is not and so on

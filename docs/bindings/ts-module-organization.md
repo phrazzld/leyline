@@ -464,7 +464,7 @@ const userService = new UserService(orderService);
 
 ## Related Bindings
 
-- [modularity](modularity.md): This binding is a TypeScript-specific implementation of our core modularity tenet, providing concrete guidance on how to achieve modularity in TypeScript projects specifically.
+- [modularity](../tenets/modularity.md): This binding is a TypeScript-specific implementation of our core modularity tenet, providing concrete guidance on how to achieve modularity in TypeScript projects specifically.
 
 - [dependency-inversion](dependency-inversion.md): Proper module organization works hand-in-hand with dependency inversion. By depending on abstractions (interfaces) rather than concrete implementations, modules can communicate without creating tight coupling or circular dependencies.
 

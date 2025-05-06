@@ -226,7 +226,7 @@ Closes #256
 
 ## Related Bindings
 
-- [document-decisions](document-decisions.md): Both bindings emphasize the importance of preserving context. While conventional commits provide structured history at the repository level, documenting decisions focuses on capturing context within the code. Together, they ensure the "why" behind changes is preserved at both the commit level and in the codebase itself.
+- [document-decisions](../tenets/document-decisions.md): Both bindings emphasize the importance of preserving context. While conventional commits provide structured history at the repository level, documenting decisions focuses on capturing context within the code. Together, they ensure the "why" behind changes is preserved at both the commit level and in the codebase itself.
 
 - [automate-changelog](automate-changelog.md): Conventional commits enable automated changelog generation by providing a structured format that tools can parse. These bindings work hand-in-hand—conventional commits provide the input data that automated changelog tools transform into organized release notes that highlight features, fixes, and breaking changes.
 

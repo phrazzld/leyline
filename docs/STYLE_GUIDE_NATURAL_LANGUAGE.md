@@ -229,6 +229,6 @@ When reviewing or writing tenets and bindings, check if the document:
 
 ## Further Reading
 
-- [The Leyline DEVELOPMENT_PHILOSOPHY.md](/source/DEVELOPMENT_PHILOSOPHY.md)
-- Tenet Template: [docs/templates/tenet_template.md](/docs/templates/tenet_template.md)
-- Binding Template: [docs/templates/binding_template.md](/docs/templates/binding_template.md)
+- The Leyline DEVELOPMENT_PHILOSOPHY.md (in source directory)
+- Tenet Template: [templates/tenet_template.md](templates/tenet_template.md)
+- Binding Template: [templates/binding_template.md](templates/binding_template.md)

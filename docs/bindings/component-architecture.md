@@ -444,7 +444,7 @@ function ContactForm() {
 
 ## Related Bindings
 
-- [modularity.md](../tenets/modularity.md): This binding directly implements the modularity tenet through the systematic breakdown of UI into composable components. While the tenet describes the general principle of dividing systems into independent, reusable modules, this binding provides the specific pattern for achieving modularity in frontend applications.
+- [../tenets/modularity.md](../tenets/modularity.md): This binding directly implements the modularity tenet through the systematic breakdown of UI into composable components. While the tenet describes the general principle of dividing systems into independent, reusable modules, this binding provides the specific pattern for achieving modularity in frontend applications.
 
 - [frontend-state-management.md](frontend-state-management.md): Complements component architecture by defining how state should be organized within and between components. Together, these bindings create a complete picture of component structure (architecture) and behavior (state).
 
