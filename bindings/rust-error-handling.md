@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: rust-error-handling
 last_modified: "2025-05-06"
 derived_from: simplicity
 enforced_by: "Code review, Clippy static analysis"
 applies_to:
-  - rust
----
+
+- rust
+
+______________________________________________________________________
 
 # Binding: Rust Error Handling
 

@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: hex-domain-purity
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: import graph analysis & code review
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Keep Business Logic Pure and Infrastructure-Free
 
@@ -24,6 +27,7 @@ The real power of this separation becomes apparent over time. As your applicatio
 This binding establishes clear boundaries between your domain and infrastructure:
 
 - **Domain Layer Restrictions**: Your domain layer (core business logic) must not:
+
   - Import or use any infrastructure libraries (databases, HTTP clients, file I/O)
   - Reference specific technologies (SQL queries, HTTP status codes, file paths)
   - Include serialization/deserialization logic for external systems
@@ -31,6 +35,7 @@ This binding establishes clear boundaries between your domain and infrastructure
   - Directly instantiate infrastructure components
 
 - **Interface Ownership**: The domain layer defines interfaces (ports) representing its needs for external services, but never implements those interfaces directly:
+
   - Data persistence (repositories)
   - External services (API clients, notification systems)
   - Security/authentication services
@@ -38,6 +43,7 @@ This binding establishes clear boundaries between your domain and infrastructure
   - Logging/monitoring systems
 
 - **Implementation Location**: All concrete implementations of these interfaces (adapters) belong in the infrastructure layer:
+
   - Database access logic
   - API clients and servers
   - File system interaction
@@ -51,6 +57,7 @@ Limited exceptions exist only for truly domain-level utilities (like date manipu
 To effectively implement domain purity in your system:
 
 1. **Apply Architectural Patterns**: Adopt a layered architecture pattern that enforces domain purity through structure. Ask yourself: "Which architectural boundary style works best for our application and team?" Common options include:
+
    - **Hexagonal Architecture** (Ports & Adapters): Domain at the center, with adapter implementations on the outside
    - **Clean Architecture**: Concentric circles with dependencies pointing inward toward the domain
    - **Onion Architecture**: Similar to Clean Architecture with domain at the center, surrounded by services and infrastructure
@@ -73,14 +80,14 @@ To effectively implement domain purity in your system:
        di/             // Dependency injection setup
    ```
 
-2. **Create Domain-Centric Interfaces**: Define interfaces in your domain layer that express what your business logic needs, not how those needs are implemented. Ask yourself: "What capabilities does my domain need, regardless of implementation details?" Focus on domain terminology and operations, not technical implementation details.
+1. **Create Domain-Centric Interfaces**: Define interfaces in your domain layer that express what your business logic needs, not how those needs are implemented. Ask yourself: "What capabilities does my domain need, regardless of implementation details?" Focus on domain terminology and operations, not technical implementation details.
 
    ```java
    // Domain layer - pure business concepts
    package com.example.domain.repositories;
-   
+
    import com.example.domain.entities.Customer;
-   
+
    public interface CustomerRepository {
      Customer findById(CustomerId id);
      void save(Customer customer);
@@ -88,32 +95,32 @@ To effectively implement domain purity in your system:
    }
    ```
 
-3. **Enforce Dependency Direction**: Organize your code to make improper dependencies physically difficult or impossible. Ask yourself: "If someone violates this pattern, will it be immediately obvious?" Use package/module visibility, project structures, and build tools to create physical constraints that guide developers toward proper architecture.
+1. **Enforce Dependency Direction**: Organize your code to make improper dependencies physically difficult or impossible. Ask yourself: "If someone violates this pattern, will it be immediately obvious?" Use package/module visibility, project structures, and build tools to create physical constraints that guide developers toward proper architecture.
 
    ```go
    // Go example with explicitly enforced dependency direction
    package domain // domain package has no imports from infrastructure
-   
+
    type OrderRepository interface {
      FindById(id OrderId) (Order, error)
      Save(order Order) error
    }
-   
+
    // infrastructure package imports domain, never the reverse
    package infrastructure
-   
+
    import "myapp/domain"
-   
+
    type PostgresOrderRepository struct {
      db *sql.DB
    }
-   
+
    func (r *PostgresOrderRepository) FindById(id domain.OrderId) (domain.Order, error) {
      // Implementation details
    }
    ```
 
-4. **Use Dependency Injection**: Provide infrastructure implementations to your domain code at runtime rather than hardcoding them. Ask yourself: "How will infrastructure implementations be connected to the domain?" Use constructor injection or a dependency injection container to wire components together at the application's entry point.
+1. **Use Dependency Injection**: Provide infrastructure implementations to your domain code at runtime rather than hardcoding them. Ask yourself: "How will infrastructure implementations be connected to the domain?" Use constructor injection or a dependency injection container to wire components together at the application's entry point.
 
    ```csharp
    // Domain service that receives its dependencies
@@ -130,14 +137,14 @@ To effectively implement domain purity in your system:
        // Pure business logic with no knowledge of concrete implementations
      }
    }
-   
+
    // In application startup/composition root
    services.AddScoped<IOrderRepository, SqlOrderRepository>();
    services.AddScoped<IPaymentGateway, StripePaymentGateway>();
    services.AddScoped<OrderService>();
    ```
 
-5. **Convert Between Boundaries**: When crossing the domain-infrastructure boundary, use mappers or adapters to convert between domain objects and infrastructure-specific representations. Ask yourself: "How can I prevent leakage between layers?" Ensure that infrastructure concepts (like database records) don't leak into your domain logic.
+1. **Convert Between Boundaries**: When crossing the domain-infrastructure boundary, use mappers or adapters to convert between domain objects and infrastructure-specific representations. Ask yourself: "How can I prevent leakage between layers?" Ensure that infrastructure concepts (like database records) don't leak into your domain logic.
 
    ```python
    # Infrastructure layer mapper example

@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: no-lint-suppression
 last_modified: "2025-05-04"
 derived_from: no-secret-suppression
 enforced_by: code review & custom linters
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Document Why You're Silencing Warnings
 
@@ -24,12 +27,14 @@ The dangers of undocumented suppressions compound over time. As codebases grow a
 This binding establishes clear requirements for any code that suppresses automated quality checks:
 
 - **Document Every Suppression**: All directives that disable linter rules, type checking, or other automated quality checks must include an explanatory comment that:
+
   - Identifies why the underlying rule is triggering in this specific case
   - Explains why the code is actually correct/safe despite the warning
   - Clarifies why fixing the issue properly isn't currently feasible
   - Ideally includes a ticket reference or timeline for revisiting the suppression
 
 - **Suppression Methods Covered**: This rule applies to all forms of quality check suppressions, including but not limited to:
+
   - Language-specific linter suppression comments (e.g., `// eslint-disable-line`, `// nolint`, `// NOSONAR`)
   - Compiler flag suppressions (e.g., `#pragma warning disable`, `#[allow(...)]`, `@SuppressWarnings`)
   - Inline type assertions that bypass type checking (e.g., `as any`, type casts, `@ts-ignore`)
@@ -37,11 +42,13 @@ This binding establishes clear requirements for any code that suppresses automat
   - CI/build script flags that bypass quality checks (`--no-lint`, `--force`, etc.)
 
 - **Limit Suppression Scope**: Beyond documentation, suppressions must be:
+
   - As narrow as possible in scope (line-level rather than file-level when available)
   - As specific as possible (targeting only the exact rule being suppressed)
   - Temporary by default (include a timeline or conditions for removal when possible)
 
 - **Exceptions**: This binding recognizes limited scenarios where suppressions may be necessary:
+
   - Integration with external code you can't modify (third-party libraries, generated code)
   - Known false positives in the quality tools
   - Temporary emergency fixes that will be properly addressed in a timely manner
@@ -59,7 +66,7 @@ Here are concrete strategies for handling suppressions responsibly:
    // ❌ BAD: No explanation
    // eslint-disable-next-line no-console
    console.log('User logged in');
-   
+
    // ✅ GOOD: Clear explanation
    // eslint-disable-next-line no-console
    // Intentionally using console.log for login events to provide visibility in production
@@ -70,14 +77,14 @@ Here are concrete strategies for handling suppressions responsibly:
 
    The explanation should include enough context for someone unfamiliar with the code to understand both why the rule triggered and why the suppression is justified.
 
-2. **Make Suppressions Temporary By Default**: Include strategies for eventual resolution:
+1. **Make Suppressions Temporary By Default**: Include strategies for eventual resolution:
 
    ```java
    // ❌ BAD: Permanent suppression with vague justification
    @SuppressWarnings("unchecked")
    // We know this is safe
    List<User> users = (List<User>) result;
-   
+
    // ✅ GOOD: Suppression with clear intent and timeline
    @SuppressWarnings("unchecked")
    // Temporary cast needed until we update the legacy UserRepository interface
@@ -88,7 +95,7 @@ Here are concrete strategies for handling suppressions responsibly:
 
    When possible, include ticket references, planned resolution approaches, or conditions under which the suppression should be reevaluated.
 
-3. **Implement Suppression Linters**: Set up automated checks to enforce documentation of suppressions:
+1. **Implement Suppression Linters**: Set up automated checks to enforce documentation of suppressions:
 
    ```yaml
    # ESLint rule configuration
@@ -98,24 +105,24 @@ Here are concrete strategies for handling suppressions responsibly:
 
    Many linting tools can be configured to require comments with suppressions. Custom linters can also scan for suppression patterns and verify they have associated explanations.
 
-4. **Create Team Standards for Common Suppressions**: Document agreed-upon patterns for handling common cases:
+1. **Create Team Standards for Common Suppressions**: Document agreed-upon patterns for handling common cases:
 
-   ```markdown
+   ````markdown
    # Team Standards for Lint Suppressions
-   
+
    ## React useEffect Dependencies
-   
+
    When intentionally omitting a dependency from useEffect:
-   
+
    ```jsx
    // eslint-disable-next-line react-hooks/exhaustive-deps
    // Intentionally omitting 'user' as a dependency to prevent re-fetching
    // when only user metadata changes. Only want to refresh when userId changes.
-   ```
+   ````
 
    This approach reduces the need for each developer to reinvent justifications and promotes consistency.
 
-5. **Regularly Audit Existing Suppressions**: Implement processes to review and clean up suppressions:
+1. **Regularly Audit Existing Suppressions**: Implement processes to review and clean up suppressions:
 
    ```bash
    # Simple shell script to find and count suppression patterns

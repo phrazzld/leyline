@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: ts-module-organization
 last_modified: "2025-05-04"
 derived_from: modularity
 enforced_by: code review & project linting rules
 applies_to:
-  - typescript
----
+
+- typescript
+
+______________________________________________________________________
 
 # Binding: Organize TypeScript Code Into Feature-Focused Modules
 
@@ -24,36 +27,42 @@ The impact of module organization compounds over time. In the early stages of de
 This binding establishes clear requirements for organizing TypeScript code into modules:
 
 - **Module Identity and Focus**:
+
   - Modules MUST be organized around domain concepts, features, or functional areas, not technical roles
   - Each module SHOULD have a single, well-defined responsibility that can be expressed in a short sentence
   - Module names MUST be clear, descriptive nouns that reflect the domain concepts they represent
   - Modules SHOULD NOT be named after patterns or technical implementations (avoid "utils", "helpers", "managers")
 
 - **Project Structure Requirements**:
+
   - Follow a consistent project structure with clear separation between application code, types, tests, and assets
   - Source code MUST be organized in a `src` directory (or equivalent based on framework conventions)
   - Related files SHOULD be co-located in feature directories rather than separated by technical role
   - Maintain a flat hierarchy where possible; avoid deep nesting beyond 3-4 levels
 
 - **Module Boundaries and Visibility**:
+
   - Each module MUST clearly define its public API through deliberate exports
   - Implementation details MUST be kept private by avoiding direct exports
   - Use barrel files (`index.ts`) to control and document the public API of a module
   - Module boundaries MUST be respected; avoid reaching into the internals of other modules
 
 - **Module Coupling and Dependencies**:
+
   - Modules MUST exhibit high internal cohesion (all code in the module works together for a unified purpose)
   - Modules MUST maintain low external coupling (minimal dependencies on other modules)
   - Circular dependencies between modules are PROHIBITED
   - Higher-level modules SHOULD depend on lower-level modules, not vice versa
 
 - **Import and Export Patterns**:
+
   - Use ES Modules syntax (`import`/`export`) exclusively; CommonJS (`require`) is PROHIBITED
   - PREFER named exports over default exports for better refactoring support
   - Re-export shared types and interfaces to create a clear API contract
   - Minimize the use of deep relative imports (`../../../`) by establishing clear import paths
 
 - **Exceptions and Special Cases**:
+
   - Small utility functions SHOULD be kept in the feature modules they serve rather than creating generic utility modules
   - Shared utilities needed across multiple modules SHOULD be organized into purpose-specific shared modules
   - Very small applications may use a simplified structure, but MUST still maintain clear module boundaries
@@ -99,39 +108,41 @@ This binding establishes clear requirements for organizing TypeScript code into 
    ```
 
    This structure:
+
    - Co-locates related code regardless of technical role
    - Makes feature boundaries explicit and visible
    - Simplifies navigation by organizing code the way people think about the system
    - Creates natural boundaries for change and code ownership
 
-2. **Define Clear Module Boundaries with Barrel Files**: Use `index.ts` files to control what each module exposes:
+1. **Define Clear Module Boundaries with Barrel Files**: Use `index.ts` files to control what each module exposes:
 
    ```typescript
    // features/user/index.ts - Controls the public API of the user module
-   
+
    // Re-export public types
    export type { User, UserRole, UserPreferences } from './types';
-   
+
    // Re-export the service as the primary API
    export { UserService } from './user.service';
-   
+
    // Export the repository interface but not the implementation
    export type { UserRepository } from './user.repository';
-   
+
    // Re-export factory function to create the service
    export { createUserService } from './user.factory';
-   
+
    // Note: Internal implementations like user.repository.impl.ts 
    // are NOT exported, keeping them as implementation details
    ```
 
    This approach:
+
    - Makes the public API explicit and documented in one place
    - Hides implementation details by selectively re-exporting
    - Allows for easier refactoring without breaking dependent code
    - Creates a contract with the rest of the application
 
-3. **Configure Path Aliases for Clean Imports**: Set up TypeScript path aliases to avoid deep relative imports:
+1. **Configure Path Aliases for Clean Imports**: Set up TypeScript path aliases to avoid deep relative imports:
 
    ```jsonc
    // tsconfig.json
@@ -154,24 +165,25 @@ This binding establishes clear requirements for organizing TypeScript code into 
    // Instead of:
    import { User } from '../../../features/user/types';
    import { formatDate } from '../../../shared/utils/date/format';
-   
+
    // Use:
    import { User } from '@features/user';
    import { formatDate } from '@utils/date/format';
    ```
 
    This approach:
+
    - Makes imports more readable and maintainable
    - Reduces fragility when files move within the directory structure
    - Creates a clear, consistent pattern for importing from different parts of the application
 
-4. **Implement Dependency Inversion for Module Communication**: Use interfaces to manage dependencies between modules:
+1. **Implement Dependency Inversion for Module Communication**: Use interfaces to manage dependencies between modules:
 
    ```typescript
    // features/order/types.ts
    import type { User } from '@features/user';
    import type { Product } from '@features/product';
-   
+
    export interface Order {
      id: string;
      user: User;
@@ -182,7 +194,7 @@ This binding establishes clear requirements for organizing TypeScript code into 
      status: OrderStatus;
      createdAt: Date;
    }
-   
+
    export enum OrderStatus {
      Pending = 'PENDING',
      Processing = 'PROCESSING',
@@ -190,13 +202,13 @@ This binding establishes clear requirements for organizing TypeScript code into 
      Delivered = 'DELIVERED',
      Cancelled = 'CANCELLED'
    }
-   
+
    // Define interface for user operations needed by orders
    export interface UserService {
      canPlaceOrder(userId: string): Promise<boolean>;
      notifyOrderStatus(userId: string, orderId: string, status: OrderStatus): Promise<void>;
    }
-   
+
    // Define interface for product operations needed by orders
    export interface ProductService {
      checkAvailability(productId: string, quantity: number): Promise<boolean>;
@@ -208,7 +220,7 @@ This binding establishes clear requirements for organizing TypeScript code into 
    // features/order/order.service.ts
    import { OrderRepository } from './order.repository';
    import { Order, OrderStatus, UserService, ProductService } from './types';
-   
+
    export class OrderService {
      constructor(
        private orderRepo: OrderRepository,
@@ -240,12 +252,13 @@ This binding establishes clear requirements for organizing TypeScript code into 
    ```
 
    This approach:
+
    - Defines clear interfaces between modules
    - Prevents circular dependencies by depending on abstractions
    - Makes testing easier with mock implementations
    - Creates more flexible, loosely coupled modules
 
-5. **Use ESLint Rules to Enforce Module Boundaries**: Configure ESLint to ensure module boundaries are respected:
+1. **Use ESLint Rules to Enforce Module Boundaries**: Configure ESLint to ensure module boundaries are respected:
 
    ```javascript
    // .eslintrc.js
@@ -297,6 +310,7 @@ This binding establishes clear requirements for organizing TypeScript code into 
    ```
 
    This ensures:
+
    - Module boundaries are enforced automatically
    - Circular dependencies are caught early
    - Code follows a consistent import structure

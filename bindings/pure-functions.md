@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: pure-functions
 last_modified: "2025-05-05"
 derived_from: simplicity
 enforced_by: code review & linters
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Write Pure Functions, Isolate Side Effects
 
@@ -26,6 +29,7 @@ This binding also directly supports our testability tenet. Pure functions are in
 This binding establishes the following principles for managing side effects and promoting pure functions:
 
 - **Maximize Pure Functions**: The majority of your codebase should consist of pure functions that:
+
   - Always return the same output for the same input
   - Have no observable side effects (no mutations to external state)
   - Depend only on their input parameters (no hidden dependencies)
@@ -33,12 +37,14 @@ This binding establishes the following principles for managing side effects and 
   - Don't perform I/O operations (file, network, database, etc.)
 
 - **Contain Side Effects**: When side effects are necessary (and they often are), they should be:
+
   - Isolated to the boundaries of your application or module
   - Made explicit in function signatures and documentation
   - Kept separate from your core business logic
   - Minimized in scope and complexity
 
 - **Types of Side Effects to Manage**:
+
   - External I/O (file systems, networks, databases)
   - Logging and monitoring
   - Global state modifications
@@ -47,12 +53,14 @@ This binding establishes the following principles for managing side effects and 
   - Throwing exceptions (in languages where these cause non-local control flow)
 
 - **Permitted Exceptions**: Code may deviate from pure functions in specific circumstances:
+
   - In clearly defined boundary layers responsible for I/O
   - When performance concerns are validated with benchmarks
   - In initialization/bootstrap code that runs once
   - When following language-specific idioms that would be unnatural to avoid
 
 - **Implementation Requirements**: When implementing this binding:
+
   - Use clear architectural patterns to separate pure and impure code
   - Make side effects explicit through function signatures and type systems
   - Prefer returning new data over modifying existing data
@@ -82,7 +90,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
        res.status(400).json({ errors: result.errors });
      }
    }
-   
+
    // Functional core (pure function)
    function createUser(userData) {
      // Validate and transform data
@@ -104,17 +112,17 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    }
    ```
 
-2. **Make Side Effects Explicit with Types**: Use your type system to clearly identify functions with side effects. Ask yourself: "Is it obvious from the function signature that this has side effects?" Make it impossible to accidentally invoke a side effect without being aware of it.
+1. **Make Side Effects Explicit with Types**: Use your type system to clearly identify functions with side effects. Ask yourself: "Is it obvious from the function signature that this has side effects?" Make it impossible to accidentally invoke a side effect without being aware of it.
 
    ```typescript
    // TypeScript example with explicit effect types
    type Effect<T> = () => Promise<T>;
-   
+
    // Pure function (returns data)
    function calculateTotal(items: Item[]): number {
      return items.reduce((sum, item) => sum + item.price, 0);
    }
-   
+
    // Function that returns an effect (but doesn't execute it)
    function saveOrder(order: Order): Effect<void> {
      return async () => {
@@ -122,7 +130,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
        await logger.info(`Order ${order.id} saved`);
      };
    }
-   
+
    // Imperative shell composes and executes effects
    async function processOrder(items: Item[]): Promise<void> {
      const total = calculateTotal(items);
@@ -135,7 +143,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    }
    ```
 
-3. **Isolate Non-Deterministic Operations**: Separate non-deterministic operations (like generating random numbers or timestamps) from your pure business logic. Ask yourself: "What makes this function unpredictable?" Then extract those elements and inject the results.
+1. **Isolate Non-Deterministic Operations**: Separate non-deterministic operations (like generating random numbers or timestamps) from your pure business logic. Ask yourself: "What makes this function unpredictable?" Then extract those elements and inject the results.
 
    ```javascript
    // ❌ BAD: Non-deterministic function
@@ -147,7 +155,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
        createdAt: new Date()
      };
    }
-   
+
    // ✅ GOOD: Pure function with injected non-determinism
    function createUser(name, email, id, timestamp) {
      return {
@@ -157,7 +165,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
        createdAt: timestamp
      };
    }
-   
+
    // The shell provides the non-deterministic values
    function createUserController(name, email) {
      const id = generateId();
@@ -166,7 +174,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    }
    ```
 
-4. **Apply Functional Programming Patterns**: Use functional programming patterns to help maintain purity. Ask yourself: "How can I transform data without modifying it?" Learn to use techniques like:
+1. **Apply Functional Programming Patterns**: Use functional programming patterns to help maintain purity. Ask yourself: "How can I transform data without modifying it?" Learn to use techniques like:
 
    - Map/filter/reduce instead of for-loops with mutation
    - Function composition to build complex operations from simple ones
@@ -177,7 +185,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    // Functional patterns example
    const discount = rate => price => price * (1 - rate);
    const applyTax = rate => price => price * (1 + rate);
-   
+
    // Function composition
    const computeFinalPrice = (discountRate, taxRate) => {
      const applyDiscount = discount(discountRate);
@@ -186,12 +194,12 @@ Here are concrete strategies for implementing and enforcing pure functions acros
      // Create a pipeline of transformations
      return price => addTax(applyDiscount(price));
    };
-   
+
    // Usage
    const finalPrice = computeFinalPrice(0.1, 0.08)(100);
    ```
 
-5. **Use Dependency Injection**: Make dependencies explicit by injecting them rather than importing them directly. Ask yourself: "What does this function depend on that isn't in its parameters?" Those hidden dependencies are candidates for injection.
+1. **Use Dependency Injection**: Make dependencies explicit by injecting them rather than importing them directly. Ask yourself: "What does this function depend on that isn't in its parameters?" Those hidden dependencies are candidates for injection.
 
    ```python
    # ❌ BAD: Hidden dependencies
@@ -199,11 +207,11 @@ Here are concrete strategies for implementing and enforcing pure functions acros
        # Hidden dependency on database module
        from database import db
        return db.users.find_one({"id": user_id}).get("preferences", {})
-   
+
    # ✅ GOOD: Explicit dependency injection
    def get_user_preferences(user_id, db_client):
        return db_client.users.find_one({"id": user_id}).get("preferences", {})
-   
+
    # Usage in the shell
    def preferences_controller(user_id):
        from database import get_db_client

@@ -1,7 +1,6 @@
----
-id: simplicity
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: simplicity last_modified: "2025-05-04"
 
 # Tenet: Simplicity Above All
 
@@ -21,13 +20,13 @@ The pursuit of simplicity isn't about cutting corners or avoiding sophisticated 
 
 1. **Apply YAGNI Rigorously**: "You Aren't Gonna Need It" is more than just an acronym—it's a mindset that challenges you to question every piece of code that isn't solving an immediate, demonstrated need. When you feel the urge to add functionality "just in case," ask yourself: "Do we have concrete evidence we'll need this?" If not, defer it. The future requirement you're imagining may never materialize, or it might look completely different when it does.
 
-2. **Minimize Moving Parts**: Each component, abstraction, configuration option, or dependency you add is a part that can break, must be understood, and needs maintenance. Before adding something new, ask: "What value does this add? Is there a simpler way to achieve the same outcome?" Be especially critical of dependencies—they bring their own complexity, security concerns, and update cycles into your project.
+1. **Minimize Moving Parts**: Each component, abstraction, configuration option, or dependency you add is a part that can break, must be understood, and needs maintenance. Before adding something new, ask: "What value does this add? Is there a simpler way to achieve the same outcome?" Be especially critical of dependencies—they bring their own complexity, security concerns, and update cycles into your project.
 
-3. **Value Readability Over Cleverness**: Remember that code is read far more often than it's written. When writing code, you're not just communicating with the computer—you're communicating with other developers (including your future self). Prioritize clear, readable code over terse or clever approaches. Ask yourself: "Will someone unfamiliar with this code immediately understand what it does and why?" A solution that takes a few more lines but clearly expresses intent is better than a compact but cryptic alternative.
+1. **Value Readability Over Cleverness**: Remember that code is read far more often than it's written. When writing code, you're not just communicating with the computer—you're communicating with other developers (including your future self). Prioritize clear, readable code over terse or clever approaches. Ask yourself: "Will someone unfamiliar with this code immediately understand what it does and why?" A solution that takes a few more lines but clearly expresses intent is better than a compact but cryptic alternative.
 
-4. **Distinguish Complexity Types**: Learn to tell the difference between essential complexity (inherent in the problem domain) and accidental complexity (introduced by implementation choices). Essential complexity must be managed through good design and clear abstractions. Accidental complexity should be ruthlessly eliminated. When you find yourself creating complex structures, ask: "Is this complexity coming from the problem itself, or from my approach to solving it?"
+1. **Distinguish Complexity Types**: Learn to tell the difference between essential complexity (inherent in the problem domain) and accidental complexity (introduced by implementation choices). Essential complexity must be managed through good design and clear abstractions. Accidental complexity should be ruthlessly eliminated. When you find yourself creating complex structures, ask: "Is this complexity coming from the problem itself, or from my approach to solving it?"
 
-5. **Refactor Towards Simplicity**: Codebases naturally drift toward complexity over time unless actively counteracted. Make simplification a continuous practice. Regularly step back and evaluate your existing code, asking: "How could this be simplified?" When you understand a piece of complex code, take the time to refactor it toward simplicity while its workings are fresh in your mind. This ongoing investment prevents complexity debt from accumulating.
+1. **Refactor Towards Simplicity**: Codebases naturally drift toward complexity over time unless actively counteracted. Make simplification a continuous practice. Regularly step back and evaluate your existing code, asking: "How could this be simplified?" When you understand a piece of complex code, take the time to refactor it toward simplicity while its workings are fresh in your mind. This ongoing investment prevents complexity debt from accumulating.
 
 ## Warning Signs
 

@@ -1,7 +1,6 @@
----
-id: no-secret-suppression
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: no-secret-suppression last_modified: "2025-05-04"
 
 # Tenet: Confront Issues, Don't Suppress Warnings
 
@@ -21,13 +20,13 @@ This principle isn't about blind adherence to tools or treating every warning as
 
 1. **Address Root Causes, Not Symptoms**: When faced with a warning or error, focus on resolving the underlying issue rather than suppressing the message. Ask yourself: "What is this warning trying to tell me about my code?" Quality tools rarely flag issues without reason—they're identifying patterns that have historically led to problems. Understand why the rule exists before considering whether an exception is truly warranted. Remember that the quickest solution (suppression) is rarely the best solution for long-term code health.
 
-2. **Document Any Necessary Exceptions**: In the rare cases where suppressions are genuinely needed, document them thoroughly. Ask yourself: "Will someone who finds this suppression understand exactly why it's here?" Include a clear explanation of why the rule doesn't apply in this specific case, what alternative measures ensure safety, who made the decision, and ideally, a ticket reference for future reconsideration. This transforms a dangerous "secret suppression" into a transparent, justified exception that future maintainers can evaluate.
+1. **Document Any Necessary Exceptions**: In the rare cases where suppressions are genuinely needed, document them thoroughly. Ask yourself: "Will someone who finds this suppression understand exactly why it's here?" Include a clear explanation of why the rule doesn't apply in this specific case, what alternative measures ensure safety, who made the decision, and ideally, a ticket reference for future reconsideration. This transforms a dangerous "secret suppression" into a transparent, justified exception that future maintainers can evaluate.
 
-3. **Make Suppressions Visible During Review**: Ensure that any quality tool suppressions are explicitly highlighted during code review. Ask yourself: "Would I be comfortable explaining this suppression to the most senior engineer on the team?" Normalizing the discussion of suppressions helps maintain a culture where they're treated as significant exceptions requiring justification rather than routine shortcuts. This visibility also spreads knowledge about when exceptions are appropriate and when they're not.
+1. **Make Suppressions Visible During Review**: Ensure that any quality tool suppressions are explicitly highlighted during code review. Ask yourself: "Would I be comfortable explaining this suppression to the most senior engineer on the team?" Normalizing the discussion of suppressions helps maintain a culture where they're treated as significant exceptions requiring justification rather than routine shortcuts. This visibility also spreads knowledge about when exceptions are appropriate and when they're not.
 
-4. **Regularly Audit Existing Suppressions**: Set up a practice of periodically reviewing existing suppressions to determine if they're still necessary. Ask yourself: "Has the context changed since this suppression was added?" Codebases evolve, and suppressions that were once necessary might no longer be needed. Similarly, temporary suppressions added during crunch times often become permanent by default unless they're explicitly revisited. Create a process or schedule for reevaluating suppressions, treating them as technical debt to be addressed when possible.
+1. **Regularly Audit Existing Suppressions**: Set up a practice of periodically reviewing existing suppressions to determine if they're still necessary. Ask yourself: "Has the context changed since this suppression was added?" Codebases evolve, and suppressions that were once necessary might no longer be needed. Similarly, temporary suppressions added during crunch times often become permanent by default unless they're explicitly revisited. Create a process or schedule for reevaluating suppressions, treating them as technical debt to be addressed when possible.
 
-5. **Adapt Global Rules When Patterns Emerge**: If you find your team repeatedly suppressing the same rule across the codebase, consider whether the rule itself should be modified globally. Ask yourself: "Is this rule providing value in our specific context, or is it generating more noise than signal?" Not all default rules in quality tools will align perfectly with your project's needs. It's better to thoughtfully adjust a global rule configuration than to accumulate dozens of individual suppressions. However, be cautious about weakening rules without careful consideration of the security or quality implications.
+1. **Adapt Global Rules When Patterns Emerge**: If you find your team repeatedly suppressing the same rule across the codebase, consider whether the rule itself should be modified globally. Ask yourself: "Is this rule providing value in our specific context, or is it generating more noise than signal?" Not all default rules in quality tools will align perfectly with your project's needs. It's better to thoughtfully adjust a global rule configuration than to accumulate dozens of individual suppressions. However, be cautious about weakening rules without careful consideration of the security or quality implications.
 
 ## Warning Signs
 

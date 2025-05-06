@@ -1,7 +1,6 @@
----
-id: explicit-over-implicit
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: explicit-over-implicit last_modified: "2025-05-04"
 
 # Tenet: Explicit is Better than Implicit
 
@@ -21,13 +20,13 @@ Explicitness doesn't mean verbosity or redundancy. Rather, it means that code sh
 
 1. **Make Dependencies Explicit**: Express dependencies directly rather than accessing them through global state, ambient context, or hidden singletons. Ask yourself: "Can someone understand what this component needs by reading its interface?" Prefer passing dependencies as parameters or using explicit dependency injection rather than allowing components to reach out and grab what they need from the environment. This makes component requirements visible, simplifies testing, and prevents subtle coupling between supposedly independent parts of your system.
 
-2. **Reveal Control Flow**: Structure code so the path of execution is clear and obvious. Ask yourself: "Can a reader easily trace the flow of control through this code?" Avoid techniques that hide control flow, such as excessive event-based programming, complex decorator chains, or aspect-oriented programming without clear documentation. While these techniques have their place, they should be used judiciously and with clear signposts to help readers understand the non-linear flow of execution.
+1. **Reveal Control Flow**: Structure code so the path of execution is clear and obvious. Ask yourself: "Can a reader easily trace the flow of control through this code?" Avoid techniques that hide control flow, such as excessive event-based programming, complex decorator chains, or aspect-oriented programming without clear documentation. While these techniques have their place, they should be used judiciously and with clear signposts to help readers understand the non-linear flow of execution.
 
-3. **Signal Side Effects**: Make it obvious when a function or method does more than compute a return value. Ask yourself: "Are all the effects of calling this function clear from its interface?" Functions that update state, make network calls, write to files, or have other side effects should communicate these behaviors through their names, return types, documentation, or parameter structure. Pure functions (those without side effects) should be the default, with side effects clearly marked as exceptional.
+1. **Signal Side Effects**: Make it obvious when a function or method does more than compute a return value. Ask yourself: "Are all the effects of calling this function clear from its interface?" Functions that update state, make network calls, write to files, or have other side effects should communicate these behaviors through their names, return types, documentation, or parameter structure. Pure functions (those without side effects) should be the default, with side effects clearly marked as exceptional.
 
-4. **Express Contracts Clearly**: Define the expectations and guarantees of each component explicitly. Ask yourself: "What assumptions does this code make about its inputs, environment, or usage?" Document preconditions, postconditions, and invariants to make contracts clear. Use strong typing to enforce as many constraints as possible at compile time. For dynamic languages or constraints that can't be expressed in the type system, add runtime validation with informative error messages when contracts are violated.
+1. **Express Contracts Clearly**: Define the expectations and guarantees of each component explicitly. Ask yourself: "What assumptions does this code make about its inputs, environment, or usage?" Document preconditions, postconditions, and invariants to make contracts clear. Use strong typing to enforce as many constraints as possible at compile time. For dynamic languages or constraints that can't be expressed in the type system, add runtime validation with informative error messages when contracts are violated.
 
-5. **Choose Clarity Over Convenience**: Prioritize code that clearly communicates its intent over code that saves a few keystrokes. Ask yourself: "Does this abstraction make the code more understandable, or just shorter?" Resist the temptation to create abstractions that hide too much or rely on subtle, implicit conventions. The time saved by typing less code is quickly overwhelmed by the time spent understanding, debugging, and explaining unclear code. Remember that most code is read many more times than it is written.
+1. **Choose Clarity Over Convenience**: Prioritize code that clearly communicates its intent over code that saves a few keystrokes. Ask yourself: "Does this abstraction make the code more understandable, or just shorter?" Resist the temptation to create abstractions that hide too much or rely on subtle, implicit conventions. The time saved by typing less code is quickly overwhelmed by the time spent understanding, debugging, and explaining unclear code. Remember that most code is read many more times than it is written.
 
 ## Warning Signs
 

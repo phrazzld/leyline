@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: ts-no-any
 last_modified: "2025-05-04"
 derived_from: explicit-over-implicit
 enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
 applies_to:
-  - typescript
----
+
+- typescript
+
+______________________________________________________________________
 
 # Binding: Make Types Explicit, Never Use `any`
 
@@ -47,6 +50,7 @@ Instead, you must use precise types like:
 ### TypeScript Configuration
 
 1. **Enable strict type checking** in your `tsconfig.json`:
+
    ```json
    {
      "compilerOptions": {
@@ -56,7 +60,8 @@ Instead, you must use precise types like:
    }
    ```
 
-2. **Add ESLint rules** to prevent explicit `any`:
+1. **Add ESLint rules** to prevent explicit `any`:
+
    ```json
    {
      "rules": {
@@ -68,6 +73,7 @@ Instead, you must use precise types like:
 ### Alternative Approaches
 
 1. **Use `unknown` instead of `any` for values of uncertain type**:
+
    ```typescript
    // Instead of:
    function process(data: any): void { /* ... */ }
@@ -83,7 +89,8 @@ Instead, you must use precise types like:
    }
    ```
 
-2. **Create proper interfaces for structured data**:
+1. **Create proper interfaces for structured data**:
+
    ```typescript
    // Instead of:
    function processUser(user: any): void { /* ... */ }
@@ -98,7 +105,8 @@ Instead, you must use precise types like:
    function processUser(user: User): void { /* ... */ }
    ```
 
-3. **Use union types for values that could be one of several types**:
+1. **Use union types for values that could be one of several types**:
+
    ```typescript
    // Instead of:
    function getLength(value: any): number { /* ... */ }
@@ -109,7 +117,8 @@ Instead, you must use precise types like:
    }
    ```
 
-4. **Use generics for flexible, type-safe functions**:
+1. **Use generics for flexible, type-safe functions**:
+
    ```typescript
    // Instead of:
    function getProperty(obj: any, key: string): any { /* ... */ }
@@ -120,7 +129,8 @@ Instead, you must use precise types like:
    }
    ```
 
-5. **For third-party libraries without types, use declaration files or minimally-scoped type assertions**:
+1. **For third-party libraries without types, use declaration files or minimally-scoped type assertions**:
+
    ```typescript
    // Instead of:
    import * as untyped from 'untyped-library';
@@ -130,7 +140,7 @@ Instead, you must use precise types like:
    declare module 'untyped-library' {
      export function someFunction(): SomeReturnType;
    }
-   
+
    // Or use type assertions scoped to the minimum needed interface:
    import * as untyped from 'untyped-library';
    interface SomeReturnType { id: string; value: number; }

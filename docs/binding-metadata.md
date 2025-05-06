@@ -42,6 +42,7 @@ applies_to:
 ### Valid `applies_to` Values
 
 #### Languages
+
 - `typescript`
 - `javascript`
 - `go`
@@ -52,6 +53,7 @@ applies_to:
 - `ruby`
 
 #### Environments/Contexts
+
 - `frontend`
 - `backend`
 - `mobile`
@@ -61,6 +63,7 @@ applies_to:
 - `service`
 
 #### Special Values
+
 - `all` - Indicates the binding applies to all contexts/languages
 
 ### Naming Convention and Auto-detection
@@ -75,14 +78,14 @@ The language prefix should correspond to the appropriate language in `applies_to
 
 | Prefix | Language |
 |--------|----------|
-| `ts-`  | typescript |
-| `js-`  | javascript |
-| `go-`  | go |
+| `ts-` | typescript |
+| `js-` | javascript |
+| `go-` | go |
 | `rust-` | rust |
-| `py-`  | python |
+| `py-` | python |
 | `java-` | java |
-| `cs-`  | csharp |
-| `rb-`  | ruby |
+| `cs-` | csharp |
+| `rb-` | ruby |
 
 For language-agnostic bindings, omit the language prefix and include `all` in the `applies_to` array.
 
@@ -134,6 +137,7 @@ applies_to:
 ## Validation
 
 The `tools/validate_front_matter.rb` script will validate:
+
 - All required fields are present
 - The `applies_to` field contains an array of strings
 - The values in `applies_to` are from the list of valid contexts

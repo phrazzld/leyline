@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: go-concurrency-patterns
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: code review & race detector
 applies_to:
-  - go
----
+
+- go
+
+______________________________________________________________________
 
 # Binding: Use Goroutines and Channels Judiciously with Explicit Coordination
 
@@ -24,6 +27,7 @@ The apparent simplicity of Go's concurrency mechanisms—the ease of spinning up
 This binding establishes clear requirements for implementing concurrency in Go:
 
 - **Goroutine Management**:
+
   - Goroutines MUST NOT be started without a clear strategy for termination
   - Every goroutine MUST have at least one of:
     - A defined exit condition that is guaranteed to occur
@@ -34,6 +38,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
   - Worker pools SHOULD be used for bounding concurrent operations rather than unbounded goroutine creation
 
 - **Context Usage**:
+
   - Functions that perform I/O, long-running operations, or spawn goroutines MUST accept a `context.Context` parameter
   - Context MUST be the first parameter of a function that accepts it
   - Context cancellation MUST be respected by checking `ctx.Done()` in long-running operations
@@ -42,6 +47,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
   - Context MUST be propagated through call chains to lower-level functions
 
 - **Channel Patterns**:
+
   - Channels MUST have clear ownership semantics:
     - Exactly one goroutine is responsible for closing each channel
     - Senders typically must not close channels they don't own
@@ -53,6 +59,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
   - Avoid complex channel-of-channels patterns unless unavoidable
 
 - **Synchronization Primitives**:
+
   - Use `sync.Mutex` or `sync.RWMutex` when data must be shared between goroutines
   - Always release locks in a defer statement when possible to prevent leaks
   - Keep the critical section (locked code) as small as possible
@@ -62,6 +69,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
   - DO NOT copy mutex-containing structs; use pointers instead
 
 - **Race Safety**:
+
   - All code MUST pass the race detector (`go test -race ./...`)
   - All shared data access across goroutines MUST be properly synchronized
   - Avoid subtle data races with maps, slices, and interface values
@@ -129,7 +137,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
    }
    ```
 
-2. **Effective Context Propagation**: Use context correctly for cancellation and timeout:
+1. **Effective Context Propagation**: Use context correctly for cancellation and timeout:
 
    ```go
    // ✅ GOOD: Proper context usage with timeout
@@ -163,7 +171,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
        
        return &data, nil
    }
-   
+
    // ✅ GOOD: Check for cancellation in loops and long operations
    func ProcessLargeDataset(ctx context.Context, dataset []Data) error {
        for i, data := range dataset {
@@ -185,11 +193,11 @@ This binding establishes clear requirements for implementing concurrency in Go:
    }
    ```
 
-3. **Channel Ownership and Direction**: Establish clear ownership semantics:
+1. **Channel Ownership and Direction**: Establish clear ownership semantics:
 
    ```go
    // ✅ GOOD: Clear sender/receiver responsibilities with direction
-   
+
    // Generator owns and closes the returned channel
    func generateItems(ctx context.Context) <-chan Item {
        ch := make(chan Item)
@@ -209,7 +217,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
        
        return ch // Return receive-only channel
    }
-   
+
    // Processor accepts a receive-only channel, doesn't close it
    func processItems(ctx context.Context, items <-chan Item) <-chan Result {
        results := make(chan Result)
@@ -231,7 +239,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
        
        return results
    }
-   
+
    // Main orchestration
    func main() {
        ctx, cancel := context.WithCancel(context.Background())
@@ -247,7 +255,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
    }
    ```
 
-4. **Proper Synchronization Primitives**: Use the right tool for each synchronization need:
+1. **Proper Synchronization Primitives**: Use the right tool for each synchronization need:
 
    ```go
    // ✅ GOOD: Appropriate mutex usage with defer
@@ -255,7 +263,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
        mu      sync.RWMutex
        entries map[string]Entry
    }
-   
+
    func (c *Cache) Get(key string) (Entry, bool) {
        c.mu.RLock() // Read lock for concurrent reads
        defer c.mu.RUnlock()
@@ -263,7 +271,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
        entry, found := c.entries[key]
        return entry, found
    }
-   
+
    func (c *Cache) Set(key string, entry Entry) {
        c.mu.Lock() // Write lock for exclusive access
        defer c.mu.Unlock()
@@ -273,7 +281,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
        }
        c.entries[key] = entry
    }
-   
+
    // ✅ GOOD: WaitGroup for coordinating multiple goroutines
    func processInParallel(items []Item) []Result {
        results := make([]Result, len(items))
@@ -290,13 +298,13 @@ This binding establishes clear requirements for implementing concurrency in Go:
        wg.Wait() // Wait for all goroutines to finish
        return results
    }
-   
+
    // ✅ GOOD: Using Once for safe one-time initialization
    var (
        instance *Singleton
        once     sync.Once
    )
-   
+
    func GetInstance() *Singleton {
        once.Do(func() {
            instance = &Singleton{}
@@ -306,7 +314,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
    }
    ```
 
-5. **Race Detection and Testing**: Implement thorough concurrent testing:
+1. **Race Detection and Testing**: Implement thorough concurrent testing:
 
    ```go
    // ✅ GOOD: Testing concurrent access
@@ -337,7 +345,7 @@ This binding establishes clear requirements for implementing concurrency in Go:
        
        wg.Wait()
    }
-   
+
    // Run with:
    // go test -race -count=5 ./...
    ```

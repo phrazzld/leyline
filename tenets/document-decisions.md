@@ -1,7 +1,6 @@
----
-id: document-decisions
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: document-decisions last_modified: "2025-05-04"
 
 # Tenet: Document Decisions, Not Mechanics
 
@@ -21,13 +20,13 @@ However, there's an important distinction between documenting decisions and docu
 
 1. **Capture Context, Not Mechanics**: Focus your documentation on information that can't be easily recovered by reading the code. Ask yourself: "If someone reads this code a year from now, what essential context might they be missing?" Record business requirements, performance constraints, security considerations, and historical factors that influenced your design. Avoid explaining how the code works—that's what the code itself should communicate through clear structure and naming.
 
-2. **Make the Code Self-Documenting**: Invest in making your code legible without relying on comments. Ask yourself: "Does this code clearly communicate its intent and behavior?" Use descriptive variable and function names, follow consistent patterns, leverage type systems, and create well-structured abstractions. When you feel the need to add a comment explaining what code does, consider whether you could instead refactor the code to make its purpose more obvious. Remember that unlike comments, self-documenting code can't become outdated or incorrect.
+1. **Make the Code Self-Documenting**: Invest in making your code legible without relying on comments. Ask yourself: "Does this code clearly communicate its intent and behavior?" Use descriptive variable and function names, follow consistent patterns, leverage type systems, and create well-structured abstractions. When you feel the need to add a comment explaining what code does, consider whether you could instead refactor the code to make its purpose more obvious. Remember that unlike comments, self-documenting code can't become outdated or incorrect.
 
-3. **Document at the Right Level**: Different types of documentation serve different purposes and should be maintained at different granularities. Ask yourself: "What's the appropriate scope for this information?" Function-level documentation should focus on contracts, side effects, and non-obvious constraints. Module-level documentation should explain responsibilities and interaction patterns. Project-level documentation should cover architecture decisions, development workflows, and cross-cutting concerns. Inline comments should be reserved primarily for explaining the rationale behind particularly complex or unintuitive solutions.
+1. **Document at the Right Level**: Different types of documentation serve different purposes and should be maintained at different granularities. Ask yourself: "What's the appropriate scope for this information?" Function-level documentation should focus on contracts, side effects, and non-obvious constraints. Module-level documentation should explain responsibilities and interaction patterns. Project-level documentation should cover architecture decisions, development workflows, and cross-cutting concerns. Inline comments should be reserved primarily for explaining the rationale behind particularly complex or unintuitive solutions.
 
-4. **Adopt Structured Documentation Formats**: Use formal documentation approaches for significant decisions. Ask yourself: "Is this decision important enough that future developers will need its full context?" For architectural decisions, consider using Architecture Decision Records (ADRs)—short documents that capture the context, options considered, decision made, and consequences. For complex algorithms or domain models, create diagrams with explanations of key concepts and relationships. These structured formats provide a single source of truth that won't be lost in comment blocks buried deep in the code.
+1. **Adopt Structured Documentation Formats**: Use formal documentation approaches for significant decisions. Ask yourself: "Is this decision important enough that future developers will need its full context?" For architectural decisions, consider using Architecture Decision Records (ADRs)—short documents that capture the context, options considered, decision made, and consequences. For complex algorithms or domain models, create diagrams with explanations of key concepts and relationships. These structured formats provide a single source of truth that won't be lost in comment blocks buried deep in the code.
 
-5. **Update Documentation with Code**: Treat documentation as a first-class citizen in your development process. Ask yourself: "Does this code change invalidate any existing documentation?" When you modify code, review related documentation to ensure it remains accurate. When making significant design changes, update architectural documentation to reflect the new approach and the reasons for changing it. Remember that outdated documentation is often worse than no documentation, as it can actively mislead developers and undermine trust in all documentation.
+1. **Update Documentation with Code**: Treat documentation as a first-class citizen in your development process. Ask yourself: "Does this code change invalidate any existing documentation?" When you modify code, review related documentation to ensure it remains accurate. When making significant design changes, update architectural documentation to reflect the new approach and the reasons for changing it. Remember that outdated documentation is often worse than no documentation, as it can actively mislead developers and undermine trust in all documentation.
 
 ## Warning Signs
 

@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: no-internal-mocking
 last_modified: "2025-05-04"
 derived_from: testability
 enforced_by: code review & linters
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Mock External Systems Only, Never Internal Components
 
@@ -24,6 +27,7 @@ The problem with internal mocking goes beyond philosophical purity—it creates 
 This binding establishes clear boundaries for what can and cannot be replaced with test doubles:
 
 - **Never Mock Internal Components**: Do not create mocks, stubs, fakes, or spies for any component defined within your application boundary:
+
   - Classes and objects
   - Functions and methods
   - Interfaces and protocols implemented within your application
@@ -31,6 +35,7 @@ This binding establishes clear boundaries for what can and cannot be replaced wi
   - Local event emitters or message buses
 
 - **Only Mock True External Dependencies**: Test doubles should only stand in for components that cross system boundaries:
+
   - Databases and data stores
   - HTTP/gRPC/API clients
   - File system interactions
@@ -41,6 +46,7 @@ This binding establishes clear boundaries for what can and cannot be replaced wi
   - Third-party service clients
 
 - **Key Distinctions**:
+
   - The boundary is your application or service, not individual modules or packages
   - "Internal" means "code you own and can change"
   - "External" means "systems outside your control"
@@ -48,11 +54,13 @@ This binding establishes clear boundaries for what can and cannot be replaced wi
   - Libraries and frameworks you use but don't control are not considered external unless they access external resources
 
 - **Exceptions**: There are limited exceptions to this rule:
+
   - When testing edge cases that are impractical to create with real components (extreme error conditions, race conditions)
   - When real components would make tests prohibitively slow (>100ms per test)
   - When testing UI components where the rendering framework itself is considered external
-  
+
   Even in these cases, you should:
+
   - Keep exceptions minimal and explicitly justified in the test code
   - Consider if the need for exceptions indicates design problems
   - Maintain integration tests that verify real components work together
@@ -72,7 +80,7 @@ Here are concrete strategies for building testable systems without resorting to 
        // Uses internal repo directly
      }
    }
-   
+
    // ✅ GOOD: Receiving dependencies externally
    class OrderService {
      constructor(private readonly repo: OrderRepository) {}
@@ -85,7 +93,7 @@ Here are concrete strategies for building testable systems without resorting to 
 
    This approach allows you to provide real implementations in unit tests and substitute test doubles only for external dependencies in integration tests.
 
-2. **Extract Pure Business Logic**: Move core business rules and logic into pure functions or classes that don't depend directly on external resources:
+1. **Extract Pure Business Logic**: Move core business rules and logic into pure functions or classes that don't depend directly on external resources:
 
    ```python
    # ❌ BAD: Business logic mixed with external concerns
@@ -94,13 +102,13 @@ Here are concrete strategies for building testable systems without resorting to 
        if customer.tier == 'gold':
            return purchase_amount * 0.1
        return 0
-   
+
    # ✅ GOOD: Pure business logic free from external dependencies
    def calculate_discount(customer_tier, purchase_amount):
        if customer_tier == 'gold':
            return purchase_amount * 0.1
        return 0
-   
+
    # Interface to external systems handles the database part
    def get_customer_discount(customer_id, purchase_amount):
        customer = customer_repository.find_by_id(customer_id)
@@ -109,14 +117,14 @@ Here are concrete strategies for building testable systems without resorting to 
 
    Pure functions are naturally testable without mocks because they have no dependencies to substitute.
 
-3. **Create Proper Abstraction Boundaries**: Define clear interfaces for all external system interactions and keep these interfaces in your domain layer:
+1. **Create Proper Abstraction Boundaries**: Define clear interfaces for all external system interactions and keep these interfaces in your domain layer:
 
    ```java
    // Domain layer interface (owned by your application)
    public interface PaymentGateway {
        PaymentResult processPayment(Order order, PaymentDetails details);
    }
-   
+
    // Infrastructure implementation (uses external system)
    public class StripePaymentGateway implements PaymentGateway {
        private final StripeClient stripeClient;
@@ -132,7 +140,7 @@ Here are concrete strategies for building testable systems without resorting to 
            // Convert response back to domain objects
        }
    }
-   
+
    // In tests: Create test implementation of PaymentGateway
    public class TestPaymentGateway implements PaymentGateway {
        private List<Order> processedOrders = new ArrayList<>();
@@ -151,7 +159,7 @@ Here are concrete strategies for building testable systems without resorting to 
 
    This pattern lets you inject test implementations for external services without mocking internal components.
 
-4. **Use Composition Over Inheritance**: Build systems of small, focused components that you can easily assemble and test individually:
+1. **Use Composition Over Inheritance**: Build systems of small, focused components that you can easily assemble and test individually:
 
    ```csharp
    // ❌ BAD: Large classes with many responsibilities
@@ -166,7 +174,7 @@ Here are concrete strategies for building testable systems without resorting to 
            // Update reporting
        }
    }
-   
+
    // ✅ GOOD: Composable components with focused responsibilities
    public class OrderValidator { /* ... */ }
    public class InventoryManager { /* ... */ }
@@ -174,7 +182,7 @@ Here are concrete strategies for building testable systems without resorting to 
    public class DiscountApplier { /* ... */ }
    public class PaymentProcessor { /* ... */ }
    public class NotificationSender { /* ... */ }
-   
+
    public class OrderProcessor {
        private readonly OrderValidator validator;
        private readonly InventoryManager inventory;
@@ -200,7 +208,7 @@ Here are concrete strategies for building testable systems without resorting to 
 
    With small, focused components, you can use real implementations in tests without creating complex setups.
 
-5. **Leverage In-Memory Implementations**: For data stores and repositories, create in-memory implementations for testing:
+1. **Leverage In-Memory Implementations**: For data stores and repositories, create in-memory implementations for testing:
 
    ```go
    // Interface defined in domain layer
@@ -209,23 +217,23 @@ Here are concrete strategies for building testable systems without resorting to 
        Save(user *User) error
        FindByEmail(email string) (*User, error)
    }
-   
+
    // Production implementation using PostgreSQL
    type PostgresUserRepository struct {
        db *sql.DB
    }
-   
+
    // Test implementation using in-memory storage
    type InMemoryUserRepository struct {
        users map[string]*User
    }
-   
+
    func NewInMemoryUserRepository() *InMemoryUserRepository {
        return &InMemoryUserRepository{
            users: make(map[string]*User),
        }
    }
-   
+
    func (r *InMemoryUserRepository) FindByID(id string) (*User, error) {
        user, exists := r.users[id]
        if !exists {
@@ -233,7 +241,7 @@ Here are concrete strategies for building testable systems without resorting to 
        }
        return user, nil
    }
-   
+
    // Other method implementations...
    ```
 

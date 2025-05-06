@@ -6,13 +6,14 @@ This document outlines the steps to configure branch protection rules for the `m
 
 1. Navigate to the repository on GitHub: [https://github.com/phrazzld/leyline](https://github.com/phrazzld/leyline)
 
-2. Go to the "Settings" tab of the repository
+1. Go to the "Settings" tab of the repository
 
-3. In the left sidebar, click on "Branches"
+1. In the left sidebar, click on "Branches"
 
-4. Under "Branch protection rules", click "Add rule"
+1. Under "Branch protection rules", click "Add rule"
 
-5. Configure the branch protection rule with these settings:
+1. Configure the branch protection rule with these settings:
+
    - Branch name pattern: `master`
    - Require a pull request before merging: ✓
      - Require approvals: Not required initially (per simplified governance model)
@@ -22,7 +23,7 @@ This document outlines the steps to configure branch protection rules for the `m
    - Allow force pushes: ✗
    - Allow deletions: ✗
 
-6. Click "Create" to apply the branch protection rule
+1. Click "Create" to apply the branch protection rule
 
 ## Additional Repository Settings
 

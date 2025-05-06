@@ -16,14 +16,17 @@ examples/
 To integrate your repository with Leyline, follow these steps:
 
 1. **Set up GitHub Actions Workflow**
+
    - Copy `github-workflows/vendor-docs.yml` to your repository at `.github/workflows/vendor-docs.yml`
    - This workflow will sync tenets and bindings to your repository's `docs/` directory
 
-2. **Add Pre-commit Hook (Optional but Recommended)**
+1. **Add Pre-commit Hook (Optional but Recommended)**
+
    - Add the content from `pre-commit/pre-commit-config.yaml` to your repository's `.pre-commit-config.yaml`
    - This hook ensures that Leyline vendor files haven't been manually modified
 
-3. **Configure Renovate (Optional)**
+1. **Configure Renovate (Optional)**
+
    - If you use Renovate bot, add the configuration from `renovate/renovate.json` to your repository
    - This will automatically update Leyline references in your workflows
 
@@ -38,6 +41,6 @@ To integrate your repository with Leyline, follow these steps:
 When a new version of Leyline is released, you can update your integration by:
 
 1. Changing the `ref` parameter in your workflow file (e.g., from `v0.1.0` to `v0.2.0`)
-2. Running the updated workflow, which will create a pull request with the new tenets and bindings
+1. Running the updated workflow, which will create a pull request with the new tenets and bindings
 
 If you've configured Renovate, it will automatically create pull requests to update your Leyline references.

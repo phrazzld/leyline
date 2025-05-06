@@ -1,7 +1,6 @@
----
-id: automation
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: automation last_modified: "2025-05-04"
 
 # Tenet: Automation as a Force Multiplier
 
@@ -21,13 +20,13 @@ The pursuit of automation isn't about eliminating human judgment or creativity�
 
 1. **Apply the "Three Strikes" Rule**: Never perform the same task manually more than twice without automating it. The third time you find yourself repeating a process, stop and ask: "How can I automate this so I never have to manually do it again?" This creates a natural prioritization mechanism—tasks that occur frequently get automated first, providing the highest return on investment. This simple heuristic can transform your workflow from reactive to proactive.
 
-2. **Make Automation Mandatory, Not Optional**: Treat automation as a non-negotiable part of your development process, not as a "nice-to-have" addition. When you create automated processes like linting, testing, or build verification, enforce their use through mechanisms like pre-commit hooks, CI/CD pipelines, and protected branches. Ask yourself: "How can I make it impossible to skip this automated check?" Remember that optional automation will eventually be bypassed, especially under time pressure—precisely when it's most needed.
+1. **Make Automation Mandatory, Not Optional**: Treat automation as a non-negotiable part of your development process, not as a "nice-to-have" addition. When you create automated processes like linting, testing, or build verification, enforce their use through mechanisms like pre-commit hooks, CI/CD pipelines, and protected branches. Ask yourself: "How can I make it impossible to skip this automated check?" Remember that optional automation will eventually be bypassed, especially under time pressure—precisely when it's most needed.
 
-3. **Start with Developer Experience**: Focus first on automating tasks that directly impact the developer workflow, creating a tight feedback loop between writing code and verifying its correctness. This includes automating linting, formatting, type checking, and testing that can run locally before code is even committed. Ask: "What manual tasks are slowing down developers' ability to iterate quickly?" By automating these high-frequency activities, you create immediate benefits that motivate further investment in automation.
+1. **Start with Developer Experience**: Focus first on automating tasks that directly impact the developer workflow, creating a tight feedback loop between writing code and verifying its correctness. This includes automating linting, formatting, type checking, and testing that can run locally before code is even committed. Ask: "What manual tasks are slowing down developers' ability to iterate quickly?" By automating these high-frequency activities, you create immediate benefits that motivate further investment in automation.
 
-4. **Automate at the Right Level of Abstraction**: Choose the appropriate tools and approaches based on the task's frequency, complexity, and audience. For developer-facing automation (like linting or testing), prioritize speed and clear feedback. For operational automation (like deployments), prioritize reliability and observability. Ask yourself: "Who will be using this automation, and what do they need from it?" This ensures your automation serves its intended purpose effectively without unnecessary complexity.
+1. **Automate at the Right Level of Abstraction**: Choose the appropriate tools and approaches based on the task's frequency, complexity, and audience. For developer-facing automation (like linting or testing), prioritize speed and clear feedback. For operational automation (like deployments), prioritize reliability and observability. Ask yourself: "Who will be using this automation, and what do they need from it?" This ensures your automation serves its intended purpose effectively without unnecessary complexity.
 
-5. **Invest in Automation Maintenance**: Treat automation code as production code that requires regular maintenance, refactoring, and improvement. Set aside dedicated time to review and update your automation tools, scripts, and workflows. Ask: "Are our automated processes still serving their purpose effectively?" Regular maintenance prevents automation decay, where automated processes become outdated or begin to fail, potentially leading teams to work around them rather than rely on them.
+1. **Invest in Automation Maintenance**: Treat automation code as production code that requires regular maintenance, refactoring, and improvement. Set aside dedicated time to review and update your automation tools, scripts, and workflows. Ask: "Are our automated processes still serving their purpose effectively?" Regular maintenance prevents automation decay, where automated processes become outdated or begin to fail, potentially leading teams to work around them rather than rely on them.
 
 ## Warning Signs
 

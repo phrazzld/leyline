@@ -1,13 +1,16 @@
----
+______________________________________________________________________
+
 id: immutable-by-default
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: linters & code review
 applies_to:
-  - all
-  - typescript
-  - javascript
----
+
+- all
+- typescript
+- javascript
+
+______________________________________________________________________
 
 # Binding: Treat All Data as Unchangeable by Default
 
@@ -26,12 +29,14 @@ The benefits of immutability compound over time. In complex systems, tracking mu
 This binding establishes immutability as the default approach for all data in your system:
 
 - **Default to Immutability**: Consider all data immutable unless there's a compelling reason otherwise. This applies to:
+
   - Function parameters (never modify what was passed in)
   - Return values (return new objects, not modified versions of inputs)
   - Internal data structures (create new versions rather than modifying in place)
   - Shared state (manage through controlled replacement rather than direct mutation)
 
 - **Scope of Application**: This rule applies to all types of data structures:
+
   - Objects/maps/dictionaries
   - Arrays/lists/collections
   - Sets and other specialized data structures
@@ -39,12 +44,14 @@ This binding establishes immutability as the default approach for all data in yo
   - Configuration data
 
 - **Permitted Exceptions**: Direct mutation is only allowed in specific circumstances:
+
   - Performance-critical code where immutability creates a measurable bottleneck
   - Initialization phase of objects before they become visible to other components
   - Private implementation details that maintain immutable public interfaces
   - Language-specific idioms where immutability would violate platform conventions
 
 - **Exception Requirements**: When implementing exceptions, you must:
+
   - Document the specific reason for allowing mutation
   - Contain mutation to the smallest possible scope
   - Keep mutations private, never exposing mutable objects across boundaries
@@ -59,10 +66,11 @@ Here are concrete strategies for implementing immutability across your codebase:
 1. **Use Language Features for Immutability**: Leverage built-in language support wherever possible to make immutability the default pattern:
 
    - In TypeScript/JavaScript:
+
      ```typescript
      // Mark variables as constant to prevent reassignment
      const user = { name: "Alice", email: "alice@example.com" };
-     
+
      // Use readonly for properties and array types
      interface User {
        readonly id: string;
@@ -73,15 +81,17 @@ Here are concrete strategies for implementing immutability across your codebase:
      ```
 
    - In Rust:
+
      ```rust
      // Default to immutable bindings
      let user = User { name: "Alice", email: "alice@example.com" };
-     
+
      // Only use mut when necessary
      let mut builder = UserBuilder::new();
      ```
 
    - In Java/Kotlin:
+
      ```java
      // Make fields final
      public final class User {
@@ -93,6 +103,7 @@ Here are concrete strategies for implementing immutability across your codebase:
      ```
 
    - In C#:
+
      ```csharp
      // Use init-only properties
      public class User {
@@ -101,21 +112,23 @@ Here are concrete strategies for implementing immutability across your codebase:
      }
      ```
 
-2. **Implement Immutable Update Patterns**: Learn the patterns for updating immutable data structures in your language:
+1. **Implement Immutable Update Patterns**: Learn the patterns for updating immutable data structures in your language:
 
    - Spread/rest operator for objects and arrays in JavaScript/TypeScript:
+
      ```typescript
      // Update user properties by creating a new object
      const updatedUser = { ...user, name: "Bob" };
-     
+
      // Add item to array by creating a new array
      const newItems = [...items, newItem];
-     
+
      // Remove item from array by creating a new array
      const filteredItems = items.filter(item => item.id !== itemToRemove.id);
      ```
 
    - Builder pattern for complex objects:
+
      ```java
      User updatedUser = User.builder()
        .from(originalUser)  // Copy all properties from original
@@ -124,38 +137,42 @@ Here are concrete strategies for implementing immutability across your codebase:
      ```
 
    - Record types in languages that support them:
+
      ```csharp
      // C# record types are immutable by default
      public record User(string Id, string Name, string Email);
-     
+
      // Create new record with updated properties
      var updatedUser = user with { Name = "Bob" };
      ```
 
-3. **Use Immutability Libraries**: When built-in language features aren't sufficient, leverage libraries specifically designed for immutable data:
+1. **Use Immutability Libraries**: When built-in language features aren't sufficient, leverage libraries specifically designed for immutable data:
 
    - For JavaScript/TypeScript:
+
      - Immer.js for simpler immutable updates
      - Immutable.js for persistent data structures
      - Redux Toolkit for immutable state management
 
    - For Java:
+
      - Immutables for generating immutable classes
      - Vavr for persistent collections
 
    - For other languages, seek equivalent libraries that provide:
+
      - Persistent data structures with efficient updates
      - Helper utilities for immutable transformations
      - Thread-safe immutable collections
 
-4. **Apply Functional Programming Techniques**: Adopt functional patterns that work well with immutable data:
+1. **Apply Functional Programming Techniques**: Adopt functional patterns that work well with immutable data:
 
    - Favor pure functions that don't modify their inputs
    - Use function composition instead of sequential mutation
    - Apply transformations with map/filter/reduce instead of in-place loops
    - Implement copy-on-write when performance is a concern
 
-5. **Enforce Through Tooling**: Use automated checks to prevent accidental mutations:
+1. **Enforce Through Tooling**: Use automated checks to prevent accidental mutations:
 
    - Configure ESLint with rules like `no-param-reassign`, `prefer-const`
    - Enable compiler flags like `-XStrict` (Haskell) or `--strict` (TypeScript)

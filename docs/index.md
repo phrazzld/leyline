@@ -27,9 +27,9 @@ tools/        # Validation and maintenance scripts
 The Leyline Warden is an automated system that synchronizes tenets and bindings across repositories:
 
 1. When a new version of Leyline is tagged (e.g., `v0.1.0`)
-2. Warden creates pull requests in all target repositories
-3. Each PR updates the local copies of tenets and bindings
-4. This ensures consistent standards across all codebases
+1. Warden creates pull requests in all target repositories
+1. Each PR updates the local copies of tenets and bindings
+1. This ensures consistent standards across all codebases
 
 ### Integration
 
@@ -57,7 +57,7 @@ jobs:
 We welcome contributions to both tenets and bindings:
 
 1. **For tenets**: Focus on fundamental principles that stand the test of time
-2. **For bindings**: Create specific, enforceable rules that implement tenets
+1. **For bindings**: Create specific, enforceable rules that implement tenets
 
 See the [Contributing](CONTRIBUTING.md) section for detailed guidelines on proposing changes.
 

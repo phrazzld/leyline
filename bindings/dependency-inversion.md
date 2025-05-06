@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: dependency-inversion
 last_modified: "2025-05-04"
 derived_from: testability
 enforced_by: code review & architecture analysis
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Design Against Abstractions, Not Implementations
 
@@ -29,6 +32,7 @@ The Dependency Inversion Principle (DIP) specifically requires that:
 - The direction of source code dependencies must point inward toward the core domain, not outward toward infrastructure
 
 This creates a clear boundary where:
+
 - Your domain models and business logic remain pure and focused, isolated from technical details
 - Infrastructure components act as plugins to your business core, implementing interfaces defined by the domain
 - Dependencies flow in one direction, from infrastructure toward domain, making the system more modular and testable
@@ -50,7 +54,7 @@ To effectively implement dependency inversion in your projects:
    }
    ```
 
-2. **Use Constructor Dependency Injection**: Have your business logic accept its dependencies through constructors rather than creating them directly. This makes dependencies explicit, allows them to be substituted during testing, and prevents the business layer from knowing which specific implementations are being used.
+1. **Use Constructor Dependency Injection**: Have your business logic accept its dependencies through constructors rather than creating them directly. This makes dependencies explicit, allows them to be substituted during testing, and prevents the business layer from knowing which specific implementations are being used.
 
    ```typescript
    // Domain layer
@@ -63,12 +67,12 @@ To effectively implement dependency inversion in your projects:
    }
    ```
 
-3. **Implement Adapters in the Infrastructure Layer**: Create concrete implementations of your domain interfaces in a separate infrastructure layer. These adapters translate between your domain's abstractions and the specific technologies you're using. When implementing these adapters, import from your domain, never the other way around.
+1. **Implement Adapters in the Infrastructure Layer**: Create concrete implementations of your domain interfaces in a separate infrastructure layer. These adapters translate between your domain's abstractions and the specific technologies you're using. When implementing these adapters, import from your domain, never the other way around.
 
    ```typescript
    // Infrastructure layer
    import { UserRepository, User } from '../domain/user';
-   
+
    export class MongoUserRepository implements UserRepository {
      constructor(private mongoClient: MongoClient) {}
      
@@ -86,13 +90,13 @@ To effectively implement dependency inversion in your projects:
    }
    ```
 
-4. **Create a Composition Root**: Use a composition root (often in your application's entry point) to wire together your domain services with their infrastructure implementations. This is the one place where it's acceptable to know about both domains and implementations.
+1. **Create a Composition Root**: Use a composition root (often in your application's entry point) to wire together your domain services with their infrastructure implementations. This is the one place where it's acceptable to know about both domains and implementations.
 
    ```typescript
    // Composition root (application entry point)
    import { UserService } from './domain/user';
    import { MongoUserRepository } from './infrastructure/persistence';
-   
+
    function bootstrap() {
      const mongoClient = new MongoClient(config.dbUri);
      const userRepository = new MongoUserRepository(mongoClient);
@@ -102,7 +106,7 @@ To effectively implement dependency inversion in your projects:
    }
    ```
 
-5. **Enforce Through Package Structure**: Reinforce dependency inversion through your project's physical structure. Organize code into packages/modules that make it impossible to import in the wrong direction. Many languages provide module or package visibility modifiers that can help enforce these boundaries. If your language doesn't, consider using build tools or linters to validate import directions.
+1. **Enforce Through Package Structure**: Reinforce dependency inversion through your project's physical structure. Organize code into packages/modules that make it impossible to import in the wrong direction. Many languages provide module or package visibility modifiers that can help enforce these boundaries. If your language doesn't, consider using build tools or linters to validate import directions.
 
 ## Examples
 

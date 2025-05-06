@@ -7,8 +7,8 @@ This document explains how to set up the required labels in the GitHub repositor
 To manually set up the labels defined in `labels.yml`:
 
 1. Go to the repository on GitHub
-2. Navigate to Issues → Labels
-3. Click "New Label" for each label and enter:
+1. Navigate to Issues → Labels
+1. Click "New Label" for each label and enter:
    - Label name (e.g., "tenet")
    - Description (e.g., "Changes to tenets - requires 2 core maintainer approvals")
    - Color (e.g., "#0366d6")
@@ -41,7 +41,7 @@ The following labels are essential for the governance workflow:
 These labels integrate with the governance model described in `PLAN.md` and the contributing guidelines. GitHub branch protection rules should be configured to:
 
 1. Require specific reviewers based on PR labels
-2. Enable auto-merge for PRs with only the "leyline-sync" label (when CI passes)
+1. Enable auto-merge for PRs with only the "leyline-sync" label (when CI passes)
 
 ## Maintenance
 

@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: dependency-management
 last_modified: "2025-05-05"
 derived_from: simplicity
 enforced_by: dependency scanners & code review
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Minimize and Maintain Dependencies Deliberately
 
@@ -24,6 +27,7 @@ This binding also directly supports our automation tenet by emphasizing the need
 This binding establishes principles for thoughtful dependency management throughout the software lifecycle:
 
 - **Evaluation and Selection**: Before adding any dependency, you must:
+
   - Verify that the functionality cannot be reasonably implemented in-house with less complexity
   - Evaluate the dependency's quality, activity, maintenance status, and community health
   - Assess the full impact of the dependency's transitive dependency tree
@@ -31,6 +35,7 @@ This binding establishes principles for thoughtful dependency management through
   - Examine the compatibility with your existing technology stack and deployment targets
 
 - **Minimization and Isolation**: When using dependencies, you should:
+
   - Choose the smallest, most focused solution that solves your specific problem
   - Prefer mature, well-maintained libraries with minimal dependency trees of their own
   - Isolate third-party dependencies behind clear boundaries in your architecture
@@ -38,6 +43,7 @@ This binding establishes principles for thoughtful dependency management through
   - Only import the specific functionality you need, not entire frameworks
 
 - **Ongoing Maintenance**: For the lifetime of your project, you must:
+
   - Regularly update dependencies to their latest compatible versions
   - Continuously monitor for security vulnerabilities and license compliance issues
   - Automate dependency updates where possible, with appropriate testing to catch regressions
@@ -45,6 +51,7 @@ This binding establishes principles for thoughtful dependency management through
   - Maintain an accurate inventory of all dependencies and their purposes
 
 - **Permitted Exceptions**: The following exceptions are allowed:
+
   - Core platform dependencies (language runtimes, standard libraries)
   - Organization-wide approved frameworks designated as "sanctioned"
   - Critical specialized functionality where the cost of implementation would be prohibitive
@@ -85,7 +92,7 @@ When implementing these exceptions, you must document the justification, scope t
     */
    ```
 
-2. **Set Up Automated Dependency Management**: Implement automation for keeping dependencies up-to-date and secure. Ask yourself: "How will we know when a dependency needs attention?" Configure tools appropriate for your ecosystem that:
+1. **Set Up Automated Dependency Management**: Implement automation for keeping dependencies up-to-date and secure. Ask yourself: "How will we know when a dependency needs attention?" Configure tools appropriate for your ecosystem that:
 
    - Monitor for security vulnerabilities
    - Alert about outdated dependencies
@@ -116,37 +123,37 @@ When implementing these exceptions, you must document the justification, scope t
        open-pull-requests-limit: 5
    ```
 
-3. **Create Architectural Boundaries Around Dependencies**: Design your code to isolate third-party dependencies behind clear interfaces. Ask yourself: "What would happen if we needed to replace this dependency?" This approach creates a buffer zone between your core code and external libraries, making them easier to manage, test, and potentially replace.
+1. **Create Architectural Boundaries Around Dependencies**: Design your code to isolate third-party dependencies behind clear interfaces. Ask yourself: "What would happen if we needed to replace this dependency?" This approach creates a buffer zone between your core code and external libraries, making them easier to manage, test, and potentially replace.
 
    ```go
    // ❌ BAD: Exposing third-party library throughout codebase
    import "github.com/third-party/parsing"
-   
+
    func ProcessUserData(data []byte) {
        // Direct usage of third-party types and functions scattered
        // throughout the codebase
        result := parsing.Parse(data)
        // ...
    }
-   
+
    // ✅ GOOD: Isolating third-party library behind an interface
    // parser.go
    type Parser interface {
        Parse(data []byte) (Document, error)
    }
-   
+
    // internal/parsing/third_party.go
    import "github.com/third-party/parsing"
-   
+
    type ThirdPartyParser struct {}
-   
+
    func (p *ThirdPartyParser) Parse(data []byte) (Document, error) {
        // Adapter code that converts between your domain types
        // and the third-party library's types
        result := parsing.Parse(data)
        return convertToDocument(result), nil
    }
-   
+
    // Usage in business logic only sees your interface
    func ProcessUserData(parser Parser, data []byte) {
        doc, err := parser.Parse(data)
@@ -154,7 +161,7 @@ When implementing these exceptions, you must document the justification, scope t
    }
    ```
 
-4. **Implement Dependency Inventory and Auditing**: Maintain a clear inventory of your dependencies and regularly audit them. Ask yourself: "Do we know what every dependency is doing in our project?" Consider using tools to:
+1. **Implement Dependency Inventory and Auditing**: Maintain a clear inventory of your dependencies and regularly audit them. Ask yourself: "Do we know what every dependency is doing in our project?" Consider using tools to:
 
    - Generate a software bill of materials (SBOM)
    - Track dependencies and their purposes
@@ -163,25 +170,25 @@ When implementing these exceptions, you must document the justification, scope t
 
    ```shell
    # Example dependency audit commands
-   
+
    # npm example: find unused dependencies
    $ npx depcheck
-   
+
    # npm example: analyze dependency tree
    $ npm ls --all
-   
+
    # Python example: generate requirements.txt with pinned versions
    $ pip freeze > requirements.txt
-   
+
    # Go example: tidy dependencies
    $ go mod tidy
    $ go mod why github.com/some/dependency
-   
+
    # General: generate SBOM
    $ cyclonedx-npm --output-file sbom.xml
    ```
 
-5. **Practice Dependency Pruning and Replacement**: Regularly review your dependencies and remove those that are no longer necessary or have become problematic. Ask yourself: "If we were starting this project today, would we still choose this dependency?" Consider:
+1. **Practice Dependency Pruning and Replacement**: Regularly review your dependencies and remove those that are no longer necessary or have become problematic. Ask yourself: "If we were starting this project today, would we still choose this dependency?" Consider:
 
    - Replacing heavy dependencies with lighter alternatives
    - Inlining small amounts of functionality instead of carrying entire libraries
@@ -190,23 +197,23 @@ When implementing these exceptions, you must document the justification, scope t
 
    ```typescript
    // Example: Consider replacing a large date library with native functionality
-   
+
    // ❌ BAD: Using a heavy library for simple date formatting
    import * as moment from 'moment'; // Adds ~300KB to your bundle
-   
+
    function formatDate(date) {
      return moment(date).format('YYYY-MM-DD');
    }
-   
+
    // ✅ GOOD: Using native functionality or smaller alternative
    function formatDate(date) {
      const d = new Date(date);
      return d.toISOString().split('T')[0]; // No additional dependencies
    }
-   
+
    // Or with a more focused library if native isn't sufficient
    import { format } from 'date-fns'; // Modular, tree-shakable, ~6KB for this function
-   
+
    function formatDate(date) {
      return format(new Date(date), 'yyyy-MM-dd');
    }

@@ -1,7 +1,6 @@
----
-id: maintainability
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: maintainability last_modified: "2025-05-04"
 
 # Tenet: Maintainability Over Premature Optimization
 
@@ -21,13 +20,13 @@ Maintainable code isn't incompatible with high performance. Rather, it's about e
 
 1. **Optimize for Readability First**: Code is primarily a form of human-to-human communication that happens to be executable by machines. Prioritize clarity and comprehensibility in your implementation choices. Ask yourself: "If someone unfamiliar with this code reads it six months from now, will they understand what it does and why?" This often means avoiding overly clever techniques, breaking complex operations into well-named steps, and structuring code to mirror the mental model of the problem domain rather than the implementation details.
 
-2. **Establish Consistent Patterns**: Consistency reduces the cognitive load required to understand and modify code. Follow established patterns within your codebase, even if you might personally prefer a different approach. Ask yourself: "Does this implementation align with the patterns used elsewhere in the system?" Consistency applies to everything from naming conventions and code formatting to architectural patterns and error handling. When patterns must change, change them systematically across the codebase, not piecemeal.
+1. **Establish Consistent Patterns**: Consistency reduces the cognitive load required to understand and modify code. Follow established patterns within your codebase, even if you might personally prefer a different approach. Ask yourself: "Does this implementation align with the patterns used elsewhere in the system?" Consistency applies to everything from naming conventions and code formatting to architectural patterns and error handling. When patterns must change, change them systematically across the codebase, not piecemeal.
 
-3. **Invest in Clear Naming**: Names are the most important form of documentation in code. Take time to select precise, descriptive names for variables, functions, classes, and modules. Ask yourself: "Does this name accurately communicate the purpose and behavior without requiring the reader to examine the implementation?" Good names should reveal intent, avoid abbreviations or acronyms (unless universally recognized), and use a consistent vocabulary. Remember that the time spent thinking about a name is amortized across all future readings of the code.
+1. **Invest in Clear Naming**: Names are the most important form of documentation in code. Take time to select precise, descriptive names for variables, functions, classes, and modules. Ask yourself: "Does this name accurately communicate the purpose and behavior without requiring the reader to examine the implementation?" Good names should reveal intent, avoid abbreviations or acronyms (unless universally recognized), and use a consistent vocabulary. Remember that the time spent thinking about a name is amortized across all future readings of the code.
 
-4. **Document the Why, Not the How**: Self-explanatory code shows how something works, but doesn't always convey why a particular approach was chosen. Add comments to explain rationale, business rules, edge cases, workarounds for external constraints, and non-obvious implications. Ask yourself: "Are there important decisions or context that aren't evident from the code itself?" These explanations are invaluable for future maintainers who need to understand your reasoning before making changes. Comments that merely restate what the code does should be avoided or replaced with clearer code.
+1. **Document the Why, Not the How**: Self-explanatory code shows how something works, but doesn't always convey why a particular approach was chosen. Add comments to explain rationale, business rules, edge cases, workarounds for external constraints, and non-obvious implications. Ask yourself: "Are there important decisions or context that aren't evident from the code itself?" These explanations are invaluable for future maintainers who need to understand your reasoning before making changes. Comments that merely restate what the code does should be avoided or replaced with clearer code.
 
-5. **Measure Before Optimizing**: Use profiling tools to identify actual performance bottlenecks before making optimization changes. Direct your optimization efforts only at proven hotspots rather than guessing where performance issues might be. Ask yourself: "Do I have concrete evidence that this code is a performance bottleneck?" In most applications, a small fraction of the code (typically 10-20%) accounts for the majority of execution time. Finding and optimizing these critical sections while keeping the rest of your code maintainable yields the best balance between performance and maintainability.
+1. **Measure Before Optimizing**: Use profiling tools to identify actual performance bottlenecks before making optimization changes. Direct your optimization efforts only at proven hotspots rather than guessing where performance issues might be. Ask yourself: "Do I have concrete evidence that this code is a performance bottleneck?" In most applications, a small fraction of the code (typically 10-20%) accounts for the majority of execution time. Finding and optimizing these critical sections while keeping the rest of your code maintainable yields the best balance between performance and maintainability.
 
 ## Warning Signs
 

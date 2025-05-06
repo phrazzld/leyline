@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: code-size
 last_modified: "2025-05-05"
 derived_from: simplicity
 enforced_by: linters & code review
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Keep Code Units Small and Focused
 
@@ -26,6 +29,7 @@ The resulting codebase, built from small, focused components, becomes dramatical
 This binding establishes the following size limits for different code units:
 
 - **Functions and Methods**:
+
   - Should have a maximum of 15-30 lines of code (excluding comments and blank lines)
   - Should handle a single, focused responsibility
   - Should have no more than 3-4 parameters
@@ -33,29 +37,34 @@ This binding establishes the following size limits for different code units:
   - Should contain at most 1-2 return statements in typical cases
 
 - **Classes and Components**:
+
   - Should have a maximum of 300-500 lines of code (including methods)
   - Should have a cohesive set of related methods and properties
   - Should have no more than 10-15 public methods/properties
   - Should follow the Single Responsibility Principle
 
 - **Files**:
+
   - Should have a maximum of 500-750 lines of code in total
   - Should contain related functionality that belongs together
   - Should have a clear, focused purpose reflected in the filename
 
 - **Nesting Depth**:
+
   - Maximum 3 levels of nested conditionals/loops
   - Maximum 4 levels of nested callbacks/promises (in asynchronous code)
 
 These limits are intended as practical guidance rather than rigid rules. The following exceptions and considerations apply:
 
 - **Permitted Exceptions**:
+
   - Generated or declarative code (schemas, machine-generated parsers)
   - Data-heavy initialization routines with repetitive structure
   - Well-documented public APIs where splitting would harm usability
   - Performance-critical code where inlining is necessary (with benchmarks)
 
 - **Context-Sensitive Considerations**:
+
   - Simpler functions can be longer than complex ones
   - Declarative code can be longer than imperative code
   - Lower-level languages may need more lines for the same functionality
@@ -97,7 +106,7 @@ When exceeding these guidelines, you must provide justification in comments expl
    };
    ```
 
-2. **Apply Single Responsibility Refactorings**: Identify oversized code units and break them down into smaller, focused components. Ask yourself: "What are the distinct responsibilities or steps in this function or class?" Then extract each into its own well-named function or class.
+1. **Apply Single Responsibility Refactorings**: Identify oversized code units and break them down into smaller, focused components. Ask yourself: "What are the distinct responsibilities or steps in this function or class?" Then extract each into its own well-named function or class.
 
    ```typescript
    // ❌ BAD: Large function with multiple responsibilities
@@ -114,7 +123,7 @@ When exceeding these guidelines, you must provide justification in comments expl
      // 15 lines of notification sending
      // ...
    }
-   
+
    // ✅ GOOD: Broken down into focused functions
    function processUser(userData) {
      const validatedData = validateUserData(userData);
@@ -123,23 +132,24 @@ When exceeding these guidelines, you must provide justification in comments expl
      notifyUserCreation(savedUser);
      return savedUser;
    }
-   
+
    function validateUserData(userData) {
      // 20 lines of focused validation logic
      // ...
    }
-   
+
    function applyBusinessRules(userData) {
      // 30 lines of focused business rule application
      // ...
    }
-   
+
    // And so on...
    ```
 
-3. **Establish Clear Refactoring Triggers**: Define specific signals that indicate when code should be broken down into smaller units. Ask yourself: "What observable criteria indicate that a code unit is becoming too complex?" Create a shared understanding of these triggers among team members.
+1. **Establish Clear Refactoring Triggers**: Define specific signals that indicate when code should be broken down into smaller units. Ask yourself: "What observable criteria indicate that a code unit is becoming too complex?" Create a shared understanding of these triggers among team members.
 
    Common refactoring triggers include:
+
    - Function needs more than one screenful of code to view
    - Multiple nested conditionals or loops (arrow-shaped code)
    - Difficulty writing a concise function name that covers all behavior
@@ -179,7 +189,7 @@ When exceeding these guidelines, you must provide justification in comments expl
        # Create final order
        total = subtotal - discount + tax
        # ... 20 more lines of code
-   
+
    # ✅ GOOD: Broken into smaller, focused functions
    def process_order(order_data):
        validate_order_data(order_data)
@@ -189,7 +199,7 @@ When exceeding these guidelines, you must provide justification in comments expl
        return create_order(order_data, subtotal, discount, tax)
    ```
 
-4. **Use Consistent Naming Conventions**: Establish clear naming patterns that reveal the purpose and relationships between smaller components. Ask yourself: "If I divide this large function, how should I name the pieces to make their purpose and relationship clear?" Good naming is essential when breaking down large units into smaller ones.
+1. **Use Consistent Naming Conventions**: Establish clear naming patterns that reveal the purpose and relationships between smaller components. Ask yourself: "If I divide this large function, how should I name the pieces to make their purpose and relationship clear?" Good naming is essential when breaking down large units into smaller ones.
 
    ```java
    // Class with methods broken down and named consistently
@@ -218,18 +228,18 @@ When exceeding these guidelines, you must provide justification in comments expl
    }
    ```
 
-5. **Monitor and Reduce Complexity Metrics**: Use tools that measure cyclomatic complexity, cognitive complexity, and maintainability indices. Ask yourself: "Beyond just counting lines, how complex is this code really?" Then focus on reducing the most troublesome complexity hotspots first.
+1. **Monitor and Reduce Complexity Metrics**: Use tools that measure cyclomatic complexity, cognitive complexity, and maintainability indices. Ask yourself: "Beyond just counting lines, how complex is this code really?" Then focus on reducing the most troublesome complexity hotspots first.
 
    ```
    # Sample complexity report from a static analyzer
-   
+
    File: UserService.java
    - Cyclomatic Complexity: 24 (exceeds limit of 15)
    - Cognitive Complexity: 31 (exceeds limit of 20)
    - Methods exceeding complexity limits:
      - processUserRegistration: 18 (exceeds limit of 10)
      - validateUserInput: 12 (exceeds limit of 10)
-   
+
    Recommendation: 
    - Break down processUserRegistration into smaller methods
    - Extract validation rules from validateUserInput

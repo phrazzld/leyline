@@ -1,7 +1,6 @@
----
-id: testability
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: testability last_modified: "2025-05-04"
 
 # Tenet: Design for Testability
 
@@ -21,13 +20,13 @@ Testability is not about reaching arbitrary coverage numbers or following rigid 
 
 1. **Test-Driven Development When Appropriate**: Consider writing tests before implementation, especially for complex logic or critical functionality. This approach naturally leads to more testable designs and clearer requirements. Ask yourself: "Do I fully understand what this component needs to do?" If not, writing tests first can help clarify your thinking. TDD isn't always necessary, but when requirements are complex or specifications are unclear, it provides a powerful way to think through the problem space methodically.
 
-2. **Structure for Testability**: Organize code with clear interfaces, dependency inversion, separation of concerns, and pure functions to enable easy verification. Design decisions should consider testing implications from the start. Ask yourself: "How will this design decision impact our ability to test this component?" Prefer architectures that naturally support isolation and independent testing of components. Function parameters should be explicit rather than pulled from ambient context, side effects should be minimized, and dependencies should be injectable.
+1. **Structure for Testability**: Organize code with clear interfaces, dependency inversion, separation of concerns, and pure functions to enable easy verification. Design decisions should consider testing implications from the start. Ask yourself: "How will this design decision impact our ability to test this component?" Prefer architectures that naturally support isolation and independent testing of components. Function parameters should be explicit rather than pulled from ambient context, side effects should be minimized, and dependencies should be injectable.
 
-3. **Test Behavior, Not Implementation**: Focus tests on what the code should do (public API, behavior), not how it does it (internal implementation). Implementation details can and will change, but the behavior should remain consistent. Ask yourself: "Will this test break if I refactor the implementation without changing the external behavior?" Your tests should verify outcomes, not mechanisms. If your tests are tightly coupled to implementation details, they'll become a hindrance to refactoring rather than an enabler.
+1. **Test Behavior, Not Implementation**: Focus tests on what the code should do (public API, behavior), not how it does it (internal implementation). Implementation details can and will change, but the behavior should remain consistent. Ask yourself: "Will this test break if I refactor the implementation without changing the external behavior?" Your tests should verify outcomes, not mechanisms. If your tests are tightly coupled to implementation details, they'll become a hindrance to refactoring rather than an enabler.
 
-4. **Refactor First, Not Last**: If code is difficult to test, this is a signal to refactor the code under test rather than creating complex test setups or mocking frameworks. The difficulty in testing is revealing a design problem that should be addressed before proceeding. Ask yourself: "Why is this code hard to test?" The answer often points to problems like tight coupling, mixed concerns, or hidden dependencies that should be resolved in your production code, not worked around in your test code.
+1. **Refactor First, Not Last**: If code is difficult to test, this is a signal to refactor the code under test rather than creating complex test setups or mocking frameworks. The difficulty in testing is revealing a design problem that should be addressed before proceeding. Ask yourself: "Why is this code hard to test?" The answer often points to problems like tight coupling, mixed concerns, or hidden dependencies that should be resolved in your production code, not worked around in your test code.
 
-5. **No Mocking Internal Components**: Mocking should only be used at true external system boundaries (databases, APIs, file systems, etc.). The need to mock internal collaborators indicates a design problem—likely tight coupling or unclear boundaries. Ask yourself: "Am I mocking this because it's truly external to my system, or because my components are too entangled?" Mock objects should represent things outside your control, not convenient substitutes for internal components. If you feel compelled to mock an internal component, consider instead refactoring to better encapsulate that functionality.
+1. **No Mocking Internal Components**: Mocking should only be used at true external system boundaries (databases, APIs, file systems, etc.). The need to mock internal collaborators indicates a design problem—likely tight coupling or unclear boundaries. Ask yourself: "Am I mocking this because it's truly external to my system, or because my components are too entangled?" Mock objects should represent things outside your control, not convenient substitutes for internal components. If you feel compelled to mock an internal component, consider instead refactoring to better encapsulate that functionality.
 
 ## Warning Signs
 

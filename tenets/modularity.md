@@ -1,7 +1,6 @@
----
-id: modularity
-last_modified: "2025-05-04"
----
+______________________________________________________________________
+
+## id: modularity last_modified: "2025-05-04"
 
 # Tenet: Modularity is Mandatory
 
@@ -21,13 +20,13 @@ Modularity isn't about arbitrarily dividing code into random chunks—it's about
 
 1. **Do One Thing Well**: Each module, package, service, or function should have a single, clear responsibility. When evaluating a component, ask yourself: "Can I describe what this does in a single sentence without using 'and'?" If not, it's likely trying to do too much. Having a clear, focused purpose makes components easier to understand, test, and reuse. It also makes your codebase more resilient to change, as modifications tend to align with these natural boundaries.
 
-2. **Define Clear Boundaries**: Modules should have well-defined interfaces and hide their implementation details. Think of each module as having a contract with the rest of the system—clearly stating what it provides and what it requires, but keeping the "how" private. Ask yourself: "Could someone use this component correctly without understanding how it works internally?" When implementation details are well-encapsulated, you can change them without impacting other parts of the system.
+1. **Define Clear Boundaries**: Modules should have well-defined interfaces and hide their implementation details. Think of each module as having a contract with the rest of the system—clearly stating what it provides and what it requires, but keeping the "how" private. Ask yourself: "Could someone use this component correctly without understanding how it works internally?" When implementation details are well-encapsulated, you can change them without impacting other parts of the system.
 
-3. **Minimize Coupling**: Reduce dependencies between modules; when dependencies exist, they should be through abstract interfaces rather than concrete implementations. High coupling means changes ripple throughout your codebase, making maintenance increasingly difficult. When evaluating dependencies, ask: "Does this module really need to know about that other module?" Consider dependency inversion, where both modules depend on a shared abstraction rather than directly on each other.
+1. **Minimize Coupling**: Reduce dependencies between modules; when dependencies exist, they should be through abstract interfaces rather than concrete implementations. High coupling means changes ripple throughout your codebase, making maintenance increasingly difficult. When evaluating dependencies, ask: "Does this module really need to know about that other module?" Consider dependency inversion, where both modules depend on a shared abstraction rather than directly on each other.
 
-4. **Maximize Cohesion**: Related functionality should be grouped together within a module. Cohesive modules are focused and purposeful, making them easier to understand and maintain. When assessing cohesion, ask: "Do all parts of this module work together to serve a unified purpose?" Low cohesion often manifests as unrelated functionality bundled together, or as modules that have pieces that frequently need to be used separately from the rest of the module.
+1. **Maximize Cohesion**: Related functionality should be grouped together within a module. Cohesive modules are focused and purposeful, making them easier to understand and maintain. When assessing cohesion, ask: "Do all parts of this module work together to serve a unified purpose?" Low cohesion often manifests as unrelated functionality bundled together, or as modules that have pieces that frequently need to be used separately from the rest of the module.
 
-5. **Design for Composition**: Smaller modules should combine easily to build more complex functionality. This approach allows for tremendous flexibility while keeping individual components simple and focused. Consider whether your modules follow the Unix philosophy of "doing one thing well" and can be connected through simple, clear interfaces. Ask yourself: "Can this functionality be composed from simpler, more focused pieces?" This mindset leads to more flexible, reusable components that can be recombined in ways you might not initially anticipate.
+1. **Design for Composition**: Smaller modules should combine easily to build more complex functionality. This approach allows for tremendous flexibility while keeping individual components simple and focused. Consider whether your modules follow the Unix philosophy of "doing one thing well" and can be connected through simple, clear interfaces. Ask yourself: "Can this functionality be composed from simpler, more focused pieces?" This mindset leads to more flexible, reusable components that can be recombined in ways you might not initially anticipate.
 
 ## Warning Signs
 
