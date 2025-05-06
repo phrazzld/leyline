@@ -93,3 +93,44 @@
         1. Run validation tools locally
         2. Run mkdocs build --strict and view the generated site
     - **Depends‑on:** [T056, T057, T058]
+
+- [ ] **T060 · Fix · P0: Fix broken links causing MkDocs build failure**
+    - **Context:** CI deploy job fails in strict mode due to invalid links in index.md
+    - **Action:**
+        1. Fix relative links in index.md that use the ./docs/ prefix
+        2. Update link to examples/github-workflows/language-specific-sync.yml
+        3. Verify all links are using correct paths in the docs structure
+    - **Done‑when:**
+        1. All links in index.md correctly point to their targets
+        2. MkDocs builds without warnings in strict mode
+    - **Verification:**
+        1. Run mkdocs build --strict locally to verify no warnings
+        2. Run CI checks to verify successful build
+    - **Depends‑on:** none
+
+- [ ] **T061 · Fix · P0: Apply consistent markdown formatting**
+    - **Context:** CI lint-docs job fails due to inconsistent markdown formatting
+    - **Action:**
+        1. Install mdformat locally
+        2. Run mdformat on all markdown files
+        3. Commit the formatting changes
+    - **Done‑when:**
+        1. All markdown files pass the CI formatting check
+    - **Verification:**
+        1. Run local formatting check: mdformat --check .
+        2. Run CI checks to verify successful lint-docs job
+    - **Depends‑on:** none
+
+- [ ] **T062 · Chore · P1: Add markdown formatting pre-commit hook**
+    - **Context:** Prevent future formatting inconsistencies
+    - **Action:**
+        1. Update the pre-commit configuration to include mdformat
+        2. Add documentation about markdown formatting requirements
+        3. Update CONTRIBUTING.md to mention formatting requirements
+    - **Done‑when:**
+        1. Pre-commit hook is configured to run mdformat
+        2. Documentation is updated with formatting guidance
+    - **Verification:**
+        1. Make a change to a markdown file and verify pre-commit hook runs
+        2. Verify updated documentation is clear about formatting requirements
+    - **Depends‑on:** [T061]
