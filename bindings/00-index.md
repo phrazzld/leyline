@@ -27,3 +27,4 @@ This file contains an automatically generated list of all bindings with their on
 | [ts-module-organization](./ts-module-organization.md) | This binding implements our modularity tenet by defining how to create well-bounded, purpose-driven modules in TypeScript projects. Effective modul... |
 | [ts-no-any](./ts-no-any.md) | This binding implements our explicit-over-implicit tenet by requiring you to clearly express types rather than hiding them behind an escape hatch. |
 | [use-structured-logging](./use-structured-logging.md) | This binding directly implements our automation tenet by transforming system telemetry from human-readable outputs into machine-readable data that ... |
+| [web-accessibility](./web-accessibility.md) | This binding directly implements our explicit-over-implicit tenet by requiring developers to make accessibility considerations explicit rather than... |

@@ -516,7 +516,7 @@
         2. Front-matter is valid and applies to frontend technologies.
     - **Depends‑on:** [T037]
 
-- [ ] **T055 · Feature · P3: create binding 'web-accessibility.md'**
+- [x] **T055 · Feature · P3: create binding 'web-accessibility.md'**
     - **Context:** Audit Gap > Language-Specific Gaps > Frontend Practices
     - **Action:**
         1. Create new binding `bindings/web-accessibility.md` using the binding template (T002) and style guide (T003).
