@@ -215,8 +215,8 @@ export interface UserRepository {
 
 ## Related Bindings
 
-- [hex-domain-purity](/bindings/hex-domain-purity.md): These bindings work in tandem to create a clean architecture. While dependency inversion focuses on the direction of dependencies, hex-domain purity ensures that no infrastructure concepts leak into your domain layer. Together, they create a strong boundary that protects your business logic from technical details.
+- [hex-domain-purity](hex-domain-purity.md): These bindings work in tandem to create a clean architecture. While dependency inversion focuses on the direction of dependencies, hex-domain purity ensures that no infrastructure concepts leak into your domain layer. Together, they create a strong boundary that protects your business logic from technical details.
 
-- [no-internal-mocking](/bindings/no-internal-mocking.md): Dependency inversion enables proper testing without internal mocking. When your code follows dependency inversion, you can inject test doubles at the boundaries rather than mocking internal collaborators, resulting in more maintainable tests that don't break when implementation details change.
+- [no-internal-mocking](no-internal-mocking.md): Dependency inversion enables proper testing without internal mocking. When your code follows dependency inversion, you can inject test doubles at the boundaries rather than mocking internal collaborators, resulting in more maintainable tests that don't break when implementation details change.
 
-- [immutable-by-default](/bindings/immutable-by-default.md): Both bindings promote predictability and maintainability. Dependency inversion makes module interactions predictable by defining clear interfaces, while immutability makes data flow predictable by preventing unexpected mutations. Together, they significantly reduce the cognitive load of understanding how code behaves.
+- [immutable-by-default](immutable-by-default.md): Both bindings promote predictability and maintainability. Dependency inversion makes module interactions predictable by defining clear interfaces, while immutability makes data flow predictable by preventing unexpected mutations. Together, they significantly reduce the cognitive load of understanding how code behaves.

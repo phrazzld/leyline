@@ -419,12 +419,12 @@ func (s *Service) CheckCredit(userID string, amount decimal.Decimal) bool {
 
 ## Related Bindings
 
-- [modularity](/bindings/modularity.md): This binding is a Go-specific application of general modularity principles. While modularity establishes the conceptual foundation, go-package-design provides concrete rules for implementing modularity in Go codebases through package design.
+- [modularity](modularity.md): This binding is a Go-specific application of general modularity principles. While modularity establishes the conceptual foundation, go-package-design provides concrete rules for implementing modularity in Go codebases through package design.
 
-- [dependency-inversion](/bindings/dependency-inversion.md): Well-designed Go packages often use dependency inversion to manage coupling between packages. By defining interfaces in consumer packages rather than implementation packages, you create a more flexible, testable system with dependencies pointing in the right direction.
+- [dependency-inversion](dependency-inversion.md): Well-designed Go packages often use dependency inversion to manage coupling between packages. By defining interfaces in consumer packages rather than implementation packages, you create a more flexible, testable system with dependencies pointing in the right direction.
 
-- [code-size](/bindings/code-size.md): Package design and code size work together to maintain manageable units of code. When packages grow too large, they often need to be broken down into smaller, more focused packages.
+- [code-size](code-size.md): Package design and code size work together to maintain manageable units of code. When packages grow too large, they often need to be broken down into smaller, more focused packages.
 
-- [go-interface-design](/bindings/go-interface-design.md): Package boundaries and interface design are closely related. Well-designed interfaces help define clean package boundaries and APIs, while good package organization provides natural places to define domain-specific interfaces.
+- [go-interface-design](go-interface-design.md): Package boundaries and interface design are closely related. Well-designed interfaces help define clean package boundaries and APIs, while good package organization provides natural places to define domain-specific interfaces.
 
-- [hex-domain-purity](/bindings/hex-domain-purity.md): Package design in Go can directly support hexagonal architecture by organizing packages to reflect domain boundaries and infrastructure adapters, keeping domain logic pure from external concerns.
+- [hex-domain-purity](hex-domain-purity.md): Package design in Go can directly support hexagonal architecture by organizing packages to reflect domain boundaries and infrastructure adapters, keeping domain logic pure from external concerns.

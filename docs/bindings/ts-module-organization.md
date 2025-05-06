@@ -464,12 +464,12 @@ const userService = new UserService(orderService);
 
 ## Related Bindings
 
-- [modularity](/bindings/modularity.md): This binding is a TypeScript-specific implementation of our core modularity tenet, providing concrete guidance on how to achieve modularity in TypeScript projects specifically.
+- [modularity](modularity.md): This binding is a TypeScript-specific implementation of our core modularity tenet, providing concrete guidance on how to achieve modularity in TypeScript projects specifically.
 
-- [dependency-inversion](/bindings/dependency-inversion.md): Proper module organization works hand-in-hand with dependency inversion. By depending on abstractions (interfaces) rather than concrete implementations, modules can communicate without creating tight coupling or circular dependencies.
+- [dependency-inversion](dependency-inversion.md): Proper module organization works hand-in-hand with dependency inversion. By depending on abstractions (interfaces) rather than concrete implementations, modules can communicate without creating tight coupling or circular dependencies.
 
-- [ts-no-any](/bindings/ts-no-any.md): Strong typing is essential for clear module boundaries. By avoiding `any`, you create explicit contracts between modules that are enforced by the TypeScript compiler.
+- [ts-no-any](ts-no-any.md): Strong typing is essential for clear module boundaries. By avoiding `any`, you create explicit contracts between modules that are enforced by the TypeScript compiler.
 
-- [hex-domain-purity](/bindings/hex-domain-purity.md): Feature-based module organization naturally supports hexagonal architecture by creating separate modules for domain logic and adapters, ensuring clean separation of concerns.
+- [hex-domain-purity](hex-domain-purity.md): Feature-based module organization naturally supports hexagonal architecture by creating separate modules for domain logic and adapters, ensuring clean separation of concerns.
 
-- [immutable-by-default](/bindings/immutable-by-default.md): Module boundaries are more effective when data passed between them is immutable, preventing unexpected side effects when one module modifies data used by another.
+- [immutable-by-default](immutable-by-default.md): Module boundaries are more effective when data passed between them is immutable, preventing unexpected side effects when one module modifies data used by another.

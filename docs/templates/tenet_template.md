@@ -51,6 +51,6 @@ Consider addressing what the principle is NOT to counter common misconceptions. 
 
 [Links to related tenets with brief explanations of the relationships. Explain how this tenet connects to, supports, or is in tension with other tenets. Focus on how they work together to achieve broader goals.]
 
-- [Tenet Name](/tenets/tenet-filename.md): [Brief explanation of relationship that focuses on how these tenets work together or complement each other. Explain how following both leads to better outcomes.]
+- [Tenet Name](tenet-filename.md): [Brief explanation of relationship that focuses on how these tenets work together or complement each other. Explain how following both leads to better outcomes.]
 
-- [Tenet Name](/tenets/tenet-filename.md): [Brief explanation of how these principles interact, including any potential tensions and how to balance them effectively.]
+- [Tenet Name](tenet-filename.md): [Brief explanation of how these principles interact, including any potential tensions and how to balance them effectively.]

@@ -49,10 +49,10 @@ Testability is not about reaching arbitrary coverage numbers or following rigid 
 
 ## Related Tenets
 
-- [Modularity](/tenets/modularity.md): Modularity and testability reinforce each other—properly modularized code with clear boundaries and minimal dependencies is naturally easier to test. Similarly, striving for testability pushes your design toward better modularization. When a component is difficult to test in isolation, it's often a sign of poor module boundaries or excessive coupling.
+- [Modularity](modularity.md): Modularity and testability reinforce each other—properly modularized code with clear boundaries and minimal dependencies is naturally easier to test. Similarly, striving for testability pushes your design toward better modularization. When a component is difficult to test in isolation, it's often a sign of poor module boundaries or excessive coupling.
 
-- [Simplicity](/tenets/simplicity.md): Testable code tends to be simpler code. The act of making code testable often forces you to clarify responsibilities, reduce coupling, and eliminate unnecessary complexity. Conversely, simpler code with fewer moving parts and clearer intent is inherently easier to test. Both tenets push your design in the same direction.
+- [Simplicity](simplicity.md): Testable code tends to be simpler code. The act of making code testable often forces you to clarify responsibilities, reduce coupling, and eliminate unnecessary complexity. Conversely, simpler code with fewer moving parts and clearer intent is inherently easier to test. Both tenets push your design in the same direction.
 
-- [Explicit over Implicit](/tenets/explicit-over-implicit.md): Testability requires explicitness. Hidden assumptions, implicit dependencies, and invisible state make code both harder to understand and harder to test. Making dependencies and behaviors explicit improves both testability and code clarity.
+- [Explicit over Implicit](explicit-over-implicit.md): Testability requires explicitness. Hidden assumptions, implicit dependencies, and invisible state make code both harder to understand and harder to test. Making dependencies and behaviors explicit improves both testability and code clarity.
 
-- [Maintainability](/tenets/maintainability.md): Testability is a key enabler for long-term maintainability. A comprehensive test suite gives you the confidence to make changes without fear of breaking existing functionality. It also serves as living documentation that helps new team members understand how the system is supposed to behave.
+- [Maintainability](maintainability.md): Testability is a key enabler for long-term maintainability. A comprehensive test suite gives you the confidence to make changes without fear of breaking existing functionality. It also serves as living documentation that helps new team members understand how the system is supposed to behave.

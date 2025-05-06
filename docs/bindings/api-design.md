@@ -503,10 +503,10 @@ program.parse(process.argv);
 
 ## Related Bindings
 
-- [explicit-over-implicit](/tenets/explicit-over-implicit.md): This binding is a direct application of the explicit-over-implicit tenet to API design. While the tenet provides the general principle that explicitness is better than implicitness, this binding specifies concrete practices for applying that principle to API design specifically.
+- [explicit-over-implicit](../tenets/explicit-over-implicit.md): This binding is a direct application of the explicit-over-implicit tenet to API design. While the tenet provides the general principle that explicitness is better than implicitness, this binding specifies concrete practices for applying that principle to API design specifically.
 
-- [dependency-inversion](/bindings/dependency-inversion.md): Well-designed APIs with clear contracts complement dependency inversion by enabling clean interfaces between high-level and low-level components. When APIs are explicit, dependency inversion becomes easier to implement because the contracts between components are clearly defined.
+- [dependency-inversion](dependency-inversion.md): Well-designed APIs with clear contracts complement dependency inversion by enabling clean interfaces between high-level and low-level components. When APIs are explicit, dependency inversion becomes easier to implement because the contracts between components are clearly defined.
 
-- [hex-domain-purity](/bindings/hex-domain-purity.md): Explicit API design supports hexagonal architecture by creating clear boundaries between the domain and infrastructure layers. The API contracts serve as ports that explicitly define how the domain interacts with the outside world, keeping the domain logic pure and free from infrastructure concerns.
+- [hex-domain-purity](hex-domain-purity.md): Explicit API design supports hexagonal architecture by creating clear boundaries between the domain and infrastructure layers. The API contracts serve as ports that explicitly define how the domain interacts with the outside world, keeping the domain logic pure and free from infrastructure concerns.
 
-- [ts-no-any](/bindings/ts-no-any.md): For TypeScript specifically, avoiding the `any` type is a key aspect of creating explicit API contracts. The ts-no-any binding enforces type safety that strengthens API contracts by eliminating implicit type conversions and ensuring type errors are caught at compile time.
+- [ts-no-any](ts-no-any.md): For TypeScript specifically, avoiding the `any` type is a key aspect of creating explicit API contracts. The ts-no-any binding enforces type safety that strengthens API contracts by eliminating implicit type conversions and ensuring type errors are caught at compile time.

@@ -227,10 +227,10 @@ fn divide(a: i32, b: i32) -> Result<i32, MathError> {
 
 ## Related Bindings
 
-- [go-error-wrapping.md](/bindings/go-error-wrapping.md): Similar to this binding, but for Go. Both emphasize explicit error handling and proper context propagation, though Rust leverages its type system more extensively for compile-time guarantees.
+- [go-error-wrapping.md](go-error-wrapping.md): Similar to this binding, but for Go. Both emphasize explicit error handling and proper context propagation, though Rust leverages its type system more extensively for compile-time guarantees.
 
-- [rust-ownership-patterns.md](/bindings/rust-ownership-patterns.md): Complements error handling by defining how resources should be managed. Proper ownership patterns create a foundation for robust error handling by ensuring resources are properly cleaned up even when errors occur.
+- [rust-ownership-patterns.md](rust-ownership-patterns.md): Complements error handling by defining how resources should be managed. Proper ownership patterns create a foundation for robust error handling by ensuring resources are properly cleaned up even when errors occur.
 
-- [dependency-inversion.md](/bindings/dependency-inversion.md): Works with error handling to create cleanly separated components with well-defined error boundaries, making it easier to handle specific error types at the appropriate level of abstraction.
+- [dependency-inversion.md](dependency-inversion.md): Works with error handling to create cleanly separated components with well-defined error boundaries, making it easier to handle specific error types at the appropriate level of abstraction.
 
-- [immutable-by-default.md](/bindings/immutable-by-default.md): Supports robust error handling by reducing the complexity of state management, making it easier to reason about where and how errors might occur.
+- [immutable-by-default.md](immutable-by-default.md): Supports robust error handling by reducing the complexity of state management, making it easier to reason about where and how errors might occur.

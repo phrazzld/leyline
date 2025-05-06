@@ -17,7 +17,7 @@ Leyline adopts a "natural language first" approach to documentation. This means 
 2. **Effective as context for large language models (LLMs)**
 3. **Principle-focused** rather than implementation-focused
 
-All new tenets and bindings should follow this approach. Please refer to our [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md) for detailed writing guidelines and examples.
+All new tenets and bindings should follow this approach. Please refer to our [Natural Language Style Guide](./STYLE_GUIDE_NATURAL_LANGUAGE.md) for detailed writing guidelines and examples.
 
 ## Proposing Changes
 
@@ -55,7 +55,7 @@ mdformat --check .
 
 **File Structure:**
 - Create file in `tenets/` directory with a descriptive slug (e.g., `simplicity.md`)
-- Use the [tenet template](/docs/templates/tenet_template.md) as your starting point
+- Use the [tenet template](./templates/tenet_template.md) as your starting point
 - Follow front-matter format:
   ```yaml
   ---
@@ -86,7 +86,7 @@ mdformat --check .
 
   ## Related Tenets
 
-  - [Other Tenet](/tenets/other-tenet.md): [Explanation of how these tenets relate to each other]
+  - [Other Tenet](../tenets/other-tenet.md): [Explanation of how these tenets relate to each other]
   ...
   ```
 
@@ -100,7 +100,7 @@ mdformat --check .
 
 **File Structure:**
 - Create file in `bindings/` directory with a descriptive slug (e.g., `ts-no-any.md`)
-- Use the [binding template](/docs/templates/binding_template.md) as your starting point
+- Use the [binding template](./templates/binding_template.md) as your starting point
 - Follow front-matter format:
   ```yaml
   ---
@@ -142,7 +142,7 @@ mdformat --check .
 
   ## Related Bindings
 
-  - [Other Binding](/bindings/other-binding.md): [Explanation of how these bindings work together or complement each other]
+  - [Other Binding](../bindings/other-binding.md): [Explanation of how these bindings work together or complement each other]
   ...
   ```
 
@@ -152,13 +152,13 @@ mdformat --check .
 - Changes should be clarifications, not fundamental alterations
 - Update `last_modified` date
 - Ensure changes maintain or improve natural language quality
-- Follow the [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
+- Follow the [Natural Language Style Guide](./STYLE_GUIDE_NATURAL_LANGUAGE.md)
 
 **For Bindings:**
 - Can evolve more freely as implementation practices change
 - Update `last_modified` date
 - Ensure changes maintain or improve natural language quality
-- Follow the [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
+- Follow the [Natural Language Style Guide](./STYLE_GUIDE_NATURAL_LANGUAGE.md)
 
 ## Writing Effective Natural Language Documentation
 
@@ -171,7 +171,7 @@ To create effective documentation that works well for both humans and LLMs, foll
 5. **Narrative Structure**: Follow a problem → principle → solution → examples flow
 6. **Balanced Detail**: Provide enough detail for understanding without overwhelming
 
-For detailed guidance with examples, see the [Natural Language Style Guide](/docs/STYLE_GUIDE_NATURAL_LANGUAGE.md).
+For detailed guidance with examples, see the [Natural Language Style Guide](./STYLE_GUIDE_NATURAL_LANGUAGE.md).
 
 ## Release Process
 

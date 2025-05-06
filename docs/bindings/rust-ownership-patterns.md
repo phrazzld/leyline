@@ -489,10 +489,10 @@ fn process_file(path: &str) -> Result<Vec<u8>, std::io::Error> {
 
 ## Related Bindings
 
-- [immutable-by-default](/bindings/immutable-by-default.md): Rust's ownership system naturally encourages immutability through shared references (`&T`). When data is borrowed immutably, the compiler guarantees it won't change, creating the same benefits as explicit immutability patterns in other languages.
+- [immutable-by-default](immutable-by-default.md): Rust's ownership system naturally encourages immutability through shared references (`&T`). When data is borrowed immutably, the compiler guarantees it won't change, creating the same benefits as explicit immutability patterns in other languages.
 
-- [no-internal-mocking](/bindings/no-internal-mocking.md): Rust's trait system combined with ownership makes it natural to define abstractions that can be easily tested without complex mocking. Clear ownership boundaries create natural seams for testing.
+- [no-internal-mocking](no-internal-mocking.md): Rust's trait system combined with ownership makes it natural to define abstractions that can be easily tested without complex mocking. Clear ownership boundaries create natural seams for testing.
 
-- [dependency-inversion](/bindings/dependency-inversion.md): In Rust, dependency inversion is often implemented through traits, which pair naturally with the ownership system. The ownership constraints of trait objects add clarity about who owns what, making dependency relationships more explicit.
+- [dependency-inversion](dependency-inversion.md): In Rust, dependency inversion is often implemented through traits, which pair naturally with the ownership system. The ownership constraints of trait objects add clarity about who owns what, making dependency relationships more explicit.
 
-- [simplicity](/bindings/simplicity.md): Rust's ownership system might seem to add complexity at first, but it actually reduces accidental complexity by catching entire classes of bugs at compile time. What appears as additional syntax (borrowing, lifetimes) is actually a way to express constraints that would otherwise create hidden runtime complexity.
+- [simplicity](simplicity.md): Rust's ownership system might seem to add complexity at first, but it actually reduces accidental complexity by catching entire classes of bugs at compile time. What appears as additional syntax (borrowing, lifetimes) is actually a way to express constraints that would otherwise create hidden runtime complexity.

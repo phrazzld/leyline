@@ -571,12 +571,12 @@ func fetchData(ctx context.Context, urls []string) ([]Result, error) {
 
 ## Related Bindings
 
-- [go-error-wrapping](/bindings/go-error-wrapping.md): Proper error handling is even more important in concurrent code, where errors can occur in multiple goroutines simultaneously. This binding provides patterns for wrapping errors with context, which is essential for debugging issues in concurrent systems where the source of an error might be in a different goroutine than where it's observed.
+- [go-error-wrapping](go-error-wrapping.md): Proper error handling is even more important in concurrent code, where errors can occur in multiple goroutines simultaneously. This binding provides patterns for wrapping errors with context, which is essential for debugging issues in concurrent systems where the source of an error might be in a different goroutine than where it's observed.
 
-- [go-interface-design](/bindings/go-interface-design.md): Well-designed interfaces make concurrent code more testable and maintainable by providing clear abstraction boundaries. Abstractions like `io.Reader` and `io.Writer` enable concurrent operations by defining clear contracts for how components interact, which is essential for safe concurrency.
+- [go-interface-design](go-interface-design.md): Well-designed interfaces make concurrent code more testable and maintainable by providing clear abstraction boundaries. Abstractions like `io.Reader` and `io.Writer` enable concurrent operations by defining clear contracts for how components interact, which is essential for safe concurrency.
 
-- [go-package-design](/bindings/go-package-design.md): Good package organization helps control how concurrent code is structured and exposed. By defining clear package boundaries and responsibilities, you can ensure that concurrency primitives are encapsulated appropriately and not exposed unnecessarily.
+- [go-package-design](go-package-design.md): Good package organization helps control how concurrent code is structured and exposed. By defining clear package boundaries and responsibilities, you can ensure that concurrency primitives are encapsulated appropriately and not exposed unnecessarily.
 
-- [pure-functions](/bindings/pure-functions.md): Pure functions without side effects are inherently thread-safe and can be executed concurrently without synchronization. By maximizing the use of pure functions in your code, you reduce the need for complex concurrency controls and minimize the risk of race conditions.
+- [pure-functions](pure-functions.md): Pure functions without side effects are inherently thread-safe and can be executed concurrently without synchronization. By maximizing the use of pure functions in your code, you reduce the need for complex concurrency controls and minimize the risk of race conditions.
 
-- [immutable-by-default](/bindings/immutable-by-default.md): Immutable data structures eliminate an entire class of concurrency bugs by preventing shared state from being modified. When data is immutable, multiple goroutines can safely access it without synchronization, simplifying concurrent code substantially.
+- [immutable-by-default](immutable-by-default.md): Immutable data structures eliminate an entire class of concurrency bugs by preventing shared state from being modified. When data is immutable, multiple goroutines can safely access it without synchronization, simplifying concurrent code substantially.

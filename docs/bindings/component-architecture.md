@@ -444,10 +444,10 @@ function ContactForm() {
 
 ## Related Bindings
 
-- [modularity.md](/tenets/modularity.md): This binding directly implements the modularity tenet through the systematic breakdown of UI into composable components. While the tenet describes the general principle of dividing systems into independent, reusable modules, this binding provides the specific pattern for achieving modularity in frontend applications.
+- [modularity.md](../tenets/modularity.md): This binding directly implements the modularity tenet through the systematic breakdown of UI into composable components. While the tenet describes the general principle of dividing systems into independent, reusable modules, this binding provides the specific pattern for achieving modularity in frontend applications.
 
-- [frontend-state-management.md](/bindings/frontend-state-management.md): Complements component architecture by defining how state should be organized within and between components. Together, these bindings create a complete picture of component structure (architecture) and behavior (state).
+- [frontend-state-management.md](frontend-state-management.md): Complements component architecture by defining how state should be organized within and between components. Together, these bindings create a complete picture of component structure (architecture) and behavior (state).
 
-- [dependency-inversion.md](/bindings/dependency-inversion.md): Reinforces component architecture by promoting loose coupling between components. Well-designed component interfaces follow dependency inversion principles by depending on abstractions rather than concrete implementations.
+- [dependency-inversion.md](dependency-inversion.md): Reinforces component architecture by promoting loose coupling between components. Well-designed component interfaces follow dependency inversion principles by depending on abstractions rather than concrete implementations.
 
-- [code-size.md](/bindings/code-size.md): Supports component architecture by encouraging small, focused components. The atomic design approach naturally leads to smaller, more manageable components with clear boundaries and responsibilities.
+- [code-size.md](code-size.md): Supports component architecture by encouraging small, focused components. The atomic design approach naturally leads to smaller, more manageable components with clear boundaries and responsibilities.

@@ -65,7 +65,7 @@
         2. ⏳ Check that all cross-references work in the generated site (will be addressed in T058)
     - **Depends‑on:** none
 
-- [ ] **T058 · Chore · P0: Update all cross-references for new document paths**
+- [x] **T058 · Chore · P0: Update all cross-references for new document paths**
     - **Context:** Moving files will break existing references between documents
     - **Action:**
         1. Update all references between tenets and bindings to use the new paths

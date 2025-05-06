@@ -409,10 +409,10 @@ function ProductPage({ productId }) {
 
 ## Related Bindings
 
-- [component-architecture.md](/bindings/component-architecture.md): Component architecture and state management work hand in hand. Well-designed component boundaries make state management simpler by encapsulating related state and behavior. This binding builds on component architecture by defining how state should flow through the component hierarchy.
+- [component-architecture.md](component-architecture.md): Component architecture and state management work hand in hand. Well-designed component boundaries make state management simpler by encapsulating related state and behavior. This binding builds on component architecture by defining how state should flow through the component hierarchy.
 
-- [immutable-by-default.md](/bindings/immutable-by-default.md): State immutability is a fundamental requirement for predictable frontend applications. This binding reinforces the immutable-by-default binding by applying it specifically to React's state management patterns, ensuring state updates are predictable and traceable.
+- [immutable-by-default.md](immutable-by-default.md): State immutability is a fundamental requirement for predictable frontend applications. This binding reinforces the immutable-by-default binding by applying it specifically to React's state management patterns, ensuring state updates are predictable and traceable.
 
-- [pure-functions.md](/bindings/pure-functions.md): State management logic should follow pure function principles. Reducers, selectors, and state transformations should be pure functions without side effects, making state changes predictable and testable.
+- [pure-functions.md](pure-functions.md): State management logic should follow pure function principles. Reducers, selectors, and state transformations should be pure functions without side effects, making state changes predictable and testable.
 
-- [dependency-management.md](/bindings/dependency-management.md): Careful selection of state management libraries is an important aspect of dependency management. This binding complements dependency management by providing guidance on when to introduce state management libraries versus using built-in React capabilities.
+- [dependency-management.md](dependency-management.md): Careful selection of state management libraries is an important aspect of dependency management. This binding complements dependency management by providing guidance on when to introduce state management libraries versus using built-in React capabilities.

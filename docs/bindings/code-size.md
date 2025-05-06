@@ -580,10 +580,10 @@ public class PricingCalculator {
 
 ## Related Bindings
 
-- [modularity](/tenets/modularity.md): Code size constraints naturally push you toward better modularity. Breaking large functions and classes into smaller, focused components with clear responsibilities directly implements the "do one thing well" principle of modularity. Both bindings work together to create more comprehensible, maintainable code.
+- [modularity](../tenets/modularity.md): Code size constraints naturally push you toward better modularity. Breaking large functions and classes into smaller, focused components with clear responsibilities directly implements the "do one thing well" principle of modularity. Both bindings work together to create more comprehensible, maintainable code.
 
-- [pure-functions](/bindings/pure-functions.md): Pure functions tend to be smaller and more focused by nature, as they handle a single transformation without side effects. The practices in the pure-functions binding naturally help achieve the size constraints in this binding, while the size limits here encourage the functional decomposition that makes pure functions effective.
+- [pure-functions](pure-functions.md): Pure functions tend to be smaller and more focused by nature, as they handle a single transformation without side effects. The practices in the pure-functions binding naturally help achieve the size constraints in this binding, while the size limits here encourage the functional decomposition that makes pure functions effective.
 
-- [immutable-by-default](/bindings/immutable-by-default.md): Small, focused functions work well with immutable data structures, as both encourage a style where you transform data through a series of simple steps rather than accumulating changes in a large, complex function. These bindings complement each other to create more predictable, testable code.
+- [immutable-by-default](immutable-by-default.md): Small, focused functions work well with immutable data structures, as both encourage a style where you transform data through a series of simple steps rather than accumulating changes in a large, complex function. These bindings complement each other to create more predictable, testable code.
 
-- [dependency-inversion](/bindings/dependency-inversion.md): Breaking large components into smaller ones often requires thinking about their interfaces and dependencies. The dependency-inversion binding guides how these smaller components should interact, creating a cleaner overall architecture.
+- [dependency-inversion](dependency-inversion.md): Breaking large components into smaller ones often requires thinking about their interfaces and dependencies. The dependency-inversion binding guides how these smaller components should interact, creating a cleaner overall architecture.

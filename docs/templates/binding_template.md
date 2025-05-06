@@ -91,6 +91,6 @@ Choose examples that represent different scenarios or aspects of the rule. Start
 
 [List links to related bindings with brief explanations of the relationships. Explain how this binding connects to, complements, or is distinguished from other bindings. Focus on how they work together functionally to achieve broader goals.]
 
-- [binding-name.md](/bindings/binding-filename.md): [Explanation of relationship that focuses on how these bindings work together or complement each other. Explain how following both leads to better outcomes.]
+- [binding-name.md](binding-filename.md): [Explanation of relationship that focuses on how these bindings work together or complement each other. Explain how following both leads to better outcomes.]
 
-- [binding-name.md](/bindings/binding-filename.md): [Explanation of how these rules interact functionally, including any potential tensions and how to balance them effectively.]
+- [binding-name.md](binding-filename.md): [Explanation of how these rules interact functionally, including any potential tensions and how to balance them effectively.]

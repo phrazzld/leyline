@@ -586,12 +586,12 @@ async function processAllItems(items: Item[]): Promise<Result[]> {
 
 ## Related Bindings
 
-- [simplicity](/bindings/simplicity.md): Well-structured async code is inherently simpler to understand and maintain, even though asynchronous operations are complex by nature. This binding provides specific patterns that reduce the complexity of async operations.
+- [simplicity](simplicity.md): Well-structured async code is inherently simpler to understand and maintain, even though asynchronous operations are complex by nature. This binding provides specific patterns that reduce the complexity of async operations.
 
-- [ts-no-any](/bindings/ts-no-any.md): Proper typing of async functions and their results is critical for catching errors at compile time rather than runtime. Using `Promise<T>` with specific return types instead of `Promise<any>` creates more robust code.
+- [ts-no-any](ts-no-any.md): Proper typing of async functions and their results is critical for catching errors at compile time rather than runtime. Using `Promise<T>` with specific return types instead of `Promise<any>` creates more robust code.
 
-- [ts-module-organization](/bindings/ts-module-organization.md): Clear module boundaries make async operations more manageable by defining what data and operations cross boundaries, simplifying testing and error handling.
+- [ts-module-organization](ts-module-organization.md): Clear module boundaries make async operations more manageable by defining what data and operations cross boundaries, simplifying testing and error handling.
 
-- [testability](/bindings/testability.md): Async code requires special consideration in testing. Well-structured async patterns make tests more reliable and easier to write.
+- [testability](testability.md): Async code requires special consideration in testing. Well-structured async patterns make tests more reliable and easier to write.
 
-- [pure-functions](/bindings/pure-functions.md): While async functions inherently involve side effects, following pure function principles for the logic within async functions improves maintainability and testability.
+- [pure-functions](pure-functions.md): While async functions inherently involve side effects, following pure function principles for the logic within async functions improves maintainability and testability.

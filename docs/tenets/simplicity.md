@@ -49,10 +49,10 @@ The pursuit of simplicity isn't about cutting corners or avoiding sophisticated 
 
 ## Related Tenets
 
-- [Modularity](/tenets/modularity.md): While Simplicity focuses on avoiding unnecessary complexity, Modularity guides how to break systems into focused, small components. Together, they help you create systems that are both simple and well-structured. Simplicity works at all levels of your code, while modularity provides specific patterns for organization.
+- [Modularity](modularity.md): While Simplicity focuses on avoiding unnecessary complexity, Modularity guides how to break systems into focused, small components. Together, they help you create systems that are both simple and well-structured. Simplicity works at all levels of your code, while modularity provides specific patterns for organization.
 
-- [Explicit over Implicit](/tenets/explicit-over-implicit.md): Explicitness enhances simplicity by making code behavior clear and obvious. When code is explicit, it reduces the mental overhead needed to understand what's happening, directly supporting the simplicity principle. While simplicity guides what to build, explicitness guides how to express your intent clearly.
+- [Explicit over Implicit](explicit-over-implicit.md): Explicitness enhances simplicity by making code behavior clear and obvious. When code is explicit, it reduces the mental overhead needed to understand what's happening, directly supporting the simplicity principle. While simplicity guides what to build, explicitness guides how to express your intent clearly.
 
-- [Testability](/tenets/testability.md): Simple code is inherently more testable. By keeping components focused and minimizing dependencies, you make them easier to test in isolation. Testability often serves as a feedback mechanism that can indicate when your design is becoming too complex.
+- [Testability](testability.md): Simple code is inherently more testable. By keeping components focused and minimizing dependencies, you make them easier to test in isolation. Testability often serves as a feedback mechanism that can indicate when your design is becoming too complex.
 
-- [Maintainability](/tenets/maintainability.md): Simplicity is a key contributor to maintainability. Simple systems are easier to understand, modify, and extend. The relationship is bidirectional: following maintainability practices often naturally leads to simpler solutions as well.
+- [Maintainability](maintainability.md): Simplicity is a key contributor to maintainability. Simple systems are easier to understand, modify, and extend. The relationship is bidirectional: following maintainability practices often naturally leads to simpler solutions as well.
