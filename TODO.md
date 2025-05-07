@@ -99,7 +99,7 @@
     1. Run mkdocs build --strict and view the generated site
   - **Depends‑on:** \[T056, T057, T058\]
 
-- \[ \] **T060 · Fix · P0: Fix broken links causing MkDocs build failure**
+- \[x\] **T060 · Fix · P0: Fix broken links causing MkDocs build failure**
 
   - **Context:** CI deploy job fails in strict mode due to invalid links in index.md
   - **Action:**
