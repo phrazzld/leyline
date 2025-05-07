@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: web-accessibility
 last_modified: "2025-05-06"
 derived_from: explicit-over-implicit
 enforced_by: "Code review, Automated a11y testing"
 applies_to:
-  - frontend
----
+
+- frontend
+
+______________________________________________________________________
 
 # Binding: Web Accessibility
 
@@ -26,28 +29,33 @@ This binding establishes these core requirements for web accessibility:
 - **Meet WCAG 2.1 AA Standards**: All frontend applications **MUST** meet [Web Content Accessibility Guidelines (WCAG) 2.1 Level AA](https://www.w3.org/WAI/WCAG21/quickref/) at minimum. This is a comprehensive standard that covers most accessibility needs.
 
 - **Ensure Keyboard Accessibility**: All interactive elements **MUST** be fully accessible with a keyboard alone. Users should be able to:
+
   - Tab through all interactive elements in a logical order
   - Activate buttons, links, and form controls using only the keyboard
   - Navigate complex interfaces (menus, modals, etc.) with appropriate keyboard shortcuts
 
 - **Provide Proper Semantic Structure**: Content **MUST** be structured using appropriate semantic HTML elements and ARIA attributes to ensure screen readers can interpret the page correctly:
+
   - Use proper heading hierarchy (`<h1>` through `<h6>`)
   - Use semantic elements (`<nav>`, `<main>`, `<article>`, etc.) for major page sections
   - Add ARIA roles, properties, and states when HTML semantics are insufficient
   - Ensure form fields have associated labels
 
 - **Maintain Sufficient Color Contrast**: All text and essential UI elements **MUST** meet minimum contrast ratios:
+
   - 4.5:1 for normal text
   - 3:1 for large text (18pt or 14pt bold)
   - 3:1 for UI components and graphical objects
 
 - **Implement Focus Management**: Focus indicators **MUST** be visible and focus order **MUST** be logical:
+
   - Never remove focus outlines without providing an alternative
   - Trap focus within modal dialogs when they're open
   - Return focus to a logical location when interactions complete
   - Maintain a tab order that matches the visual flow of the page
 
 - **Provide Text Alternatives**: All non-text content (images, icons, etc.) **MUST** have text alternatives:
+
   - Add alt text to images that convey meaning
   - Provide transcripts for audio content
   - Include captions for video content
@@ -79,7 +87,7 @@ In rare cases, exceptions to these rules may be necessary, but they must be expl
    </nav>
    ```
 
-2. **Implement Keyboard Navigation**: Ensure all interactive elements are keyboard-accessible:
+1. **Implement Keyboard Navigation**: Ensure all interactive elements are keyboard-accessible:
 
    - Test tab order and navigation flow
    - Add keyboard event handlers for custom components
@@ -108,7 +116,7 @@ In rare cases, exceptions to these rules may be necessary, but they must be expl
    }
    ```
 
-3. **Manage Focus Properly**: Implement proper focus management for dynamic content:
+1. **Manage Focus Properly**: Implement proper focus management for dynamic content:
 
    - Use `useRef` and `focus()` to manage focus in React components
    - Create focus traps for modal dialogs
@@ -145,7 +153,7 @@ In rare cases, exceptions to these rules may be necessary, but they must be expl
    }
    ```
 
-4. **Add ARIA Attributes Judiciously**: Use ARIA to enhance HTML semantics when needed:
+1. **Add ARIA Attributes Judiciously**: Use ARIA to enhance HTML semantics when needed:
 
    - Follow the "first rule of ARIA": don't use ARIA if native HTML can do the job
    - Add `aria-label`, `aria-labelledby`, or `aria-describedby` for context
@@ -181,7 +189,7 @@ In rare cases, exceptions to these rules may be necessary, but they must be expl
    </form>
    ```
 
-5. **Implement Automated Testing**: Set up accessibility testing in your workflow:
+1. **Implement Automated Testing**: Set up accessibility testing in your workflow:
 
    - Add axe-core or similar tools to your test suite
    - Enable accessibility linting in your IDE

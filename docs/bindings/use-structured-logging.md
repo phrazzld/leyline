@@ -1,14 +1,17 @@
----
+______________________________________________________________________
+
 id: use-structured-logging
 last_modified: "2025-05-04"
 derived_from: automation
 enforced_by: linters & code review
 applies_to:
-  - all
-  - typescript
-  - javascript
-  - go
----
+
+- all
+- typescript
+- javascript
+- go
+
+______________________________________________________________________
 
 # Binding: Implement Complete Observability with Structured Logs, Metrics, and Traces
 
@@ -31,6 +34,7 @@ This binding establishes clear requirements for implementing all three observabi
 ### Structured Logging Requirements
 
 - **Use Machine-Readable Formats**: All logging must output structured data, typically in JSON format:
+
   - Each log entry must be a complete, parseable JSON object
   - Field names must be consistent across all log entries
   - Values must be properly typed (strings, numbers, booleans, nested objects)
@@ -38,6 +42,7 @@ This binding establishes clear requirements for implementing all three observabi
   - No HTML, ANSI color codes, or other formatting in production logs
 
 - **Include Mandatory Context Fields**: Every log entry must contain these standard fields:
+
   - `timestamp`: ISO 8601 format in UTC (e.g., `2025-05-04T14:22:38.123Z`)
   - `level`: Standardized severity level (`debug`, `info`, `warn`, `error`, `fatal`)
   - `message`: Human-readable description of the event
@@ -47,6 +52,7 @@ This binding establishes clear requirements for implementing all three observabi
   - For error logs: `error` object with `type`, `message`, and `stack` fields
 
 - **Avoid Unstructured Logging Methods**: These patterns are explicitly prohibited:
+
   - Direct use of console methods (`console.log`, `console.error`, etc.)
   - Print statements (`System.out.println`, `fmt.Println`, `print()`, etc.)
   - String concatenation or interpolation without structured context
@@ -56,6 +62,7 @@ This binding establishes clear requirements for implementing all three observabi
 ### Metrics Requirements
 
 - **Implement Standard Service Metrics**: All services must expose these core metrics categories:
+
   - **Traffic**: Request rates, user activities, data throughput
   - **Errors**: Error rates, types, and distributions
   - **Latency**: Response times with percentile distributions (p50, p90, p99)
@@ -63,12 +70,14 @@ This binding establishes clear requirements for implementing all three observabi
   - **Application-specific business metrics** relevant to the service domain
 
 - **Use Consistent Metric Types**: Apply appropriate metric types for different signal categories:
+
   - **Counters**: For events that accumulate (requests received, errors)
   - **Gauges**: For point-in-time measurements (memory usage, connection pool size)
   - **Histograms**: For distributions of values (request durations)
   - **Percentiles**: For latency thresholds (p95 response time)
 
 - **Include Required Metadata**: All metrics must include standardized labels/tags:
+
   - `service`: Name of the service the metric comes from
   - `instance`: Specific instance identifier
   - `version`: Service version or deployment identifier
@@ -78,6 +87,7 @@ This binding establishes clear requirements for implementing all three observabi
 ### Distributed Tracing Requirements
 
 - **Implement End-to-End Tracing**: All services must participate in distributed tracing:
+
   - Every service must generate trace spans for all incoming and outgoing requests
   - Trace context must be propagated through all service boundaries
   - Trace sampling rates must be configurable based on request properties
@@ -85,6 +95,7 @@ This binding establishes clear requirements for implementing all three observabi
   - Spans must include all relevant metadata about the operation
 
 - **Include Required Span Attributes**: All trace spans must include:
+
   - `service.name`: Name of the service generating the span
   - `span.kind`: The role of the span (client, server, producer, consumer)
   - `http.method` and `http.url` for HTTP calls
@@ -93,6 +104,7 @@ This binding establishes clear requirements for implementing all three observabi
   - Operation-specific attributes that aid in debugging
 
 - **Maintain Trace Continuity**: Trace context must be propagated:
+
   - Across process boundaries (HTTP, gRPC, message queues)
   - Across asynchronous operations (callbacks, futures, message processing)
   - Through batch processing and scheduled jobs
@@ -101,18 +113,21 @@ This binding establishes clear requirements for implementing all three observabi
 ### Cross-Cutting Requirements
 
 - **Maintain Consistent Correlation**: Every observability signal must support correlation:
+
   - Logs must include trace IDs and span IDs when available
   - Metrics should be filterable by trace ID for high-cardinality troubleshooting
   - Traces must include links to logs generated during the span
   - All three signals must share common identifiers for correlation
 
 - **Apply Consistent Data Types**: All observability data must maintain type consistency:
+
   - IDs should be strings even when they appear numeric
   - Timestamps must use consistent ISO 8601 format
   - Durations should use consistent units (usually milliseconds)
   - Boolean flags should be actual booleans, not strings like "true"/"false"
 
 - **Exceptions and Limitations**:
+
   - Development/debug-only telemetry may use simplified formats but should be disabled in production
   - CLI tools may use unstructured formats for direct human consumption
   - Interactive REPL environments may use simplified observability
@@ -127,11 +142,11 @@ Here are concrete strategies for implementing comprehensive observability with a
 1. **Choose Appropriate Logging Libraries**: Select libraries designed for structured logging in your language:
 
    - **JavaScript/TypeScript**:
-   
+
      ```typescript
      // Setup with pino
      import pino from 'pino';
-     
+
      const logger = pino({
        messageKey: 'message',
        timestamp: pino.stdTimeFunctions.isoTime,
@@ -139,7 +154,7 @@ Here are concrete strategies for implementing comprehensive observability with a
          service: 'user-service',
        },
      });
-     
+
      // Usage with request context
      app.use((req, res, next) => {
        req.log = logger.child({
@@ -148,24 +163,24 @@ Here are concrete strategies for implementing comprehensive observability with a
        });
        next();
      });
-     
+
      // Log with structured context
      req.log.info({ userId, action: 'login' }, 'User authentication successful');
      ```
 
    - **Go**:
-   
+
      ```go
      // Setup with zerolog
      package main
-     
+
      import (
        "github.com/rs/zerolog"
        "github.com/rs/zerolog/log"
        "os"
        "time"
      )
-     
+
      func main() {
        // Configure global logger
        zerolog.TimeFieldFormat = zerolog.TimeFormatISO8601
@@ -173,13 +188,13 @@ Here are concrete strategies for implementing comprehensive observability with a
          Timestamp().
          Str("service", "order-processor").
          Logger()
-     
+
        // Create context-aware logger
        ctx := log.With().
          Str("correlation_id", getCorrelationId()).
          Str("component", "payment-handler").
          Logger()
-     
+
        // Log with structured context
        ctx.Info().
          Str("order_id", "12345").
@@ -188,7 +203,7 @@ Here are concrete strategies for implementing comprehensive observability with a
      }
      ```
 
-2. **Standardize Log Levels**: Use consistent severity levels across all services:
+1. **Standardize Log Levels**: Use consistent severity levels across all services:
 
    ```
    debug: Detailed information useful during development and debugging
@@ -209,11 +224,11 @@ Here are concrete strategies for implementing comprehensive observability with a
      ```typescript
      // Setup with Prometheus client
      import * as promClient from 'prom-client';
-     
+
      // Initialize metrics registry
      const registry = new promClient.Registry();
      promClient.collectDefaultMetrics({ register: registry });
-     
+
      // Create standard metrics
      const httpRequestDuration = new promClient.Histogram({
        name: 'http_request_duration_seconds',
@@ -221,17 +236,17 @@ Here are concrete strategies for implementing comprehensive observability with a
        labelNames: ['method', 'route', 'status_code'],
        buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
      });
-     
+
      const httpRequestTotal = new promClient.Counter({
        name: 'http_requests_total',
        help: 'Total number of HTTP requests',
        labelNames: ['method', 'route', 'status_code']
      });
-     
+
      // Register metrics
      registry.registerMetric(httpRequestDuration);
      registry.registerMetric(httpRequestTotal);
-     
+
      // Express middleware to record metrics
      app.use((req, res, next) => {
        const start = Date.now();
@@ -251,7 +266,7 @@ Here are concrete strategies for implementing comprehensive observability with a
        
        next();
      });
-     
+
      // Expose metrics endpoint
      app.get('/metrics', async (req, res) => {
        res.set('Content-Type', registry.contentType);
@@ -263,7 +278,7 @@ Here are concrete strategies for implementing comprehensive observability with a
 
      ```go
      package main
-     
+
      import (
        "github.com/prometheus/client_golang/prometheus"
        "github.com/prometheus/client_golang/prometheus/promauto"
@@ -271,7 +286,7 @@ Here are concrete strategies for implementing comprehensive observability with a
        "net/http"
        "time"
      )
-     
+
      var (
        // Create standard metrics
        requestDuration = promauto.NewHistogramVec(
@@ -298,7 +313,7 @@ Here are concrete strategies for implementing comprehensive observability with a
          },
        )
      )
-     
+
      // Middleware to record request metrics
      func metricsMiddleware(next http.Handler) http.Handler {
        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -326,7 +341,7 @@ Here are concrete strategies for implementing comprehensive observability with a
          requestTotal.With(labels).Inc()
        })
      }
-     
+
      func main() {
        // Register metrics handler
        http.Handle("/metrics", promhttp.Handler())
@@ -338,7 +353,7 @@ Here are concrete strategies for implementing comprehensive observability with a
      }
      ```
 
-2. **Define Business-Level Metrics**: Track domain-specific metrics beyond technical operations:
+1. **Define Business-Level Metrics**: Track domain-specific metrics beyond technical operations:
 
    ```typescript
    // Create business metrics
@@ -347,14 +362,14 @@ Here are concrete strategies for implementing comprehensive observability with a
      help: 'Total number of orders placed',
      labelNames: ['product_type', 'payment_method', 'customer_tier']
    });
-   
+
    const orderValue = new promClient.Histogram({
      name: 'business_order_value_dollars',
      help: 'Distribution of order values in dollars',
      labelNames: ['product_type', 'customer_tier'],
      buckets: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000]
    });
-   
+
    // Record business metrics during order processing
    function processOrder(order) {
      const labels = {
@@ -373,14 +388,14 @@ Here are concrete strategies for implementing comprehensive observability with a
    }
    ```
 
-3. **Configure a Metrics Aggregation System**: Set up a central metrics collection platform:
+1. **Configure a Metrics Aggregation System**: Set up a central metrics collection platform:
 
    ```yaml
    # prometheus.yml example configuration
    global:
      scrape_interval: 15s
      evaluation_interval: 15s
-   
+
    scrape_configs:
      - job_name: 'api_services'
        metrics_path: '/metrics'
@@ -394,7 +409,7 @@ Here are concrete strategies for implementing comprehensive observability with a
        metrics_path: '/metrics'
        static_configs:
          - targets: ['db-service-1:9100', 'db-service-2:9100']
-   
+
    alerting:
      alertmanagers:
      - static_configs:
@@ -414,7 +429,7 @@ Here are concrete strategies for implementing comprehensive observability with a
      import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
      import { Resource } from '@opentelemetry/resources';
      import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-     
+
      // Configure the SDK
      const sdk = new opentelemetry.NodeSDK({
        resource: new Resource({
@@ -427,13 +442,13 @@ Here are concrete strategies for implementing comprehensive observability with a
        }),
        instrumentations: [getNodeAutoInstrumentations()]
      });
-     
+
      // Initialize OpenTelemetry
      sdk.start();
-     
+
      // Manual tracing for business operations
      import { trace } from '@opentelemetry/api';
-     
+
      async function processPayment(orderId, paymentDetails) {
        const tracer = trace.getTracer('payment-processor');
        
@@ -463,7 +478,7 @@ Here are concrete strategies for implementing comprehensive observability with a
 
      ```go
      package main
-     
+
      import (
        "context"
        "go.opentelemetry.io/otel"
@@ -477,7 +492,7 @@ Here are concrete strategies for implementing comprehensive observability with a
        "google.golang.org/grpc"
        "log"
      )
-     
+
      func initTracer() func() {
        // Create OTLP exporter
        ctx := context.Background()
@@ -522,7 +537,7 @@ Here are concrete strategies for implementing comprehensive observability with a
          }
        }
      }
-     
+
      // Using tracing in business logic
      func UpdateInventory(ctx context.Context, productID string, quantity int) error {
        tracer := otel.Tracer("inventory-operations")
@@ -548,16 +563,16 @@ Here are concrete strategies for implementing comprehensive observability with a
      }
      ```
 
-2. **Configure Context Propagation**: Ensure trace context propagates across service boundaries:
+1. **Configure Context Propagation**: Ensure trace context propagates across service boundaries:
 
    ```typescript
    // HTTP client with context propagation
    import { context, trace } from '@opentelemetry/api';
    import axios from 'axios';
    import { W3CTraceContextPropagator } from '@opentelemetry/core';
-   
+
    const propagator = new W3CTraceContextPropagator();
-   
+
    async function makeHttpRequest(url, data) {
      // Get current context and active span
      const currentContext = context.active();
@@ -585,7 +600,7 @@ Here are concrete strategies for implementing comprehensive observability with a
    }
    ```
 
-3. **Set Up an Observability Backend**: Deploy a complete observability stack:
+1. **Set Up an Observability Backend**: Deploy a complete observability stack:
 
    ```yaml
    # docker-compose.yml for observability stack
@@ -655,7 +670,7 @@ Here are concrete strategies for implementing comprehensive observability with a
    import * as opentelemetry from '@opentelemetry/sdk-node';
    import * as promClient from 'prom-client';
    import pino from 'pino';
-   
+
    // Initialize unified observability
    export function initializeObservability(serviceName, serviceVersion) {
      // Set up structured logging
@@ -797,12 +812,12 @@ Here are concrete strategies for implementing comprehensive observability with a
    }
    ```
 
-2. **Set Up Unified Health Checks**: Create consolidated checks that verify all three pillars:
+1. **Set Up Unified Health Checks**: Create consolidated checks that verify all three pillars:
 
    ```typescript
    // health-checks.ts
    import { Router } from 'express';
-   
+
    export function createHealthRoutes(observability) {
      const router = Router();
      
@@ -836,7 +851,7 @@ Here are concrete strategies for implementing comprehensive observability with a
      
      return router;
    }
-   
+
    function checkLogging() {
      try {
        // Attempt to write a log entry
@@ -848,7 +863,7 @@ Here are concrete strategies for implementing comprehensive observability with a
        };
      }
    }
-   
+
    function checkMetrics(registry) {
      try {
        // Check if metrics registry is functioning
@@ -864,7 +879,7 @@ Here are concrete strategies for implementing comprehensive observability with a
        };
      }
    }
-   
+
    function checkTracing() {
      try {
        // Verify tracing exporter is connected
@@ -878,7 +893,7 @@ Here are concrete strategies for implementing comprehensive observability with a
    }
    ```
 
-3. **Create Unified Dashboard Templates**: Set up dashboard templates showing all three pillars:
+1. **Create Unified Dashboard Templates**: Set up dashboard templates showing all three pillars:
 
    ```json
    // grafana-dashboard.json (simplified example)

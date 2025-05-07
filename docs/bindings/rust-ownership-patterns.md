@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: rust-ownership-patterns
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: rust compiler & code review
 applies_to:
-  - rust
----
+
+- rust
+
+______________________________________________________________________
 
 # Binding: Embrace Rust's Ownership System, Don't Fight It
 
@@ -26,33 +29,39 @@ When developers first encounter Rust, they often struggle against the borrow che
 This binding establishes clear rules for effective use of Rust's ownership, borrowing, and lifetime systems:
 
 - **Ownership as API Design:** Structure APIs around ownership patterns, not despite them. Consider who owns each value and for how long as a foundational aspect of API design.
+
   - Use ownership transfer (moving values) when the function takes responsibility for the value
   - Use shared references (`&T`) for read-only access to data
   - Use mutable references (`&mut T`) when temporary write access is needed
   - Return newly created or transformed values rather than mutating inputs when possible
 
 - **Borrow Checking Compliance:** Never try to circumvent the borrow checker with complex schemes, unsafe code, or excessive use of interior mutability.
+
   - If the borrow checker is fighting your design, rethink the design
   - Prefer ownership patterns that naturally satisfy the borrow checker
   - Use reference counting (`Rc`, `Arc`) and interior mutability (`RefCell`, `Mutex`) judiciously, only when truly needed
 
 - **Borrowing Over Copying:** Prefer borrowing (`&T`) over cloning/copying where possible.
+
   - Only clone data when the clone will be modified independently
   - Use references when you only need to inspect data
   - Consider Copy traits only for small, stack-based types where copying is cheaper than borrowing
 
 - **Lifetime Management:** Keep lifetime annotations as simple as possible.
+
   - Let Rust's lifetime elision rules work for you when possible
   - Use explicit lifetimes only when necessary to express constraints
   - Avoid creating complex lifetime relationships that are difficult to understand
   - Structure your types to minimize the need for complex lifetime annotations
 
 - **RAII Resource Management:** Use Rust's RAII (Resource Acquisition Is Initialization) pattern for all resource management.
+
   - Every resource should have a clear owner responsible for cleanup
   - Use the `Drop` trait to ensure proper cleanup of resources
   - Avoid manual resource management patterns from other languages
 
 - **Unsafe Usage Restrictions:** Unsafe code must be:
+
   - Strictly minimized and isolated in private implementation details
   - Thoroughly documented with `// SAFETY:` comments
   - Abstracted behind safe interfaces with appropriate invariants
@@ -67,24 +76,24 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
    fn process_message(message: Message) -> Result<Response, Error> {
        // Function takes ownership of message, can store it or transform it freely
    }
-   
+
    // Non-consuming APIs - borrow when the function only needs to read
    fn validate_message(message: &Message) -> bool {
        // Function only reads message, doesn't affect its ownership
    }
-   
+
    // Mutating APIs - use mutable borrows for modification
    fn update_message(message: &mut Message, new_content: &str) {
        // Function temporarily modifies message in-place
    }
-   
+
    // Factory pattern - return values instead of mutating
    fn enrich_message(message: Message, metadata: &Metadata) -> Message {
        // Returns a new, enhanced Message rather than mutating the input
    }
    ```
 
-2. **Use Ownership Transfer for Clear Resource Management**: Design with ownership transfer for resources:
+1. **Use Ownership Transfer for Clear Resource Management**: Design with ownership transfer for resources:
 
    ```rust
    // Connection clearly owns the socket and is responsible for cleanup
@@ -92,7 +101,7 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
        socket: Socket,
        // other fields...
    }
-   
+
    impl Connection {
        // Constructor takes ownership of the socket
        fn new(socket: Socket, config: &ConnectionConfig) -> Self {
@@ -107,18 +116,18 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
            self.socket.write(data)
        }
    }
-   
+
    // When Connection is dropped, socket is automatically cleaned up
    ```
 
-3. **Implement Borrowing Patterns for Shared Data**: Use references for data that's shared but not transferred:
+1. **Implement Borrowing Patterns for Shared Data**: Use references for data that's shared but not transferred:
 
    ```rust
    // Registry shares access to configurations without taking ownership
    struct Registry<'a> {
        configurations: Vec<&'a Configuration>,
    }
-   
+
    impl<'a> Registry<'a> {
        fn new() -> Self {
            Registry {
@@ -139,14 +148,14 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
    }
    ```
 
-4. **Use References and Slices Instead of Cloning**: Prefer borrowing over cloning when possible:
+1. **Use References and Slices Instead of Cloning**: Prefer borrowing over cloning when possible:
 
    ```rust
    // ✅ GOOD: Takes string slices instead of owned Strings
    fn format_name(first: &str, last: &str) -> String {
        format!("{}, {}", last, first)
    }
-   
+
    // ✅ GOOD: Takes a slice of records instead of cloning a vector
    fn calculate_average(values: &[f64]) -> f64 {
        if values.is_empty() {
@@ -156,7 +165,7 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
    }
    ```
 
-5. **Implement Borrowing with Lifetimes**: Use lifetimes to express relationships between borrowed values:
+1. **Implement Borrowing with Lifetimes**: Use lifetimes to express relationships between borrowed values:
 
    ```rust
    // Parser borrows the input text and returns slices of that same text
@@ -164,7 +173,7 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
        input: &'a str,
        position: usize,
    }
-   
+
    impl<'a> Parser<'a> {
        fn new(input: &'a str) -> Self {
            Parser {
@@ -193,7 +202,7 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
    }
    ```
 
-6. **Apply the Builder Pattern for Complex Construction**: Use the builder pattern to construct complex objects:
+1. **Apply the Builder Pattern for Complex Construction**: Use the builder pattern to construct complex objects:
 
    ```rust
    struct ServerConfig {
@@ -204,12 +213,12 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
        tls_enabled: bool,
        // More fields...
    }
-   
+
    // Builder owns the partially constructed config
    struct ServerConfigBuilder {
        config: ServerConfig,
    }
-   
+
    impl ServerConfigBuilder {
        fn new() -> Self {
            ServerConfigBuilder {
@@ -243,30 +252,30 @@ This binding establishes clear rules for effective use of Rust's ownership, borr
    }
    ```
 
-7. **Use Smart Pointers Judiciously**: Apply appropriate smart pointers for specific ownership needs:
+1. **Use Smart Pointers Judiciously**: Apply appropriate smart pointers for specific ownership needs:
 
    ```rust
    use std::rc::Rc;
    use std::cell::RefCell;
-   
+
    // Shared ownership with interior mutability - use when truly needed
    struct Document {
        content: String,
        // Other fields...
    }
-   
+
    // Editor shares ownership of the document with other components
    struct Editor {
        document: Rc<RefCell<Document>>,
        // Editor-specific fields...
    }
-   
+
    // UndoStack also needs shared access to the document
    struct UndoStack {
        document: Rc<RefCell<Document>>,
        history: Vec<String>,
    }
-   
+
    impl Editor {
        fn new(document: Rc<RefCell<Document>>) -> Self {
            Editor {

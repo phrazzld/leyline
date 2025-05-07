@@ -5,6 +5,9 @@
 - audit source philosophy files and ensure that every principle is properly extracted into a tenet or binding
 - make language / context specific tenets/bindings more clearly broken up (perhaps with subdirectories rather than just file prefixes)
 - add chrome browser extension tenets / bindings
+- add python tenets / bindings
+- add bash tenets / bindings
+- add cli tenets / bindings
 - add tenets / bindings for the benefit of strongly opinionated design over endless configuration
   - is probably a binding tied to the simplicity tenet (at least) because it creates better ux and simplifies code if there aren't a gazillion knobs and levers
 - stronger storybook tenets / bindings

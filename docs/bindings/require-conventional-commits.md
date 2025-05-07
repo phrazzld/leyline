@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: require-conventional-commits
 last_modified: "2025-05-04"
 derived_from: automation
 enforced_by: commit hooks & CI checks
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Express Intent Through Structured Commit Messages
 
@@ -24,6 +27,7 @@ The benefits of conventional commits compound as your project grows. For small p
 This binding establishes structured commit messages as a fundamental project requirement:
 
 - **Follow the Conventional Commits Format**: Every commit message must adhere to this pattern:
+
   ```
   <type>[optional scope]: <description>
 
@@ -33,6 +37,7 @@ This binding establishes structured commit messages as a fundamental project req
   ```
 
 - **Use Standardized Type Prefixes**: The `type` field must be one of these standardized values:
+
   - `feat`: A new feature (correlates to a MINOR version bump in semantic versioning)
   - `fix`: A bug fix (correlates to a PATCH version bump)
   - `docs`: Documentation-only changes
@@ -45,19 +50,23 @@ This binding establishes structured commit messages as a fundamental project req
   - `chore`: Other changes that don't modify source or test files
 
 - **Denote Breaking Changes**: When a commit introduces a breaking change:
+
   - Add an exclamation mark after the type/scope: `feat!:` or `feat(api)!:`
   - Explain the breaking change in the body with a `BREAKING CHANGE:` footer
 
 - **Keep Commits Focused**: Each commit should represent a single logical change:
+
   - The type should accurately reflect the primary purpose of the change
   - The description should be concise (50 characters or less) but descriptive
   - More detailed explanations belong in the commit body
 
 - **Scope Usage**: When applicable, include a scope in parentheses after the type to indicate which part of the codebase is affected:
+
   - Scopes should be consistent across similar commits
   - Common scopes include module names, feature areas, or system components
 
 - **Compliance Checking**: All commits must pass automated validation before being accepted:
+
   - Pre-commit hooks should validate commit message format
   - CI/CD pipelines should reject non-compliant commit messages
   - Pull requests containing non-compliant commits should be blocked
@@ -83,35 +92,35 @@ Here are concrete strategies for implementing conventional commits effectively:
 
    These tools validate commit messages before they're accepted, providing immediate feedback when a message doesn't meet the convention.
 
-2. **Provide Commit Message Generation Tools**: Use interactive tools to help developers create compliant messages:
+1. **Provide Commit Message Generation Tools**: Use interactive tools to help developers create compliant messages:
 
    ```bash
    # Install Commitizen
    npm install --save-dev commitizen cz-conventional-changelog
-   
+
    # Configure Commitizen to use conventional changelog format
    echo '{ "path": "cz-conventional-changelog" }' > .czrc
-   
+
    # Add script to package.json
    # "scripts": { "commit": "cz" }
    ```
 
    This creates an interactive commit process that guides developers through creating properly formatted messages without memorizing the specification.
 
-3. **Create Templates and Examples**: Provide clear guidance for your team:
+1. **Create Templates and Examples**: Provide clear guidance for your team:
 
    ```bash
    # Create a commit template file
    cat > .gitmessage.txt << EOF
    # <type>[optional scope]: <short summary>
    # |<---- Use 50 chars ---->|
-   
+
    # Explain why this change is being made
    # |<---- Try to limit each line to 72 chars ---->|
-   
+
    # Provide links to any relevant tickets, articles or other resources
    # Example: Fixes #123, Relates #456
-   
+
    # --- COMMIT END ---
    # Type can be:
    #   feat     (new feature)
@@ -130,26 +139,26 @@ Here are concrete strategies for implementing conventional commits effectively:
    #   - Can use multiple lines with "-" for bullet points in body
    # --------------------
    EOF
-   
+
    # Configure Git to use the template
    git config --local commit.template .gitmessage.txt
    ```
 
    This template provides guidance when developers write commit messages and serves as a quick reference for the convention.
 
-4. **Set Up Automated Changelog Generation**: Leverage conventional commits for release automation:
+1. **Set Up Automated Changelog Generation**: Leverage conventional commits for release automation:
 
    ```bash
    # Install standard-version
    npm install --save-dev standard-version
-   
+
    # Add script to package.json
    # "scripts": { "release": "standard-version" }
    ```
 
    This automatically generates changelogs based on commit types, making release preparation faster and more consistent.
 
-5. **Improve Commit Message Quality**: Focus on writing meaningful descriptions:
+1. **Improve Commit Message Quality**: Focus on writing meaningful descriptions:
 
    - Use the imperative mood ("Add feature" not "Added feature")
    - Be specific about what changed and why

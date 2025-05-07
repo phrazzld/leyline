@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: frontend-state-management
 last_modified: "2025-05-06"
 derived_from: simplicity
 enforced_by: "Code review, Architecture reviews"
 applies_to:
-  - frontend
----
+
+- frontend
+
+______________________________________________________________________
 
 # Binding: Frontend State Management
 
@@ -28,6 +31,7 @@ The frontend state management binding establishes these core requirements:
 - **State Locality and Colocation**: Keep state as close as possible to where it's used. State that affects only a single component should be managed within that component; state shared by a few related components should be lifted to their nearest common ancestor or a dedicated context.
 
 - **Separation of Concerns**: Maintain clear boundaries between different types of state:
+
   - UI State: Component appearance, animations, open/closed status
   - Application State: User settings, current view, application mode
   - Server/Domain State: Data from APIs, server responses, cached entities
@@ -38,6 +42,7 @@ The frontend state management binding establishes these core requirements:
 - **Clear Ownership**: Each piece of state should have a clear, single owner responsible for updating it. Avoid distributed state updates where multiple components can modify the same data.
 
 - **Explicit Update Patterns**: Use well-defined patterns for state updates:
+
   - Actions and reducers for complex state logic
   - Event handlers and setters for simple updates
   - Provider patterns for shared state
@@ -49,19 +54,21 @@ Exceptions to these rules should be extremely rare and only for well-justified p
 1. **Component State for UI Elements**: Use React's built-in hooks for local component state:
 
    - Use `useState` for simple, independent values:
+
      ```jsx
      const [isOpen, setIsOpen] = useState(false);
      const [count, setCount] = useState(0);
      ```
 
    - Use `useReducer` for complex, interrelated state:
+
      ```jsx
      const [state, dispatch] = useReducer(reducer, initialState);
      // Where state might have related properties like: 
      // { isLoading, error, data, page, sortBy, filters }
      ```
 
-2. **Context API for Shared Component State**: Create focused contexts for state shared between related components:
+1. **Context API for Shared Component State**: Create focused contexts for state shared between related components:
 
    - Keep contexts small and focused on specific concerns
    - Provide helper hooks to access context values and actions
@@ -93,7 +100,7 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    }
    ```
 
-3. **Server State with TanStack Query**: Use React Query for all server-related data operations:
+1. **Server State with TanStack Query**: Use React Query for all server-related data operations:
 
    - Separate server state from client state
    - Leverage built-in caching, deduplication, and background updates
@@ -114,7 +121,7 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    }
    ```
 
-4. **Form State with React Hook Form**: Use dedicated form libraries for all form-related state:
+1. **Form State with React Hook Form**: Use dedicated form libraries for all form-related state:
 
    - Leverage form-specific validation and state management
    - Separate form state from application state
@@ -152,7 +159,7 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    }
    ```
 
-5. **Global State for Complex Applications**: For truly application-wide state, use a dedicated state management library:
+1. **Global State for Complex Applications**: For truly application-wide state, use a dedicated state management library:
 
    - Prefer Zustand for most cases due to its simplicity and hooks-based API
    - Use Redux only for complex applications with extensive state interdependencies

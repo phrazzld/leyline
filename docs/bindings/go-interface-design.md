@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: go-interface-design
 last_modified: "2025-05-04"
 derived_from: testability
 enforced_by: code review & linting
 applies_to:
-  - go
----
+
+- go
+
+______________________________________________________________________
 
 # Binding: Design Small, Focused Interfaces in Consumer Packages
 
@@ -24,30 +27,35 @@ The difference between small, consumer-defined interfaces and large "header inte
 This binding establishes specific requirements for Go interface design:
 
 - **Consumer Ownership**: Interfaces MUST be defined in the package that uses the behavior, not the package that implements it:
+
   - Define interfaces based on the specific behaviors needed by consuming code
   - Implementation packages should return concrete types, not interfaces
   - Avoid the common anti-pattern of defining interfaces alongside their implementations
   - Exceptions are permitted for widely-used, standard interfaces (like `io.Reader`, `http.Handler`)
 
 - **Interface Size**: Interfaces MUST be small and focused:
+
   - Prefer single-method interfaces where possible (e.g., `io.Reader`, `io.Writer`)
   - Most interfaces should contain no more than 3 methods
   - Larger interfaces should be composed from smaller ones
   - Never create "header interfaces" that simply mirror the methods of a concrete type
 
 - **Interface Naming**: Interface names MUST clearly describe behaviors:
+
   - Names should describe the behavior, not the implementation
   - Prefer the `-er` suffix for active interfaces (e.g., `Reader`, `Writer`, `Validator`)
   - Avoid implementation-specific words in the name (e.g., `DBRepository`, `SQLStorage`)
   - Use descriptive, domain-specific names for clarity
 
 - **Interface Implementation**: Implementation of interfaces MUST be implicit:
+
   - Do not use explicit interface implementation declarations (`implements` keywords are not used in Go)
   - Use compile-time checks to verify interface implementation (e.g., `var _ Interface = (*ConcreteType)(nil)`)
   - Return concrete types from factories, not interfaces
   - Accept interfaces as parameters to provide flexibility
 
 - **Avoid Empty Interface**: Usage of the empty interface (`interface{}` or `any`) SHOULD be minimized:
+
   - The empty interface conveys no behavioral requirements and bypasses type safety
   - Use only when truly necessary (e.g., serialization/deserialization, value containers)
   - Prefer generic types (Go 1.18+) for type-safe polymorphism where applicable
@@ -58,30 +66,30 @@ This binding establishes specific requirements for Go interface design:
 
    ```go
    // ✅ GOOD: Define interfaces in consumer packages
-   
+
    // package: internal/notification/service.go
    package notification
-   
+
    // EmailSender defines the contract for sending emails.
    // This is defined here because the notification package 
    // consumes this behavior.
    type EmailSender interface {
        SendEmail(to string, subject string, body string) error
    }
-   
+
    // Service sends notifications through various channels.
    type Service struct {
        emailSender EmailSender
        // other dependencies...
    }
-   
+
    // NewService creates a notification service with the given dependencies.
    func NewService(emailSender EmailSender) *Service {
        return &Service{
            emailSender: emailSender,
        }
    }
-   
+
    // Send delivers a notification via email.
    func (s *Service) Send(to string, message string) error {
        return s.emailSender.SendEmail(to, "New Notification", message)
@@ -91,7 +99,7 @@ This binding establishes specific requirements for Go interface design:
    ```go
    // package: internal/email/service.go
    package email
-   
+
    // Service implements email sending capability.
    // Note: This doesn't reference the notification.EmailSender interface.
    type Service struct {
@@ -99,7 +107,7 @@ This binding establishes specific requirements for Go interface design:
        username   string
        password   string
    }
-   
+
    // NewService creates an email service.
    func NewService(smtpServer, username, password string) *Service {
        return &Service{
@@ -108,7 +116,7 @@ This binding establishes specific requirements for Go interface design:
            password:   password,
        }
    }
-   
+
    // SendEmail sends an email through SMTP.
    func (s *Service) SendEmail(to string, subject string, body string) error {
        // Implementation details...
@@ -116,21 +124,21 @@ This binding establishes specific requirements for Go interface design:
    }
    ```
 
-2. **Verify Interface Compliance**: Use compile-time checks to ensure types implement interfaces:
+1. **Verify Interface Compliance**: Use compile-time checks to ensure types implement interfaces:
 
    ```go
    // package: internal/notification/service_test.go
    package notification
-   
+
    import (
        "testing"
        
        "myapp/internal/email"
    )
-   
+
    // Compile-time check to ensure email.Service implements EmailSender
    var _ EmailSender = (*email.Service)(nil)
-   
+
    // Simple test implementation
    type mockEmailSender struct {
        sentEmails []struct {
@@ -139,7 +147,7 @@ This binding establishes specific requirements for Go interface design:
            body    string
        }
    }
-   
+
    func (m *mockEmailSender) SendEmail(to string, subject string, body string) error {
        m.sentEmails = append(m.sentEmails, struct {
            to      string
@@ -148,7 +156,7 @@ This binding establishes specific requirements for Go interface design:
        }{to, subject, body})
        return nil
    }
-   
+
    func TestNotificationService(t *testing.T) {
        // Arrange
        mock := &mockEmailSender{}
@@ -170,32 +178,32 @@ This binding establishes specific requirements for Go interface design:
    }
    ```
 
-3. **Design Small, Composable Interfaces**: Break down complex behaviors into smaller interfaces:
+1. **Design Small, Composable Interfaces**: Break down complex behaviors into smaller interfaces:
 
    ```go
    // ✅ GOOD: Small, focused interfaces
-   
+
    // Reader abstracts reading operations.
    type Reader interface {
        Read(p []byte) (n int, err error)
    }
-   
+
    // Writer abstracts writing operations.
    type Writer interface {
        Write(p []byte) (n int, err error)
    }
-   
+
    // Closer abstracts resource cleanup.
    type Closer interface {
        Close() error
    }
-   
+
    // ReadWriter combines reading and writing operations.
    type ReadWriter interface {
        Reader
        Writer
    }
-   
+
    // ReadWriteCloser adds resource cleanup to ReadWriter.
    type ReadWriteCloser interface {
        Reader
@@ -204,36 +212,36 @@ This binding establishes specific requirements for Go interface design:
    }
    ```
 
-4. **Accept Interfaces, Return Concrete Types**: Design functions and methods to promote flexibility:
+1. **Accept Interfaces, Return Concrete Types**: Design functions and methods to promote flexibility:
 
    ```go
    // repository.go
    package repository
-   
+
    // Database defines what the repository needs from a database connection.
    type Database interface {
        Query(query string, args ...interface{}) (Rows, error)
        Exec(query string, args ...interface{}) (Result, error)
    }
-   
+
    // Rows is a subset of sql.Rows functionality needed by repository.
    type Rows interface {
        Scan(dest ...interface{}) error
        Next() bool
        Close() error
    }
-   
+
    // Result is a subset of sql.Result functionality needed by repository.
    type Result interface {
        LastInsertId() (int64, error)
        RowsAffected() (int64, error)
    }
-   
+
    // UserRepository manages user data storage.
    type UserRepository struct {
        db Database
    }
-   
+
    // NewUserRepository creates a concrete UserRepository.
    func NewUserRepository(db Database) *UserRepository {
        return &UserRepository{db: db}
@@ -243,14 +251,14 @@ This binding establishes specific requirements for Go interface design:
    ```go
    // database.go
    package database
-   
+
    import "database/sql"
-   
+
    // SQLDatabase wraps a sql.DB connection.
    type SQLDatabase struct {
        db *sql.DB
    }
-   
+
    // NewSQLDatabase creates a new SQLDatabase.
    func NewSQLDatabase(connectionString string) (*SQLDatabase, error) {
        db, err := sql.Open("postgres", connectionString)
@@ -259,34 +267,34 @@ This binding establishes specific requirements for Go interface design:
        }
        return &SQLDatabase{db: db}, nil
    }
-   
+
    // Query executes a query and returns rows.
    func (s *SQLDatabase) Query(query string, args ...interface{}) (*sql.Rows, error) {
        return s.db.Query(query, args...)
    }
-   
+
    // Exec executes a non-query statement.
    func (s *SQLDatabase) Exec(query string, args ...interface{}) (sql.Result, error) {
        return s.db.Exec(query, args...)
    }
    ```
 
-5. **Avoid the Empty Interface When Possible**: Use generics for type-safe polymorphism:
+1. **Avoid the Empty Interface When Possible**: Use generics for type-safe polymorphism:
 
    ```go
    // ❌ BAD: Using empty interface loses type safety
    type Cache struct {
        items map[string]interface{}
    }
-   
+
    func (c *Cache) Set(key string, value interface{}) {
        c.items[key] = value
    }
-   
+
    func (c *Cache) Get(key string) interface{} {
        return c.items[key]
    }
-   
+
    // Usage requires type assertions
    value := cache.Get("user")
    user, ok := value.(*User)
@@ -300,22 +308,22 @@ This binding establishes specific requirements for Go interface design:
    type Cache[T any] struct {
        items map[string]T
    }
-   
+
    func NewCache[T any]() *Cache[T] {
        return &Cache[T]{
            items: make(map[string]T),
        }
    }
-   
+
    func (c *Cache[T]) Set(key string, value T) {
        c.items[key] = value
    }
-   
+
    func (c *Cache[T]) Get(key string) (T, bool) {
        value, exists := c.items[key]
        return value, exists
    }
-   
+
    // Type-safe usage
    userCache := NewCache[*User]()
    userCache.Set("user", &User{Name: "Alice"})

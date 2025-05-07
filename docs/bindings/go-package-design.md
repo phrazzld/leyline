@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: go-package-design
 last_modified: "2025-05-04"
 derived_from: modularity
 enforced_by: code review & project structure linting
 applies_to:
-  - go
----
+
+- go
+
+______________________________________________________________________
 
 # Binding: Organize Go Code Into Purpose-Driven Packages
 
@@ -24,30 +27,35 @@ The impact of package design choices compounds over time. In the early days of a
 This binding establishes clear requirements for how Go code should be organized into packages:
 
 - **Package Purpose and Identity**:
+
   - Each package MUST have a single, well-defined purpose that can be expressed in a short sentence
   - Package names MUST be concise, lower-case, single words without underscores that describe what the package contains
   - Packages SHOULD NOT be named after their patterns or implementation details (e.g., avoid names like "factory", "manager", "util")
   - Package comments (`// Package foo ...`) at the top of doc.go or primary .go file MUST clearly explain the package's purpose
 
 - **Package Structure and Organization**:
+
   - Projects MUST follow the standard Go project layout with `/cmd`, `/internal`, `/pkg` (when needed) directories
   - Group related functionality by domain concepts or features, not by technical roles (prefer `internal/user` over `internal/controllers`)
   - Place each Go package in its own directory with a name matching the package
   - Large packages SHOULD be split into more focused sub-packages when they exceed 2000-3000 lines of code
 
 - **Package Coupling and Cohesion**:
+
   - Packages MUST exhibit high internal cohesion (all code in the package works together for a unified purpose)
   - Packages MUST maintain low external coupling (minimal dependencies on other packages)
   - Circular dependencies between packages are STRICTLY PROHIBITED and should be detected in CI
   - Import graphs MUST form a directed acyclic graph (DAG) with clear hierarchical structure
 
 - **Package API Design**:
+
   - Package APIs MUST be intentionally designed, not emergent from implementation needs
   - Only types, functions, and constants directly related to the package's purpose should be exported
   - Implementation details MUST be unexported (private to the package)
   - PREFER accepting interfaces and returning concrete types
 
 - **Exceptions and Special Cases**:
+
   - Small utilities or helper functions SHOULD be kept in the package they serve rather than creating tiny utility packages
   - Utility code needed by multiple packages SHOULD be organized into purposeful shared packages (e.g., `internal/validation`) rather than generic catch-all utilities
   - Package main is an exception that often contains glue code connecting other packages; it should be kept minimal and focused on application bootstrapping
@@ -76,12 +84,13 @@ This binding establishes clear requirements for how Go code should be organized 
    ```
 
    Strictly adhere to the semantic meaning of these directories:
+
    - `/cmd`: Entry points for executables, with minimal code
    - `/internal`: Private code that cannot be imported by other modules
    - `/pkg`: Public library code that can be imported by other modules (use only when necessary)
    - `/api`: API definition files, schemas, protocol definitions
 
-2. **Organize by Domain Concepts**: Structure packages around business domains and features rather than technical layers:
+1. **Organize by Domain Concepts**: Structure packages around business domains and features rather than technical layers:
 
    ```go
    // ❌ BAD: Technical/layer-based organization
@@ -90,7 +99,7 @@ This binding establishes clear requirements for how Go code should be organized 
    ├── services/        // All business logic
    ├── repositories/    // All data access
    └── models/          // All data structures
-   
+
    // ✅ GOOD: Domain/feature-based organization
    internal/
    ├── user/            // Everything related to users
@@ -111,18 +120,19 @@ This binding establishes clear requirements for how Go code should be organized 
    ```
 
    This approach promotes:
+
    - Higher cohesion as related code stays together
    - Clearer ownership of features
    - Easier navigation for new developers
    - Natural boundaries for changes and testing
 
-3. **Design Clean Package APIs**: Explicitly define what's exported and what remains internal:
+1. **Design Clean Package APIs**: Explicitly define what's exported and what remains internal:
 
    For each package, create a clear contract with the rest of the system:
 
    ```go
    // package: internal/order/order.go
-   
+
    // Package order manages order processing and storage.
    package order
 
@@ -135,7 +145,7 @@ This binding establishes clear requirements for how Go code should be organized 
        Status    OrderStatus
        CreatedAt time.Time
    }
-   
+
    // Item represents an individual line item within an order.
    // This type is exported as it's part of Order.
    type Item struct {
@@ -143,10 +153,10 @@ This binding establishes clear requirements for how Go code should be organized 
        Quantity  int
        Price     decimal.Decimal
    }
-   
+
    // OrderStatus represents the current state of an order.
    type OrderStatus string
-   
+
    // Define valid order statuses as constants
    const (
        StatusPending   OrderStatus = "pending"
@@ -155,12 +165,12 @@ This binding establishes clear requirements for how Go code should be organized 
        StatusDelivered OrderStatus = "delivered"
        StatusCancelled OrderStatus = "cancelled"
    )
-   
+
    // internal type not exposed outside the package
    type orderValidator struct {
        // implementation details
    }
-   
+
    // unexported function used internally
    func validateOrderItems(items []Item) error {
        // implementation
@@ -171,7 +181,7 @@ This binding establishes clear requirements for how Go code should be organized 
 
    ```go
    // package: internal/order/service.go
-   
+
    // Service defines the operations available on orders.
    // This interface is exported to allow other packages to use it.
    type Service interface {
@@ -180,7 +190,7 @@ This binding establishes clear requirements for how Go code should be organized 
        Update(ctx context.Context, order *Order) error
        Cancel(ctx context.Context, id string) error
    }
-   
+
    // Repository defines the storage operations required by the order service.
    // This is an internal dependency the service needs.
    type Repository interface {
@@ -188,13 +198,13 @@ This binding establishes clear requirements for how Go code should be organized 
        FindByID(ctx context.Context, id string) (*Order, error)
        Update(ctx context.Context, order *Order) error
    }
-   
+
    // implementation of the service
    type service struct {
        repo Repository
        // other dependencies
    }
-   
+
    // NewService creates a new order service.
    // This factory function is exported to allow creating the service.
    func NewService(repo Repository) Service {
@@ -202,18 +212,18 @@ This binding establishes clear requirements for how Go code should be organized 
            repo: repo,
        }
    }
-   
+
    // Implementation methods for the service
    func (s *service) Create(ctx context.Context, customerID string, items []Item) (*Order, error) {
        // implementation
    }
    ```
 
-4. **Set up Dependency Management**: Use interfaces and dependency injection to manage and limit coupling:
+1. **Set up Dependency Management**: Use interfaces and dependency injection to manage and limit coupling:
 
    ```go
    // package: internal/app/app.go
-   
+
    // App represents the application and its dependencies.
    type App struct {
        UserService    user.Service
@@ -221,7 +231,7 @@ This binding establishes clear requirements for how Go code should be organized 
        PaymentService payment.Service
        // other dependencies
    }
-   
+
    // NewApp creates a new application instance with all dependencies wired up.
    func NewApp(cfg Config) (*App, error) {
        // Set up database
@@ -248,7 +258,7 @@ This binding establishes clear requirements for how Go code should be organized 
    }
    ```
 
-5. **Visualize and Enforce Package Relationships**: Regularly analyze and optimize your dependency graph:
+1. **Visualize and Enforce Package Relationships**: Regularly analyze and optimize your dependency graph:
 
    ```bash
    # Install go-tools to analyze dependencies

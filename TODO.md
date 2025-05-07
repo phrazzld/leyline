@@ -114,7 +114,7 @@
     1. Run CI checks to verify successful build
   - **Depends‑on:** none
 
-- \[ \] **T061 · Fix · P0: Apply consistent markdown formatting**
+- \[x\] **T061 · Fix · P0: Apply consistent markdown formatting**
 
   - **Context:** CI lint-docs job fails due to inconsistent markdown formatting
   - **Action:**

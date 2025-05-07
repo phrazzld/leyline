@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: external-configuration
 last_modified: "2025-05-04"
 derived_from: no-secret-suppression
 enforced_by: linters & secret scanning
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Never Hardcode Configuration
 
@@ -24,6 +27,7 @@ The costs of hardcoded configuration compound over time and across teams. What b
 This binding stipulates that:
 
 - All variable configuration must be externalized from source code and supplied at runtime. This includes:
+
   - Environment-specific values (URLs, hostnames, ports, timeouts)
   - Credentials (passwords, API keys, tokens, certificates)
   - Feature flags and toggles
@@ -32,18 +36,21 @@ This binding stipulates that:
   - Any other value that might need to change between deployments or environments
 
 - Configuration should be supplied through standardized mechanisms appropriate to your deployment environment:
+
   - Environment variables
   - Configuration files (excluded from version control when containing sensitive values)
   - Secrets management systems
   - Configuration management platforms
 
 - Configuration values must never be:
+
   - Hardcoded in source code, even as "defaults"
   - Stored in version control (except for template files and non-sensitive examples)
   - Embedded in compiled binaries or deployment artifacts
   - Shared across environments without intentional decision-making
 
 Limited exceptions exist primarily for:
+
 - Non-sensitive constants that are truly invariant (e.g., mathematical constants, HTTP status codes)
 - Development-only tooling aids that never deploy to production
 - Test fixtures that are explicitly labeled and isolated
@@ -60,27 +67,27 @@ To implement external configuration effectively in your systems:
    // Configuration layer with abstraction
    class ConfigService {
      private readonly config: Record<string, any>;
-   
+
      constructor() {
        // Load from environment, files, or remote sources
        this.config = this.loadConfiguration();
      }
-   
+
      get<T>(key: string, defaultValue?: T): T {
        return this.config[key] !== undefined ? this.config[key] : defaultValue;
      }
-   
+
      private loadConfiguration() {
        // Implementation details of loading configuration
      }
    }
-   
+
    // Usage in business logic
    const configService = new ConfigService();
    const databaseUrl = configService.get<string>('DATABASE_URL');
    ```
 
-2. **Implement Strong Validation**: Validate configuration values at application startup, failing fast if required values are missing or invalid. Don't wait until a feature is used to discover the configuration is incorrect. Ask yourself: "What assumptions am I making about this configuration value?" Then validate those assumptions explicitly. This creates a clear contract for what configuration your application requires and ensures problems are caught immediately, not deep in a call stack.
+1. **Implement Strong Validation**: Validate configuration values at application startup, failing fast if required values are missing or invalid. Don't wait until a feature is used to discover the configuration is incorrect. Ask yourself: "What assumptions am I making about this configuration value?" Then validate those assumptions explicitly. This creates a clear contract for what configuration your application requires and ensures problems are caught immediately, not deep in a call stack.
 
    ```go
    type DatabaseConfig struct {
@@ -88,7 +95,7 @@ To implement external configuration effectively in your systems:
      MaxConnections int
      Timeout        time.Duration
    }
-   
+
    func ValidateDatabaseConfig(config DatabaseConfig) error {
      if config.URL == "" {
        return errors.New("database URL is required")
@@ -103,7 +110,7 @@ To implement external configuration effectively in your systems:
    }
    ```
 
-3. **Layer Your Configuration Sources**: Implement a configuration hierarchy that allows for overrides from multiple sources. A common pattern is: default values → configuration files → environment variables → command-line arguments. Ask yourself: "How will operators configure this system in an emergency?" Ensure there's always a mechanism to override configuration without requiring a rebuild or redeploy.
+1. **Layer Your Configuration Sources**: Implement a configuration hierarchy that allows for overrides from multiple sources. A common pattern is: default values → configuration files → environment variables → command-line arguments. Ask yourself: "How will operators configure this system in an emergency?" Ensure there's always a mechanism to override configuration without requiring a rebuild or redeploy.
 
    ```python
    def load_config():
@@ -133,7 +140,7 @@ To implement external configuration effectively in your systems:
        return config
    ```
 
-4. **Secure Sensitive Configuration**: Treat secrets differently from regular configuration. Ask yourself: "What would happen if this value was exposed in logs or error messages?" Use specialized secrets management services appropriate to your deployment platform (e.g., AWS Secrets Manager, HashiCorp Vault, Kubernetes Secrets) rather than plain environment variables or configuration files for truly sensitive values.
+1. **Secure Sensitive Configuration**: Treat secrets differently from regular configuration. Ask yourself: "What would happen if this value was exposed in logs or error messages?" Use specialized secrets management services appropriate to your deployment platform (e.g., AWS Secrets Manager, HashiCorp Vault, Kubernetes Secrets) rather than plain environment variables or configuration files for truly sensitive values.
 
    ```typescript
    async function getSecrets() {
@@ -150,21 +157,21 @@ To implement external configuration effectively in your systems:
    }
    ```
 
-5. **Document Configuration Requirements**: Provide clear documentation about all configuration options, including their purpose, format, default values, and validation rules. Include example configuration for common scenarios. Ask yourself: "Could someone unfamiliar with this codebase configure it correctly just from the documentation?" Create template files with placeholder values (like `.env.example`) that can be checked into version control as a guide, even if the actual configuration files with real values are excluded.
+1. **Document Configuration Requirements**: Provide clear documentation about all configuration options, including their purpose, format, default values, and validation rules. Include example configuration for common scenarios. Ask yourself: "Could someone unfamiliar with this codebase configure it correctly just from the documentation?" Create template files with placeholder values (like `.env.example`) that can be checked into version control as a guide, even if the actual configuration files with real values are excluded.
 
    ```markdown
    # Configuration Guide
-   
+
    The application requires the following configuration:
-   
+
    ## Database Settings
-   
+
    - `DATABASE_URL`: Connection string for the database (required)
    - `DB_POOL_SIZE`: Number of connections in the pool (default: 10)
    - `DB_TIMEOUT_MS`: Query timeout in milliseconds (default: 5000)
-   
+
    ## API Settings
-   
+
    - `API_KEY`: Authentication key for external API (required)
    - `API_TIMEOUT_MS`: API call timeout in milliseconds (default: 30000)
    ```

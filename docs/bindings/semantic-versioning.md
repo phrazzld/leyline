@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: semantic-versioning
 last_modified: "2025-05-06"
 derived_from: explicit-over-implicit
 enforced_by: version checking tools & CI validation
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Make Breaking Changes Explicit with Semantic Versioning
 
@@ -24,35 +27,42 @@ The benefits of semantic versioning compound as projects scale and dependencies 
 This binding establishes how version numbers must communicate the nature of changes:
 
 - **Version Format**: All releases must use the `MAJOR.MINOR.PATCH` versioning scheme:
+
   - `MAJOR`: Incremented for backward-incompatible changes
   - `MINOR`: Incremented for backward-compatible new features
   - `PATCH`: Incremented for backward-compatible bug fixes
 
 - **Initial Development**: Versions before 1.0.0 (0.x.y) are considered unstable:
+
   - The API is not considered stable
   - Breaking changes may occur in minor versions
   - Projects should reach 1.0.0 when the API stabilizes
 
 - **Version Increments**: Follow these rules for incrementing versions:
+
   - Increment `PATCH` when making backward-compatible bug fixes
   - Increment `MINOR` when adding functionality in a backward-compatible manner
   - Increment `MAJOR` when making incompatible API changes
   - Never modify released versions; always increment the version number
 
 - **Pre-release Versions**: Use pre-release identifiers for unstable releases:
+
   - Format as `MAJOR.MINOR.PATCH-[identifier]`, e.g., `1.0.0-alpha.1`
   - Consider pre-release versions less precedent than normal versions
 
 - **Build Metadata**: Additional build information can be appended:
+
   - Format as `MAJOR.MINOR.PATCH+[metadata]`, e.g., `1.0.0+20250506`
   - Build metadata does not affect version precedence
 
 - **Deprecation Process**: Before removing features in a major version:
+
   - Mark features as deprecated in a minor version
   - Document migration paths and alternatives
   - Maintain deprecated features until the next major version
 
 - **Compliance Verification**: Versions must be validated:
+
   - Include version validation in CI pipelines
   - Enforce compatibility with published API contracts
   - Verify version increments match the nature of changes
@@ -66,7 +76,7 @@ Here are concrete strategies for implementing semantic versioning effectively:
    ```bash
    # Install semantic-release for automated SemVer management
    npm install --save-dev semantic-release
-   
+
    # Configure semantic-release (.releaserc.json)
    echo '{
      "branches": ["main"],
@@ -78,12 +88,12 @@ Here are concrete strategies for implementing semantic versioning effectively:
        "@semantic-release/git"
      ]
    }' > .releaserc.json
-   
+
    # Alternative: Use standard-version
    npm install --save-dev standard-version
    ```
 
-2. **Implement API Contract Validation**:
+1. **Implement API Contract Validation**:
 
    ```typescript
    // api-extractor.json for TypeScript API contract validation
@@ -113,12 +123,12 @@ Here are concrete strategies for implementing semantic versioning effectively:
    }
    ```
 
-3. **Configure CI/CD for Version Validation**:
+1. **Configure CI/CD for Version Validation**:
 
    ```yaml
    # Workflow for validating version changes
    name: Version Validation
-   
+
    on:
      pull_request:
        branches: [main]
@@ -165,34 +175,34 @@ Here are concrete strategies for implementing semantic versioning effectively:
              npx api-extractor run --local
    ```
 
-4. **Document Versioning Policy**:
+1. **Document Versioning Policy**:
 
    ```markdown
    # Versioning Policy
-   
+
    This project follows [Semantic Versioning 2.0.0](https://semver.org/).
-   
+
    ## Version Increments
-   
+
    - **PATCH** (`1.0.X`): Bug fixes and patches that don't change the public API
    - **MINOR** (`1.X.0`): New features added in a backward-compatible manner
    - **MAJOR** (`X.0.0`): Breaking changes to the public API
-   
+
    ## Stability Guarantees
-   
+
    - **Stable API** (`>=1.0.0`): Public APIs are stable and will only break with a major version increment
    - **Experimental Features**: APIs marked as experimental may change between minor versions
    - **Internal APIs**: Anything marked "internal" or in `internal/` directories is not part of the public API
-   
+
    ## Deprecation Process
-   
+
    1. Features are marked as deprecated with `@deprecated` annotations
    2. Documentation is updated with migration guidance
    3. Deprecation warnings are emitted at runtime
    4. Deprecated features remain functional until the next major version
    ```
 
-5. **Integrate with Package Registries**:
+1. **Integrate with Package Registries**:
 
    ```json
    // package.json version scripts

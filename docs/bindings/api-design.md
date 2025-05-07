@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: api-design
 last_modified: "2025-05-05"
 derived_from: explicit-over-implicit
 enforced_by: code review & style guides
 applies_to:
-  - all
----
+
+- all
+
+______________________________________________________________________
 
 # Binding: Design Clear, Explicit API Contracts
 
@@ -24,6 +27,7 @@ The cost of implicit API design compounds over time and across team boundaries. 
 This binding requires that all APIs—whether they're interfaces between modules, HTTP endpoints, command-line tools, or any other boundary between components—must have explicit, well-defined contracts. Specifically:
 
 - Every API must clearly define its:
+
   - Input requirements (parameters, their types, formats, valid ranges, and required vs. optional status)
   - Output guarantees (return values, response formats, possible errors/exceptions)
   - Side effects (what state changes occur, what external systems are affected)
@@ -31,6 +35,7 @@ This binding requires that all APIs—whether they're interfaces between modules
   - Security requirements (authentication, authorization, data validation)
 
 - These contracts must be expressed through:
+
   - Strong typing where available (using the most specific types possible)
   - Input validation that fails fast with clear error messages
   - Comprehensive documentation (purpose, usage examples, edge cases)
@@ -38,6 +43,7 @@ This binding requires that all APIs—whether they're interfaces between modules
   - Explicit error handling strategies
 
 - API designs must avoid:
+
   - Magic parameters or "flag" arguments that drastically change behavior
   - Overloaded methods that do fundamentally different things based on input types
   - Hidden side effects not clear from the interface
@@ -45,6 +51,7 @@ This binding requires that all APIs—whether they're interfaces between modules
   - Leaking implementation details into the public contract
 
 Limited exceptions may apply for:
+
 - Internal utility functions with small scope and limited usage
 - Performance-critical code sections where the contract complexity would create measurable overhead
 - Legacy systems with established patterns that would be disruptive to change
@@ -60,7 +67,7 @@ In these exceptional cases, extra documentation explaining the implicit behavior
    function processUserData(userData: any) {
      // Implementation assumes userData has specific properties
    }
-   
+
    // Define a precise contract
    interface UserData {
      id: string;
@@ -71,58 +78,58 @@ In these exceptional cases, extra documentation explaining the implicit behavior
        notifications: boolean;
      };
    }
-   
+
    function processUserData(userData: UserData) {
      // Implementation can rely on the contract
    }
    ```
 
-2. **Separate Public APIs from Internal Implementation**: Clearly distinguish between public interfaces and internal implementation details. Ask yourself: "What is the minimum interface needed to fulfill the use cases?" Then expose only those elements, keeping implementation details hidden. This creates a clear boundary between what clients can depend on and what might change.
+1. **Separate Public APIs from Internal Implementation**: Clearly distinguish between public interfaces and internal implementation details. Ask yourself: "What is the minimum interface needed to fulfill the use cases?" Then expose only those elements, keeping implementation details hidden. This creates a clear boundary between what clients can depend on and what might change.
 
    ```go
    // Public API package with minimal, focused interfaces
    package api
-   
+
    type UserService interface {
      GetUser(id string) (User, error)
      CreateUser(user CreateUserRequest) (User, error)
      UpdateUser(id string, updates UpdateUserRequest) (User, error)
    }
-   
+
    type User struct {
      ID        string
      Name      string
      Email     string
      CreatedAt time.Time
    }
-   
+
    type CreateUserRequest struct {
      Name  string `validate:"required"`
      Email string `validate:"required,email"`
    }
-   
+
    type UpdateUserRequest struct {
      Name  *string
      Email *string
    }
-   
+
    // Implementation package with internal details
    package internal
-   
+
    type userService struct {
      db               Database
      eventPublisher   EventPublisher
      validationHelper *ValidationHelper
      // Other implementation details
    }
-   
+
    // Implementation of api.UserService
    func (s *userService) GetUser(id string) (api.User, error) {
      // Implementation details
    }
    ```
 
-3. **Document All Aspects of the Contract**: Create comprehensive documentation that explains the API's purpose, usage patterns, error handling, and edge cases. Ask yourself: "Could someone use this API correctly without looking at the implementation?" Documentation should include examples of correct usage, common pitfalls, and guidance for error handling.
+1. **Document All Aspects of the Contract**: Create comprehensive documentation that explains the API's purpose, usage patterns, error handling, and edge cases. Ask yourself: "Could someone use this API correctly without looking at the implementation?" Documentation should include examples of correct usage, common pitfalls, and guidance for error handling.
 
    ```python
    def transfer_funds(source_account_id: str, destination_account_id: str, amount: Decimal) -> TransferResult:
@@ -152,7 +159,7 @@ In these exceptional cases, extra documentation explaining the implicit behavior
        # Implementation
    ```
 
-4. **Design for Evolution**: Create APIs that can evolve without breaking clients. Ask yourself: "How will this API need to change in the future?" Use versioning, opt-in features, and backward compatibility patterns to allow APIs to evolve while preserving existing client behavior.
+1. **Design for Evolution**: Create APIs that can evolve without breaking clients. Ask yourself: "How will this API need to change in the future?" Use versioning, opt-in features, and backward compatibility patterns to allow APIs to evolve while preserving existing client behavior.
 
    ```java
    // REST API versioning in URL
@@ -160,12 +167,12 @@ In these exceptional cases, extra documentation explaining the implicit behavior
    public class UserControllerV1 {
        // V1 implementation
    }
-   
+
    @RequestMapping("/api/v2/users")
    public class UserControllerV2 {
        // V2 implementation with new features
    }
-   
+
    // GraphQL schema evolution
    type User {
      id: ID!
@@ -175,19 +182,19 @@ In these exceptional cases, extra documentation explaining the implicit behavior
      # New optional fields don't break existing queries
      preferences: UserPreferences
    }
-   
+
    type UserPreferences {
      theme: Theme
      notifications: Boolean
    }
-   
+
    enum Theme {
      LIGHT
      DARK
    }
    ```
 
-5. **Use Consistent Naming and Patterns**: Apply consistent naming and design patterns across all APIs. Ask yourself: "Is this consistent with our other APIs?" Consistency makes APIs more predictable and easier to learn. Names should accurately reflect behavior and follow established conventions.
+1. **Use Consistent Naming and Patterns**: Apply consistent naming and design patterns across all APIs. Ask yourself: "Is this consistent with our other APIs?" Consistency makes APIs more predictable and easier to learn. Names should accurately reflect behavior and follow established conventions.
 
    ```javascript
    // Consistent naming for CRUD operations

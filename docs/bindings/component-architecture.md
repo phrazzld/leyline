@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: component-architecture
 last_modified: "2025-05-06"
 derived_from: modularity
 enforced_by: "Code review, Storybook organization"
 applies_to:
-  - frontend
----
+
+- frontend
+
+______________________________________________________________________
 
 # Binding: Component Architecture
 
@@ -24,6 +27,7 @@ Well-designed component architecture delivers significant business value by enab
 The component architecture binding establishes these core requirements:
 
 - **Use Atomic Design Hierarchy**: Structure UI components according to the five levels of Atomic Design:
+
   - **Atoms**: Basic UI building blocks that can't be broken down further (buttons, inputs, icons)
   - **Molecules**: Simple combinations of atoms functioning together as a unit (search bars, form fields with labels)
   - **Organisms**: Complex UI sections formed by combining molecules (navigation menus, forms, content cards)
@@ -82,21 +86,21 @@ src/
    - Build thorough documentation and Storybook stories for each atom
    - Implement proper accessibility features at the atomic level
 
-3. **Define Clear Component Interfaces**: Create well-defined props for every component:
+1. **Define Clear Component Interfaces**: Create well-defined props for every component:
 
    - Use TypeScript interfaces to document all props and their types
    - Make interfaces explicit about what is required vs. optional
    - Include JSDoc comments explaining the purpose of each prop
    - Consider using prop validation libraries for runtime validation
 
-4. **Implement Effective Composition Patterns**: Design components to be combined in predictable ways:
+1. **Implement Effective Composition Patterns**: Design components to be combined in predictable ways:
 
    - Use React's children prop for simple composition
    - Implement the Compound Component pattern for related component sets
    - Use React Context for component communication within a hierarchy
    - Consider the Slot pattern for flexible content placement
 
-5. **Document the Component Library**: Make your component system discoverable and usable:
+1. **Document the Component Library**: Make your component system discoverable and usable:
 
    - Implement comprehensive Storybook documentation
    - Create usage examples for each component

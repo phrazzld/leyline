@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: ts-async-patterns
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: eslint rules & code review
 applies_to:
-  - typescript
----
+
+- typescript
+
+______________________________________________________________________
 
 # Binding: Structure TypeScript Async Code with Best Practices
 
@@ -13,7 +16,7 @@ Use async/await for all asynchronous operations in TypeScript, with proper error
 
 ## Rationale
 
-This binding implements our simplicity tenet by addressing one of the most common sources of complexity in modern JavaScript and TypeScript applications: asynchronous code flow. 
+This binding implements our simplicity tenet by addressing one of the most common sources of complexity in modern JavaScript and TypeScript applications: asynchronous code flow.
 
 Asynchronous programming is inherently more complex than synchronous code. It introduces temporal coupling, error propagation challenges, and cognitive overhead due to its non-linear execution. When not managed properly, async code quickly becomes a breeding ground for subtle bugs, race conditions, and unhandled exceptions that manifest in unpredictable ways.
 
@@ -26,23 +29,27 @@ By establishing clear, consistent patterns for async code, we create predictabil
 This binding establishes clear requirements for async code patterns in TypeScript:
 
 - **Async/Await Usage**:
+
   - MUST use `async`/`await` syntax for all asynchronous operations, rather than direct Promise chains with `.then()` and `.catch()`
   - `Promise.all()`, `Promise.race()` and other Promise combinators MAY be used with `await` for concurrent operations
   - MUST always declare functions that return Promises with the `async` keyword
   - MUST explicitly type async functions with `Promise<T>` for their return values
 
 - **Error Handling**:
+
   - MUST wrap `await` expressions in `try/catch` blocks to handle potential errors
   - MUST NOT have unhandled Promise rejections or uncaught exceptions from async code
   - SHOULD create specific error subclasses that extend `Error` for different error categories
   - MUST propagate errors with context, preserving the error chain by using techniques like wrapping
 
 - **Cancellation**:
+
   - MUST implement cancellation mechanism for long-running async operations that may need to be terminated
   - SHOULD use `AbortController` and `AbortSignal` for cancellation when available
   - MUST clean up resources (event listeners, subscriptions, file handles) even when operations are canceled
 
 - **Concurrency Management**:
+
   - MUST handle concurrent operations explicitly using appropriate Promise combinators:
     - `Promise.all()` when all operations must succeed
     - `Promise.allSettled()` when operations can individually fail
@@ -50,12 +57,14 @@ This binding establishes clear requirements for async code patterns in TypeScrip
   - SHOULD limit concurrent operations to avoid overwhelming resources using patterns like semaphores and throttling
 
 - **Async Flows**:
+
   - MUST avoid deeply nested async code (more than 2-3 levels)
   - SHOULD break down complex async workflows into smaller, named async functions
   - MUST NOT mix callback-based async with Promise-based async without proper wrapping (use promisification)
   - SHOULD use sequential, concurrent, or parallel execution patterns appropriately based on dependencies
 
 - **Testing Async Code**:
+
   - MUST ensure all tests properly await async operations and correctly handle Promise resolution/rejection
   - SHOULD use testing utilities that help with async testing (like test framework's async support)
 
@@ -92,7 +101,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
        );
      }
    }
-   
+
    // Custom error class with context
    class ApiError extends Error {
      constructor(
@@ -106,7 +115,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
    }
    ```
 
-2. **Implement Proper Cancellation**: Use AbortController to make async operations cancellable:
+1. **Implement Proper Cancellation**: Use AbortController to make async operations cancellable:
 
    ```typescript
    // ✅ GOOD: Cancellable async operation
@@ -114,7 +123,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
      promise: Promise<T>;
      cancel: () => void;
    }
-   
+
    export function fetchWithTimeout<T>(
      url: string, 
      options?: RequestInit, 
@@ -150,19 +159,19 @@ This binding establishes clear requirements for async code patterns in TypeScrip
        }
      };
    }
-   
+
    // Usage:
    const { promise, cancel } = fetchWithTimeout<UserData>('/api/users/123');
-   
+
    // Later, if needed:
    cancel(); // This will abort the request
    ```
 
-3. **Handle Concurrent Operations**: Use appropriate Promise combinators for managing multiple async operations:
+1. **Handle Concurrent Operations**: Use appropriate Promise combinators for managing multiple async operations:
 
    ```typescript
    // ✅ GOOD: Handling multiple async operations with Promise combinators
-   
+
    // When all operations must succeed
    async function loadDashboardData(userId: string): Promise<DashboardData> {
      try {
@@ -186,7 +195,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
        );
      }
    }
-   
+
    // When individual failures should be tolerated
    async function loadDashboardDataResilient(userId: string): Promise<DashboardData> {
      const results = await Promise.allSettled([
@@ -202,7 +211,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
        notifications: results[2].status === 'fulfilled' ? results[2].value : []
      };
    }
-   
+
    // When you need the first successful response
    async function fetchFromMirroredApis<T>(urls: string[]): Promise<T> {
      // Create an array of promises with timeouts
@@ -215,11 +224,11 @@ This binding establishes clear requirements for async code patterns in TypeScrip
    }
    ```
 
-4. **Limit Concurrency**: Implement rate limiting for async operations:
+1. **Limit Concurrency**: Implement rate limiting for async operations:
 
    ```typescript
    // ✅ GOOD: Managing concurrency to avoid overwhelming resources
-   
+
    // Semaphore for limiting concurrent operations
    class Semaphore {
      private permits: number;
@@ -249,7 +258,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
        }
      }
    }
-   
+
    // Process a large array of items with limited concurrency
    async function processItemsWithLimit<T, R>(
      items: T[],
@@ -278,7 +287,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
      
      return results;
    }
-   
+
    // Usage example:
    const userIds = ['user1', 'user2', 'user3', /* ... hundreds more ... */];
    const userData = await processItemsWithLimit(
@@ -288,7 +297,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
    );
    ```
 
-5. **Handle Timeouts and Retries**: Implement timeout and retry mechanisms for resilient async operations:
+1. **Handle Timeouts and Retries**: Implement timeout and retry mechanisms for resilient async operations:
 
    ```typescript
    // ✅ GOOD: Async operation with retries and exponential backoff
@@ -336,24 +345,24 @@ This binding establishes clear requirements for async code patterns in TypeScrip
        }
      }
    }
-   
+
    class RetryableError extends Error {
      constructor(message: string) {
        super(message);
        this.name = 'RetryableError';
      }
    }
-   
+
    function sleep(ms: number): Promise<void> {
      return new Promise(resolve => setTimeout(resolve, ms));
    }
    ```
 
-6. **Testing Async Code**: Structure async tests properly:
+1. **Testing Async Code**: Structure async tests properly:
 
    ```typescript
    // ✅ GOOD: Properly structured async tests
-   
+
    // Jest example
    describe('UserService', () => {
      test('fetchUserData returns user data for valid ID', async () => {
@@ -393,7 +402,7 @@ This binding establishes clear requirements for async code patterns in TypeScrip
    });
    ```
 
-7. **Configure ESLint for Async Best Practices**: Use ESLint rules to enforce async patterns:
+1. **Configure ESLint for Async Best Practices**: Use ESLint rules to enforce async patterns:
 
    ```javascript
    // .eslintrc.js

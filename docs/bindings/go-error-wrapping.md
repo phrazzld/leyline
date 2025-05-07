@@ -1,11 +1,14 @@
----
+______________________________________________________________________
+
 id: go-error-wrapping
 last_modified: "2025-05-04"
 derived_from: explicit-over-implicit
 enforced_by: golangci-lint("wrapcheck") & code review
 applies_to:
-  - go
----
+
+- go
+
+______________________________________________________________________
 
 # Binding: Add Context to Errors as They Travel Upward
 
@@ -22,8 +25,8 @@ Think of error wrapping like a travel journal for an error's journey through you
 Error wrapping means adding contextual information to an error as it travels up the call stack, while preserving the original error for type checking and root cause analysis. At minimum, this context should include:
 
 1. The operation that was attempted (e.g., "fetching user profile")
-2. Any relevant identifiers (e.g., user IDs, record numbers)
-3. Additional information that would help with debugging
+1. Any relevant identifiers (e.g., user IDs, record numbers)
+1. Additional information that would help with debugging
 
 This binding specifically requires:
 
@@ -37,11 +40,13 @@ This binding specifically requires:
 ### When to Wrap Errors
 
 Always wrap errors when:
+
 - Returning an error from an exported function
 - Crossing major component boundaries
 - Adding significant context would help with debugging
 
 Generally avoid wrapping when:
+
 - The error is already wrapped with the same context
 - The function is internal to a package and doesn't add meaningful context
 - Creating sentinel errors meant to be checked by type/value (these should be returned directly)
@@ -49,13 +54,15 @@ Generally avoid wrapping when:
 ### Implementation Patterns
 
 1. **Simple wrapping with fmt.Errorf**:
+
    ```go
    if err != nil {
        return fmt.Errorf("operation description: %w", err)
    }
    ```
 
-2. **Custom error types** (when you need to include structured data):
+1. **Custom error types** (when you need to include structured data):
+
    ```go
    type MyError struct {
        Operation string
@@ -72,13 +79,14 @@ Generally avoid wrapping when:
    }
    ```
 
-3. **Error handling with wrapping**:
+1. **Error handling with wrapping**:
+
    ```go
    // Working with wrapped errors
    if errors.Is(err, sql.ErrNoRows) {
        // Handle specific error type
    }
-   
+
    var myErr *MyError
    if errors.As(err, &myErr) {
        // Access fields in custom error
@@ -88,18 +96,21 @@ Generally avoid wrapping when:
 ### Common Mistakes to Avoid
 
 1. **Losing the original error**:
+
    ```go
    // ❌ BAD: Lost original error
    return fmt.Errorf("operation failed: %v", err) // Using %v loses error type
    ```
 
-2. **Wrapping with insufficient context**:
+1. **Wrapping with insufficient context**:
+
    ```go
    // ❌ BAD: Too generic
    return fmt.Errorf("failed: %w", err) // Not enough context
    ```
 
-3. **Duplicate wrapping**:
+1. **Duplicate wrapping**:
+
    ```go
    // ❌ BAD: Duplicate context
    if err != nil {
@@ -177,11 +188,12 @@ failed to process customer request: fetching order details for order 12345: conn
 ```
 
 This error trace tells us:
+
 1. What high-level operation failed (processing customer request)
-2. What specific step failed (fetching order details)
-3. Which order was affected (12345)
-4. What lower-level operation failed (connecting to database)
-5. The root cause (connection refused)
+1. What specific step failed (fetching order details)
+1. Which order was affected (12345)
+1. What lower-level operation failed (connecting to database)
+1. The root cause (connection refused)
 
 Without proper wrapping, we might only see "connection refused" with no context.
 

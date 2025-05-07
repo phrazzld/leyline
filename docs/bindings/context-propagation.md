@@ -1,12 +1,15 @@
----
+______________________________________________________________________
+
 id: context-propagation
 last_modified: "2025-05-06"
 derived_from: explicit-over-implicit
 enforced_by: code review & integration tests
 applies_to:
-  - all
-  - distributed-systems
----
+
+- all
+- distributed-systems
+
+______________________________________________________________________
 
 # Binding: Propagate Request Context Across Service Boundaries
 
@@ -27,6 +30,7 @@ By consistently propagating context across all service boundaries, you transform
 This binding establishes concrete requirements for implementing context propagation:
 
 - **Mandatory Context Fields**: Every request must propagate these standard fields:
+
   - `correlation_id`: Unique identifier that connects all parts of a distributed transaction
   - `causality_token` or `trace_id`: Identifier for tracing the causal path through the system
   - `request_id`: Unique identifier for the specific request (different from `correlation_id`)
@@ -38,6 +42,7 @@ This binding establishes concrete requirements for implementing context propagat
   - `auth_context`: Authentication and authorization context (appropriately secured)
 
 - **Propagation Mechanisms**: Context must be propagated through these channels:
+
   - HTTP headers for synchronous service-to-service calls
   - Message metadata for asynchronous messaging
   - Event payloads for event-driven communication
@@ -45,23 +50,27 @@ This binding establishes concrete requirements for implementing context propagat
   - Metadata fields in file storage when applicable
 
 - **Cross-Language Compatibility**: Context format must be consistent across languages:
+
   - Use language-agnostic serialization formats
   - Maintain consistent naming conventions
   - Follow W3C Trace Context specification when applicable
   - Preserve type fidelity (UUIDs, timestamps, structured data)
 
 - **Cardinality Control**: For high-cardinality context (like user-specific values):
+
   - Do not include in metrics to avoid cardinality explosion
   - Consider sampling strategies for high-volume telemetry
   - Hash values when necessary to reduce cardinality while preserving uniqueness
 
 - **Security Considerations**: Context must be handled securely:
+
   - Sanitize sensitive information before logging
   - Validate and authorize context from external sources
   - Sign or encrypt sensitive context fields when crossing trust boundaries
   - Apply appropriate access controls to context information
 
 - **Generation and Initialization**: Context must be properly established:
+
   - Generate missing correlation IDs at system boundaries
   - Initialize missing context fields with reasonable defaults
   - Validate required context fields and reject invalid requests
@@ -77,7 +86,7 @@ Here are concrete strategies for implementing context propagation effectively:
    // TypeScript Express middleware for context propagation
    import { v4 as uuidv4 } from 'uuid';
    import { Request, Response, NextFunction } from 'express';
-   
+
    // Context interface
    interface RequestContext {
      correlationId: string;
@@ -88,7 +97,7 @@ Here are concrete strategies for implementing context propagation effectively:
      originService: string;
      requestTimestamp: string;
    }
-   
+
    // Header names for context propagation
    const HEADER_CORRELATION_ID = 'X-Correlation-ID';
    const HEADER_REQUEST_ID = 'X-Request-ID';
@@ -97,7 +106,7 @@ Here are concrete strategies for implementing context propagation effectively:
    const HEADER_SESSION_ID = 'X-Session-ID';
    const HEADER_ORIGIN = 'X-Origin-Service';
    const HEADER_TIMESTAMP = 'X-Request-Timestamp';
-   
+
    // Middleware to extract or create context
    export function contextMiddleware(serviceName: string) {
      return (req: Request, res: Response, next: NextFunction) => {
@@ -135,7 +144,7 @@ Here are concrete strategies for implementing context propagation effectively:
        next();
      };
    }
-   
+
    // HTTP client wrapper that propagates context
    export function createHttpClient(baseURL: string, serviceName: string) {
      const client = axios.create({ baseURL });
@@ -164,7 +173,7 @@ Here are concrete strategies for implementing context propagation effectively:
    }
    ```
 
-2. **Message Queue Context Propagation**: Implement context for asynchronous messaging:
+1. **Message Queue Context Propagation**: Implement context for asynchronous messaging:
 
    ```typescript
    // Message producer with context propagation
@@ -189,7 +198,7 @@ Here are concrete strategies for implementing context propagation effectively:
        };
      };
    }
-   
+
    class MessageProducer {
      private serviceName: string;
      private client: any; // Message broker client
@@ -226,7 +235,7 @@ Here are concrete strategies for implementing context propagation effectively:
        await this.client.send(topic, message);
      }
    }
-   
+
    // Message consumer that extracts context
    class MessageConsumer {
      private serviceName: string;
@@ -264,24 +273,24 @@ Here are concrete strategies for implementing context propagation effectively:
    }
    ```
 
-3. **Async Local Storage for Context Propagation**: Implement context that spans async operations:
+1. **Async Local Storage for Context Propagation**: Implement context that spans async operations:
 
    ```typescript
    // Using AsyncLocalStorage in Node.js for request context
    import { AsyncLocalStorage } from 'async_hooks';
-   
+
    const contextStorage = new AsyncLocalStorage<RequestContext>();
-   
+
    // Get the current active context
    export function getActiveContext(): RequestContext | undefined {
      return contextStorage.getStore();
    }
-   
+
    // Set context for a function execution and all its async operations
    export function withContext<T>(context: RequestContext, fn: () => T): T {
      return contextStorage.run(context, fn);
    }
-   
+
    // Middleware that sets context for the request lifecycle
    export function contextMiddleware(serviceName: string) {
      return (req: Request, res: Response, next: NextFunction) => {
@@ -293,20 +302,20 @@ Here are concrete strategies for implementing context propagation effectively:
    }
    ```
 
-4. **Context Propagation in Go**: Implement context propagation in Go using the context package:
+1. **Context Propagation in Go**: Implement context propagation in Go using the context package:
 
    ```go
    package context
-   
+
    import (
      "context"
      "net/http"
      "github.com/google/uuid"
    )
-   
+
    // ContextKey type for type-safe context keys
    type ContextKey string
-   
+
    // Context keys
    const (
      CorrelationIDKey ContextKey = "correlation_id"
@@ -317,7 +326,7 @@ Here are concrete strategies for implementing context propagation effectively:
      OriginServiceKey ContextKey = "origin_service"
      TimestampKey     ContextKey = "request_timestamp"
    )
-   
+
    // Header names
    const (
      HeaderCorrelationID = "X-Correlation-ID"
@@ -328,7 +337,7 @@ Here are concrete strategies for implementing context propagation effectively:
      HeaderOrigin        = "X-Origin-Service"
      HeaderTimestamp     = "X-Request-Timestamp"
    )
-   
+
    // ExtractOrCreateContext extracts context from HTTP headers or creates new values
    func ExtractOrCreateContext(r *http.Request, serviceName string) context.Context {
      ctx := r.Context()
@@ -373,7 +382,7 @@ Here are concrete strategies for implementing context propagation effectively:
      
      return ctx
    }
-   
+
    // InjectContextHeaders injects context values into outgoing HTTP request headers
    func InjectContextHeaders(ctx context.Context, req *http.Request, serviceName string) {
      // Add correlation ID
@@ -409,7 +418,7 @@ Here are concrete strategies for implementing context propagation effectively:
    }
    ```
 
-5. **Database Context Storage**: Store context with data for asynchronous processing:
+1. **Database Context Storage**: Store context with data for asynchronous processing:
 
    ```typescript
    // Include context in database records for background processing
@@ -433,7 +442,7 @@ Here are concrete strategies for implementing context propagation effectively:
        created_timestamp: string;
      };
    }
-   
+
    // When creating a new job
    async function createJob(type: string, payload: any): Promise<string> {
      const context = getActiveContext();
@@ -460,7 +469,7 @@ Here are concrete strategies for implementing context propagation effectively:
      await db.collection('jobs').insertOne(job);
      return job.id;
    }
-   
+
    // When processing a job, restore the context
    async function processJob(jobId: string): Promise<void> {
      const job = await db.collection('jobs').findOne({ id: jobId });
