@@ -203,11 +203,13 @@
     1. Review content against style guide
   - **Depends‑on:** \[T001, T003\]
 
-- \[x\] **T066 · Feature · P1: Rewrite explicit-over-implicit tenet in natural language format**
+- \[x\] **T066 · Feature · P1: Rewrite explicit-over-implicit tenet in natural language
+  format**
 
   - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
   - **Action:**
-    1. Update `docs/tenets/explicit-over-implicit.md` to use proper YAML front-matter format
+    1. Update `docs/tenets/explicit-over-implicit.md` to use proper YAML front-matter
+       format
     1. Ensure content follows natural language style guide
     1. Validate content with validation tools
   - **Done‑when:**
@@ -218,3 +220,220 @@
     1. Run validation tools to verify format
     1. Review content against style guide
   - **Depends‑on:** \[T001, T003\]
+
+- \[x\] **T067 · Feature · P1: Rewrite document-decisions tenet in natural language
+  format**
+
+  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
+  - **Action:**
+    1. Update `docs/tenets/document-decisions.md` to ensure correct front-matter format
+    1. Ensure content follows natural language style guide
+    1. Validate content with validation tools
+  - **Done‑when:**
+    1. Tenet document passes validation
+    1. Content follows natural language approach
+    1. Tenet appears correctly in index
+  - **Verification:**
+    1. Run validation tools to verify format
+    1. Review content against style guide
+  - **Depends‑on:** \[T001, T003\]
+
+- \[ \] **T068 · Feature · P1: Rewrite maintainability tenet in natural language
+  format**
+
+  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
+  - **Action:**
+    1. Update `docs/tenets/maintainability.md` to ensure correct front-matter format
+    1. Ensure content follows natural language style guide
+    1. Validate content with validation tools
+  - **Done‑when:**
+    1. Tenet document passes validation
+    1. Content follows natural language approach
+    1. Tenet appears correctly in index
+  - **Verification:**
+    1. Run validation tools to verify format
+    1. Review content against style guide
+  - **Depends‑on:** \[T001, T003\]
+
+- \[ \] **T069 · Feature · P1: Rewrite no-secret-suppression tenet in natural language
+  format**
+
+  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
+  - **Action:**
+    1. Update `docs/tenets/no-secret-suppression.md` to ensure correct front-matter format
+    1. Ensure content follows natural language style guide
+    1. Validate content with validation tools
+  - **Done‑when:**
+    1. Tenet document passes validation
+    1. Content follows natural language approach
+    1. Tenet appears correctly in index
+  - **Verification:**
+    1. Run validation tools to verify format
+    1. Review content against style guide
+  - **Depends‑on:** \[T001, T003\]
+
+- \[ \] **T070 · Chore · P1: Document and standardize front-matter format**
+
+  - **Context:** Consistently format tenet and binding front-matter
+  - **Action:**
+    1. Document the standard format for metadata in tenets and bindings
+    1. Update any non-conforming files to match the standard format
+    1. Create TENET_FORMATTING.md to document the standard approach
+  - **Done‑when:**
+    1. Consistent front-matter format is documented
+    1. All tenet files use the standardized format
+    1. Documentation clearly explains the format and rationale
+  - **Verification:**
+    1. Check that documentation matches actual file formatting
+    1. Verify files pass validation tools
+  - **Depends‑on:** none
+
+- \[ \] **T071 · Chore · P1: Fix validation for remaining tenets**
+
+  - **Context:** Some tenet files are failing validation
+  - **Action:**
+    1. Run validation tools to identify all failing tenets
+    1. Fix validation errors across all tenet files
+    1. Ensure consistent front-matter format across all files
+  - **Done‑when:**
+    1. All tenet files pass validation tools
+    1. Front-matter is consistently formatted
+    1. Index files are correctly generated
+  - **Verification:**
+    1. Run validation tools on all tenet files
+    1. Verify all files appear correctly in the index
+  - **Depends‑on:** \[T070\]
+
+## Front-Matter Standardization
+
+- \[ \] **T072 · Fix · P0: Configure mdformat to preserve YAML front-matter**
+  - **Context:** mdformat pre-commit hook converts YAML front-matter to horizontal rule format
+  - **Action:**
+    1. Update `.mdformat.toml` to properly configure front-matter preservation
+    1. Test configuration with sample files to verify front-matter remains intact
+    1. Document the configuration in code comments
+  - **Done‑when:**
+    1. mdformat no longer converts YAML front-matter to horizontal rule format
+    1. Configuration file is properly documented
+  - **Verification:**
+    1. Run mdformat manually on a test file with YAML front-matter
+    1. Verify front-matter remains in YAML format after formatting
+  - **Depends‑on:** none
+
+- \[ \] **T073 · Fix · P0: Update pre-commit configuration for front-matter support**
+  - **Context:** pre-commit hooks need to be configured to respect YAML front-matter
+  - **Action:**
+    1. Update `.pre-commit-config.yaml` to ensure mdformat properly handles front-matter
+    1. Add necessary dependencies for mdformat-frontmatter
+    1. Test pre-commit hook with sample files
+  - **Done‑when:**
+    1. Pre-commit hooks run without converting YAML front-matter
+    1. Configuration includes proper dependencies for front-matter support
+  - **Verification:**
+    1. Make changes to a file with YAML front-matter
+    1. Run pre-commit hooks and verify format remains intact
+  - **Depends‑on:** \[T072\]
+
+- \[ \] **T074 · Fix · P1: Update validate_front_matter.rb to enforce YAML standard**
+  - **Context:** Validation tool needs to consistently enforce YAML front-matter
+  - **Action:**
+    1. Review `validate_front_matter.rb` to ensure it properly enforces YAML format
+    1. Update any code that might accept alternative formats
+    1. Improve error messages to be clear about expected YAML format
+  - **Done‑when:**
+    1. Validation tool consistently requires YAML front-matter
+    1. Error messages clearly indicate the expected format
+  - **Verification:**
+    1. Run validation tool on files with different formats
+    1. Verify it correctly identifies non-YAML formats as errors
+  - **Depends‑on:** none
+
+- \[ \] **T075 · Chore · P1: Document standardized front-matter format**
+  - **Context:** Consistent documentation needed for front-matter standards
+  - **Action:**
+    1. Update `TENET_FORMATTING.md` to clearly document YAML front-matter as the standard
+    1. Include examples of correct format
+    1. Add explanation of required metadata fields
+    1. Include troubleshooting section for common issues
+  - **Done‑when:**
+    1. Documentation clearly establishes YAML front-matter as the standard
+    1. Examples and requirements are comprehensive
+  - **Verification:**
+    1. Review documentation for clarity and completeness
+    1. Ensure all required metadata fields are documented
+  - **Depends‑on:** none
+
+- \[ \] **T076 · Chore · P1: Update templates to use standardized YAML front-matter**
+  - **Context:** Templates should use the standardized format for new content
+  - **Action:**
+    1. Update `docs/templates/tenet_template.md` to use YAML front-matter
+    1. Update `docs/templates/binding_template.md` to use YAML front-matter
+    1. Ensure all required fields are included in templates
+  - **Done‑when:**
+    1. Templates use standard YAML front-matter
+    1. Templates include all required metadata fields
+  - **Verification:**
+    1. Verify templates pass validation tools
+    1. Check that templates are properly documented
+  - **Depends‑on:** \[T075\]
+
+- \[ \] **T077 · Feature · P1: Update CONTRIBUTING.md with front-matter guidance**
+  - **Context:** Contributors need clear guidance on front-matter standards
+  - **Action:**
+    1. Update `CONTRIBUTING.md` to reference the standardized front-matter format
+    1. Add section on metadata requirements for new content
+    1. Link to `TENET_FORMATTING.md` for detailed guidance
+  - **Done‑when:**
+    1. Contribution guidelines clearly reference YAML front-matter standard
+    1. Guidelines provide sufficient guidance for contributors
+  - **Verification:**
+    1. Review updated guidelines for clarity
+    1. Ensure all links are functional
+  - **Depends‑on:** \[T075\]
+
+- \[ \] **T078 · Feature · P2: Convert all tenet files to standardized format**
+  - **Context:** All tenet files need to use the standardized YAML front-matter
+  - **Action:**
+    1. Identify all tenet files still using horizontal rule format
+    1. Convert each file to use YAML front-matter
+    1. Preserve all metadata during conversion
+    1. Validate each file after conversion
+  - **Done‑when:**
+    1. All tenet files use YAML front-matter
+    1. All files pass validation tools
+  - **Verification:**
+    1. Run validation tools on all tenet files
+    1. Verify index generation works correctly
+  - **Depends‑on:** \[T072, T073, T074, T075\]
+
+- \[ \] **T079 · Feature · P2: Convert all binding files to standardized format**
+  - **Context:** All binding files need to use the standardized YAML front-matter
+  - **Action:**
+    1. Identify all binding files still using horizontal rule format
+    1. Convert each file to use YAML front-matter
+    1. Preserve all metadata during conversion
+    1. Validate each file after conversion
+  - **Done‑when:**
+    1. All binding files use YAML front-matter
+    1. All files pass validation tools
+  - **Verification:**
+    1. Run validation tools on all binding files
+    1. Verify index generation works correctly
+  - **Depends‑on:** \[T072, T073, T074, T075\]
+
+- \[ \] **T080 · Test · P1: Verify complete toolchain with standardized format**
+  - **Context:** Final verification that all tools work with the standardized format
+  - **Action:**
+    1. Run validation tools on all tenets and bindings
+    1. Generate indexes and verify correctness
+    1. Run pre-commit hooks on sample changes to verify format preservation
+    1. Run a complete build of the documentation site
+  - **Done‑when:**
+    1. All validation tools pass without errors
+    1. Index generation works correctly
+    1. Pre-commit hooks preserve YAML front-matter
+    1. Documentation site builds correctly
+  - **Verification:**
+    1. Complete end-to-end testing of all toolchain components
+    1. Verify no formatting issues are introduced during the process
+  - **Depends‑on:** \[T078, T079\]

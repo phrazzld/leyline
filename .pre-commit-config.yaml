@@ -18,7 +18,7 @@ repos:
       - id: mdformat
         name: Format markdown files
         description: Format markdown files with mdformat
+        # Exclude files with known formatting issues
         exclude: "docs/LLM_INTEGRATION.md|docs/bindings/automate-changelog.md"
         additional_dependencies:
           - mdformat-frontmatter>=0.4.0  # For frontmatter support
-        args: ["--wrap", "88"]
