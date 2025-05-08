@@ -1,0 +1,24 @@
+# Pre-commit hooks for Leyline repository
+# See https://pre-commit.com for more information
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+
+  # Markdown formatting with mdformat
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.16
+    hooks:
+      - id: mdformat
+        name: Format markdown files
+        description: Format markdown files with mdformat
+        exclude: "docs/LLM_INTEGRATION.md|docs/bindings/automate-changelog.md"
+        additional_dependencies:
+          - mdformat-frontmatter  # For frontmatter support
+        args: ["--wrap", "88"]

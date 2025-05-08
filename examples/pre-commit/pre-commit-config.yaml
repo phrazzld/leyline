@@ -8,7 +8,13 @@ repos:
     hooks:
       - id: leyline-vendor-check
         name: Validate Leyline vendor files
-        entry: bash -c 'if [ -d docs/tenets ] && [ -d docs/bindings ]; then echo "Checking Leyline vendor files have not been manually modified"; diff -rq docs/tenets "$(git rev-parse --show-toplevel)/docs/tenets" && diff -rq docs/bindings "$(git rev-parse --show-toplevel)/docs/bindings" || (echo "⚠️ ERROR: Leyline vendor files have been manually modified. Please use the Leyline Warden to update these files." && exit 1); fi'
+        entry: >-
+          bash -c 'if [ -d docs/tenets ] && [ -d docs/bindings ]; then
+          echo "Checking Leyline vendor files have not been manually modified";
+          diff -rq docs/tenets "$(git rev-parse --show-toplevel)/docs/tenets" &&
+          diff -rq docs/bindings "$(git rev-parse --show-toplevel)/docs/bindings" ||
+          (echo "⚠️ ERROR: Leyline vendor files have been manually modified. Please use the Leyline Warden to update these files." && exit 1);
+          fi'
         language: system
         pass_filenames: false
         always_run: true

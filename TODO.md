@@ -3,9 +3,11 @@
 ## Phase 1: Framework, Templates & Prototypes
 
 - \[x\] **T001 · Feature · P1: create natural language tenet template**
-  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template Documents
+  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template
+    Documents
   - **Action:**
-    1. Create `docs/templates/tenet_template.md` adhering to the revised tenet structure (Front-Matter, Core Belief, Practical Guidelines, Warning Signs, Related Tenets).
+    1. Create `docs/templates/tenet_template.md` adhering to the revised tenet structure
+       (Front-Matter, Core Belief, Practical Guidelines, Warning Signs, Related Tenets).
   - **Done‑when:**
     1. Template file exists and matches the structure defined in PLAN.md.
     1. Template includes placeholders and explanatory comments for each section.
@@ -13,9 +15,12 @@
     1. Manually inspect template against PLAN.md structure.
   - **Depends‑on:** none
 - \[x\] **T002 · Feature · P1: create natural language binding template**
-  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template Documents
+  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template
+    Documents
   - **Action:**
-    1. Create `docs/templates/binding_template.md` adhering to the revised binding structure (Front-Matter, Rationale, Rule Definition, Practical Implementation, Examples, Related Bindings).
+    1. Create `docs/templates/binding_template.md` adhering to the revised binding
+       structure (Front-Matter, Rationale, Rule Definition, Practical Implementation,
+       Examples, Related Bindings).
   - **Done‑when:**
     1. Template file exists and matches the structure defined in PLAN.md.
     1. Template includes placeholders and explanatory comments for each section.
@@ -23,9 +28,11 @@
     1. Manually inspect template against PLAN.md structure.
   - **Depends‑on:** none
 - \[x\] **T003 · Feature · P1: document style guide for natural language approach**
-  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template Documents & Natural Language Guidelines
+  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template
+    Documents & Natural Language Guidelines
   - **Action:**
-    1. Create `docs/STYLE_GUIDE_NATURAL_LANGUAGE.md` detailing conversational tone, principle-first approach, context/connections, and narrative structure.
+    1. Create `docs/STYLE_GUIDE_NATURAL_LANGUAGE.md` detailing conversational tone,
+       principle-first approach, context/connections, and narrative structure.
     1. Include examples of preferred phrasing and anti-patterns.
   - **Done‑when:**
     1. Style guide exists and covers all guidelines from PLAN.md.
@@ -54,7 +61,8 @@
 
 - \[x\] **T057 · Chore · P0: Restructure project for proper documentation organization**
 
-  - **Context:** Project structure should align with its purpose as a documentation project
+  - **Context:** Project structure should align with its purpose as a documentation
+    project
   - **Action:**
     1. ✅ Move `/tenets/` directory to `/docs/tenets/`
     1. ✅ Move `/bindings/` directory to `/docs/bindings/`
@@ -62,10 +70,12 @@
     1. ✅ Update mkdocs.yml to reference the new paths with detailed navigation
   - **Done‑when:**
     1. ✅ All tenets and bindings are contained within the docs directory
-    1. ⏳ All internal links work correctly with the new structure (will be addressed in T058)
+    1. ⏳ All internal links work correctly with the new structure (will be addressed in
+       T058)
   - **Verification:**
     1. ✅ Run mkdocs build locally to verify structure works
-    1. ⏳ Check that all cross-references work in the generated site (will be addressed in T058)
+    1. ⏳ Check that all cross-references work in the generated site (will be addressed
+       in T058)
   - **Depends‑on:** none
 
 - \[x\] **T058 · Chore · P0: Update all cross-references for new document paths**
@@ -128,7 +138,7 @@
     1. Run CI checks to verify successful lint-docs job
   - **Depends‑on:** none
 
-- \[ \] **T062 · Chore · P1: Add markdown formatting pre-commit hook**
+- \[x\] **T062 · Chore · P1: Add markdown formatting pre-commit hook**
 
   - **Context:** Prevent future formatting inconsistencies
   - **Action:**
@@ -142,3 +152,53 @@
     1. Make a change to a markdown file and verify pre-commit hook runs
     1. Verify updated documentation is clear about formatting requirements
   - **Depends‑on:** \[T061\]
+
+## Phase 2: Tenet Rewrites
+
+- \[x\] **T063 · Feature · P1: Rewrite simplicity tenet in natural language format**
+
+  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
+  - **Action:**
+    1. Update `docs/tenets/simplicity.md` to use proper YAML front-matter format
+    1. Ensure content follows natural language style guide
+    1. Validate content with validation tools
+  - **Done‑when:**
+    1. Tenet document passes validation
+    1. Content follows natural language approach
+    1. Tenet appears correctly in index
+  - **Verification:**
+    1. Run validation tools to verify format
+    1. Review content against style guide
+  - **Depends‑on:** \[T001, T003\]
+
+- \[x\] **T064 · Feature · P1: Rewrite modularity tenet in natural language format**
+
+  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
+  - **Action:**
+    1. Update `docs/tenets/modularity.md` to use proper YAML front-matter format
+    1. Ensure content follows natural language style guide
+    1. Validate content with validation tools
+  - **Done‑when:**
+    1. Tenet document passes validation
+    1. Content follows natural language approach
+    1. Tenet appears correctly in index
+  - **Verification:**
+    1. Run validation tools to verify format
+    1. Review content against style guide
+  - **Depends‑on:** \[T001, T003\]
+
+- \[ \] **T065 · Feature · P1: Rewrite testability tenet in natural language format**
+
+  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
+  - **Action:**
+    1. Update `docs/tenets/testability.md` to use proper YAML front-matter format
+    1. Ensure content follows natural language style guide
+    1. Validate content with validation tools
+  - **Done‑when:**
+    1. Tenet document passes validation
+    1. Content follows natural language approach
+    1. Tenet appears correctly in index
+  - **Verification:**
+    1. Run validation tools to verify format
+    1. Review content against style guide
+  - **Depends‑on:** \[T001, T003\]

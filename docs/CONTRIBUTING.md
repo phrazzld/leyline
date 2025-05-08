@@ -1,23 +1,28 @@
 # Contributing to Leyline
 
-Thank you for your interest in contributing to Leyline! This document provides guidelines for proposing changes to our tenets and bindings.
+Thank you for your interest in contributing to Leyline! This document provides
+guidelines for proposing changes to our tenets and bindings.
 
 ## Core Principles
 
 Leyline maintains two types of documents:
 
 1. **Tenets**: Immutable truths and principles that guide our development philosophy
-1. **Bindings**: Enforceable rules derived from tenets, with specific implementation guidance
+1. **Bindings**: Enforceable rules derived from tenets, with specific implementation
+   guidance
 
 ## Natural Language First Approach
 
-Leyline adopts a "natural language first" approach to documentation. This means our tenets and bindings are written to be:
+Leyline adopts a "natural language first" approach to documentation. This means our
+tenets and bindings are written to be:
 
 1. **Accessible to humans** with different technical backgrounds
 1. **Effective as context for large language models (LLMs)**
 1. **Principle-focused** rather than implementation-focused
 
-All new tenets and bindings should follow this approach. Please refer to our [Natural Language Style Guide](STYLE_GUIDE_NATURAL_LANGUAGE.md) for detailed writing guidelines and examples.
+All new tenets and bindings should follow this approach. Please refer to our
+[Natural Language Style Guide](STYLE_GUIDE_NATURAL_LANGUAGE.md) for detailed writing
+guidelines and examples.
 
 ## Proposing Changes
 
@@ -34,15 +39,44 @@ All new tenets and bindings should follow this approach. Please refer to our [Na
 Before submitting your PR, please run the following validation tools locally:
 
 ```bash
+# Install pre-commit hooks
+pre-commit install
+
 # Validate front-matter format and required fields
 ruby tools/validate_front_matter.rb
 
 # Regenerate index files
 ruby tools/reindex.rb
 
-# If you have the tools installed, run formatting check
+# The pre-commit hook will automatically format markdown files,
+# but you can also run this check manually:
 mdformat --check .
 ```
+
+### Markdown Formatting
+
+All markdown files must follow consistent formatting rules, which are enforced by a
+pre-commit hook using [mdformat](https://github.com/executablebooks/mdformat). When you
+commit changes, the pre-commit hook will automatically format your markdown files.
+
+The formatting rules include:
+
+- Consistent list numbering (all lists use 1. for every item)
+- Standardized heading spacing
+- Uniform indentation
+- Proper code block formatting
+
+If you want to format files manually before committing, run:
+
+```bash
+mdformat .
+```
+
+**Note**: A few files are excluded from automatic formatting due to compatibility
+issues:
+
+- `docs/LLM_INTEGRATION.md`
+- `docs/bindings/automate-changelog.md`
 
 ## Guidelines for Specific Contributions
 
@@ -151,8 +185,8 @@ mdformat --check .
 
   ## Related Bindings
 
-  - [Dependency Inversion](bindings/dependency-inversion.md): \[Explanation of how these bindings work together or complement each other\]
-    ...
+  - [Dependency Inversion](bindings/dependency-inversion.md): \[Explanation of how these
+    bindings work together or complement each other\] ...
 
   ```
 
@@ -176,7 +210,8 @@ mdformat --check .
 
 ## Writing Effective Natural Language Documentation
 
-To create effective documentation that works well for both humans and LLMs, follow these key principles:
+To create effective documentation that works well for both humans and LLMs, follow these
+key principles:
 
 1. **Principle-First Approach**: Start with the "why" before moving to the "how"
 1. **Conversational Tone**: Use active voice and direct address
@@ -185,13 +220,15 @@ To create effective documentation that works well for both humans and LLMs, foll
 1. **Narrative Structure**: Follow a problem → principle → solution → examples flow
 1. **Balanced Detail**: Provide enough detail for understanding without overwhelming
 
-For detailed guidance with examples, see the [Natural Language Style Guide](STYLE_GUIDE_NATURAL_LANGUAGE.md).
+For detailed guidance with examples, see the
+[Natural Language Style Guide](STYLE_GUIDE_NATURAL_LANGUAGE.md).
 
 ## Release Process
 
 - **Patch Releases** (typo fixes, clarifications): Quick review and merge
 - **MINOR Releases** (new bindings): Standard review process
-- **MAJOR Releases** (new/changed tenets, breaking binding changes): More thorough review
+- **MAJOR Releases** (new/changed tenets, breaking binding changes): More thorough
+  review
 
 ## Code of Conduct
 
@@ -203,4 +240,5 @@ All contributors are expected to adhere to our code of conduct, which emphasizes
 
 ## Questions?
 
-If you have questions about contributing, please open an issue with the "question" label.
+If you have questions about contributing, please open an issue with the "question"
+label.
