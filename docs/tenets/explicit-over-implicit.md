@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## id: explicit-over-implicit last_modified: "2025-05-04"
+---
+id: explicit-over-implicit
+last_modified: "2025-05-08"
+---
 
 # Tenet: Explicit is Better than Implicit
 

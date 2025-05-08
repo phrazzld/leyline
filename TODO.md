@@ -202,3 +202,19 @@
     1. Run validation tools to verify format
     1. Review content against style guide
   - **Depends‑on:** \[T001, T003\]
+
+- \[x\] **T066 · Feature · P1: Rewrite explicit-over-implicit tenet in natural language format**
+
+  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
+  - **Action:**
+    1. Update `docs/tenets/explicit-over-implicit.md` to use proper YAML front-matter format
+    1. Ensure content follows natural language style guide
+    1. Validate content with validation tools
+  - **Done‑when:**
+    1. Tenet document passes validation
+    1. Content follows natural language approach
+    1. Tenet appears correctly in index
+  - **Verification:**
+    1. Run validation tools to verify format
+    1. Review content against style guide
+  - **Depends‑on:** \[T001, T003\]
