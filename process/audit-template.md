@@ -2,7 +2,10 @@
 
 ## Purpose
 
-This template provides a structured approach for auditing source philosophy documents to ensure complete coverage in tenets and bindings. It helps identify gaps where important principles or rules from the source documents haven't been properly represented in the Leyline system.
+This template provides a structured approach for auditing source philosophy documents to
+ensure complete coverage in tenets and bindings. It helps identify gaps where important
+principles or rules from the source documents haven't been properly represented in the
+Leyline system.
 
 ## Instructions
 

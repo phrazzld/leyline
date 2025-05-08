@@ -2,7 +2,9 @@
 
 ## Issue Analysis
 
-The CI lint-docs job is failing due to inconsistent markdown formatting. The task requires installing mdformat locally, running it on all markdown files, and committing the formatting changes.
+The CI lint-docs job is failing due to inconsistent markdown formatting. The task
+requires installing mdformat locally, running it on all markdown files, and committing
+the formatting changes.
 
 ## Approach
 
@@ -18,4 +20,5 @@ The CI lint-docs job is failing due to inconsistent markdown formatting. The tas
 1. Verify the formatting with a check mode to ensure all files pass.
 1. Commit the changes with a clear commit message about the formatting update.
 
-This is a simple, straightforward task focused on applying automated formatting to markdown files.
+This is a simple, straightforward task focused on applying automated formatting to
+markdown files.

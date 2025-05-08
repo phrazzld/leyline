@@ -1,8 +1,6 @@
 ______________________________________________________________________
 
-id: ts-no-any
-last_modified: "2025-05-04"
-derived_from: explicit-over-implicit
+id: ts-no-any last_modified: "2025-05-04" derived_from: explicit-over-implicit
 enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
 applies_to:
 
@@ -12,19 +10,34 @@ ______________________________________________________________________
 
 # Binding: Make Types Explicit, Never Use `any`
 
-Never use the `any` type in TypeScript code. Instead, always create proper type definitions that accurately describe your data structures and API contracts. The `any` type defeats TypeScript's safety mechanisms and undermines the compiler's ability to catch errors.
+Never use the `any` type in TypeScript code. Instead, always create proper type
+definitions that accurately describe your data structures and API contracts. The `any`
+type defeats TypeScript's safety mechanisms and undermines the compiler's ability to
+catch errors.
 
 ## Rationale
 
-This binding implements our explicit-over-implicit tenet by requiring you to clearly express types rather than hiding them behind an escape hatch.
+This binding implements our explicit-over-implicit tenet by requiring you to clearly
+express types rather than hiding them behind an escape hatch.
 
-Think of TypeScript's type system like a detailed map for your code. When you mark something as `any`, it's like drawing a blank area on that map labeled "here be dragons." While explorers once used this phrase to mark unknown territories, modern software doesn't have room for such uncertainty. Each `any` type creates a blind spot where TypeScript can't provide guidance, intellisense help, or error checking. These blind spots don't stay contained—they spread outward as untyped values flow through your system, eventually affecting parts of your code that you thought were safe.
+Think of TypeScript's type system like a detailed map for your code. When you mark
+something as `any`, it's like drawing a blank area on that map labeled "here be
+dragons." While explorers once used this phrase to mark unknown territories, modern
+software doesn't have room for such uncertainty. Each `any` type creates a blind spot
+where TypeScript can't provide guidance, intellisense help, or error checking. These
+blind spots don't stay contained—they spread outward as untyped values flow through your
+system, eventually affecting parts of your code that you thought were safe.
 
-Just as experienced travelers prefer detailed maps with clearly marked roads and landmarks, experienced developers prefer a codebase where types are explicit and well-defined. This clarity isn't just about preventing errors—it's about creating a self-documenting codebase where intentions and constraints are visible to everyone.
+Just as experienced travelers prefer detailed maps with clearly marked roads and
+landmarks, experienced developers prefer a codebase where types are explicit and
+well-defined. This clarity isn't just about preventing errors—it's about creating a
+self-documenting codebase where intentions and constraints are visible to everyone.
 
 ## Rule Definition
 
-The `any` type in TypeScript is an escape hatch that effectively opts out of type checking. When you use `any`, you're telling the compiler to trust you blindly, regardless of what operations you perform. Specifically:
+The `any` type in TypeScript is an escape hatch that effectively opts out of type
+checking. When you use `any`, you're telling the compiler to trust you blindly,
+regardless of what operations you perform. Specifically:
 
 - A value of type `any` can be assigned to any other type without type checking
 - Any property can be accessed on an `any` value, regardless of whether it exists
@@ -129,7 +142,8 @@ Instead, you must use precise types like:
    }
    ```
 
-1. **For third-party libraries without types, use declaration files or minimally-scoped type assertions**:
+1. **For third-party libraries without types, use declaration files or minimally-scoped
+   type assertions**:
 
    ```typescript
    // Instead of:
@@ -153,7 +167,8 @@ Instead, you must use precise types like:
 - **Improved IDE support** — Get accurate autocomplete and inline documentation
 - **Self-documenting code** — Types serve as live documentation that can't get outdated
 - **Safer refactoring** — The compiler will flag affected areas when you change types
-- **Fewer runtime bugs** — Many common errors become impossible when proper typing is enforced
+- **Fewer runtime bugs** — Many common errors become impossible when proper typing is
+  enforced
 
 ## Examples
 
@@ -285,7 +300,11 @@ processUserInput({ isvalid: true, userData: { name: "User" } });
 
 ## Related Bindings
 
-- [external-configuration](./external-configuration.md) - Type safety extends to configuration, preventing undefined configuration values from causing runtime failures
-- [immutable-by-default](./immutable-by-default.md) - Type safety works best with immutable data, creating a stronger guarantee of correctness
-- [no-lint-suppression](./no-lint-suppression.md) - Enforces that developers don't suppress TypeScript type errors or linter warnings without documented justification
-- [hex-domain-purity](./hex-domain-purity.md) - Well-typed domain code ensures business logic operates on valid, properly structured data
+- [external-configuration](./external-configuration.md) - Type safety extends to
+  configuration, preventing undefined configuration values from causing runtime failures
+- [immutable-by-default](./immutable-by-default.md) - Type safety works best with
+  immutable data, creating a stronger guarantee of correctness
+- [no-lint-suppression](./no-lint-suppression.md) - Enforces that developers don't
+  suppress TypeScript type errors or linter warnings without documented justification
+- [hex-domain-purity](./hex-domain-purity.md) - Well-typed domain code ensures business
+  logic operates on valid, properly structured data

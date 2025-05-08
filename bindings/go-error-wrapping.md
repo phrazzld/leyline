@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: go-error-wrapping
-last_modified: "2025-05-04"
-derived_from: explicit-over-implicit
-enforced_by: golangci-lint("wrapcheck") & code review
-applies_to:
+id: go-error-wrapping last_modified: "2025-05-04" derived_from: explicit-over-implicit
+enforced_by: golangci-lint("wrapcheck") & code review applies_to:
 
 - go
 
@@ -12,17 +9,27 @@ ______________________________________________________________________
 
 # Binding: Add Context to Errors as They Travel Upward
 
-When errors cross package boundaries in Go, wrap them with contextual information using `fmt.Errorf("context: %w", err)` or custom error types. Never return raw errors from exported functions.
+When errors cross package boundaries in Go, wrap them with contextual information using
+`fmt.Errorf("context: %w", err)` or custom error types. Never return raw errors from
+exported functions.
 
 ## Rationale
 
-This binding implements our explicit-over-implicit tenet by making error context and propagation paths visible rather than hidden.
+This binding implements our explicit-over-implicit tenet by making error context and
+propagation paths visible rather than hidden.
 
-Think of error wrapping like a travel journal for an error's journey through your codebase. When a raw error travels across your application without being wrapped, it's like a mysterious visitor with no record of where they've been or what they were trying to do. By wrapping the error at each significant boundary—adding an entry to its travel journal—you create a clear path of breadcrumbs showing exactly where it originated and what operations failed along the way.
+Think of error wrapping like a travel journal for an error's journey through your
+codebase. When a raw error travels across your application without being wrapped, it's
+like a mysterious visitor with no record of where they've been or what they were trying
+to do. By wrapping the error at each significant boundary—adding an entry to its travel
+journal—you create a clear path of breadcrumbs showing exactly where it originated and
+what operations failed along the way.
 
 ## Rule Definition
 
-Error wrapping means adding contextual information to an error as it travels up the call stack, while preserving the original error for type checking and root cause analysis. At minimum, this context should include:
+Error wrapping means adding contextual information to an error as it travels up the call
+stack, while preserving the original error for type checking and root cause analysis. At
+minimum, this context should include:
 
 1. The operation that was attempted (e.g., "fetching user profile")
 1. Any relevant identifiers (e.g., user IDs, record numbers)
@@ -30,10 +37,14 @@ Error wrapping means adding contextual information to an error as it travels up 
 
 This binding specifically requires:
 
-- **Always wrap errors at package boundaries**: Any error returned from an exported function must be wrapped with context
-- **Use the `%w` verb with fmt.Errorf**: This preserves the original error for later unwrapping and type checking
-- **Custom error types must implement Unwrap()**: If using custom error types, they must properly implement the Unwrap() method
-- **Don't wrap errors within package internals**: Internal functions generally don't need to wrap errors unless additional context is truly valuable
+- **Always wrap errors at package boundaries**: Any error returned from an exported
+  function must be wrapped with context
+- **Use the `%w` verb with fmt.Errorf**: This preserves the original error for later
+  unwrapping and type checking
+- **Custom error types must implement Unwrap()**: If using custom error types, they must
+  properly implement the Unwrap() method
+- **Don't wrap errors within package internals**: Internal functions generally don't
+  need to wrap errors unless additional context is truly valuable
 
 ## Practical Implementation
 
@@ -49,7 +60,8 @@ Generally avoid wrapping when:
 
 - The error is already wrapped with the same context
 - The function is internal to a package and doesn't add meaningful context
-- Creating sentinel errors meant to be checked by type/value (these should be returned directly)
+- Creating sentinel errors meant to be checked by type/value (these should be returned
+  directly)
 
 ### Implementation Patterns
 
@@ -132,21 +144,21 @@ func ProcessOrder(id string) error {
     return nil
 }
 
-// ✅ GOOD: Wrapping with context 
+// ✅ GOOD: Wrapping with context
 func ProcessOrder(id string) error {
     order, err := db.GetOrder(id)
     if err != nil {
         return fmt.Errorf("fetching order %s: %w", id, err)
     }
-    
+
     if err := order.Validate(); err != nil {
         return fmt.Errorf("validating order %s: %w", id, err)
     }
-    
+
     if err := payment.Process(order); err != nil {
         return fmt.Errorf("processing payment for order %s: %w", id, err)
     }
-    
+
     return nil
 }
 
@@ -199,6 +211,9 @@ Without proper wrapping, we might only see "connection refused" with no context.
 
 ## Related Bindings
 
-- [use-structured-logging](./use-structured-logging.md) - Error context should be included in logs using structured formats
-- [external-configuration](./external-configuration.md) - Error messages shouldn't contain hardcoded configuration values
-- [hex-domain-purity](./hex-domain-purity.md) - Domain logic shouldn't depend on specific error implementation details
+- [use-structured-logging](./use-structured-logging.md) - Error context should be
+  included in logs using structured formats
+- [external-configuration](./external-configuration.md) - Error messages shouldn't
+  contain hardcoded configuration values
+- [hex-domain-purity](./hex-domain-purity.md) - Domain logic shouldn't depend on
+  specific error implementation details

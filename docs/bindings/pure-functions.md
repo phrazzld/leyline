@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: pure-functions
-last_modified: "2025-05-05"
-derived_from: simplicity
-enforced_by: code review & linters
-applies_to:
+id: pure-functions last_modified: "2025-05-05" derived_from: simplicity enforced_by:
+code review & linters applies_to:
 
 - all
 
@@ -12,23 +9,48 @@ ______________________________________________________________________
 
 # Binding: Write Pure Functions, Isolate Side Effects
 
-Structure your code to maximize the use of pure functions that always produce the same output for a given input and have no side effects. When side effects are necessary, isolate them to the boundaries of your application and make them explicit.
+Structure your code to maximize the use of pure functions that always produce the same
+output for a given input and have no side effects. When side effects are necessary,
+isolate them to the boundaries of your application and make them explicit.
 
 ## Rationale
 
-This binding implements our simplicity tenet by reducing complexity at its most fundamental level—predictable code execution. When a function is pure, its behavior is entirely determined by its inputs, making it dramatically easier to understand, test, debug, and reason about. There's no hidden state, no temporal coupling, and no mysterious interactions with the outside world—just a clear, predictable transformation of inputs to outputs.
+This binding implements our simplicity tenet by reducing complexity at its most
+fundamental level—predictable code execution. When a function is pure, its behavior is
+entirely determined by its inputs, making it dramatically easier to understand, test,
+debug, and reason about. There's no hidden state, no temporal coupling, and no
+mysterious interactions with the outside world—just a clear, predictable transformation
+of inputs to outputs.
 
-Think of pure functions like mathematical equations. The formula for calculating a circle's area (πr²) always gives the same result for the same radius—it doesn't depend on the time of day, the weather, or what other calculations you've performed previously. This predictability makes mathematical formulas easy to work with, verify, and combine into more complex calculations. Similarly, pure functions create islands of certainty in your codebase—components that will behave consistently no matter when or where they're called.
+Think of pure functions like mathematical equations. The formula for calculating a
+circle's area (πr²) always gives the same result for the same radius—it doesn't depend
+on the time of day, the weather, or what other calculations you've performed previously.
+This predictability makes mathematical formulas easy to work with, verify, and combine
+into more complex calculations. Similarly, pure functions create islands of certainty in
+your codebase—components that will behave consistently no matter when or where they're
+called.
 
-By contrast, functions with side effects are like chemical reactions—their behavior depends not only on their inputs but also on their environment and can permanently alter that environment in ways that affect future operations. While such reactions are sometimes necessary, they're inherently more complex to understand and control. Just as chemists carefully isolate dangerous reactions in controlled environments, we need to isolate side effects in our code to contain their complexity.
+By contrast, functions with side effects are like chemical reactions—their behavior
+depends not only on their inputs but also on their environment and can permanently alter
+that environment in ways that affect future operations. While such reactions are
+sometimes necessary, they're inherently more complex to understand and control. Just as
+chemists carefully isolate dangerous reactions in controlled environments, we need to
+isolate side effects in our code to contain their complexity.
 
-This binding also directly supports our testability tenet. Pure functions are inherently testable because they have clearly defined inputs and outputs with no hidden dependencies. Testing becomes as simple as providing input values and asserting on the output, without need for complex mocks, stubs, or setup. The test cases are also repeatable and deterministic, eliminating flaky tests that undermine confidence in your test suite.
+This binding also directly supports our testability tenet. Pure functions are inherently
+testable because they have clearly defined inputs and outputs with no hidden
+dependencies. Testing becomes as simple as providing input values and asserting on the
+output, without need for complex mocks, stubs, or setup. The test cases are also
+repeatable and deterministic, eliminating flaky tests that undermine confidence in your
+test suite.
 
 ## Rule Definition
 
-This binding establishes the following principles for managing side effects and promoting pure functions:
+This binding establishes the following principles for managing side effects and
+promoting pure functions:
 
-- **Maximize Pure Functions**: The majority of your codebase should consist of pure functions that:
+- **Maximize Pure Functions**: The majority of your codebase should consist of pure
+  functions that:
 
   - Always return the same output for the same input
   - Have no observable side effects (no mutations to external state)
@@ -36,7 +58,8 @@ This binding establishes the following principles for managing side effects and 
   - Don't rely on or modify global state
   - Don't perform I/O operations (file, network, database, etc.)
 
-- **Contain Side Effects**: When side effects are necessary (and they often are), they should be:
+- **Contain Side Effects**: When side effects are necessary (and they often are), they
+  should be:
 
   - Isolated to the boundaries of your application or module
   - Made explicit in function signatures and documentation
@@ -52,7 +75,8 @@ This binding establishes the following principles for managing side effects and 
   - System clock or random number usage
   - Throwing exceptions (in languages where these cause non-local control flow)
 
-- **Permitted Exceptions**: Code may deviate from pure functions in specific circumstances:
+- **Permitted Exceptions**: Code may deviate from pure functions in specific
+  circumstances:
 
   - In clearly defined boundary layers responsible for I/O
   - When performance concerns are validated with benchmarks
@@ -68,19 +92,24 @@ This binding establishes the following principles for managing side effects and 
 
 ## Practical Implementation
 
-Here are concrete strategies for implementing and enforcing pure functions across your codebase:
+Here are concrete strategies for implementing and enforcing pure functions across your
+codebase:
 
-1. **Adopt Functional Core, Imperative Shell**: Structure your application with a "functional core" of pure business logic surrounded by a thin "imperative shell" that handles side effects. Ask yourself: "Can I separate the what from the how?" The core should determine what to do (decisions) while the shell handles how to do it (effects).
+1. **Adopt Functional Core, Imperative Shell**: Structure your application with a
+   "functional core" of pure business logic surrounded by a thin "imperative shell" that
+   handles side effects. Ask yourself: "Can I separate the what from the how?" The core
+   should determine what to do (decisions) while the shell handles how to do it
+   (effects).
 
    ```typescript
    // Imperative shell (handles side effects)
    async function createUserController(req, res) {
      // Extract and validate input
      const userData = req.body;
-     
+
      // Call pure function for business logic
      const result = createUser(userData);
-     
+
      // Handle side effects based on the result
      if (result.success) {
        await userRepository.save(result.user);
@@ -98,7 +127,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
      if (!validation.valid) {
        return { success: false, errors: validation.errors };
      }
-     
+
      // Create user entity (no side effects, just returns data)
      const user = {
        id: generateId(userData.email),
@@ -107,12 +136,15 @@ Here are concrete strategies for implementing and enforcing pure functions acros
        role: 'user',
        createdAt: new Date().toISOString()
      };
-     
+
      return { success: true, user };
    }
    ```
 
-1. **Make Side Effects Explicit with Types**: Use your type system to clearly identify functions with side effects. Ask yourself: "Is it obvious from the function signature that this has side effects?" Make it impossible to accidentally invoke a side effect without being aware of it.
+1. **Make Side Effects Explicit with Types**: Use your type system to clearly identify
+   functions with side effects. Ask yourself: "Is it obvious from the function signature
+   that this has side effects?" Make it impossible to accidentally invoke a side effect
+   without being aware of it.
 
    ```typescript
    // TypeScript example with explicit effect types
@@ -135,7 +167,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    async function processOrder(items: Item[]): Promise<void> {
      const total = calculateTotal(items);
      const order = { id: generateId(), items, total, date: new Date() };
-     
+
      // Execute effects in sequence
      await saveOrder(order)();
      await sendConfirmationEmail(order)();
@@ -143,7 +175,10 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    }
    ```
 
-1. **Isolate Non-Deterministic Operations**: Separate non-deterministic operations (like generating random numbers or timestamps) from your pure business logic. Ask yourself: "What makes this function unpredictable?" Then extract those elements and inject the results.
+1. **Isolate Non-Deterministic Operations**: Separate non-deterministic operations (like
+   generating random numbers or timestamps) from your pure business logic. Ask yourself:
+   "What makes this function unpredictable?" Then extract those elements and inject the
+   results.
 
    ```javascript
    // ❌ BAD: Non-deterministic function
@@ -174,7 +209,9 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    }
    ```
 
-1. **Apply Functional Programming Patterns**: Use functional programming patterns to help maintain purity. Ask yourself: "How can I transform data without modifying it?" Learn to use techniques like:
+1. **Apply Functional Programming Patterns**: Use functional programming patterns to
+   help maintain purity. Ask yourself: "How can I transform data without modifying it?"
+   Learn to use techniques like:
 
    - Map/filter/reduce instead of for-loops with mutation
    - Function composition to build complex operations from simple ones
@@ -190,7 +227,7 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    const computeFinalPrice = (discountRate, taxRate) => {
      const applyDiscount = discount(discountRate);
      const addTax = applyTax(taxRate);
-     
+
      // Create a pipeline of transformations
      return price => addTax(applyDiscount(price));
    };
@@ -199,7 +236,9 @@ Here are concrete strategies for implementing and enforcing pure functions acros
    const finalPrice = computeFinalPrice(0.1, 0.08)(100);
    ```
 
-1. **Use Dependency Injection**: Make dependencies explicit by injecting them rather than importing them directly. Ask yourself: "What does this function depend on that isn't in its parameters?" Those hidden dependencies are candidates for injection.
+1. **Use Dependency Injection**: Make dependencies explicit by injecting them rather
+   than importing them directly. Ask yourself: "What does this function depend on that
+   isn't in its parameters?" Those hidden dependencies are candidates for injection.
 
    ```python
    # ❌ BAD: Hidden dependencies
@@ -225,22 +264,22 @@ Here are concrete strategies for implementing and enforcing pure functions acros
 // ❌ BAD: Function with hidden side effects
 function sendWelcomeMessage(user) {
   const message = `Welcome, ${user.name}!`;
-  
+
   // Hidden side effect: logging
   console.log(`Sending message to ${user.email}`);
-  
+
   // Hidden side effect: API call
   fetch('/api/notifications', {
     method: 'POST',
-    body: JSON.stringify({ 
-      user: user.id, 
-      message 
+    body: JSON.stringify({
+      user: user.id,
+      message
     })
   });
-  
+
   // Hidden side effect: modifying the user object
   user.hasWelcomeMessage = true;
-  
+
   return message;
 }
 ```
@@ -263,18 +302,18 @@ async function sendWelcomeMessage(user) {
   if (!needsWelcomeMessage(user)) {
     return { sent: false, reason: 'already-welcomed' };
   }
-  
+
   // Create message (pure transformation)
   const message = createWelcomeMessage(user.name);
-  
+
   // Explicit side effects
   try {
     await logger.info(`Sending welcome to ${user.email}`);
     await notificationService.send(user.id, message);
-    
+
     // Return new user state rather than modifying
-    return { 
-      sent: true, 
+    return {
+      sent: true,
       user: { ...user, hasWelcomeMessage: true }
     };
   } catch (error) {
@@ -291,23 +330,23 @@ function processOrder(items, userId) {
   let total = 0;
   for (const item of items) {
     total += item.price * item.quantity;
-    
+
     // Side effect: updating inventory
     const inventory = db.inventory.findOne({ itemId: item.id });
     inventory.stock -= item.quantity;
     db.inventory.update(inventory);
   }
-  
+
   // Apply discount if eligible
   const user = db.users.findOne({ id: userId });
   if (user.loyaltyPoints > 100) {
     total *= 0.9;  // 10% discount
-    
+
     // Side effect: updating user
     user.loyaltyPoints -= 100;
     db.users.update(user);
   }
-  
+
   // Side effect: creating order
   const order = {
     userId,
@@ -316,10 +355,10 @@ function processOrder(items, userId) {
     date: new Date()
   };
   db.orders.insert(order);
-  
+
   // Side effect: sending email
   emailService.sendOrderConfirmation(user.email, order);
-  
+
   return order;
 }
 ```
@@ -334,14 +373,14 @@ function calculateOrderTotal(items) {
 // Pure function: determines discount
 function applyDiscount(total, loyaltyPoints) {
   if (loyaltyPoints >= 100) {
-    return { 
-      newTotal: total * 0.9, 
-      pointsUsed: 100 
+    return {
+      newTotal: total * 0.9,
+      pointsUsed: 100
     };
   }
-  return { 
-    newTotal: total, 
-    pointsUsed: 0 
+  return {
+    newTotal: total,
+    pointsUsed: 0
   };
 }
 
@@ -359,30 +398,30 @@ function createOrder(userId, items, total, date) {
 async function processOrder(items, userId) {
   // Load data
   const user = await db.users.findOne({ id: userId });
-  
+
   // Pure business logic
   const total = calculateOrderTotal(items);
   const { newTotal, pointsUsed } = applyDiscount(total, user.loyaltyPoints);
   const order = createOrder(userId, items, newTotal, new Date());
-  
+
   // Side effects isolated and explicit
   try {
     // Update inventory in database
-    await Promise.all(items.map(item => 
+    await Promise.all(items.map(item =>
       db.inventory.updateStock(item.id, -item.quantity)
     ));
-    
+
     // Update user loyalty points if needed
     if (pointsUsed > 0) {
       await db.users.updateLoyaltyPoints(userId, -pointsUsed);
     }
-    
+
     // Save order
     await db.orders.insert(order);
-    
+
     // Send confirmation
     await emailService.sendOrderConfirmation(user.email, order);
-    
+
     return { success: true, order };
   } catch (error) {
     await logger.error('Order processing failed', { userId, error });
@@ -399,18 +438,18 @@ func ProcessPayment(userID string, amount float64) error {
     if err != nil {
         return err
     }
-    
+
     // Validate balance
     if user.Balance < amount {
         return errors.New("insufficient funds")
     }
-    
+
     // Update user balance
     user.Balance -= amount
     if err := db.UpdateUser(user); err != nil {
         return err
     }
-    
+
     // Create transaction record
     transaction := Transaction{
         UserID: userID,
@@ -422,13 +461,13 @@ func ProcessPayment(userID string, amount float64) error {
         // Inconsistent state if this fails!
         return err
     }
-    
+
     // Send notification
     if err := notifier.SendPaymentConfirmation(userID, amount); err != nil {
         log.Printf("Failed to send notification: %v", err)
         // Continue anyway
     }
-    
+
     return nil
 }
 ```
@@ -462,32 +501,32 @@ func ProcessPayment(userID string, amount float64, db Database, notifier Notific
         if err != nil {
             return fmt.Errorf("failed to get user: %w", err)
         }
-        
+
         // Pure business logic
         newBalance, err := ValidatePayment(user.Balance, amount)
         if err != nil {
             return err
         }
-        
+
         // Create transaction record (pure)
         transaction := CreateTransaction(userID, amount, "payment", time.Now())
-        
+
         // Side effects grouped together
         if err := tx.UpdateUserBalance(userID, newBalance); err != nil {
             return fmt.Errorf("failed to update balance: %w", err)
         }
-        
+
         if err := tx.SaveTransaction(transaction); err != nil {
             return fmt.Errorf("failed to save transaction: %w", err)
         }
-        
+
         // Non-critical side effect outside the transaction
         go func() {
             if err := notifier.SendPaymentConfirmation(userID, amount); err != nil {
                 log.Printf("Failed to send notification: %v", err)
             }
         }()
-        
+
         return nil
     })
 }
@@ -495,10 +534,27 @@ func ProcessPayment(userID string, amount float64, db Database, notifier Notific
 
 ## Related Bindings
 
-- [immutable-by-default](immutable-by-default.md): Pure functions and immutability are two sides of the same coin. Immutability ensures data doesn't change after creation, while pure functions ensure behavior doesn't have hidden side effects. Together, they create a predictable system where data flows through transformations without unexpected mutations. When you follow both bindings, you gain compounding benefits in terms of code simplicity and testability.
+- [immutable-by-default](immutable-by-default.md): Pure functions and immutability are
+  two sides of the same coin. Immutability ensures data doesn't change after creation,
+  while pure functions ensure behavior doesn't have hidden side effects. Together, they
+  create a predictable system where data flows through transformations without
+  unexpected mutations. When you follow both bindings, you gain compounding benefits in
+  terms of code simplicity and testability.
 
-- [dependency-inversion](dependency-inversion.md): Pure functions support dependency inversion by making dependencies explicit. When functions only rely on their inputs, they're naturally decoupled from implementation details. Both bindings push you toward code where components interact through clear interfaces rather than hidden shared state or direct knowledge of internals.
+- [dependency-inversion](dependency-inversion.md): Pure functions support dependency
+  inversion by making dependencies explicit. When functions only rely on their inputs,
+  they're naturally decoupled from implementation details. Both bindings push you toward
+  code where components interact through clear interfaces rather than hidden shared
+  state or direct knowledge of internals.
 
-- [hex-domain-purity](hex-domain-purity.md): Hexagonal architecture and pure functions complement each other perfectly. The domain layer in a hexagonal architecture should consist primarily of pure functions that implement business rules, while side effects are pushed to the adapters at the boundaries. This binding provides specific guidance on how to implement the "pure domain" aspect of hexagonal architecture.
+- [hex-domain-purity](hex-domain-purity.md): Hexagonal architecture and pure functions
+  complement each other perfectly. The domain layer in a hexagonal architecture should
+  consist primarily of pure functions that implement business rules, while side effects
+  are pushed to the adapters at the boundaries. This binding provides specific guidance
+  on how to implement the "pure domain" aspect of hexagonal architecture.
 
-- [no-internal-mocking](no-internal-mocking.md): Pure functions dramatically reduce the need for mocking in tests. When functions have no side effects and depend only on their inputs, you can test them by providing inputs and asserting on outputs—no mocks required. This directly supports our no-internal-mocking binding by making code naturally testable without complex test doubles.
+- [no-internal-mocking](no-internal-mocking.md): Pure functions dramatically reduce the
+  need for mocking in tests. When functions have no side effects and depend only on
+  their inputs, you can test them by providing inputs and asserting on outputs—no mocks
+  required. This directly supports our no-internal-mocking binding by making code
+  naturally testable without complex test doubles.

@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: frontend-state-management
-last_modified: "2025-05-06"
-derived_from: simplicity
-enforced_by: "Code review, Architecture reviews"
-applies_to:
+id: frontend-state-management last_modified: "2025-05-06" derived_from: simplicity
+enforced_by: "Code review, Architecture reviews" applies_to:
 
 - frontend
 
@@ -12,34 +9,61 @@ ______________________________________________________________________
 
 # Binding: Frontend State Management
 
-Apply minimalist state management by using the right approach for each need: local component state for isolated UI, React Context for shared component state, React Query for server data, React Hook Form for forms, and global state libraries only when truly necessary.
+Apply minimalist state management by using the right approach for each need: local
+component state for isolated UI, React Context for shared component state, React Query
+for server data, React Hook Form for forms, and global state libraries only when truly
+necessary.
 
 ## Rationale
 
-This binding directly implements our simplicity tenet by addressing one of the most common sources of frontend complexity: state management. As applications grow, developers face the temptation to adopt overly complex, one-size-fits-all state management solutions that quickly become unwieldy. This binding pushes back against that tendency by promoting a strategic, hierarchical approach to state management.
+This binding directly implements our simplicity tenet by addressing one of the most
+common sources of frontend complexity: state management. As applications grow,
+developers face the temptation to adopt overly complex, one-size-fits-all state
+management solutions that quickly become unwieldy. This binding pushes back against that
+tendency by promoting a strategic, hierarchical approach to state management.
 
-When every piece of state is managed through a global store—regardless of whether it belongs there—applications become harder to understand, debug, and maintain. State changes cascade in unpredictable ways, component reuse becomes difficult, and performance suffers from excessive re-renders. Think of state management like city planning: not everything belongs in the central district. Some activities work best in local neighborhoods (component state), others in community hubs (context), and only a few truly need to happen downtown (global state).
+When every piece of state is managed through a global store—regardless of whether it
+belongs there—applications become harder to understand, debug, and maintain. State
+changes cascade in unpredictable ways, component reuse becomes difficult, and
+performance suffers from excessive re-renders. Think of state management like city
+planning: not everything belongs in the central district. Some activities work best in
+local neighborhoods (component state), others in community hubs (context), and only a
+few truly need to happen downtown (global state).
 
-By carefully selecting the appropriate state management approach for each specific need, we drastically reduce complexity while improving performance. Local state remains encapsulated and predictable, shared state has clear boundaries, and global state is reserved for truly application-wide concerns. This tiered approach makes your application more maintainable, testable, and scalable—and ultimately delivers a better user experience with fewer bugs and faster performance.
+By carefully selecting the appropriate state management approach for each specific need,
+we drastically reduce complexity while improving performance. Local state remains
+encapsulated and predictable, shared state has clear boundaries, and global state is
+reserved for truly application-wide concerns. This tiered approach makes your
+application more maintainable, testable, and scalable—and ultimately delivers a better
+user experience with fewer bugs and faster performance.
 
 ## Rule Definition
 
 The frontend state management binding establishes these core requirements:
 
-- **Use the Most Appropriate Tool**: Select the simplest, most localized state management approach that fully addresses the need at hand. Prefer local component state when possible, and only escalate to more complex solutions when necessary.
+- **Use the Most Appropriate Tool**: Select the simplest, most localized state
+  management approach that fully addresses the need at hand. Prefer local component
+  state when possible, and only escalate to more complex solutions when necessary.
 
-- **State Locality and Colocation**: Keep state as close as possible to where it's used. State that affects only a single component should be managed within that component; state shared by a few related components should be lifted to their nearest common ancestor or a dedicated context.
+- **State Locality and Colocation**: Keep state as close as possible to where it's used.
+  State that affects only a single component should be managed within that component;
+  state shared by a few related components should be lifted to their nearest common
+  ancestor or a dedicated context.
 
-- **Separation of Concerns**: Maintain clear boundaries between different types of state:
+- **Separation of Concerns**: Maintain clear boundaries between different types of
+  state:
 
   - UI State: Component appearance, animations, open/closed status
   - Application State: User settings, current view, application mode
   - Server/Domain State: Data from APIs, server responses, cached entities
   - Form State: Input values, validation errors, submission status
 
-- **Immutable Updates**: All state updates must follow immutable patterns. Never mutate state directly, always create new state objects that replace the old ones.
+- **Immutable Updates**: All state updates must follow immutable patterns. Never mutate
+  state directly, always create new state objects that replace the old ones.
 
-- **Clear Ownership**: Each piece of state should have a clear, single owner responsible for updating it. Avoid distributed state updates where multiple components can modify the same data.
+- **Clear Ownership**: Each piece of state should have a clear, single owner responsible
+  for updating it. Avoid distributed state updates where multiple components can modify
+  the same data.
 
 - **Explicit Update Patterns**: Use well-defined patterns for state updates:
 
@@ -47,11 +71,14 @@ The frontend state management binding establishes these core requirements:
   - Event handlers and setters for simple updates
   - Provider patterns for shared state
 
-Exceptions to these rules should be extremely rare and only for well-justified performance optimizations in critical paths, with detailed documentation explaining the deviation.
+Exceptions to these rules should be extremely rare and only for well-justified
+performance optimizations in critical paths, with detailed documentation explaining the
+deviation.
 
 ## Practical Implementation
 
-1. **Component State for UI Elements**: Use React's built-in hooks for local component state:
+1. **Component State for UI Elements**: Use React's built-in hooks for local component
+   state:
 
    - Use `useState` for simple, independent values:
 
@@ -64,11 +91,12 @@ Exceptions to these rules should be extremely rare and only for well-justified p
 
      ```jsx
      const [state, dispatch] = useReducer(reducer, initialState);
-     // Where state might have related properties like: 
+     // Where state might have related properties like:
      // { isLoading, error, data, page, sortBy, filters }
      ```
 
-1. **Context API for Shared Component State**: Create focused contexts for state shared between related components:
+1. **Context API for Shared Component State**: Create focused contexts for state shared
+   between related components:
 
    - Keep contexts small and focused on specific concerns
    - Provide helper hooks to access context values and actions
@@ -82,7 +110,7 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    function ThemeProvider({ children }) {
      const [theme, setTheme] = useState('light');
      const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
-     
+
      return (
        <ThemeContext.Provider value={{ theme, toggleTheme }}>
          {children}
@@ -100,7 +128,8 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    }
    ```
 
-1. **Server State with TanStack Query**: Use React Query for all server-related data operations:
+1. **Server State with TanStack Query**: Use React Query for all server-related data
+   operations:
 
    - Separate server state from client state
    - Leverage built-in caching, deduplication, and background updates
@@ -121,7 +150,8 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    }
    ```
 
-1. **Form State with React Hook Form**: Use dedicated form libraries for all form-related state:
+1. **Form State with React Hook Form**: Use dedicated form libraries for all
+   form-related state:
 
    - Leverage form-specific validation and state management
    - Separate form state from application state
@@ -130,7 +160,7 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    ```jsx
    function ContactForm() {
      const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
-     
+
      const onSubmit = async (data) => {
        try {
          await submitContactForm(data);
@@ -143,14 +173,14 @@ Exceptions to these rules should be extremely rare and only for well-justified p
 
      return (
        <form onSubmit={handleSubmit(onSubmit)}>
-         <input 
-           {...register('name', { required: 'Name is required' })} 
-           placeholder="Name" 
+         <input
+           {...register('name', { required: 'Name is required' })}
+           placeholder="Name"
          />
          {errors.name && <span>{errors.name.message}</span>}
-         
+
          {/* Other form fields */}
-         
+
          <button type="submit" disabled={isSubmitting}>
            {isSubmitting ? 'Submitting...' : 'Submit'}
          </button>
@@ -159,7 +189,8 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    }
    ```
 
-1. **Global State for Complex Applications**: For truly application-wide state, use a dedicated state management library:
+1. **Global State for Complex Applications**: For truly application-wide state, use a
+   dedicated state management library:
 
    - Prefer Zustand for most cases due to its simplicity and hooks-based API
    - Use Redux only for complex applications with extensive state interdependencies
@@ -170,12 +201,12 @@ Exceptions to these rules should be extremely rare and only for well-justified p
    const useStore = create((set) => ({
      user: null,
      isAuthenticated: false,
-     
+
      login: async (credentials) => {
        const user = await authService.login(credentials);
        set({ user, isAuthenticated: true });
      },
-     
+
      logout: () => {
        authService.logout();
        set({ user: null, isAuthenticated: false });
@@ -192,18 +223,18 @@ const store = createStore({
   // UI state that should be local
   isModalOpen: false,
   activeTab: 'home',
-  
+
   // Form state that should use a form library
   firstName: '',
   lastName: '',
   email: '',
   formErrors: {},
-  
+
   // Server state that should use React Query
   users: [],
   usersLoading: false,
   usersError: null,
-  
+
   // Actions mixed together
   setModalOpen: (state, isOpen) => ({ ...state, isModalOpen: isOpen }),
   setActiveTab: (state, tab) => ({ ...state, activeTab: tab }),
@@ -213,15 +244,15 @@ const store = createStore({
 
 // Component.jsx
 function Component() {
-  const { 
-    isModalOpen, setModalOpen, 
-    users, usersLoading, fetchUsers 
+  const {
+    isModalOpen, setModalOpen,
+    users, usersLoading, fetchUsers
   } = useStore();
-  
+
   useEffect(() => {
     fetchUsers();
   }, []);
-  
+
   // Component using global state for everything
 }
 
@@ -229,7 +260,7 @@ function Component() {
 // Component with local state
 function TabPanel() {
   const [activeTab, setActiveTab] = useState('home');
-  
+
   return (
     <div>
       <TabList activeTab={activeTab} onChange={setActiveTab} />
@@ -244,21 +275,21 @@ function UserList() {
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
-  
+
   if (isLoading) return <Loader />;
   if (error) return <ErrorMessage error={error} />;
-  
+
   return <UserTable users={users} />;
 }
 
 // Form state with React Hook Form
 function ProfileForm() {
   const { register, handleSubmit, formState } = useForm();
-  
+
   const onSubmit = async (data) => {
     await updateProfile(data);
   };
-  
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {/* Form fields with register */}
@@ -276,7 +307,7 @@ const useAuthStore = create((set) => ({
 
 function AuthStatus() {
   const { user, isAuthenticated, logout } = useAuthStore();
-  
+
   return isAuthenticated ? (
     <div>
       Welcome, {user.name}
@@ -309,7 +340,7 @@ export function uiReducer(state = initialState, action) {
 function Sidebar() {
   const isSidebarOpen = useSelector(state => state.ui.isSidebarOpen);
   const dispatch = useDispatch();
-  
+
   return (
     <>
       <button onClick={() => dispatch(toggleSidebar())}>
@@ -323,7 +354,7 @@ function Sidebar() {
 // ✅ GOOD: Appropriate simplicity for UI state
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <>
       <button onClick={() => setIsOpen(!isOpen)}>
@@ -340,15 +371,15 @@ function Sidebar() {
 function ProductPage({ productId }) {
   // UI state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
+
   // Server state managed manually (should use React Query)
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Global state
   const { cart, addToCart } = useCartStore();
-  
+
   // Manual fetch with useEffect - prone to race conditions, no caching
   useEffect(() => {
     async function fetchProduct() {
@@ -364,14 +395,14 @@ function ProductPage({ productId }) {
         setLoading(false);
       }
     }
-    
+
     fetchProduct();
   }, [productId]);
-  
+
   // Complex component handling multiple state concerns
   if (loading) return <Loader />;
   if (error) return <ErrorMessage message={error.message} />;
-  
+
   return (
     <div>
       <h1>{product.name}</h1>
@@ -388,19 +419,19 @@ function ProductPage({ productId }) {
 function ProductPage({ productId }) {
   // UI state: Local component state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
+
   // Server state: React Query
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', productId],
     queryFn: () => api.fetchProduct(productId),
   });
-  
+
   // Global state: Only what's needed
   const addToCart = useCartStore(state => state.addToCart);
-  
+
   if (isLoading) return <Loader />;
   if (error) return <ErrorMessage error={error} />;
-  
+
   return (
     <div>
       <h1>{product.name}</h1>
@@ -416,10 +447,22 @@ function ProductPage({ productId }) {
 
 ## Related Bindings
 
-- [component-architecture.md](component-architecture.md): Component architecture and state management work hand in hand. Well-designed component boundaries make state management simpler by encapsulating related state and behavior. This binding builds on component architecture by defining how state should flow through the component hierarchy.
+- [component-architecture.md](component-architecture.md): Component architecture and
+  state management work hand in hand. Well-designed component boundaries make state
+  management simpler by encapsulating related state and behavior. This binding builds on
+  component architecture by defining how state should flow through the component
+  hierarchy.
 
-- [immutable-by-default.md](immutable-by-default.md): State immutability is a fundamental requirement for predictable frontend applications. This binding reinforces the immutable-by-default binding by applying it specifically to React's state management patterns, ensuring state updates are predictable and traceable.
+- [immutable-by-default.md](immutable-by-default.md): State immutability is a
+  fundamental requirement for predictable frontend applications. This binding reinforces
+  the immutable-by-default binding by applying it specifically to React's state
+  management patterns, ensuring state updates are predictable and traceable.
 
-- [pure-functions.md](pure-functions.md): State management logic should follow pure function principles. Reducers, selectors, and state transformations should be pure functions without side effects, making state changes predictable and testable.
+- [pure-functions.md](pure-functions.md): State management logic should follow pure
+  function principles. Reducers, selectors, and state transformations should be pure
+  functions without side effects, making state changes predictable and testable.
 
-- [dependency-management.md](dependency-management.md): Careful selection of state management libraries is an important aspect of dependency management. This binding complements dependency management by providing guidance on when to introduce state management libraries versus using built-in React capabilities.
+- [dependency-management.md](dependency-management.md): Careful selection of state
+  management libraries is an important aspect of dependency management. This binding
+  complements dependency management by providing guidance on when to introduce state
+  management libraries versus using built-in React capabilities.

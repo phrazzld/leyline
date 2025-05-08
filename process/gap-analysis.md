@@ -1,6 +1,7 @@
 # Gap Analysis: Source Philosophy to Tenets & Bindings
 
-This document identifies gaps between the source philosophy documents and the current set of tenets and bindings in Leyline.
+This document identifies gaps between the source philosophy documents and the current
+set of tenets and bindings in Leyline.
 
 ## Current Coverage
 
@@ -30,40 +31,46 @@ This document identifies gaps between the source philosophy documents and the cu
 ### Core Principles
 
 | Core Principle | Current Coverage | Gaps |
-|----------------|------------------|------|
-| Simplicity First | Tenet: simplicity<br>Bindings: ts-no-any, hex-domain-purity | Missing bindings for premature abstraction, YAGNI enforcement |
-| Modularity is Mandatory | Tenet: modularity<br>Bindings: hex-domain-purity | Missing binding for package structure (organize by feature) |
-| Design for Testability | Tenet: testability<br>Bindings: no-internal-mocking | Missing binding for dependency inversion |
-| Maintainability Over Optimization | Tenet: maintainability<br>Bindings: None | Missing bindings for enforcing maintainability (code length, clarity) |
-| Explicit is Better than Implicit | Tenet: explicit-over-implicit<br>Bindings: None | Missing bindings for explicit dependencies, no global state |
-| Automate Everything | Tenet: automation<br>Bindings: require-conventional-commits | Missing bindings for CI pipeline requirements, pre-commit hooks |
-| Document Decisions | Tenet: document-decisions<br>Bindings: None | Missing binding for architectural decision records |
+|----------------|------------------|------| | Simplicity First | Tenet:
+simplicity<br>Bindings: ts-no-any, hex-domain-purity | Missing bindings for premature
+abstraction, YAGNI enforcement | | Modularity is Mandatory | Tenet:
+modularity<br>Bindings: hex-domain-purity | Missing binding for package structure
+(organize by feature) | | Design for Testability | Tenet: testability<br>Bindings:
+no-internal-mocking | Missing binding for dependency inversion | | Maintainability Over
+Optimization | Tenet: maintainability<br>Bindings: None | Missing bindings for enforcing
+maintainability (code length, clarity) | | Explicit is Better than Implicit | Tenet:
+explicit-over-implicit<br>Bindings: None | Missing bindings for explicit dependencies,
+no global state | | Automate Everything | Tenet: automation<br>Bindings:
+require-conventional-commits | Missing bindings for CI pipeline requirements, pre-commit
+hooks | | Document Decisions | Tenet: document-decisions<br>Bindings: None | Missing
+binding for architectural decision records |
 
 ### Architecture Guidelines
 
 | Architecture Guideline | Current Coverage | Gaps |
-|------------------------|------------------|------|
-| Unix Philosophy | Covered by modularity tenet | Missing specific binding |
-| Separation of Concerns | Binding: hex-domain-purity | Well covered |
-| Dependency Inversion | No direct coverage | Missing binding for DIP |
-| Package Structure | No direct coverage | Missing binding for feature-oriented structure |
-| API Design | No direct coverage | Missing binding for API contracts |
-| Configuration Management | Related to no-secret-suppression | Missing binding for configuration externalization |
-| Error Handling | Binding: go-error-wrapping (partial) | Missing language-agnostic binding |
-| Design for Observability | Binding: use-structured-logging (partial) | Missing bindings for metrics and tracing |
+|------------------------|------------------|------| | Unix Philosophy | Covered by
+modularity tenet | Missing specific binding | | Separation of Concerns | Binding:
+hex-domain-purity | Well covered | | Dependency Inversion | No direct coverage | Missing
+binding for DIP | | Package Structure | No direct coverage | Missing binding for
+feature-oriented structure | | API Design | No direct coverage | Missing binding for API
+contracts | | Configuration Management | Related to no-secret-suppression | Missing
+binding for configuration externalization | | Error Handling | Binding:
+go-error-wrapping (partial) | Missing language-agnostic binding | | Design for
+Observability | Binding: use-structured-logging (partial) | Missing bindings for metrics
+and tracing |
 
 ### Coding Standards
 
 | Coding Standard | Current Coverage | Gaps |
-|-----------------|------------------|------|
-| Language Strictness | Binding: ts-no-any (partial) | Missing comprehensive strictness binding |
-| Leverage Types | Binding: ts-no-any (partial) | Missing bindings for other languages |
-| Default to Immutability | No direct coverage | Missing binding for immutable data structures |
-| Pure Functions | Related to hex-domain-purity | Missing specific binding |
-| Meaningful Naming | No direct coverage | Missing binding for naming conventions |
-| No Suppressions | Binding: no-lint-suppression | Well covered |
-| Dependency Management | No direct coverage | Missing binding for dependency governance |
-| Length Guidelines | No direct coverage | Missing binding for code length limits |
+|-----------------|------------------|------| | Language Strictness | Binding: ts-no-any
+(partial) | Missing comprehensive strictness binding | | Leverage Types | Binding:
+ts-no-any (partial) | Missing bindings for other languages | | Default to Immutability |
+No direct coverage | Missing binding for immutable data structures | | Pure Functions |
+Related to hex-domain-purity | Missing specific binding | | Meaningful Naming | No
+direct coverage | Missing binding for naming conventions | | No Suppressions | Binding:
+no-lint-suppression | Well covered | | Dependency Management | No direct coverage |
+Missing binding for dependency governance | | Length Guidelines | No direct coverage |
+Missing binding for code length limits |
 
 ## Priority Items for Creation
 

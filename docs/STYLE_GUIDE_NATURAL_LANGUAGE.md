@@ -2,9 +2,15 @@
 
 ## Introduction and Purpose
 
-This style guide defines the approach for writing tenets and bindings with a "natural language first" mindset. The goal is to optimize these documents to serve as effective context for large language models (LLMs) while maintaining their philosophical integrity and utility for human readers.
+This style guide defines the approach for writing tenets and bindings with a "natural
+language first" mindset. The goal is to optimize these documents to serve as effective
+context for large language models (LLMs) while maintaining their philosophical integrity
+and utility for human readers.
 
-While our previous approach prioritized technical explicitness and enforceability, this updated approach emphasizes principles, rationales, and patterns (the "why" and "what") alongside technical implementation details (the "how"). This makes our documents more accessible and interpretable by both humans and AI systems.
+While our previous approach prioritized technical explicitness and enforceability, this
+updated approach emphasizes principles, rationales, and patterns (the "why" and "what")
+alongside technical implementation details (the "how"). This makes our documents more
+accessible and interpretable by both humans and AI systems.
 
 Use this guide when:
 
@@ -16,7 +22,8 @@ Use this guide when:
 
 ### Conversational Tone
 
-Use a conversational, accessible tone that feels like a knowledgeable colleague explaining important principles:
+Use a conversational, accessible tone that feels like a knowledgeable colleague
+explaining important principles:
 
 - **Use active voice** to create direct, engaging content
 
@@ -31,11 +38,13 @@ Use a conversational, accessible tone that feels like a knowledgeable colleague 
 - **Avoid excessive formality** that creates distance
 
   - ✅ "This approach prevents bugs and makes your code easier to test."
-  - ❌ "The aforementioned methodology facilitates the reduction of defects and enhances testability."
+  - ❌ "The aforementioned methodology facilitates the reduction of defects and enhances
+    testability."
 
 - **Limit jargon**, and when necessary, explain it
 
-  - ✅ "Practice 'YAGNI' (You Aren't Gonna Need It) by avoiding speculative abstractions."
+  - ✅ "Practice 'YAGNI' (You Aren't Gonna Need It) by avoiding speculative
+    abstractions."
   - ❌ "Adhere to YAGNI principles to minimize superfluous abstraction layers."
 
 ### Relatable Language
@@ -44,17 +53,20 @@ Connect principles to human experience and understanding:
 
 - **Use analogies** to explain complex concepts
 
-  - ✅ "Think of immutability like a recipe card: you can make many cookies from one recipe without changing the original instructions."
+  - ✅ "Think of immutability like a recipe card: you can make many cookies from one
+    recipe without changing the original instructions."
   - ❌ "Immutability ensures data is not modified after creation."
 
 - **Tell micro-stories** when explaining patterns
 
-  - ✅ "When a developer encounters this code later, they'll immediately understand what it does without having to decode clever tricks."
+  - ✅ "When a developer encounters this code later, they'll immediately understand what
+    it does without having to decode clever tricks."
   - ❌ "Readability is prioritized over cleverness."
 
 - **Use real-world consequences** to illustrate importance
 
-  - ✅ "Without explicit error handling, bugs can silently propagate through the system, only becoming visible in unexpected places far from their source."
+  - ✅ "Without explicit error handling, bugs can silently propagate through the system,
+    only becoming visible in unexpected places far from their source."
   - ❌ "Proper error handling is required."
 
 ## Structure and Organization
@@ -65,18 +77,26 @@ Always lead with the "why" before moving to the "what" and "how":
 
 - **Start with underlying principles** before implementation details
 
-  - ✅ "We isolate domain logic to protect it from infrastructure concerns, ensuring our core business rules remain pure and testable. This is implemented through a hexagonal architecture pattern."
-  - ❌ "Implement hexagonal architecture pattern. This separates domain and infrastructure."
+  - ✅ "We isolate domain logic to protect it from infrastructure concerns, ensuring our
+    core business rules remain pure and testable. This is implemented through a
+    hexagonal architecture pattern."
+  - ❌ "Implement hexagonal architecture pattern. This separates domain and
+    infrastructure."
 
 - **Emphasize patterns over syntax**
 
-  - ✅ "Ensure functions have a single responsibility and clear purpose. For example, separate data validation from business processing."
+  - ✅ "Ensure functions have a single responsibility and clear purpose. For example,
+    separate data validation from business processing."
   - ❌ "Functions should call validateInput() before calling processData()."
 
 - **Use examples to illustrate concepts**, not just to show syntax
 
-  - ✅ "Consider a user service that depends directly on a database client. This creates tight coupling that makes testing difficult. Instead, define an interface that the database client implements, allowing you to substitute a test double during testing."
-  - ❌ "Use interfaces to enable mocking of dependencies. Example: `interface DBClient { query(): Result }`"
+  - ✅ "Consider a user service that depends directly on a database client. This creates
+    tight coupling that makes testing difficult. Instead, define an interface that the
+    database client implements, allowing you to substitute a test double during
+    testing."
+  - ❌ "Use interfaces to enable mocking of dependencies. Example:
+    `interface DBClient { query(): Result }`"
 
 ### Context and Connections
 
@@ -84,17 +104,21 @@ Explicitly connect ideas and establish relationships:
 
 - **Connect bindings to parent tenets** clearly
 
-  - ✅ "This binding implements our simplicity tenet by eliminating accidental complexity that comes from mixing concerns."
+  - ✅ "This binding implements our simplicity tenet by eliminating accidental complexity
+    that comes from mixing concerns."
   - ❌ "This binding enforces separation of concerns."
 
 - **Establish relationships** between related concepts
 
-  - ✅ "While our modularity tenet focuses on component boundaries, this explicitness tenet addresses how those components should communicate."
+  - ✅ "While our modularity tenet focuses on component boundaries, this explicitness
+    tenet addresses how those components should communicate."
   - ❌ "This tenet is related to modularity."
 
 - **Provide sufficient context** for independent understanding
 
-  - ✅ "In strongly typed languages like TypeScript, using 'any' effectively opts out of the type system. This defeats the purpose of using TypeScript and eliminates the safety net that static typing provides."
+  - ✅ "In strongly typed languages like TypeScript, using 'any' effectively opts out of
+    the type system. This defeats the purpose of using TypeScript and eliminates the
+    safety net that static typing provides."
   - ❌ "Don't use 'any' in TypeScript."
 
 ### Narrative Structure
@@ -110,12 +134,15 @@ Organize content to tell a coherent story:
 
 - **Frame rules as solutions** to common problems
 
-  - ✅ "Developers often struggle with understanding code that relies on implicit behaviors. By making dependencies explicit, we create code that clearly communicates its needs and assumptions."
+  - ✅ "Developers often struggle with understanding code that relies on implicit
+    behaviors. By making dependencies explicit, we create code that clearly communicates
+    its needs and assumptions."
   - ❌ "Dependencies must be explicit."
 
 - **Include rationales that tell the story** of why the rule exists
 
-  - ✅ "This rule emerged from our experience with subtle bugs caused by mutation. When data can change unexpectedly, it becomes difficult to reason about program state."
+  - ✅ "This rule emerged from our experience with subtle bugs caused by mutation. When
+    data can change unexpectedly, it becomes difficult to reason about program state."
   - ❌ "Mutation causes bugs."
 
 ## Language Patterns
@@ -126,23 +153,30 @@ These patterns make content more accessible for both humans and LLMs:
 
 - **Define terms before using them**
 
-  - ✅ "Pure functions—those which always produce the same output for a given input and have no side effects—are easier to test and reason about."
+  - ✅ "Pure functions—those which always produce the same output for a given input and
+    have no side effects—are easier to test and reason about."
   - ❌ "Use pure functions for better testability."
 
 - **Use consistent terminology** throughout the document
 
-  - ✅ Consistently use "component" rather than alternating between "component," "module," and "unit"
-  - ❌ "Components should be small. Modules should have clear boundaries. Units should be testable."
+  - ✅ Consistently use "component" rather than alternating between "component,"
+    "module," and "unit"
+  - ❌ "Components should be small. Modules should have clear boundaries. Units should be
+    testable."
 
 - **Balance abstract principles with concrete examples**
 
-  - ✅ "Prefer composition over inheritance. For example, instead of creating a complex inheritance hierarchy for different report types, compose reports from reusable formatting and data components."
+  - ✅ "Prefer composition over inheritance. For example, instead of creating a complex
+    inheritance hierarchy for different report types, compose reports from reusable
+    formatting and data components."
   - ❌ "Always choose composition over inheritance as it's more flexible."
 
 - **Use parallel structure** for similar concepts
 
-  - ✅ "Testing validates that your code works. Linting ensures your code follows conventions. Typing verifies your code is type-safe."
-  - ❌ "Testing is important for validation. Your code should follow linting rules. Type safety is ensured by typing."
+  - ✅ "Testing validates that your code works. Linting ensures your code follows
+    conventions. Typing verifies your code is type-safe."
+  - ❌ "Testing is important for validation. Your code should follow linting rules. Type
+    safety is ensured by typing."
 
 ### Anti-Patterns to Avoid
 
@@ -150,22 +184,29 @@ Patterns that reduce clarity and effectiveness:
 
 - **Unexplained acronyms or project-specific terminology**
 
-  - ✅ "The Single Responsibility Principle (SRP) states that a class should have only one reason to change."
+  - ✅ "The Single Responsibility Principle (SRP) states that a class should have only
+    one reason to change."
   - ❌ "Follow SRP to reduce coupling."
 
 - **Technical details without principles**
 
-  - ✅ "We use ESLint with strict configuration to catch potential issues early. This implements our principle of catching problems at their source rather than in production."
+  - ✅ "We use ESLint with strict configuration to catch potential issues early. This
+    implements our principle of catching problems at their source rather than in
+    production."
   - ❌ "Set 'strict: true' in your ESLint config."
 
 - **Excessive focus on tooling over principles**
 
-  - ✅ "The principle of automated verification means we never rely on manual checks for quality. We implement this through continuous integration pipelines that run tests, linters, and security scans."
+  - ✅ "The principle of automated verification means we never rely on manual checks for
+    quality. We implement this through continuous integration pipelines that run tests,
+    linters, and security scans."
   - ❌ "Set up GitHub Actions to run on every PR."
 
 - **Vague or absolute language** without nuance
 
-  - ✅ "In most cases, mutable state increases complexity and should be isolated. There are rare exceptions, such as performance-critical code sections, where controlled mutation may be acceptable."
+  - ✅ "In most cases, mutable state increases complexity and should be isolated. There
+    are rare exceptions, such as performance-critical code sections, where controlled
+    mutation may be acceptable."
   - ❌ "Never use mutable state."
 
 ## Examples

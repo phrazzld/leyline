@@ -1,10 +1,12 @@
 # Setting Up GitHub Branch Protection Rules
 
-This document outlines the steps to configure branch protection rules for the `master` branch of the `phrazzld/leyline` repository.
+This document outlines the steps to configure branch protection rules for the `master`
+branch of the `phrazzld/leyline` repository.
 
 ## Configuration Steps
 
-1. Navigate to the repository on GitHub: [https://github.com/phrazzld/leyline](https://github.com/phrazzld/leyline)
+1. Navigate to the repository on GitHub:
+   [https://github.com/phrazzld/leyline](https://github.com/phrazzld/leyline)
 
 1. Go to the "Settings" tab of the repository
 
@@ -36,7 +38,8 @@ This document outlines the steps to configure branch protection rules for the `m
 
 ## Rationale
 
-These branch protection rules implement our simplified governance model while ensuring code quality:
+These branch protection rules implement our simplified governance model while ensuring
+code quality:
 
 - Requiring pull requests prevents direct pushes to master
 - Disabling force pushes maintains a clean, linear history

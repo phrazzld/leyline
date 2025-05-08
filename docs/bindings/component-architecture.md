@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: component-architecture
-last_modified: "2025-05-06"
-derived_from: modularity
-enforced_by: "Code review, Storybook organization"
-applies_to:
+id: component-architecture last_modified: "2025-05-06" derived_from: modularity
+enforced_by: "Code review, Storybook organization" applies_to:
 
 - frontend
 
@@ -12,49 +9,83 @@ ______________________________________________________________________
 
 # Binding: Component Architecture
 
-Structure UI components using Atomic Design principles, organizing elements into a hierarchical system of atoms, molecules, organisms, templates, and pages with clear responsibilities and well-defined interfaces.
+Structure UI components using Atomic Design principles, organizing elements into a
+hierarchical system of atoms, molecules, organisms, templates, and pages with clear
+responsibilities and well-defined interfaces.
 
 ## Rationale
 
-This binding directly implements our modularity tenet by establishing a systematic approach to frontend component organization. User interfaces are inherently complex, combining hundreds of interactive elements that must work in harmony. Without a structured approach to breaking down this complexity, UI code quickly becomes tangled, brittle, and resistant to change.
+This binding directly implements our modularity tenet by establishing a systematic
+approach to frontend component organization. User interfaces are inherently complex,
+combining hundreds of interactive elements that must work in harmony. Without a
+structured approach to breaking down this complexity, UI code quickly becomes tangled,
+brittle, and resistant to change.
 
-Atomic Design provides a mental model borrowed from chemistry—just as all matter consists of atoms combined into increasingly complex structures, our interfaces are built from simple components combined into progressively more elaborate systems. This creates a shared vocabulary that helps teams think about components at the appropriate level of abstraction. When everyone understands the difference between an atom (like a button) and an organism (like a navigation bar), communication becomes clearer, and components are more likely to be built with the right scope and responsibility.
+Atomic Design provides a mental model borrowed from chemistry—just as all matter
+consists of atoms combined into increasingly complex structures, our interfaces are
+built from simple components combined into progressively more elaborate systems. This
+creates a shared vocabulary that helps teams think about components at the appropriate
+level of abstraction. When everyone understands the difference between an atom (like a
+button) and an organism (like a navigation bar), communication becomes clearer, and
+components are more likely to be built with the right scope and responsibility.
 
-Well-designed component architecture delivers significant business value by enabling faster development cycles and a consistent user experience. Teams can work in parallel on different components, reuse existing elements across features, and implement design changes systematically rather than hunting through code for every instance of a pattern. Think of a component library as a set of standardized building blocks—like LEGO bricks that snap together in predictable ways—rather than custom-cutting every piece of your UI from raw materials each time.
+Well-designed component architecture delivers significant business value by enabling
+faster development cycles and a consistent user experience. Teams can work in parallel
+on different components, reuse existing elements across features, and implement design
+changes systematically rather than hunting through code for every instance of a pattern.
+Think of a component library as a set of standardized building blocks—like LEGO bricks
+that snap together in predictable ways—rather than custom-cutting every piece of your UI
+from raw materials each time.
 
 ## Rule Definition
 
 The component architecture binding establishes these core requirements:
 
-- **Use Atomic Design Hierarchy**: Structure UI components according to the five levels of Atomic Design:
+- **Use Atomic Design Hierarchy**: Structure UI components according to the five levels
+  of Atomic Design:
 
-  - **Atoms**: Basic UI building blocks that can't be broken down further (buttons, inputs, icons)
-  - **Molecules**: Simple combinations of atoms functioning together as a unit (search bars, form fields with labels)
-  - **Organisms**: Complex UI sections formed by combining molecules (navigation menus, forms, content cards)
-  - **Templates**: Page-level structural components defining content areas without specific content
+  - **Atoms**: Basic UI building blocks that can't be broken down further (buttons,
+    inputs, icons)
+  - **Molecules**: Simple combinations of atoms functioning together as a unit (search
+    bars, form fields with labels)
+  - **Organisms**: Complex UI sections formed by combining molecules (navigation menus,
+    forms, content cards)
+  - **Templates**: Page-level structural components defining content areas without
+    specific content
   - **Pages**: Specific instances of templates populated with actual content
 
-- **Single Responsibility**: Each component should do exactly one thing and do it well. Avoid components that handle multiple unrelated concerns.
+- **Single Responsibility**: Each component should do exactly one thing and do it well.
+  Avoid components that handle multiple unrelated concerns.
 
-- **Clear Component Interfaces**: Define explicit props for component inputs, including proper TypeScript types, default values, and required vs. optional props.
+- **Clear Component Interfaces**: Define explicit props for component inputs, including
+  proper TypeScript types, default values, and required vs. optional props.
 
-- **Composition Over Configuration**: Prefer composing smaller components rather than building complex, highly configurable components with numerous props and conditional logic.
+- **Composition Over Configuration**: Prefer composing smaller components rather than
+  building complex, highly configurable components with numerous props and conditional
+  logic.
 
-- **Separation of Concerns**: Separate presentational aspects (how things look) from container aspects (how things work) for organisms and larger components when appropriate.
+- **Separation of Concerns**: Separate presentational aspects (how things look) from
+  container aspects (how things work) for organisms and larger components when
+  appropriate.
 
-- **Component Discoverability**: Structure your component library for maximum discoverability, with consistent naming and organization that makes it intuitive to find the right component.
+- **Component Discoverability**: Structure your component library for maximum
+  discoverability, with consistent naming and organization that makes it intuitive to
+  find the right component.
 
 In rare cases, exceptions to these rules may be necessary:
 
 - Legacy code integration might require temporary hybrid approaches while migrating
 - Third-party components may not perfectly align with Atomic Design principles
-- Performance-critical components might need special optimization that affects their structure
+- Performance-critical components might need special optimization that affects their
+  structure
 
-Such exceptions should be clearly documented and contained to the smallest possible scope.
+Such exceptions should be clearly documented and contained to the smallest possible
+scope.
 
 ## Practical Implementation
 
-1. **Set Up Project Structure**: Organize your components folder to reflect the Atomic Design hierarchy:
+1. **Set Up Project Structure**: Organize your components folder to reflect the Atomic
+   Design hierarchy:
 
 ```
 src/
@@ -79,7 +110,8 @@ src/
       ProductDetail/
 ```
 
-2. **Start Small and Build Up**: Begin your component library with a set of well-designed atoms that form the foundation of your UI:
+2. **Start Small and Build Up**: Begin your component library with a set of
+   well-designed atoms that form the foundation of your UI:
 
    - Create a comprehensive set of primitive UI components (buttons, inputs, typography)
    - Ensure atoms are highly reusable and follow your design system specifications
@@ -93,14 +125,16 @@ src/
    - Include JSDoc comments explaining the purpose of each prop
    - Consider using prop validation libraries for runtime validation
 
-1. **Implement Effective Composition Patterns**: Design components to be combined in predictable ways:
+1. **Implement Effective Composition Patterns**: Design components to be combined in
+   predictable ways:
 
    - Use React's children prop for simple composition
    - Implement the Compound Component pattern for related component sets
    - Use React Context for component communication within a hierarchy
    - Consider the Slot pattern for flexible content placement
 
-1. **Document the Component Library**: Make your component system discoverable and usable:
+1. **Document the Component Library**: Make your component system discoverable and
+   usable:
 
    - Implement comprehensive Storybook documentation
    - Create usage examples for each component
@@ -173,7 +207,7 @@ function UserActions({ onEdit, onDelete, expanded, onToggleExpand }) {
 // Organism
 function UserCard({ user, onEdit, onDelete }) {
   const [expanded, setExpanded] = useState(false);
-  
+
   return (
     <div className="card">
       <Avatar src={user.avatar} alt={user.name} />
@@ -184,7 +218,7 @@ function UserCard({ user, onEdit, onDelete }) {
           <p>Member since: {user.joinDate}</p>
         </div>
       )}
-      <UserActions 
+      <UserActions
         onEdit={onEdit}
         onDelete={onDelete}
         expanded={expanded}
@@ -222,9 +256,9 @@ function Button({
   if (outlined) buttonClass += ' btn-outlined';
   if (fullWidth) buttonClass += ' btn-fullWidth';
   if (className) buttonClass += ` ${className}`;
-  
+
   return (
-    <button 
+    <button
       className={buttonClass}
       disabled={disabled || loading}
       onClick={onClick}
@@ -243,7 +277,7 @@ function Button({
 // Base Button atom
 function Button({ children, disabled, onClick, className, ...props }) {
   return (
-    <button 
+    <button
       className={`btn ${className || ''}`}
       disabled={disabled}
       onClick={onClick}
@@ -290,7 +324,7 @@ function ContactForm() {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   function validate() {
     const newErrors = {};
     if (!name) newErrors.name = 'Name is required';
@@ -300,11 +334,11 @@ function ContactForm() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
-  
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!validate()) return;
-    
+
     setIsSubmitting(true);
     try {
       await submitContactForm({ name, email, message });
@@ -318,7 +352,7 @@ function ContactForm() {
       setIsSubmitting(false);
     }
   }
-  
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-group">
@@ -331,7 +365,7 @@ function ContactForm() {
         />
         {errors.name && <span className="error-message">{errors.name}</span>}
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="email">Email</label>
         <input
@@ -343,7 +377,7 @@ function ContactForm() {
         />
         {errors.email && <span className="error-message">{errors.email}</span>}
       </div>
-      
+
       <div className="form-group">
         <label htmlFor="message">Message</label>
         <textarea
@@ -354,7 +388,7 @@ function ContactForm() {
         />
         {errors.message && <span className="error-message">{errors.message}</span>}
       </div>
-      
+
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Submitting...' : 'Submit'}
       </button>
@@ -368,10 +402,10 @@ function Input({ id, label, error, ...props }) {
   return (
     <div className="form-field">
       <label htmlFor={id}>{label}</label>
-      <input 
+      <input
         id={id}
-        className={error ? 'input-error' : 'input'} 
-        {...props} 
+        className={error ? 'input-error' : 'input'}
+        {...props}
       />
       {error && <span className="error-text">{error}</span>}
     </div>
@@ -383,10 +417,10 @@ function TextArea({ id, label, error, ...props }) {
   return (
     <div className="form-field">
       <label htmlFor={id}>{label}</label>
-      <textarea 
+      <textarea
         id={id}
-        className={error ? 'textarea-error' : 'textarea'} 
-        {...props} 
+        className={error ? 'textarea-error' : 'textarea'}
+        {...props}
       />
       {error && <span className="error-text">{error}</span>}
     </div>
@@ -396,7 +430,7 @@ function TextArea({ id, label, error, ...props }) {
 // Organism (with React Hook Form for logic)
 function ContactForm() {
   const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm();
-  
+
   const onSubmit = async (data) => {
     try {
       await submitContactForm(data);
@@ -406,7 +440,7 @@ function ContactForm() {
       toast.error('Error submitting form: ' + error.message);
     }
   };
-  
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Input
@@ -415,7 +449,7 @@ function ContactForm() {
         error={errors.name?.message}
         {...register('name', { required: 'Name is required' })}
       />
-      
+
       <Input
         id="email"
         type="email"
@@ -429,7 +463,7 @@ function ContactForm() {
           }
         })}
       />
-      
+
       <TextArea
         id="message"
         label="Message"
@@ -437,7 +471,7 @@ function ContactForm() {
         rows={5}
         {...register('message', { required: 'Message is required' })}
       />
-      
+
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Submitting...' : 'Submit'}
       </Button>
@@ -448,10 +482,22 @@ function ContactForm() {
 
 ## Related Bindings
 
-- [../tenets/modularity.md](../tenets/modularity.md): This binding directly implements the modularity tenet through the systematic breakdown of UI into composable components. While the tenet describes the general principle of dividing systems into independent, reusable modules, this binding provides the specific pattern for achieving modularity in frontend applications.
+- [../tenets/modularity.md](../tenets/modularity.md): This binding directly implements
+  the modularity tenet through the systematic breakdown of UI into composable
+  components. While the tenet describes the general principle of dividing systems into
+  independent, reusable modules, this binding provides the specific pattern for
+  achieving modularity in frontend applications.
 
-- [frontend-state-management.md](frontend-state-management.md): Complements component architecture by defining how state should be organized within and between components. Together, these bindings create a complete picture of component structure (architecture) and behavior (state).
+- [frontend-state-management.md](frontend-state-management.md): Complements component
+  architecture by defining how state should be organized within and between components.
+  Together, these bindings create a complete picture of component structure
+  (architecture) and behavior (state).
 
-- [dependency-inversion.md](dependency-inversion.md): Reinforces component architecture by promoting loose coupling between components. Well-designed component interfaces follow dependency inversion principles by depending on abstractions rather than concrete implementations.
+- [dependency-inversion.md](dependency-inversion.md): Reinforces component architecture
+  by promoting loose coupling between components. Well-designed component interfaces
+  follow dependency inversion principles by depending on abstractions rather than
+  concrete implementations.
 
-- [code-size.md](code-size.md): Supports component architecture by encouraging small, focused components. The atomic design approach naturally leads to smaller, more manageable components with clear boundaries and responsibilities.
+- [code-size.md](code-size.md): Supports component architecture by encouraging small,
+  focused components. The atomic design approach naturally leads to smaller, more
+  manageable components with clear boundaries and responsibilities.

@@ -2,13 +2,22 @@
 
 ## Goal
 
-Transform Leyline's tenets and bindings to prioritize natural language and readability, optimizing them to serve as more effective context for large language models (LLMs) while maintaining their philosophical integrity and utility.
+Transform Leyline's tenets and bindings to prioritize natural language and readability,
+optimizing them to serve as more effective context for large language models (LLMs)
+while maintaining their philosophical integrity and utility.
 
 ## Background and Rationale
 
-Current tenets and bindings are structured primarily for technical explicitness and enforceability, with a focus on deterministic configurations and actions. While this serves human developers well for specific implementation guidance, it creates limitations when these documents are used as contextual information for LLMs.
+Current tenets and bindings are structured primarily for technical explicitness and
+enforceability, with a focus on deterministic configurations and actions. While this
+serves human developers well for specific implementation guidance, it creates
+limitations when these documents are used as contextual information for LLMs.
 
-When LLMs consume these documents as context, a more natural language approach that emphasizes the principles, rationales, and patterns (the "why" and "what") rather than just the technical implementation (the "how") will provide more effective guidance. This rewrite aims to preserve the core philosophical content while making it more accessible and interpretable by both humans and AI.
+When LLMs consume these documents as context, a more natural language approach that
+emphasizes the principles, rationales, and patterns (the "why" and "what") rather than
+just the technical implementation (the "how") will provide more effective guidance. This
+rewrite aims to preserve the core philosophical content while making it more accessible
+and interpretable by both humans and AI.
 
 ## Architecture and Approach
 
@@ -17,7 +26,8 @@ When LLMs consume these documents as context, a more natural language approach t
 1. **Maintain Front-Matter Metadata**
 
    - Continue using YAML front-matter for machine readability
-   - Preserve all existing fields (`id`, `last_modified`, `derived_from`, `enforced_by`, `applies_to`)
+   - Preserve all existing fields (`id`, `last_modified`, `derived_from`, `enforced_by`,
+     `applies_to`)
    - Front-matter will remain deterministic and machine-parsable
 
 1. **Revised Tenet Structure**
@@ -34,12 +44,12 @@ When LLMs consume these documents as context, a more natural language approach t
 
    ## Core Belief
 
-   [Natural language explanation of the underlying principle, focusing on the "why". Written in a conversational, 
+   [Natural language explanation of the underlying principle, focusing on the "why". Written in a conversational,
    accessible style that LLMs can effectively interpret and apply.]
 
    ## Practical Guidelines
 
-   [Bulleted list of concrete ways this principle manifests in development practices. Each guideline should be 
+   [Bulleted list of concrete ways this principle manifests in development practices. Each guideline should be
    actionable but focused on patterns rather than specific technical implementations.]
 
    ## Warning Signs
@@ -73,17 +83,17 @@ When LLMs consume these documents as context, a more natural language approach t
 
    ## Rule Definition
 
-   [Clear, conversational explanation of the rule. Use examples to illustrate concepts rather than just technical 
+   [Clear, conversational explanation of the rule. Use examples to illustrate concepts rather than just technical
    specifications. When technical specifics are needed, explain the "why" behind them.]
 
    ## Practical Implementation
 
-   [Guidelines for implementing the rule in different contexts. May include language-specific approaches but 
+   [Guidelines for implementing the rule in different contexts. May include language-specific approaches but
    focused on patterns and principles rather than just syntax.]
 
    ## Examples
 
-   [Concrete examples that illustrate both good and bad implementations, with explanations of why each is 
+   [Concrete examples that illustrate both good and bad implementations, with explanations of why each is
    good or bad from a principle perspective, not just technical correctness.]
 
    ## Related Bindings
@@ -97,7 +107,8 @@ When LLMs consume these documents as context, a more natural language approach t
 
    - Use active voice and direct address
    - Avoid jargon where possible; when necessary, explain it
-   - Write as if explaining to a developer who understands programming but not your specific conventions
+   - Write as if explaining to a developer who understands programming but not your
+     specific conventions
 
 1. **Principle-First Approach**
 
@@ -224,13 +235,16 @@ When LLMs consume these documents as context, a more natural language approach t
 
 ## Risk Assessment and Mitigation
 
-| Risk | Severity | Mitigation Strategy |
-|------|----------|---------------------|
-| Loss of technical specificity during rewrite | High | Maintain separate "Technical Implementation" sections where needed; peer review by domain experts |
-| Inconsistent natural language style across documents | Medium | Develop and strictly follow a style guide; use templates; regular review |
-| Breaking existing tooling with format changes | Medium | Early validation testing; maintain all required metadata fields; update tools as needed |
-| Drift from source philosophy during rewrites | High | Systematic audit against source documents; explicit tracing to source principles |
-| Increased maintenance burden for two writing styles | Low | Documentation of natural language approach; templates; automation where possible |
+| Risk | Severity | Mitigation Strategy | |------|----------|---------------------| |
+Loss of technical specificity during rewrite | High | Maintain separate "Technical
+Implementation" sections where needed; peer review by domain experts | | Inconsistent
+natural language style across documents | Medium | Develop and strictly follow a style
+guide; use templates; regular review | | Breaking existing tooling with format changes |
+Medium | Early validation testing; maintain all required metadata fields; update tools
+as needed | | Drift from source philosophy during rewrites | High | Systematic audit
+against source documents; explicit tracing to source principles | | Increased
+maintenance burden for two writing styles | Low | Documentation of natural language
+approach; templates; automation where possible |
 
 ## Success Criteria
 

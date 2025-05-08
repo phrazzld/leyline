@@ -21,13 +21,13 @@ end
 Dir.glob("docs/bindings/*.md").reject { |f| f =~ /00-index\.md$/ }.each do |file|
   content = File.read(file)
   updated_content = content.dup
-  
+
   # Replace references to tenet files
   tenet_ids.each do |tenet_id|
     # Replace standalone tenet references (not preceded by a path)
     updated_content.gsub!(/(?<!\/)#{tenet_id}\.md/, "../tenets/#{tenet_id}.md")
   end
-  
+
   # Write updated content if changes were made
   if content != updated_content
     puts "Fixing cross-references in #{file}"

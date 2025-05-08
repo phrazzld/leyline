@@ -6,7 +6,7 @@ require 'date'
 
 # Configuration
 REQUIRED_KEYS = {
-  'tenets' => %w[id last_modified], 
+  'tenets' => %w[id last_modified],
   'bindings' => %w[id last_modified derived_from enforced_by]
 }
 
@@ -34,11 +34,11 @@ all_ids = {}
 %w[docs/tenets docs/bindings].each do |dir|
   dir_base = dir.split('/').last
   puts "Validating #{dir_base}..."
-  
+
   # Skip index files
   Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.each do |file|
     content = File.read(file)
-    
+
     # Extract front-matter
     if content =~ /^---\n(.*?)\n---/m
       yaml_content = $1
@@ -49,19 +49,19 @@ all_ids = {}
         puts "  YAML content: #{yaml_content.inspect}"
         exit 1
       end
-      
+
       if front_matter.nil?
         puts "  [ERROR] #{file}: Empty YAML in front-matter"
         exit 1
       end
-      
+
       # Check required keys
       missing_keys = REQUIRED_KEYS[dir_base] - front_matter.keys
       unless missing_keys.empty?
         puts "  [ERROR] #{file}: Missing required keys: #{missing_keys.join(', ')}"
         exit 1
       end
-      
+
       # Check for unique ID
       id = front_matter['id']
       if all_ids[id]
@@ -69,14 +69,14 @@ all_ids = {}
         exit 1
       end
       all_ids[id] = file
-      
+
       # Validate date format
       date = front_matter['last_modified']
       unless date.is_a?(Date) || date.is_a?(String) && date =~ /^\d{4}-\d{2}-\d{2}$/
         puts "  [ERROR] #{file}: Invalid date format in 'last_modified'"
         exit 1
       end
-      
+
       # For bindings, validate that derived_from exists
       if dir_base == 'bindings' && front_matter['derived_from']
         tenet_file = Dir.glob("docs/tenets/#{front_matter['derived_from']}.md").first
@@ -85,7 +85,7 @@ all_ids = {}
           exit 1
         end
       end
-      
+
       # Validate optional keys if present
       if dir_base == 'bindings' && OPTIONAL_KEYS['bindings']
         OPTIONAL_KEYS['bindings'].each do |key, validator|
@@ -94,7 +94,7 @@ all_ids = {}
               puts "  [ERROR] #{file}: Invalid format for '#{key}'"
               exit 1
             end
-            
+
             # Additional validation for applies_to values
             if key == 'applies_to'
               invalid_contexts = front_matter[key] - VALID_CONTEXTS
@@ -102,13 +102,13 @@ all_ids = {}
                 puts "  [WARNING] #{file}: Unknown context(s) in 'applies_to': #{invalid_contexts.join(', ')}"
                 puts "  Valid contexts are: #{VALID_CONTEXTS.join(', ')}"
               end
-              
+
               # Auto-detect language specific bindings without proper applies_to
               if file =~ /\/(ts|js|go|rust|py|java|cs|rb)-/ && !front_matter[key].any? { |v| v =~ /^(typescript|javascript|go|rust|python|java|csharp|ruby)$/ }
                 prefix = $1
                 language_map = {
-                  'ts' => 'typescript', 'js' => 'javascript', 'go' => 'go', 
-                  'rust' => 'rust', 'py' => 'python', 'java' => 'java', 
+                  'ts' => 'typescript', 'js' => 'javascript', 'go' => 'go',
+                  'rust' => 'rust', 'py' => 'python', 'java' => 'java',
                   'cs' => 'csharp', 'rb' => 'ruby'
                 }
                 puts "  [WARNING] #{file}: Has prefix '#{prefix}-' but doesn't include '#{language_map[prefix]}' in applies_to"
@@ -117,7 +117,7 @@ all_ids = {}
           end
         end
       end
-      
+
       puts "  [OK] #{file}"
     else
       puts "  [ERROR] #{file}: No front-matter found"

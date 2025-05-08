@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: go-package-design
-last_modified: "2025-05-04"
-derived_from: modularity
-enforced_by: code review & project structure linting
-applies_to:
+id: go-package-design last_modified: "2025-05-04" derived_from: modularity enforced_by:
+code review & project structure linting applies_to:
 
 - go
 
@@ -12,62 +9,98 @@ ______________________________________________________________________
 
 # Binding: Organize Go Code Into Purpose-Driven Packages
 
-Design Go packages as cohesive units with clear, focused responsibilities and well-defined boundaries. Each package should have a single purpose, contain related functionality, maintain high internal cohesion, and expose a minimal, well-documented API that hides implementation details.
+Design Go packages as cohesive units with clear, focused responsibilities and
+well-defined boundaries. Each package should have a single purpose, contain related
+functionality, maintain high internal cohesion, and expose a minimal, well-documented
+API that hides implementation details.
 
 ## Rationale
 
-This binding directly implements our modularity tenet by establishing clear, well-defined boundaries for Go code organization. Package design is the primary mechanism for modularity in Go, serving as the foundational unit of code organization that determines how components interact and compose together.
+This binding directly implements our modularity tenet by establishing clear,
+well-defined boundaries for Go code organization. Package design is the primary
+mechanism for modularity in Go, serving as the foundational unit of code organization
+that determines how components interact and compose together.
 
-Think of Go packages like specialized departments in a well-run organization. Each department has a clear purpose, its members work cohesively toward shared goals, and there are established protocols for how departments communicate with each other. When a department tries to do too much or lacks a coherent identity, the organization becomes confused and inefficient. Similarly, when Go packages lack focus or appropriate boundaries, codebases become tangled and difficult to maintain. Well-designed packages create a map of your system's architecture that developers can navigate intuitively.
+Think of Go packages like specialized departments in a well-run organization. Each
+department has a clear purpose, its members work cohesively toward shared goals, and
+there are established protocols for how departments communicate with each other. When a
+department tries to do too much or lacks a coherent identity, the organization becomes
+confused and inefficient. Similarly, when Go packages lack focus or appropriate
+boundaries, codebases become tangled and difficult to maintain. Well-designed packages
+create a map of your system's architecture that developers can navigate intuitively.
 
-The impact of package design choices compounds over time. In the early days of a project, poor package boundaries might seem like a minor inconvenience, but as the system grows, these boundaries determine how easily developers can understand, test, refactor, and extend the codebase. Packages with mixed responsibilities create hidden dependencies and unexpected side effects when modified. In contrast, purpose-driven packages allow developers to reason about one part of the system without holding the entire codebase in their head—turning an overwhelmingly complex system into a collection of manageable pieces.
+The impact of package design choices compounds over time. In the early days of a
+project, poor package boundaries might seem like a minor inconvenience, but as the
+system grows, these boundaries determine how easily developers can understand, test,
+refactor, and extend the codebase. Packages with mixed responsibilities create hidden
+dependencies and unexpected side effects when modified. In contrast, purpose-driven
+packages allow developers to reason about one part of the system without holding the
+entire codebase in their head—turning an overwhelmingly complex system into a collection
+of manageable pieces.
 
 ## Rule Definition
 
-This binding establishes clear requirements for how Go code should be organized into packages:
+This binding establishes clear requirements for how Go code should be organized into
+packages:
 
 - **Package Purpose and Identity**:
 
-  - Each package MUST have a single, well-defined purpose that can be expressed in a short sentence
-  - Package names MUST be concise, lower-case, single words without underscores that describe what the package contains
-  - Packages SHOULD NOT be named after their patterns or implementation details (e.g., avoid names like "factory", "manager", "util")
-  - Package comments (`// Package foo ...`) at the top of doc.go or primary .go file MUST clearly explain the package's purpose
+  - Each package MUST have a single, well-defined purpose that can be expressed in a
+    short sentence
+  - Package names MUST be concise, lower-case, single words without underscores that
+    describe what the package contains
+  - Packages SHOULD NOT be named after their patterns or implementation details (e.g.,
+    avoid names like "factory", "manager", "util")
+  - Package comments (`// Package foo ...`) at the top of doc.go or primary .go file
+    MUST clearly explain the package's purpose
 
 - **Package Structure and Organization**:
 
-  - Projects MUST follow the standard Go project layout with `/cmd`, `/internal`, `/pkg` (when needed) directories
-  - Group related functionality by domain concepts or features, not by technical roles (prefer `internal/user` over `internal/controllers`)
+  - Projects MUST follow the standard Go project layout with `/cmd`, `/internal`, `/pkg`
+    (when needed) directories
+  - Group related functionality by domain concepts or features, not by technical roles
+    (prefer `internal/user` over `internal/controllers`)
   - Place each Go package in its own directory with a name matching the package
-  - Large packages SHOULD be split into more focused sub-packages when they exceed 2000-3000 lines of code
+  - Large packages SHOULD be split into more focused sub-packages when they exceed
+    2000-3000 lines of code
 
 - **Package Coupling and Cohesion**:
 
-  - Packages MUST exhibit high internal cohesion (all code in the package works together for a unified purpose)
-  - Packages MUST maintain low external coupling (minimal dependencies on other packages)
-  - Circular dependencies between packages are STRICTLY PROHIBITED and should be detected in CI
-  - Import graphs MUST form a directed acyclic graph (DAG) with clear hierarchical structure
+  - Packages MUST exhibit high internal cohesion (all code in the package works together
+    for a unified purpose)
+  - Packages MUST maintain low external coupling (minimal dependencies on other
+    packages)
+  - Circular dependencies between packages are STRICTLY PROHIBITED and should be
+    detected in CI
+  - Import graphs MUST form a directed acyclic graph (DAG) with clear hierarchical
+    structure
 
 - **Package API Design**:
 
   - Package APIs MUST be intentionally designed, not emergent from implementation needs
-  - Only types, functions, and constants directly related to the package's purpose should be exported
+  - Only types, functions, and constants directly related to the package's purpose
+    should be exported
   - Implementation details MUST be unexported (private to the package)
   - PREFER accepting interfaces and returning concrete types
 
 - **Exceptions and Special Cases**:
 
-  - Small utilities or helper functions SHOULD be kept in the package they serve rather than creating tiny utility packages
-  - Utility code needed by multiple packages SHOULD be organized into purposeful shared packages (e.g., `internal/validation`) rather than generic catch-all utilities
-  - Package main is an exception that often contains glue code connecting other packages; it should be kept minimal and focused on application bootstrapping
+  - Small utilities or helper functions SHOULD be kept in the package they serve rather
+    than creating tiny utility packages
+  - Utility code needed by multiple packages SHOULD be organized into purposeful shared
+    packages (e.g., `internal/validation`) rather than generic catch-all utilities
+  - Package main is an exception that often contains glue code connecting other
+    packages; it should be kept minimal and focused on application bootstrapping
 
 ## Practical Implementation
 
-1. **Establish a Standard Project Layout**: Start with the Go community's standard layout to provide familiar structure:
+1. **Establish a Standard Project Layout**: Start with the Go community's standard
+   layout to provide familiar structure:
 
    ```
    project-root/
    ├── cmd/                 # Command-line applications
-   │   └── myapp/          
+   │   └── myapp/
    │       └── main.go     # Application entry point
    ├── internal/            # Private code that cannot be imported
    │   ├── auth/           # Authentication-related code
@@ -87,10 +120,12 @@ This binding establishes clear requirements for how Go code should be organized 
 
    - `/cmd`: Entry points for executables, with minimal code
    - `/internal`: Private code that cannot be imported by other modules
-   - `/pkg`: Public library code that can be imported by other modules (use only when necessary)
+   - `/pkg`: Public library code that can be imported by other modules (use only when
+     necessary)
    - `/api`: API definition files, schemas, protocol definitions
 
-1. **Organize by Domain Concepts**: Structure packages around business domains and features rather than technical layers:
+1. **Organize by Domain Concepts**: Structure packages around business domains and
+   features rather than technical layers:
 
    ```go
    // ❌ BAD: Technical/layer-based organization
@@ -126,7 +161,8 @@ This binding establishes clear requirements for how Go code should be organized 
    - Easier navigation for new developers
    - Natural boundaries for changes and testing
 
-1. **Design Clean Package APIs**: Explicitly define what's exported and what remains internal:
+1. **Design Clean Package APIs**: Explicitly define what's exported and what remains
+   internal:
 
    For each package, create a clear contract with the rest of the system:
 
@@ -219,7 +255,8 @@ This binding establishes clear requirements for how Go code should be organized 
    }
    ```
 
-1. **Set up Dependency Management**: Use interfaces and dependency injection to manage and limit coupling:
+1. **Set up Dependency Management**: Use interfaces and dependency injection to manage
+   and limit coupling:
 
    ```go
    // package: internal/app/app.go
@@ -239,17 +276,17 @@ This binding establishes clear requirements for how Go code should be organized 
        if err != nil {
            return nil, fmt.Errorf("connecting to database: %w", err)
        }
-       
+
        // Create repositories
        userRepo := user.NewRepository(db)
        orderRepo := order.NewRepository(db)
        paymentRepo := payment.NewRepository(db)
-       
+
        // Create services with their dependencies
        userService := user.NewService(userRepo, cfg.UserConfig)
        orderService := order.NewService(orderRepo, userService)
        paymentService := payment.NewService(paymentRepo, orderService, cfg.PaymentConfig)
-       
+
        return &App{
            UserService:    userService,
            OrderService:   orderService,
@@ -258,7 +295,8 @@ This binding establishes clear requirements for how Go code should be organized 
    }
    ```
 
-1. **Visualize and Enforce Package Relationships**: Regularly analyze and optimize your dependency graph:
+1. **Visualize and Enforce Package Relationships**: Regularly analyze and optimize your
+   dependency graph:
 
    ```bash
    # Install go-tools to analyze dependencies
@@ -279,7 +317,7 @@ This binding establishes clear requirements for how Go code should be organized 
      - name: Detect circular dependencies
        command: go-cyclo
        args: ["./..."]
-     
+
      - name: Check package sizes
        command: go-package-size
        args: ["--max-lines=3000", "./..."]
@@ -429,12 +467,25 @@ func (s *Service) CheckCredit(userID string, amount decimal.Decimal) bool {
 
 ## Related Bindings
 
-- [modularity](../tenets/modularity.md): This binding is a Go-specific application of general modularity principles. While modularity establishes the conceptual foundation, go-package-design provides concrete rules for implementing modularity in Go codebases through package design.
+- [modularity](../tenets/modularity.md): This binding is a Go-specific application of
+  general modularity principles. While modularity establishes the conceptual foundation,
+  go-package-design provides concrete rules for implementing modularity in Go codebases
+  through package design.
 
-- [dependency-inversion](dependency-inversion.md): Well-designed Go packages often use dependency inversion to manage coupling between packages. By defining interfaces in consumer packages rather than implementation packages, you create a more flexible, testable system with dependencies pointing in the right direction.
+- [dependency-inversion](dependency-inversion.md): Well-designed Go packages often use
+  dependency inversion to manage coupling between packages. By defining interfaces in
+  consumer packages rather than implementation packages, you create a more flexible,
+  testable system with dependencies pointing in the right direction.
 
-- [code-size](code-size.md): Package design and code size work together to maintain manageable units of code. When packages grow too large, they often need to be broken down into smaller, more focused packages.
+- [code-size](code-size.md): Package design and code size work together to maintain
+  manageable units of code. When packages grow too large, they often need to be broken
+  down into smaller, more focused packages.
 
-- [go-interface-design](go-interface-design.md): Package boundaries and interface design are closely related. Well-designed interfaces help define clean package boundaries and APIs, while good package organization provides natural places to define domain-specific interfaces.
+- [go-interface-design](go-interface-design.md): Package boundaries and interface design
+  are closely related. Well-designed interfaces help define clean package boundaries and
+  APIs, while good package organization provides natural places to define
+  domain-specific interfaces.
 
-- [hex-domain-purity](hex-domain-purity.md): Package design in Go can directly support hexagonal architecture by organizing packages to reflect domain boundaries and infrastructure adapters, keeping domain logic pure from external concerns.
+- [hex-domain-purity](hex-domain-purity.md): Package design in Go can directly support
+  hexagonal architecture by organizing packages to reflect domain boundaries and
+  infrastructure adapters, keeping domain logic pure from external concerns.

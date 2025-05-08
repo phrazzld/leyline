@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: go-interface-design
-last_modified: "2025-05-04"
-derived_from: testability
-enforced_by: code review & linting
-applies_to:
+id: go-interface-design last_modified: "2025-05-04" derived_from: testability
+enforced_by: code review & linting applies_to:
 
 - go
 
@@ -12,26 +9,49 @@ ______________________________________________________________________
 
 # Binding: Design Small, Focused Interfaces in Consumer Packages
 
-In Go, define interfaces where they are used (consumer packages), not where they are implemented. Keep interfaces small and focused, preferably with only 1-3 methods, and design them based on the specific behaviors required by the consuming code rather than an implementation's capabilities.
+In Go, define interfaces where they are used (consumer packages), not where they are
+implemented. Keep interfaces small and focused, preferably with only 1-3 methods, and
+design them based on the specific behaviors required by the consuming code rather than
+an implementation's capabilities.
 
 ## Rationale
 
-This binding directly implements our testability tenet by enabling clean, flexible testing without over-mocking. When interfaces are small and defined by consumers, they naturally facilitate testing by allowing easy substitution of implementations without forcing tight coupling to concrete types.
+This binding directly implements our testability tenet by enabling clean, flexible
+testing without over-mocking. When interfaces are small and defined by consumers, they
+naturally facilitate testing by allowing easy substitution of implementations without
+forcing tight coupling to concrete types.
 
-Think of Go interfaces like power adapters for traveling internationally. Instead of requiring every device to conform to every international socket standard (which would be impractical and inflexible), we use adapters that convert between standards as needed. Similarly, small interfaces defined by consumers act as "adapters" that specify only the behavior needed in a particular context, rather than forcing implementations to conform to large, rigid contracts. This approach creates natural seams in your codebase where alternate implementations—including test doubles—can be easily inserted without complex mocking frameworks.
+Think of Go interfaces like power adapters for traveling internationally. Instead of
+requiring every device to conform to every international socket standard (which would be
+impractical and inflexible), we use adapters that convert between standards as needed.
+Similarly, small interfaces defined by consumers act as "adapters" that specify only the
+behavior needed in a particular context, rather than forcing implementations to conform
+to large, rigid contracts. This approach creates natural seams in your codebase where
+alternate implementations—including test doubles—can be easily inserted without complex
+mocking frameworks.
 
-The difference between small, consumer-defined interfaces and large "header interfaces" becomes most apparent when requirements change. With the small interface approach, a change in one area of code affects only the immediate interfaces needed by that area, while the rest of the system remains stable. With large interfaces defined alongside implementations, a change in one component can trigger a ripple effect of modifications throughout the codebase as all consumers must adapt to interface changes they may not even use. This principle is captured in the Go proverb: "The bigger the interface, the weaker the abstraction"—larger interfaces create more rigid, brittle connections between components.
+The difference between small, consumer-defined interfaces and large "header interfaces"
+becomes most apparent when requirements change. With the small interface approach, a
+change in one area of code affects only the immediate interfaces needed by that area,
+while the rest of the system remains stable. With large interfaces defined alongside
+implementations, a change in one component can trigger a ripple effect of modifications
+throughout the codebase as all consumers must adapt to interface changes they may not
+even use. This principle is captured in the Go proverb: "The bigger the interface, the
+weaker the abstraction"—larger interfaces create more rigid, brittle connections between
+components.
 
 ## Rule Definition
 
 This binding establishes specific requirements for Go interface design:
 
-- **Consumer Ownership**: Interfaces MUST be defined in the package that uses the behavior, not the package that implements it:
+- **Consumer Ownership**: Interfaces MUST be defined in the package that uses the
+  behavior, not the package that implements it:
 
   - Define interfaces based on the specific behaviors needed by consuming code
   - Implementation packages should return concrete types, not interfaces
   - Avoid the common anti-pattern of defining interfaces alongside their implementations
-  - Exceptions are permitted for widely-used, standard interfaces (like `io.Reader`, `http.Handler`)
+  - Exceptions are permitted for widely-used, standard interfaces (like `io.Reader`,
+    `http.Handler`)
 
 - **Interface Size**: Interfaces MUST be small and focused:
 
@@ -43,26 +63,32 @@ This binding establishes specific requirements for Go interface design:
 - **Interface Naming**: Interface names MUST clearly describe behaviors:
 
   - Names should describe the behavior, not the implementation
-  - Prefer the `-er` suffix for active interfaces (e.g., `Reader`, `Writer`, `Validator`)
+  - Prefer the `-er` suffix for active interfaces (e.g., `Reader`, `Writer`,
+    `Validator`)
   - Avoid implementation-specific words in the name (e.g., `DBRepository`, `SQLStorage`)
   - Use descriptive, domain-specific names for clarity
 
 - **Interface Implementation**: Implementation of interfaces MUST be implicit:
 
-  - Do not use explicit interface implementation declarations (`implements` keywords are not used in Go)
-  - Use compile-time checks to verify interface implementation (e.g., `var _ Interface = (*ConcreteType)(nil)`)
+  - Do not use explicit interface implementation declarations (`implements` keywords are
+    not used in Go)
+  - Use compile-time checks to verify interface implementation (e.g.,
+    `var _ Interface = (*ConcreteType)(nil)`)
   - Return concrete types from factories, not interfaces
   - Accept interfaces as parameters to provide flexibility
 
-- **Avoid Empty Interface**: Usage of the empty interface (`interface{}` or `any`) SHOULD be minimized:
+- **Avoid Empty Interface**: Usage of the empty interface (`interface{}` or `any`)
+  SHOULD be minimized:
 
   - The empty interface conveys no behavioral requirements and bypasses type safety
-  - Use only when truly necessary (e.g., serialization/deserialization, value containers)
+  - Use only when truly necessary (e.g., serialization/deserialization, value
+    containers)
   - Prefer generic types (Go 1.18+) for type-safe polymorphism where applicable
 
 ## Practical Implementation
 
-1. **Define Interfaces at the Point of Use**: Place interfaces in the package where they're consumed:
+1. **Define Interfaces at the Point of Use**: Place interfaces in the package where
+   they're consumed:
 
    ```go
    // ✅ GOOD: Define interfaces in consumer packages
@@ -71,7 +97,7 @@ This binding establishes specific requirements for Go interface design:
    package notification
 
    // EmailSender defines the contract for sending emails.
-   // This is defined here because the notification package 
+   // This is defined here because the notification package
    // consumes this behavior.
    type EmailSender interface {
        SendEmail(to string, subject string, body string) error
@@ -124,7 +150,8 @@ This binding establishes specific requirements for Go interface design:
    }
    ```
 
-1. **Verify Interface Compliance**: Use compile-time checks to ensure types implement interfaces:
+1. **Verify Interface Compliance**: Use compile-time checks to ensure types implement
+   interfaces:
 
    ```go
    // package: internal/notification/service_test.go
@@ -132,7 +159,7 @@ This binding establishes specific requirements for Go interface design:
 
    import (
        "testing"
-       
+
        "myapp/internal/email"
    )
 
@@ -161,10 +188,10 @@ This binding establishes specific requirements for Go interface design:
        // Arrange
        mock := &mockEmailSender{}
        service := NewService(mock)
-       
+
        // Act
        err := service.Send("user@example.com", "Hello, World!")
-       
+
        // Assert
        if err != nil {
            t.Fatalf("expected no error, got %v", err)
@@ -178,7 +205,8 @@ This binding establishes specific requirements for Go interface design:
    }
    ```
 
-1. **Design Small, Composable Interfaces**: Break down complex behaviors into smaller interfaces:
+1. **Design Small, Composable Interfaces**: Break down complex behaviors into smaller
+   interfaces:
 
    ```go
    // ✅ GOOD: Small, focused interfaces
@@ -212,7 +240,8 @@ This binding establishes specific requirements for Go interface design:
    }
    ```
 
-1. **Accept Interfaces, Return Concrete Types**: Design functions and methods to promote flexibility:
+1. **Accept Interfaces, Return Concrete Types**: Design functions and methods to promote
+   flexibility:
 
    ```go
    // repository.go
@@ -464,10 +493,26 @@ func Process[T constraints.Ordered](input T) T {
 
 ## Related Bindings
 
-- [dependency-inversion](dependency-inversion.md): Go's consumer-defined interfaces directly implement dependency inversion by having high-level modules define interfaces that low-level modules implement. This binding provides the concrete Go pattern for achieving dependency inversion, which creates more testable, modular code by decoupling components and focusing on behaviors rather than implementations.
+- [dependency-inversion](dependency-inversion.md): Go's consumer-defined interfaces
+  directly implement dependency inversion by having high-level modules define interfaces
+  that low-level modules implement. This binding provides the concrete Go pattern for
+  achieving dependency inversion, which creates more testable, modular code by
+  decoupling components and focusing on behaviors rather than implementations.
 
-- [go-package-design](go-package-design.md): Interface design and package design work together closely in Go. Well-designed interfaces define the boundaries between packages and enable clean dependency management. The consumer-defined interface approach helps prevent circular dependencies between packages, and clear interface boundaries promote better package organization.
+- [go-package-design](go-package-design.md): Interface design and package design work
+  together closely in Go. Well-designed interfaces define the boundaries between
+  packages and enable clean dependency management. The consumer-defined interface
+  approach helps prevent circular dependencies between packages, and clear interface
+  boundaries promote better package organization.
 
-- [testability](../tenets/testability.md): Small interfaces make testing dramatically easier, as they can be readily mocked with simple test implementations rather than complex mocking frameworks. This binding implements the "No Mocking Internal Components" guideline by providing natural seams for substituting test implementations at package boundaries.
+- [testability](../tenets/testability.md): Small interfaces make testing dramatically
+  easier, as they can be readily mocked with simple test implementations rather than
+  complex mocking frameworks. This binding implements the "No Mocking Internal
+  Components" guideline by providing natural seams for substituting test implementations
+  at package boundaries.
 
-- [hex-domain-purity](hex-domain-purity.md): Go interfaces are a key enabler for hexagonal architecture by providing the adapters between the domain and external concerns. Domain logic can remain pure by depending on interfaces rather than concrete implementations of infrastructure components, with the interfaces defined by the domain itself.
+- [hex-domain-purity](hex-domain-purity.md): Go interfaces are a key enabler for
+  hexagonal architecture by providing the adapters between the domain and external
+  concerns. Domain logic can remain pure by depending on interfaces rather than concrete
+  implementations of infrastructure components, with the interfaces defined by the
+  domain itself.

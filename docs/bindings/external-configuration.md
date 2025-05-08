@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: external-configuration
-last_modified: "2025-05-04"
-derived_from: no-secret-suppression
-enforced_by: linters & secret scanning
-applies_to:
+id: external-configuration last_modified: "2025-05-04" derived_from:
+no-secret-suppression enforced_by: linters & secret scanning applies_to:
 
 - all
 
@@ -12,21 +9,40 @@ ______________________________________________________________________
 
 # Binding: Never Hardcode Configuration
 
-Never embed configuration values in your source code. Keep all environment-specific settings, credentials, connection strings, feature flags, and other variable configuration external to your application code, making them injectable at runtime.
+Never embed configuration values in your source code. Keep all environment-specific
+settings, credentials, connection strings, feature flags, and other variable
+configuration external to your application code, making them injectable at runtime.
 
 ## Rationale
 
-This binding directly implements our no-secret-suppression tenet by preventing one of its most dangerous forms: hardcoded secrets and configuration. When you embed configuration values directly in your code, you're essentially creating hidden vulnerabilities and dependencies that evade the checks and balances designed to protect your system.
+This binding directly implements our no-secret-suppression tenet by preventing one of
+its most dangerous forms: hardcoded secrets and configuration. When you embed
+configuration values directly in your code, you're essentially creating hidden
+vulnerabilities and dependencies that evade the checks and balances designed to protect
+your system.
 
-Think of your application as a fine musical instrument that needs to be tuned differently depending on the venue and performance. Hardcoding configuration is like permanently fixing all the tuning pegs in place—the instrument can only perform correctly in one specific environment. External configuration, on the other hand, allows your application to be "tuned" appropriately for each environment it runs in, from a developer's laptop to staging and production systems, without changing a single line of code.
+Think of your application as a fine musical instrument that needs to be tuned
+differently depending on the venue and performance. Hardcoding configuration is like
+permanently fixing all the tuning pegs in place—the instrument can only perform
+correctly in one specific environment. External configuration, on the other hand, allows
+your application to be "tuned" appropriately for each environment it runs in, from a
+developer's laptop to staging and production systems, without changing a single line of
+code.
 
-The costs of hardcoded configuration compound over time and across teams. What begins as a convenient shortcut ("I'll just put the dev server URL right here for now") inevitably leads to deployment failures, security breaches, and configuration drift. When a credential is embedded in code, it typically lives far longer than intended, potentially remaining accessible long after the developer has left the company. What's worse, changing these values requires code changes, testing cycles, and redeployment—turning what should be a simple configuration adjustment into a full release process.
+The costs of hardcoded configuration compound over time and across teams. What begins as
+a convenient shortcut ("I'll just put the dev server URL right here for now") inevitably
+leads to deployment failures, security breaches, and configuration drift. When a
+credential is embedded in code, it typically lives far longer than intended, potentially
+remaining accessible long after the developer has left the company. What's worse,
+changing these values requires code changes, testing cycles, and redeployment—turning
+what should be a simple configuration adjustment into a full release process.
 
 ## Rule Definition
 
 This binding stipulates that:
 
-- All variable configuration must be externalized from source code and supplied at runtime. This includes:
+- All variable configuration must be externalized from source code and supplied at
+  runtime. This includes:
 
   - Environment-specific values (URLs, hostnames, ports, timeouts)
   - Credentials (passwords, API keys, tokens, certificates)
@@ -35,7 +51,8 @@ This binding stipulates that:
   - Logging levels and destinations
   - Any other value that might need to change between deployments or environments
 
-- Configuration should be supplied through standardized mechanisms appropriate to your deployment environment:
+- Configuration should be supplied through standardized mechanisms appropriate to your
+  deployment environment:
 
   - Environment variables
   - Configuration files (excluded from version control when containing sensitive values)
@@ -51,17 +68,26 @@ This binding stipulates that:
 
 Limited exceptions exist primarily for:
 
-- Non-sensitive constants that are truly invariant (e.g., mathematical constants, HTTP status codes)
+- Non-sensitive constants that are truly invariant (e.g., mathematical constants, HTTP
+  status codes)
 - Development-only tooling aids that never deploy to production
 - Test fixtures that are explicitly labeled and isolated
 
-Even in these exceptional cases, consider whether the value might ever need to change. If there's any doubt, externalize it. When you must include default values in code (e.g., for developer convenience), ensure they're clearly marked as defaults and are overridden in all real deployment environments.
+Even in these exceptional cases, consider whether the value might ever need to change.
+If there's any doubt, externalize it. When you must include default values in code
+(e.g., for developer convenience), ensure they're clearly marked as defaults and are
+overridden in all real deployment environments.
 
 ## Practical Implementation
 
 To implement external configuration effectively in your systems:
 
-1. **Design with Configuration Abstraction**: Create a dedicated configuration layer in your application that centralizes all interactions with external configuration sources. Ask yourself: "If we needed to change where configuration comes from, how many files would we need to modify?" A well-designed system should require changes to only one dedicated component. This approach creates a clear boundary between configuration retrieval and the business logic that uses those values.
+1. **Design with Configuration Abstraction**: Create a dedicated configuration layer in
+   your application that centralizes all interactions with external configuration
+   sources. Ask yourself: "If we needed to change where configuration comes from, how
+   many files would we need to modify?" A well-designed system should require changes to
+   only one dedicated component. This approach creates a clear boundary between
+   configuration retrieval and the business logic that uses those values.
 
    ```typescript
    // Configuration layer with abstraction
@@ -87,7 +113,13 @@ To implement external configuration effectively in your systems:
    const databaseUrl = configService.get<string>('DATABASE_URL');
    ```
 
-1. **Implement Strong Validation**: Validate configuration values at application startup, failing fast if required values are missing or invalid. Don't wait until a feature is used to discover the configuration is incorrect. Ask yourself: "What assumptions am I making about this configuration value?" Then validate those assumptions explicitly. This creates a clear contract for what configuration your application requires and ensures problems are caught immediately, not deep in a call stack.
+1. **Implement Strong Validation**: Validate configuration values at application
+   startup, failing fast if required values are missing or invalid. Don't wait until a
+   feature is used to discover the configuration is incorrect. Ask yourself: "What
+   assumptions am I making about this configuration value?" Then validate those
+   assumptions explicitly. This creates a clear contract for what configuration your
+   application requires and ensures problems are caught immediately, not deep in a call
+   stack.
 
    ```go
    type DatabaseConfig struct {
@@ -110,7 +142,11 @@ To implement external configuration effectively in your systems:
    }
    ```
 
-1. **Layer Your Configuration Sources**: Implement a configuration hierarchy that allows for overrides from multiple sources. A common pattern is: default values → configuration files → environment variables → command-line arguments. Ask yourself: "How will operators configure this system in an emergency?" Ensure there's always a mechanism to override configuration without requiring a rebuild or redeploy.
+1. **Layer Your Configuration Sources**: Implement a configuration hierarchy that allows
+   for overrides from multiple sources. A common pattern is: default values →
+   configuration files → environment variables → command-line arguments. Ask yourself:
+   "How will operators configure this system in an emergency?" Ensure there's always a
+   mechanism to override configuration without requiring a rebuild or redeploy.
 
    ```python
    def load_config():
@@ -120,7 +156,7 @@ To implement external configuration effectively in your systems:
            "server_port": 8080,
            "metrics_enabled": True
        }
-       
+
        # Override with config file if present
        try:
            with open("config.json") as f:
@@ -128,7 +164,7 @@ To implement external configuration effectively in your systems:
                config.update(file_config)
        except FileNotFoundError:
            pass
-       
+
        # Environment variables override file config
        if os.environ.get("LOG_LEVEL"):
            config["log_level"] = os.environ.get("LOG_LEVEL")
@@ -136,11 +172,16 @@ To implement external configuration effectively in your systems:
            config["server_port"] = int(os.environ.get("SERVER_PORT"))
        if os.environ.get("METRICS_ENABLED"):
            config["metrics_enabled"] = os.environ.get("METRICS_ENABLED").lower() == "true"
-       
+
        return config
    ```
 
-1. **Secure Sensitive Configuration**: Treat secrets differently from regular configuration. Ask yourself: "What would happen if this value was exposed in logs or error messages?" Use specialized secrets management services appropriate to your deployment platform (e.g., AWS Secrets Manager, HashiCorp Vault, Kubernetes Secrets) rather than plain environment variables or configuration files for truly sensitive values.
+1. **Secure Sensitive Configuration**: Treat secrets differently from regular
+   configuration. Ask yourself: "What would happen if this value was exposed in logs or
+   error messages?" Use specialized secrets management services appropriate to your
+   deployment platform (e.g., AWS Secrets Manager, HashiCorp Vault, Kubernetes Secrets)
+   rather than plain environment variables or configuration files for truly sensitive
+   values.
 
    ```typescript
    async function getSecrets() {
@@ -148,16 +189,22 @@ To implement external configuration effectively in your systems:
      const secretsManager = new AWS.SecretsManager();
      const result = await secretsManager.getSecretValue({ SecretId: 'my-service/production' }).promise();
      return JSON.parse(result.SecretString);
-     
+
      // For Kubernetes environments
      // return readKubernetesSecret('my-service-secrets');
-     
+
      // For local development, might fall back to well-isolated .env file
      // return dotenv.parse(fs.readFileSync('.env.secrets'));
    }
    ```
 
-1. **Document Configuration Requirements**: Provide clear documentation about all configuration options, including their purpose, format, default values, and validation rules. Include example configuration for common scenarios. Ask yourself: "Could someone unfamiliar with this codebase configure it correctly just from the documentation?" Create template files with placeholder values (like `.env.example`) that can be checked into version control as a guide, even if the actual configuration files with real values are excluded.
+1. **Document Configuration Requirements**: Provide clear documentation about all
+   configuration options, including their purpose, format, default values, and
+   validation rules. Include example configuration for common scenarios. Ask yourself:
+   "Could someone unfamiliar with this codebase configure it correctly just from the
+   documentation?" Create template files with placeholder values (like `.env.example`)
+   that can be checked into version control as a guide, even if the actual configuration
+   files with real values are excluded.
 
    ```markdown
    # Configuration Guide
@@ -184,7 +231,7 @@ public class DatabaseService {
     private final String url = "jdbc:mysql://db.example.com:3306/production";
     private final String username = "admin";
     private final String password = "super-secret-password"; // Security risk!
-    
+
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, username, password);
     }
@@ -197,16 +244,16 @@ public class DatabaseService {
     private final String url;
     private final String username;
     private final String password;
-    
+
     public DatabaseService(Config config) {
-        this.url = Objects.requireNonNull(config.getString("db.url"), 
+        this.url = Objects.requireNonNull(config.getString("db.url"),
                                          "Database URL is required");
-        this.username = Objects.requireNonNull(config.getString("db.username"), 
+        this.username = Objects.requireNonNull(config.getString("db.username"),
                                               "Database username is required");
         this.password = Objects.requireNonNull(config.getString("db.password"),
                                               "Database password is required");
     }
-    
+
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, username, password);
     }
@@ -228,7 +275,7 @@ function sendAnalytics(eventData) {
   const apiKey = "1a2b3c4d5e6f";
   const batchSize = 10;
   const retryCount = 3;
-  
+
   // What if we need different values for testing or different environments?
   // What if the API key needs to be rotated?
   fetch(endpoint, {
@@ -249,13 +296,13 @@ class AnalyticsService {
   private readonly apiKey: string;
   private readonly batchSize: number;
   private readonly retryCount: number;
-  
+
   constructor(config: AnalyticsConfig) {
     this.endpoint = config.endpoint;
     this.apiKey = config.apiKey;
     this.batchSize = config.batchSize || 10;
     this.retryCount = config.retryCount || 3;
-    
+
     // Validate configuration
     if (!this.endpoint) {
       throw new Error("Analytics endpoint is required");
@@ -264,7 +311,7 @@ class AnalyticsService {
       throw new Error("Analytics API key is required");
     }
   }
-  
+
   async sendEvent(eventData: any): Promise<void> {
     // Use the configuration values
     await fetch(this.endpoint, {
@@ -295,7 +342,7 @@ def process_image(image_data):
     max_size = 2048
     compression_quality = 85
     allowed_formats = ["jpg", "png", "webp"]
-    
+
     # Business logic using hardcoded values
     # ...
 ```
@@ -308,7 +355,7 @@ class ImageProcessingConfig:
         self.max_size = config_source.get_int("image.max_size", 1024)
         self.compression_quality = config_source.get_int("image.compression_quality", 80)
         self.allowed_formats = config_source.get_list("image.allowed_formats", ["jpg", "png"])
-        
+
         # Validate configuration
         if self.max_size < 100:
             raise ValueError("image.max_size must be at least 100")
@@ -320,15 +367,28 @@ def process_image(image_data, config):
     if config.enable_hd:
         # HD processing logic
         pass
-    
+
     # Rest of the business logic using config object
     # ...
 ```
 
 ## Related Bindings
 
-- [no-secret-suppression](../tenets/no-secret-suppression.md): While no-secret-suppression focuses broadly on not bypassing quality safeguards, external configuration specifically addresses the practice of storing configuration and secrets directly in code. Both bindings work to prevent vulnerabilities and improve maintainability, but from different angles—implementing both creates multiple layers of protection against security issues.
+- [no-secret-suppression](../tenets/no-secret-suppression.md): While
+  no-secret-suppression focuses broadly on not bypassing quality safeguards, external
+  configuration specifically addresses the practice of storing configuration and secrets
+  directly in code. Both bindings work to prevent vulnerabilities and improve
+  maintainability, but from different angles—implementing both creates multiple layers
+  of protection against security issues.
 
-- [dependency-inversion](dependency-inversion.md): Proper external configuration complements dependency inversion by creating a clean separation between business logic and its environmental dependencies. When configuration is injected rather than hardcoded, your domain logic becomes more testable and portable across different environments—key benefits that dependency inversion also promotes.
+- [dependency-inversion](dependency-inversion.md): Proper external configuration
+  complements dependency inversion by creating a clean separation between business logic
+  and its environmental dependencies. When configuration is injected rather than
+  hardcoded, your domain logic becomes more testable and portable across different
+  environments—key benefits that dependency inversion also promotes.
 
-- [hex-domain-purity](hex-domain-purity.md): External configuration supports domain purity by ensuring that environment-specific details don't contaminate your business logic. Configuration becomes an infrastructure concern that's kept at the boundaries of your application, allowing your domain code to remain focused on the business problem rather than implementation details.
+- [hex-domain-purity](hex-domain-purity.md): External configuration supports domain
+  purity by ensuring that environment-specific details don't contaminate your business
+  logic. Configuration becomes an infrastructure concern that's kept at the boundaries
+  of your application, allowing your domain code to remain focused on the business
+  problem rather than implementation details.

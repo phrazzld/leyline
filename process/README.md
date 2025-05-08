@@ -1,10 +1,12 @@
 # Leyline Process Documents
 
-This directory contains process documentation and templates for managing Leyline's tenets and bindings.
+This directory contains process documentation and templates for managing Leyline's
+tenets and bindings.
 
 ## Philosophy Coverage Audit
 
-The audit process ensures that all principles and guidelines from source philosophy documents are properly represented in Leyline's tenets and bindings.
+The audit process ensures that all principles and guidelines from source philosophy
+documents are properly represented in Leyline's tenets and bindings.
 
 ### Getting Started
 
@@ -55,4 +57,5 @@ graph TD
 
 ## Maintaining Process Documentation
 
-As Leyline evolves, these process documents should be updated to reflect current best practices. Suggest improvements via pull requests.
+As Leyline evolves, these process documents should be updated to reflect current best
+practices. Suggest improvements via pull requests.

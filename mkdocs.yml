@@ -10,7 +10,7 @@ repo_url: https://github.com/phrazzld/leyline
 # Navigation
 nav:
   - Home: index.md
-  - Tenets: 
+  - Tenets:
     - Overview: tenets/00-index.md
     - Simplicity: tenets/simplicity.md
     - Modularity: tenets/modularity.md
@@ -22,7 +22,7 @@ nav:
     - No Secret Suppression: tenets/no-secret-suppression.md
   - Bindings:
     - Overview: bindings/00-index.md
-    - TypeScript: 
+    - TypeScript:
       - No Any: bindings/ts-no-any.md
       - Module Organization: bindings/ts-module-organization.md
       - Async Patterns: bindings/ts-async-patterns.md

@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: code-size
-last_modified: "2025-05-05"
-derived_from: simplicity
-enforced_by: linters & code review
-applies_to:
+id: code-size last_modified: "2025-05-05" derived_from: simplicity enforced_by: linters
+& code review applies_to:
 
 - all
 
@@ -12,17 +9,38 @@ ______________________________________________________________________
 
 # Binding: Keep Code Units Small and Focused
 
-Limit the size of all code units—functions, methods, classes, and files—to maintain readability and comprehension. Each unit should be small enough to understand at a glance, with specific upper bounds based on the unit type and responsibility.
+Limit the size of all code units—functions, methods, classes, and files—to maintain
+readability and comprehension. Each unit should be small enough to understand at a
+glance, with specific upper bounds based on the unit type and responsibility.
 
 ## Rationale
 
-This binding implements our simplicity tenet by addressing the cognitive overhead created by large, sprawling code units. When functions, methods, classes, or files grow beyond certain thresholds, they become increasingly difficult to understand, debug, and modify—even for their original authors. Every additional line of code increases the number of potential interactions and state changes a developer must hold in their mind at once, quickly exceeding our brain's working memory capacity.
+This binding implements our simplicity tenet by addressing the cognitive overhead
+created by large, sprawling code units. When functions, methods, classes, or files grow
+beyond certain thresholds, they become increasingly difficult to understand, debug, and
+modify—even for their original authors. Every additional line of code increases the
+number of potential interactions and state changes a developer must hold in their mind
+at once, quickly exceeding our brain's working memory capacity.
 
-Think of code size like paragraphs in writing. A paragraph that spans an entire page becomes intimidating and hard to digest, forcing readers to constantly backtrack and reread sections to maintain context. Similarly, code units that require significant scrolling force developers to maintain too much context, making it difficult to understand the component's purpose and behavior. Breaking large units into focused, well-named components creates natural "cognitive resting points" that aid comprehension, much like well-structured paragraphs guide readers through complex ideas.
+Think of code size like paragraphs in writing. A paragraph that spans an entire page
+becomes intimidating and hard to digest, forcing readers to constantly backtrack and
+reread sections to maintain context. Similarly, code units that require significant
+scrolling force developers to maintain too much context, making it difficult to
+understand the component's purpose and behavior. Breaking large units into focused,
+well-named components creates natural "cognitive resting points" that aid comprehension,
+much like well-structured paragraphs guide readers through complex ideas.
 
-This binding also directly supports our modularity tenet. Size limits serve as a forcing function for creating proper module boundaries and appropriate separation of concerns. When a function or class grows too large, it's almost always a sign that it's trying to do too much—violating the "do one thing well" principle of modularity. Enforcing size constraints naturally pushes developers to identify these distinct responsibilities and separate them into focused, composable units.
+This binding also directly supports our modularity tenet. Size limits serve as a forcing
+function for creating proper module boundaries and appropriate separation of concerns.
+When a function or class grows too large, it's almost always a sign that it's trying to
+do too much—violating the "do one thing well" principle of modularity. Enforcing size
+constraints naturally pushes developers to identify these distinct responsibilities and
+separate them into focused, composable units.
 
-The resulting codebase, built from small, focused components, becomes dramatically more maintainable, testable, and comprehensible. It enables developers to understand each piece in isolation, make changes with confidence, and compose simple units to create complex behaviors without creating complex code.
+The resulting codebase, built from small, focused components, becomes dramatically more
+maintainable, testable, and comprehensible. It enables developers to understand each
+piece in isolation, make changes with confidence, and compose simple units to create
+complex behaviors without creating complex code.
 
 ## Rule Definition
 
@@ -54,7 +72,8 @@ This binding establishes the following size limits for different code units:
   - Maximum 3 levels of nested conditionals/loops
   - Maximum 4 levels of nested callbacks/promises (in asynchronous code)
 
-These limits are intended as practical guidance rather than rigid rules. The following exceptions and considerations apply:
+These limits are intended as practical guidance rather than rigid rules. The following
+exceptions and considerations apply:
 
 - **Permitted Exceptions**:
 
@@ -70,56 +89,64 @@ These limits are intended as practical guidance rather than rigid rules. The fol
   - Lower-level languages may need more lines for the same functionality
   - Formatting conventions affect line count
 
-When exceeding these guidelines, you must provide justification in comments explaining why the exception is appropriate, and take extra care with naming, documentation, and internal structure to mitigate the increased complexity.
+When exceeding these guidelines, you must provide justification in comments explaining
+why the exception is appropriate, and take extra care with naming, documentation, and
+internal structure to mitigate the increased complexity.
 
 ## Practical Implementation
 
-1. **Configure Linters with Size Limits**: Set up automated tools to enforce size constraints as part of your continuous integration process. Ask yourself: "What size thresholds are appropriate for our specific codebase and team?" Then configure tools like ESLint, Rubocop, or SonarQube to flag violations based on those thresholds.
+1. **Configure Linters with Size Limits**: Set up automated tools to enforce size
+   constraints as part of your continuous integration process. Ask yourself: "What size
+   thresholds are appropriate for our specific codebase and team?" Then configure tools
+   like ESLint, Rubocop, or SonarQube to flag violations based on those thresholds.
 
    ```javascript
    // .eslintrc.js example for JavaScript/TypeScript
    module.exports = {
      rules: {
        // Limit function size
-       'max-lines-per-function': ['error', { 
+       'max-lines-per-function': ['error', {
          max: 25,
          skipBlankLines: true,
-         skipComments: true 
+         skipComments: true
        }],
-       
+
        // Limit file size
        'max-lines': ['error', {
          max: 500,
          skipBlankLines: true,
-         skipComments: true 
+         skipComments: true
        }],
-       
+
        // Limit parameter count
        'max-params': ['error', 3],
-       
+
        // Limit nesting depth
        'max-depth': ['error', 3],
-       
+
        // Limit complexity
        'complexity': ['error', 10],
      }
    };
    ```
 
-1. **Apply Single Responsibility Refactorings**: Identify oversized code units and break them down into smaller, focused components. Ask yourself: "What are the distinct responsibilities or steps in this function or class?" Then extract each into its own well-named function or class.
+1. **Apply Single Responsibility Refactorings**: Identify oversized code units and break
+   them down into smaller, focused components. Ask yourself: "What are the distinct
+   responsibilities or steps in this function or class?" Then extract each into its own
+   well-named function or class.
 
    ```typescript
    // ❌ BAD: Large function with multiple responsibilities
    function processUser(userData) {
      // 20 lines of validation logic
      // ...
-     
+
      // 30 lines of business rule application
      // ...
-     
+
      // 25 lines of database operations
      // ...
-     
+
      // 15 lines of notification sending
      // ...
    }
@@ -146,7 +173,10 @@ When exceeding these guidelines, you must provide justification in comments expl
    // And so on...
    ```
 
-1. **Establish Clear Refactoring Triggers**: Define specific signals that indicate when code should be broken down into smaller units. Ask yourself: "What observable criteria indicate that a code unit is becoming too complex?" Create a shared understanding of these triggers among team members.
+1. **Establish Clear Refactoring Triggers**: Define specific signals that indicate when
+   code should be broken down into smaller units. Ask yourself: "What observable
+   criteria indicate that a code unit is becoming too complex?" Create a shared
+   understanding of these triggers among team members.
 
    Common refactoring triggers include:
 
@@ -167,25 +197,25 @@ When exceeding these guidelines, you must provide justification in comments expl
        for item in order_data['items']:
            if not 'product_id' in item:
                raise ValueError(f"Item missing product ID: {item}")
-       
+
        # Calculate order totals
        subtotal = 0
        for item in order_data['items']:
            price = get_product_price(item['product_id'])
            quantity = item.get('quantity', 1)
            subtotal += price * quantity
-       
+
        # Apply discounts
        discount = 0
        if order_data.get('coupon_code'):
            discount = apply_coupon(order_data['coupon_code'], subtotal)
        if subtotal > 1000:
            discount += subtotal * 0.05  # 5% volume discount
-       
+
        # Calculate taxes
        tax_rate = get_tax_rate(order_data.get('shipping_address', {}).get('country'))
        tax = (subtotal - discount) * tax_rate
-       
+
        # Create final order
        total = subtotal - discount + tax
        # ... 20 more lines of code
@@ -199,7 +229,11 @@ When exceeding these guidelines, you must provide justification in comments expl
        return create_order(order_data, subtotal, discount, tax)
    ```
 
-1. **Use Consistent Naming Conventions**: Establish clear naming patterns that reveal the purpose and relationships between smaller components. Ask yourself: "If I divide this large function, how should I name the pieces to make their purpose and relationship clear?" Good naming is essential when breaking down large units into smaller ones.
+1. **Use Consistent Naming Conventions**: Establish clear naming patterns that reveal
+   the purpose and relationships between smaller components. Ask yourself: "If I divide
+   this large function, how should I name the pieces to make their purpose and
+   relationship clear?" Good naming is essential when breaking down large units into
+   smaller ones.
 
    ```java
    // Class with methods broken down and named consistently
@@ -214,21 +248,24 @@ When exceeding these guidelines, you must provide justification in comments expl
            notifyOrderCreation(order);
            return order;
        }
-       
+
        // Each method handles one focused task
        private void validateOrderRequest(OrderRequest request) {
            // Focused validation logic
        }
-       
+
        private Order createOrderFromRequest(OrderRequest request) {
            // Focused order creation logic
        }
-       
+
        // Other methods follow the same pattern...
    }
    ```
 
-1. **Monitor and Reduce Complexity Metrics**: Use tools that measure cyclomatic complexity, cognitive complexity, and maintainability indices. Ask yourself: "Beyond just counting lines, how complex is this code really?" Then focus on reducing the most troublesome complexity hotspots first.
+1. **Monitor and Reduce Complexity Metrics**: Use tools that measure cyclomatic
+   complexity, cognitive complexity, and maintainability indices. Ask yourself: "Beyond
+   just counting lines, how complex is this code really?" Then focus on reducing the
+   most troublesome complexity hotspots first.
 
    ```
    # Sample complexity report from a static analyzer
@@ -240,7 +277,7 @@ When exceeding these guidelines, you must provide justification in comments expl
      - processUserRegistration: 18 (exceeds limit of 10)
      - validateUserInput: 12 (exceeds limit of 10)
 
-   Recommendation: 
+   Recommendation:
    - Break down processUserRegistration into smaller methods
    - Extract validation rules from validateUserInput
    ```
@@ -260,13 +297,13 @@ function processPayment(user, cart, paymentInfo) {
   if (!paymentInfo || !paymentInfo.method) {
     throw new Error('Invalid payment info');
   }
-  
+
   // Calculate totals
   let subtotal = 0;
   for (const item of cart.items) {
     subtotal += item.price * item.quantity;
   }
-  
+
   // Apply discounts
   let discount = 0;
   if (user.isVIP) {
@@ -277,19 +314,19 @@ function processPayment(user, cart, paymentInfo) {
   if (cart.couponCode) {
     const coupon = getCoupon(cart.couponCode);
     if (coupon && coupon.isValid) {
-      discount += coupon.type === 'percentage' 
-        ? subtotal * (coupon.value / 100) 
+      discount += coupon.type === 'percentage'
+        ? subtotal * (coupon.value / 100)
         : coupon.value;
     }
   }
-  
+
   // Calculate tax
   const taxRate = getTaxRate(user.address.state);
   const tax = (subtotal - discount) * taxRate;
-  
+
   // Calculate final total
   const total = subtotal - discount + tax;
-  
+
   // Process payment
   let paymentResult;
   if (paymentInfo.method === 'credit_card') {
@@ -307,7 +344,7 @@ function processPayment(user, cart, paymentInfo) {
   } else {
     throw new Error('Unsupported payment method');
   }
-  
+
   // Create order
   const order = {
     id: generateOrderId(),
@@ -322,18 +359,18 @@ function processPayment(user, cart, paymentInfo) {
     status: paymentResult.success ? 'confirmed' : 'failed',
     createdAt: new Date()
   };
-  
+
   // Save order to database
   saveOrder(order);
-  
+
   // Send email confirmation
   if (paymentResult.success) {
     sendOrderConfirmation(user.email, order);
   }
-  
+
   // Clear cart
   clearCart(user.id);
-  
+
   // Return result
   return {
     success: paymentResult.success,
@@ -348,13 +385,13 @@ function processPayment(user, cart, paymentInfo) {
 // High-level orchestration function
 function processPayment(user, cart, paymentInfo) {
   validateInputs(user, cart, paymentInfo);
-  
+
   const pricingDetails = calculatePricing(user, cart);
   const paymentResult = processPaymentMethod(paymentInfo, pricingDetails.total);
   const order = createOrder(user, cart, pricingDetails, paymentResult);
-  
+
   handleOrderCompletion(user, order, paymentResult);
-  
+
   return {
     success: paymentResult.success,
     orderId: order.id,
@@ -374,7 +411,7 @@ function calculatePricing(user, cart) {
   const discount = calculateDiscount(user, cart, subtotal);
   const tax = calculateTax(user, subtotal, discount);
   const total = subtotal - discount + tax;
-  
+
   return { subtotal, discount, tax, total };
 }
 
@@ -384,20 +421,20 @@ function calculateSubtotal(items) {
 
 function calculateDiscount(user, cart, subtotal) {
   let discount = 0;
-  
+
   // User status discount
   if (user.isVIP) {
     discount = subtotal * 0.1;
   } else if (subtotal > 100) {
     discount = subtotal * 0.05;
   }
-  
+
   // Coupon discount
   if (cart.couponCode) {
     const couponDiscount = calculateCouponDiscount(cart.couponCode, subtotal);
     discount += couponDiscount;
   }
-  
+
   return discount;
 }
 
@@ -411,37 +448,37 @@ class UserManager:
         self.db = db_connection
         self.email = email_service
         self.logger = logger
-        
+
     def register_user(self, user_data):
         # 40 lines of validation logic
         # ...
-        
+
         # 25 lines of password handling
         # ...
-        
+
         # 30 lines of database operations
         # ...
-        
+
         # 35 lines of email notifications
         # ...
-        
+
         # 20 lines of audit logging
         # ...
-        
+
         return user_id
-    
+
     def authenticate_user(self, username, password):
         # 50 lines of authentication logic
         # ...
-    
+
     def update_user_profile(self, user_id, profile_data):
         # 45 lines of profile update logic
         # ...
-    
+
     def reset_password(self, email):
         # 60 lines of password reset logic
         # ...
-    
+
     # 10 more similarly sized methods...
 ```
 
@@ -455,11 +492,11 @@ class UserValidator:
 class PasswordManager:
     def __init__(self, security_config):
         self.config = security_config
-    
+
     def hash_password(self, password):
         # Focused password hashing logic
         # ...
-    
+
     def verify_password(self, hashed_password, provided_password):
         # Focused password verification logic
         # ...
@@ -467,11 +504,11 @@ class PasswordManager:
 class UserRepository:
     def __init__(self, db_connection):
         self.db = db_connection
-    
+
     def save_user(self, user_data):
         # Focused database operations
         # ...
-    
+
     def find_user_by_email(self, email):
         # Focused query logic
         # ...
@@ -479,11 +516,11 @@ class UserRepository:
 class NotificationService:
     def __init__(self, email_service):
         self.email = email_service
-    
+
     def send_welcome_email(self, user):
         # Focused email logic
         # ...
-    
+
     def send_password_reset(self, user, reset_token):
         # Focused password reset notification
         # ...
@@ -495,7 +532,7 @@ class UserService:
         self.repository = repository
         self.notification = notification_service
         self.logger = logger
-    
+
     def register_user(self, user_data):
         # High-level orchestration using the specialized components
         self.validator.validate_registration_data(user_data)
@@ -513,12 +550,12 @@ class UserService:
 // Primary class with many methods
 public class OrderProcessor {
     // 20 instance variables
-    
+
     // 15 different public methods for order processing
     public void processOrder(...) { ... }
     public void cancelOrder(...) { ... }
     // ...and so on
-    
+
     // 25 private helper methods
     private void validateOrder(...) { ... }
     private void calculateTotals(...) { ... }
@@ -554,22 +591,22 @@ public class OrderProcessor {
     private final PricingCalculator pricingCalculator;
     private final InventoryService inventoryService;
     private final ShippingService shippingService;
-    
+
     // Constructor with dependencies
-    
+
     public OrderResult processOrder(OrderRequest request) {
         // High-level orchestration only
         validator.validateOrder(request);
-        
+
         PricingResult pricing = pricingCalculator.calculateOrderPricing(request);
         InventoryResult inventory = inventoryService.reserveInventory(request.getItems());
         ShippingDetails shipping = shippingService.determineShippingOptions(request);
-        
+
         return createOrderResult(request, pricing, inventory, shipping);
     }
-    
+
     // A few more high-level methods...
-    
+
     private OrderResult createOrderResult(...) {
         // Implementation details
     }
@@ -590,10 +627,25 @@ public class PricingCalculator {
 
 ## Related Bindings
 
-- [modularity](/tenets/modularity.md): Code size constraints naturally push you toward better modularity. Breaking large functions and classes into smaller, focused components with clear responsibilities directly implements the "do one thing well" principle of modularity. Both bindings work together to create more comprehensible, maintainable code.
+- [modularity](/tenets/modularity.md): Code size constraints naturally push you toward
+  better modularity. Breaking large functions and classes into smaller, focused
+  components with clear responsibilities directly implements the "do one thing well"
+  principle of modularity. Both bindings work together to create more comprehensible,
+  maintainable code.
 
-- [pure-functions](/bindings/pure-functions.md): Pure functions tend to be smaller and more focused by nature, as they handle a single transformation without side effects. The practices in the pure-functions binding naturally help achieve the size constraints in this binding, while the size limits here encourage the functional decomposition that makes pure functions effective.
+- [pure-functions](/bindings/pure-functions.md): Pure functions tend to be smaller and
+  more focused by nature, as they handle a single transformation without side effects.
+  The practices in the pure-functions binding naturally help achieve the size
+  constraints in this binding, while the size limits here encourage the functional
+  decomposition that makes pure functions effective.
 
-- [immutable-by-default](/bindings/immutable-by-default.md): Small, focused functions work well with immutable data structures, as both encourage a style where you transform data through a series of simple steps rather than accumulating changes in a large, complex function. These bindings complement each other to create more predictable, testable code.
+- [immutable-by-default](/bindings/immutable-by-default.md): Small, focused functions
+  work well with immutable data structures, as both encourage a style where you
+  transform data through a series of simple steps rather than accumulating changes in a
+  large, complex function. These bindings complement each other to create more
+  predictable, testable code.
 
-- [dependency-inversion](/bindings/dependency-inversion.md): Breaking large components into smaller ones often requires thinking about their interfaces and dependencies. The dependency-inversion binding guides how these smaller components should interact, creating a cleaner overall architecture.
+- [dependency-inversion](/bindings/dependency-inversion.md): Breaking large components
+  into smaller ones often requires thinking about their interfaces and dependencies. The
+  dependency-inversion binding guides how these smaller components should interact,
+  creating a cleaner overall architecture.

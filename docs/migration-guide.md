@@ -8,8 +8,7 @@
    git rm docs/DEVELOPMENT_PHILOSOPHY*.md
    ```
 
-1. **Create a GitHub workflow file**
-   Create `.github/workflows/vendor-docs.yml` with:
+1. **Create a GitHub workflow file** Create `.github/workflows/vendor-docs.yml` with:
 
    ```yaml
    name: Leyline Sync
@@ -53,11 +52,14 @@
 
 ## That's it!
 
-Your repository will now use the vendored tenets and bindings from Leyline instead of the old symlinks. When Leyline is updated, you'll automatically receive a PR with the updates.
+Your repository will now use the vendored tenets and bindings from Leyline instead of
+the old symlinks. When Leyline is updated, you'll automatically receive a PR with the
+updates.
 
 ## Language-Specific Filtering
 
-The Leyline workflow now automatically detects the languages and contexts in your repository and only syncs the relevant bindings:
+The Leyline workflow now automatically detects the languages and contexts in your
+repository and only syncs the relevant bindings:
 
 1. **Auto-detection**:
 
@@ -65,8 +67,8 @@ The Leyline workflow now automatically detects the languages and contexts in you
    - Contexts (frontend, backend, etc.) are inferred from code patterns
    - All tenets are always synced, as they are language-agnostic
 
-1. **Overriding detection**:
-   If you need to override the automatic detection, add parameters to the workflow:
+1. **Overriding detection**: If you need to override the automatic detection, add
+   parameters to the workflow:
 
    ```yaml
    jobs:
@@ -78,8 +80,7 @@ The Leyline workflow now automatically detects the languages and contexts in you
          override_contexts: frontend,cli    # Only sync frontend and CLI contexts
    ```
 
-1. **Pull Request Summary**:
-   The PR created by the workflow will include a summary of:
+1. **Pull Request Summary**: The PR created by the workflow will include a summary of:
 
    - Detected languages and contexts
    - Number of synced tenets and bindings
@@ -90,19 +91,24 @@ The Leyline workflow now automatically detects the languages and contexts in you
 
 **Workflow fails with "This run likely failed because of a workflow file issue"**
 
-- Check that you're using `uses` correctly. It should be at the job level, not the step level.
+- Check that you're using `uses` correctly. It should be at the job level, not the step
+  level.
 - Make sure to add the `permissions` section as shown above.
 
 **No PR is created after the workflow runs**
 
-- Check if your repository allows GitHub Actions to create pull requests. Go to Settings > Actions > General and ensure "Workflow permissions" is set to "Read and write permissions".
+- Check if your repository allows GitHub Actions to create pull requests. Go to Settings
+  \> Actions > General and ensure "Workflow permissions" is set to "Read and write
+  permissions".
 - Verify that the permissions are correctly set in the workflow file.
 
 **Error about "not finding ref" or similar reference errors**
 
-- The Leyline repository must have the `v0.1.0` tag (or whichever tag you're referencing) published on GitHub.
+- The Leyline repository must have the `v0.1.0` tag (or whichever tag you're
+  referencing) published on GitHub.
 - Check available tags at https://github.com/phrazzld/leyline/tags
-- If you need to use the latest version, use `v0.1.1` which contains improved documentation.
+- If you need to use the latest version, use `v0.1.1` which contains improved
+  documentation.
 
 If files aren't created correctly:
 

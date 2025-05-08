@@ -2,9 +2,14 @@
 
 ## Introduction
 
-This document specifies the frontend-specific standards, architecture patterns, tooling requirements, and best practices required for our React/Next.js projects. It serves as a mandatory extension to the main **Development Philosophy (v3)** document. All frontend code written for our projects **MUST** adhere to the guidelines herein, in addition to the core philosophy.
+This document specifies the frontend-specific standards, architecture patterns, tooling
+requirements, and best practices required for our React/Next.js projects. It serves as a
+mandatory extension to the main **Development Philosophy (v3)** document. All frontend
+code written for our projects **MUST** adhere to the guidelines herein, in addition to
+the core philosophy.
 
-**Reference:** Always refer back to the main [Development Philosophy](DEVELOPMENT_PHILOSOPHY.md) for overarching principles.
+**Reference:** Always refer back to the main
+[Development Philosophy](DEVELOPMENT_PHILOSOPHY.md) for overarching principles.
 
 ## Table of Contents
 
@@ -27,28 +32,38 @@ ______________________________________________________________________
 
 ## 1. Component Architecture (Atomic Design)
 
-- **Atomic Design is Mandatory:** Structure components following the [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/) methodology to enable systematic UI composition and reuse.
+- **Atomic Design is Mandatory:** Structure components following the
+  [Atomic Design](https://bradfrost.com/blog/post/atomic-web-design/) methodology to
+  enable systematic UI composition and reuse.
 - **Component Hierarchy:**
-  - **Atoms:** Foundational UI primitives (buttons, inputs, typography, icons). **MUST** be:
+  - **Atoms:** Foundational UI primitives (buttons, inputs, typography, icons). **MUST**
+    be:
     - Highly reusable
     - Stateless or with minimal self-contained state
     - Focused on a single responsibility
     - Styled according to the design system
-  - **Molecules:** Combinations of atoms forming small, functional units (form groups, search bars, menu items). **MUST**:
+  - **Molecules:** Combinations of atoms forming small, functional units (form groups,
+    search bars, menu items). **MUST**:
     - Compose atoms without knowledge of the larger context
     - Handle simple interactions between constituent atoms
     - Maintain cohesive functionality
-  - **Organisms:** Complex UI sections combining molecules and atoms (navigation, forms, content cards). **MUST**:
+  - **Organisms:** Complex UI sections combining molecules and atoms (navigation, forms,
+    content cards). **MUST**:
     - Represent distinct sections of the interface
     - Encapsulate related functionality
     - Form a meaningful unit within the application interface
-  - **Templates:** Page-level layout components defining content structure without specific data.
-  - **Pages:** Concrete implementations of templates that bring together organisms with actual data.
-- **Folder Structure:** Organize components by atomic level and domain, not technical type.
+  - **Templates:** Page-level layout components defining content structure without
+    specific data.
+  - **Pages:** Concrete implementations of templates that bring together organisms with
+    actual data.
+- **Folder Structure:** Organize components by atomic level and domain, not technical
+  type.
 
 ## 2. Component Development Workflow (Storybook-First)
 
-- **Storybook-First Development is Mandatory:** Components **MUST** be designed, developed, and documented in [Storybook](https://storybook.js.org/) before integration into the application. This approach:
+- **Storybook-First Development is Mandatory:** Components **MUST** be designed,
+  developed, and documented in [Storybook](https://storybook.js.org/) before integration
+  into the application. This approach:
   - Enforces component-driven development
   - Ensures components work in isolation
   - Provides a living component library and documentation
@@ -76,7 +91,8 @@ ______________________________________________________________________
 
 ## 3. UI Library and Styling (shadcn/ui, Tailwind)
 
-- **shadcn/ui as Foundation:** [shadcn/ui](https://ui.shadcn.com/) is our preferred component library foundation. It:
+- **shadcn/ui as Foundation:** [shadcn/ui](https://ui.shadcn.com/) is our preferred
+  component library foundation. It:
   - Provides accessible, customizable, and unstyled components
   - Follows best practices for component implementation
   - Integrates well with our atomic design approach
@@ -84,13 +100,17 @@ ______________________________________________________________________
   - Preserve accessibility features and behaviors
   - Maintain consistent API patterns
   - Document any deviations from standard shadcn/ui components
-- **Styling with Tailwind CSS:** [Tailwind CSS](https://tailwindcss.com/) is our preferred styling approach. It:
+- **Styling with Tailwind CSS:** [Tailwind CSS](https://tailwindcss.com/) is our
+  preferred styling approach. It:
   - Promotes design system consistency
   - Reduces CSS complexity and bundle size
   - Enables responsive design directly in components
   - Pairs well with shadcn/ui
-- **CSS-in-JS Usage:** Avoid CSS-in-JS solutions except for dynamic styles that cannot be achieved with Tailwind. If required, use a zero-runtime solution like [vanilla-extract](https://vanilla-extract.style/).
-- **Design Tokens:** Leverage Tailwind's theme configuration to define and enforce design tokens (colors, spacing, typography, etc.).
+- **CSS-in-JS Usage:** Avoid CSS-in-JS solutions except for dynamic styles that cannot
+  be achieved with Tailwind. If required, use a zero-runtime solution like
+  [vanilla-extract](https://vanilla-extract.style/).
+- **Design Tokens:** Leverage Tailwind's theme configuration to define and enforce
+  design tokens (colors, spacing, typography, etc.).
 - **Dark Mode:** All components **MUST** support both light and dark modes.
 
 ## 4. Testing Strategy (Component, Integration, E2E)
@@ -100,29 +120,41 @@ ______________________________________________________________________
   - **Integration Tests:** Tests for composite components (organisms, templates)
   - **E2E Tests:** Critical user flows and application behaviors
 - **Component Testing Requirements:**
-  - Use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for component tests
+  - Use
+    [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+    for component tests
   - Test behavior, not implementation details
   - Cover all component variants and states
   - Ensure accessibility in tests (a11y testing)
-- **Integration Testing:** Verify that component compositions work correctly and handle data properly.
-- **E2E Testing is Mandatory:** [Cypress](https://www.cypress.io/) or [Playwright](https://playwright.dev/) **MUST** be used to test critical user flows:
-  - **Minimum Coverage:** All happy paths of core user journeys **MUST** have E2E test coverage
-  - **Critical Error Paths:** Test important error scenarios (form validation, API failures)
+- **Integration Testing:** Verify that component compositions work correctly and handle
+  data properly.
+- **E2E Testing is Mandatory:** [Cypress](https://www.cypress.io/) or
+  [Playwright](https://playwright.dev/) **MUST** be used to test critical user flows:
+  - **Minimum Coverage:** All happy paths of core user journeys **MUST** have E2E test
+    coverage
+  - **Critical Error Paths:** Test important error scenarios (form validation, API
+    failures)
   - **Visual Testing:** Integrate visual testing to catch unintended UI changes
 - **Test Coverage Thresholds:**
   - Component tests: 90%+ for atoms and molecules
   - Integration tests: 85%+ for organisms and templates
   - E2E tests: 100% of critical user flows
-- **Test Organization:** Co-locate tests with components. For E2E tests, organize by user flow or feature.
+- **Test Organization:** Co-locate tests with components. For E2E tests, organize by
+  user flow or feature.
 
 ## 5. State Management
 
-- **Minimalist State Management:** Following core principles of simplicity, use the most appropriate and minimal state management for the need:
+- **Minimalist State Management:** Following core principles of simplicity, use the most
+  appropriate and minimal state management for the need:
   - **Component State:** Use React's `useState` for local component state
-  - **Shared State:** Use React's Context API for state shared between related components
-  - **Server State:** Use [TanStack Query](https://tanstack.com/query) (React Query) for server state and data fetching
-  - **Form State:** Use [React Hook Form](https://react-hook-form.com/) for form state management
-- **Global State:** For complex applications requiring global state, prefer [Zustand](https://github.com/pmndrs/zustand) or Redux Toolkit for:
+  - **Shared State:** Use React's Context API for state shared between related
+    components
+  - **Server State:** Use [TanStack Query](https://tanstack.com/query) (React Query) for
+    server state and data fetching
+  - **Form State:** Use [React Hook Form](https://react-hook-form.com/) for form state
+    management
+- **Global State:** For complex applications requiring global state, prefer
+  [Zustand](https://github.com/pmndrs/zustand) or Redux Toolkit for:
   - Predictable state updates
   - DevTools integration
   - Time-travel debugging
@@ -134,18 +166,24 @@ ______________________________________________________________________
 
 ## 6. Performance Optimization
 
-- **Core Metrics (Web Vitals):** Applications **MUST** consistently meet or exceed scores for:
+- **Core Metrics (Web Vitals):** Applications **MUST** consistently meet or exceed
+  scores for:
   - Largest Contentful Paint (LCP): \< 2.5 seconds
   - First Input Delay (FID): \< 100 milliseconds
   - Cumulative Layout Shift (CLS): \< 0.1
 - **Required Optimizations:**
-  - **Code Splitting:** Use dynamic imports for route-based and component-based code splitting
-  - **Image Optimization:** Use Next.js Image component or equivalent with proper sizing and formats
-  - **Font Optimization:** Use Web fonts with proper loading strategies (preconnect, font-display)
+  - **Code Splitting:** Use dynamic imports for route-based and component-based code
+    splitting
+  - **Image Optimization:** Use Next.js Image component or equivalent with proper sizing
+    and formats
+  - **Font Optimization:** Use Web fonts with proper loading strategies (preconnect,
+    font-display)
   - **Asset Optimization:** Minimize and compress all assets (images, fonts, JS, CSS)
 - **Component Rendering Optimization:**
-  - **Memoization:** Use `React.memo`, `useMemo`, and `useCallback` judiciously for expensive operations
-  - **Virtualization:** Use virtualization for long lists (react-window, react-virtualized)
+  - **Memoization:** Use `React.memo`, `useMemo`, and `useCallback` judiciously for
+    expensive operations
+  - **Virtualization:** Use virtualization for long lists (react-window,
+    react-virtualized)
   - **Lazy Loading:** Implement lazy loading for off-screen content
 - **Measurement and Monitoring:**
   - Implement real user monitoring (RUM)
@@ -154,7 +192,8 @@ ______________________________________________________________________
 
 ## 7. Accessibility (a11y)
 
-- **WCAG Compliance is Mandatory:** Applications **MUST** meet [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/quickref/) standards at minimum.
+- **WCAG Compliance is Mandatory:** Applications **MUST** meet
+  [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/quickref/) standards at minimum.
 - **Key Requirements:**
   - **Keyboard Navigation:** All interactive elements must be accessible via keyboard
   - **Screen Reader Support:** Content must be properly structured for screen readers
@@ -174,7 +213,8 @@ ______________________________________________________________________
 
 ## 8. Responsive Design
 
-- **Mobile-First Approach is Mandatory:** All components and layouts **MUST** be designed and implemented with a mobile-first approach.
+- **Mobile-First Approach is Mandatory:** All components and layouts **MUST** be
+  designed and implemented with a mobile-first approach.
 - **Breakpoint System:** Standardize on Tailwind's breakpoint system:
   - `sm`: 640px
   - `md`: 768px
@@ -194,7 +234,8 @@ ______________________________________________________________________
 ## 9. Form Handling
 
 - **Form Implementation:**
-  - Use [React Hook Form](https://react-hook-form.com/) for form state management and validation
+  - Use [React Hook Form](https://react-hook-form.com/) for form state management and
+    validation
   - Leverage [Zod](https://github.com/colinhacks/zod) for schema validation
   - Ensure forms are accessible, with proper labels, error messages, and ARIA attributes
 - **Required Features:**
@@ -229,7 +270,8 @@ ______________________________________________________________________
 ## 11. Data Fetching
 
 - **Client-Side Data Fetching:**
-  - Use [TanStack Query](https://tanstack.com/query) (React Query) for managing server state
+  - Use [TanStack Query](https://tanstack.com/query) (React Query) for managing server
+    state
   - Implement proper loading, error, and success states
   - Configure appropriate caching and revalidation strategies
 - **Server-Side Rendering (SSR) and Static Generation:**
@@ -244,7 +286,8 @@ ______________________________________________________________________
 ## 12. Internationalization (i18n)
 
 - **i18n Implementation:**
-  - Use [next-intl](https://next-intl-docs.vercel.app/) or [react-i18next](https://react.i18next.com/) for translations
+  - Use [next-intl](https://next-intl-docs.vercel.app/) or
+    [react-i18next](https://react.i18next.com/) for translations
   - Extract all user-facing strings to translation files
   - Support RTL languages where required
 - **Content Requirements:**

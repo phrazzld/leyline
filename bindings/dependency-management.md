@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: dependency-management
-last_modified: "2025-05-05"
-derived_from: simplicity
-enforced_by: dependency scanners & code review
-applies_to:
+id: dependency-management last_modified: "2025-05-05" derived_from: simplicity
+enforced_by: dependency scanners & code review applies_to:
 
 - all
 
@@ -12,24 +9,48 @@ ______________________________________________________________________
 
 # Binding: Minimize and Maintain Dependencies Deliberately
 
-Choose third-party dependencies deliberately, preferring minimal solutions that solve specific problems. Actively manage the entire dependency lifecycle, from initial evaluation through regular updates and security audits, treating each dependency as a long-term commitment rather than a quick solution.
+Choose third-party dependencies deliberately, preferring minimal solutions that solve
+specific problems. Actively manage the entire dependency lifecycle, from initial
+evaluation through regular updates and security audits, treating each dependency as a
+long-term commitment rather than a quick solution.
 
 ## Rationale
 
-This binding implements our simplicity tenet by addressing a major source of hidden complexity: the sprawling dependency trees that frequently grow beneath the surface of modern applications. When you add a dependency to your project, you're not just adding a single package—you're adopting an entire tree of transitive dependencies, each with its own APIs, behaviors, bugs, and security vulnerabilities that now become your responsibility to understand and maintain.
+This binding implements our simplicity tenet by addressing a major source of hidden
+complexity: the sprawling dependency trees that frequently grow beneath the surface of
+modern applications. When you add a dependency to your project, you're not just adding a
+single package—you're adopting an entire tree of transitive dependencies, each with its
+own APIs, behaviors, bugs, and security vulnerabilities that now become your
+responsibility to understand and maintain.
 
-Think of your dependency graph like a garden. Each new dependency is a plant that needs ongoing care, might attract pests (security vulnerabilities), and will continue to grow and spread roots (transitive dependencies) far beyond what's visible on the surface. Just as a garden requires regular weeding and pruning to remain healthy, your dependency tree requires continuous evaluation and maintenance. Without deliberate care, both quickly become overgrown, making it difficult to spot problems early and expensive to fix them once they've taken hold.
+Think of your dependency graph like a garden. Each new dependency is a plant that needs
+ongoing care, might attract pests (security vulnerabilities), and will continue to grow
+and spread roots (transitive dependencies) far beyond what's visible on the surface.
+Just as a garden requires regular weeding and pruning to remain healthy, your dependency
+tree requires continuous evaluation and maintenance. Without deliberate care, both
+quickly become overgrown, making it difficult to spot problems early and expensive to
+fix them once they've taken hold.
 
-This binding also directly supports our automation tenet by emphasizing the need for automated tools and processes throughout the dependency lifecycle. Manual dependency management quickly becomes impractical as projects grow. By automating dependency updates, security scanning, license compliance checks, and other maintenance tasks, you can consistently apply best practices across your entire codebase. These automated processes serve as gardening tools that make it possible to maintain healthy dependencies at scale, catching issues before they impact your software's security, performance, or functionality.
+This binding also directly supports our automation tenet by emphasizing the need for
+automated tools and processes throughout the dependency lifecycle. Manual dependency
+management quickly becomes impractical as projects grow. By automating dependency
+updates, security scanning, license compliance checks, and other maintenance tasks, you
+can consistently apply best practices across your entire codebase. These automated
+processes serve as gardening tools that make it possible to maintain healthy
+dependencies at scale, catching issues before they impact your software's security,
+performance, or functionality.
 
 ## Rule Definition
 
-This binding establishes principles for thoughtful dependency management throughout the software lifecycle:
+This binding establishes principles for thoughtful dependency management throughout the
+software lifecycle:
 
 - **Evaluation and Selection**: Before adding any dependency, you must:
 
-  - Verify that the functionality cannot be reasonably implemented in-house with less complexity
-  - Evaluate the dependency's quality, activity, maintenance status, and community health
+  - Verify that the functionality cannot be reasonably implemented in-house with less
+    complexity
+  - Evaluate the dependency's quality, activity, maintenance status, and community
+    health
   - Assess the full impact of the dependency's transitive dependency tree
   - Consider the security and licensing implications of adopting the dependency
   - Examine the compatibility with your existing technology stack and deployment targets
@@ -46,7 +67,8 @@ This binding establishes principles for thoughtful dependency management through
 
   - Regularly update dependencies to their latest compatible versions
   - Continuously monitor for security vulnerabilities and license compliance issues
-  - Automate dependency updates where possible, with appropriate testing to catch regressions
+  - Automate dependency updates where possible, with appropriate testing to catch
+    regressions
   - Have a clear process for evaluating and accepting or rejecting updates
   - Maintain an accurate inventory of all dependencies and their purposes
 
@@ -54,14 +76,20 @@ This binding establishes principles for thoughtful dependency management through
 
   - Core platform dependencies (language runtimes, standard libraries)
   - Organization-wide approved frameworks designated as "sanctioned"
-  - Critical specialized functionality where the cost of implementation would be prohibitive
+  - Critical specialized functionality where the cost of implementation would be
+    prohibitive
   - Legacy dependencies with plans for replacement or isolation
 
-When implementing these exceptions, you must document the justification, scope the usage as narrowly as possible, and establish a plan for any necessary refactoring toward more maintainable alternatives.
+When implementing these exceptions, you must document the justification, scope the usage
+as narrowly as possible, and establish a plan for any necessary refactoring toward more
+maintainable alternatives.
 
 ## Practical Implementation
 
-1. **Implement a Dependency Evaluation Process**: Establish clear criteria for evaluating potential dependencies before adding them to your project. Ask yourself: "Is this dependency worth the long-term maintenance burden?" Create a checklist that considers factors like:
+1. **Implement a Dependency Evaluation Process**: Establish clear criteria for
+   evaluating potential dependencies before adding them to your project. Ask yourself:
+   "Is this dependency worth the long-term maintenance burden?" Create a checklist that
+   considers factors like:
 
    - Does this solve a real, immediate need?
    - Could we reasonably implement this ourselves with less complexity?
@@ -76,11 +104,11 @@ When implementing these exceptions, you must document the justification, scope t
    // Example dependency evaluation checklist (in documentation or PR template)
    /**
     * Dependency Evaluation
-    * 
+    *
     * Package: <package-name>
     * Version: <version>
     * Purpose: <1-2 sentence justification>
-    * 
+    *
     * - [ ] Solves a specific, immediate need
     * - [ ] Would require >100 LOC to implement ourselves
     * - [ ] Active maintenance (commits within last 6 months)
@@ -92,7 +120,9 @@ When implementing these exceptions, you must document the justification, scope t
     */
    ```
 
-1. **Set Up Automated Dependency Management**: Implement automation for keeping dependencies up-to-date and secure. Ask yourself: "How will we know when a dependency needs attention?" Configure tools appropriate for your ecosystem that:
+1. **Set Up Automated Dependency Management**: Implement automation for keeping
+   dependencies up-to-date and secure. Ask yourself: "How will we know when a dependency
+   needs attention?" Configure tools appropriate for your ecosystem that:
 
    - Monitor for security vulnerabilities
    - Alert about outdated dependencies
@@ -123,7 +153,11 @@ When implementing these exceptions, you must document the justification, scope t
        open-pull-requests-limit: 5
    ```
 
-1. **Create Architectural Boundaries Around Dependencies**: Design your code to isolate third-party dependencies behind clear interfaces. Ask yourself: "What would happen if we needed to replace this dependency?" This approach creates a buffer zone between your core code and external libraries, making them easier to manage, test, and potentially replace.
+1. **Create Architectural Boundaries Around Dependencies**: Design your code to isolate
+   third-party dependencies behind clear interfaces. Ask yourself: "What would happen if
+   we needed to replace this dependency?" This approach creates a buffer zone between
+   your core code and external libraries, making them easier to manage, test, and
+   potentially replace.
 
    ```go
    // ❌ BAD: Exposing third-party library throughout codebase
@@ -161,7 +195,9 @@ When implementing these exceptions, you must document the justification, scope t
    }
    ```
 
-1. **Implement Dependency Inventory and Auditing**: Maintain a clear inventory of your dependencies and regularly audit them. Ask yourself: "Do we know what every dependency is doing in our project?" Consider using tools to:
+1. **Implement Dependency Inventory and Auditing**: Maintain a clear inventory of your
+   dependencies and regularly audit them. Ask yourself: "Do we know what every
+   dependency is doing in our project?" Consider using tools to:
 
    - Generate a software bill of materials (SBOM)
    - Track dependencies and their purposes
@@ -188,7 +224,10 @@ When implementing these exceptions, you must document the justification, scope t
    $ cyclonedx-npm --output-file sbom.xml
    ```
 
-1. **Practice Dependency Pruning and Replacement**: Regularly review your dependencies and remove those that are no longer necessary or have become problematic. Ask yourself: "If we were starting this project today, would we still choose this dependency?" Consider:
+1. **Practice Dependency Pruning and Replacement**: Regularly review your dependencies
+   and remove those that are no longer necessary or have become problematic. Ask
+   yourself: "If we were starting this project today, would we still choose this
+   dependency?" Consider:
 
    - Replacing heavy dependencies with lighter alternatives
    - Inlining small amounts of functionality instead of carrying entire libraries
@@ -246,7 +285,7 @@ function processValues(values) {
   const numbers = values.filter(v => isNumber(v));
   const oddNumbers = numbers.filter(v => isOdd(v));
   const uniqueOddNumbers = _.uniq(oddNumbers);
-  
+
   return uniqueOddNumbers.map(n => leftPad(n.toString(), 5, '0'));
 }
 ```
@@ -260,7 +299,7 @@ function processValues(values) {
   const numbers = values.filter(v => typeof v === 'number' && !isNaN(v));
   const oddNumbers = numbers.filter(n => n % 2 !== 0);
   const uniqueOddNumbers = [...new Set(oddNumbers)];
-  
+
   return uniqueOddNumbers.map(n => n.toString().padStart(5, '0'));
 }
 ```
@@ -273,11 +312,11 @@ dependencies {
     implementation 'org.json:json:20210307'
     implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
-    
+
     // Multiple HTTP client libraries
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
-    
+
     // Transitive dependencies might conflict
     implementation 'org.springframework.boot:spring-boot-starter-web:2.5.2'
     implementation 'org.springframework:spring-web:5.3.8' // Potential conflict
@@ -293,10 +332,10 @@ class UserService {
     public User parseUser(String json) {
         JSONObject jsonObject = new JSONObject(json);
         String name = jsonObject.getString("name");
-        
+
         Gson gson = new Gson();
         User partialUser = gson.fromJson(json, User.class);
-        
+
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, User.class);
     }
@@ -319,7 +358,7 @@ dependencies {
     // Single JSON library with well-defined version
     implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-    
+
     // Use BOM (Bill of Materials) for dependency sets
     implementation platform('org.springframework.boot:spring-boot-dependencies:2.5.2')
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -335,12 +374,12 @@ interface JsonParser {
 // JacksonAdapter.java - Isolates the Jackson dependency
 class JacksonAdapter implements JsonParser {
     private final ObjectMapper mapper;
-    
+
     public JacksonAdapter() {
         this.mapper = new ObjectMapper();
         // Configure mapper
     }
-    
+
     @Override
     public <T> T parse(String json, Class<T> type) {
         return mapper.readValue(json, type);
@@ -350,11 +389,11 @@ class JacksonAdapter implements JsonParser {
 // UserService.java - Uses our interface, not the dependency directly
 class UserService {
     private final JsonParser jsonParser;
-    
+
     public UserService(JsonParser jsonParser) {
         this.jsonParser = jsonParser;
     }
-    
+
     public User parseUser(String json) {
         return jsonParser.parse(json, User.class);
     }
@@ -415,7 +454,7 @@ def analyze_data(data):
 def generate_report(data, include_charts=False):
     # Core functionality works without matplotlib
     report = {"summary": summarize_data(data)}
-    
+
     # Only import matplotlib when actually needed
     if include_charts:
         try:
@@ -424,16 +463,35 @@ def generate_report(data, include_charts=False):
             report["charts"] = create_charts(data, plt)
         except ImportError:
             report["charts_error"] = "Charting libraries not available"
-    
+
     return report
 ```
 
 ## Related Bindings
 
-- [simplicity](/tenets/simplicity.md): This dependency management binding is a direct application of the simplicity tenet's guidance to "minimize moving parts." Each dependency adds complexity that must be understood, maintained, and debugged. By deliberately limiting dependencies, you reduce the cognitive load required to work with your codebase and minimize potential points of failure.
+- [simplicity](/tenets/simplicity.md): This dependency management binding is a direct
+  application of the simplicity tenet's guidance to "minimize moving parts." Each
+  dependency adds complexity that must be understood, maintained, and debugged. By
+  deliberately limiting dependencies, you reduce the cognitive load required to work
+  with your codebase and minimize potential points of failure.
 
-- [external-configuration](/bindings/external-configuration.md): External configuration and careful dependency management are complementary practices that improve system maintainability. Both focus on isolating aspects of your system that are likely to change—configuration values and third-party code—behind clear boundaries. This isolation makes it easier to adapt to changes without disrupting the core functionality of your application.
+- [external-configuration](/bindings/external-configuration.md): External configuration
+  and careful dependency management are complementary practices that improve system
+  maintainability. Both focus on isolating aspects of your system that are likely to
+  change—configuration values and third-party code—behind clear boundaries. This
+  isolation makes it easier to adapt to changes without disrupting the core
+  functionality of your application.
 
-- [no-secret-suppression](/bindings/no-secret-suppression.md): Proper dependency management is essential for security, directly supporting the no-secret-suppression tenet. Unpatched dependencies with known vulnerabilities are one of the most common security risks in modern applications. By maintaining an accurate inventory of dependencies and automating security scanning, you can detect and address vulnerabilities before they impact your users.
+- [no-secret-suppression](/bindings/no-secret-suppression.md): Proper dependency
+  management is essential for security, directly supporting the no-secret-suppression
+  tenet. Unpatched dependencies with known vulnerabilities are one of the most common
+  security risks in modern applications. By maintaining an accurate inventory of
+  dependencies and automating security scanning, you can detect and address
+  vulnerabilities before they impact your users.
 
-- [hex-domain-purity](/bindings/hex-domain-purity.md): Hexagonal architecture and careful dependency management work together to create more maintainable systems. By isolating third-party dependencies at the boundaries of your application, you keep your domain logic pure and focused on business rules rather than implementation details. This approach makes it easier to replace or upgrade dependencies without disrupting your core functionality.
+- [hex-domain-purity](/bindings/hex-domain-purity.md): Hexagonal architecture and
+  careful dependency management work together to create more maintainable systems. By
+  isolating third-party dependencies at the boundaries of your application, you keep
+  your domain logic pure and focused on business rules rather than implementation
+  details. This approach makes it easier to replace or upgrade dependencies without
+  disrupting your core functionality.

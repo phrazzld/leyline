@@ -32,7 +32,7 @@ last_modified: "2025-05-04"
 1. **Test Guideline**: This is just a test guideline.
 MARKDOWN
   },
-  
+
   # Tenet with real content
   {
     path: 'test_index/tenets/real-tenet.md',
@@ -56,7 +56,7 @@ This should not be in the index summary.
 1. **Test Guideline**: This is just a test guideline.
 MARKDOWN
   },
-  
+
   # Tenet with placeholder main text but real core belief
   {
     path: 'test_index/tenets/mixed-tenet.md',
@@ -80,7 +80,7 @@ This should not appear in the index summary.
 1. **Test Guideline**: This is just a test guideline.
 MARKDOWN
   },
-  
+
   # Binding with placeholder text
   {
     path: 'test_index/bindings/placeholder-binding.md',
@@ -107,7 +107,7 @@ applies_to:
 This is a rule definition for testing purposes.
 MARKDOWN
   },
-  
+
   # Binding with real content
   {
     path: 'test_index/bindings/real-binding.md',
@@ -135,7 +135,7 @@ This should not be in the index summary.
 This is a rule definition for testing purposes.
 MARKDOWN
   },
-  
+
   # Binding with placeholder main text but real rationale
   {
     path: 'test_index/bindings/mixed-binding.md',
@@ -176,23 +176,23 @@ puts "Created test files for enhanced indexing"
 def generate_indexes
   %w[tenets bindings].each do |dir|
     entries = []
-    
+
     # Get all markdown files except the index
     Dir.glob("test_index/#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.sort.each do |file|
       content = File.read(file)
-      
+
       # Extract front-matter and first paragraph after title
       if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
         front_matter = YAML.safe_load($1) rescue {}
         title = $2.strip
         first_para = $3.strip.gsub(/\s+/, ' ')
-        
+
         # Skip placeholder text that's enclosed in brackets
         if first_para =~ /^\[.*\]$/
           # Try to find the first real paragraph in the Core Belief/Rationale section
           if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
             section_text = $2.strip.gsub(/\s+/, ' ')
-            
+
             # Skip if this is also a placeholder
             if section_text =~ /^\[.*\]$/
               first_para = "See document for details."
@@ -203,10 +203,10 @@ def generate_indexes
             first_para = "See document for details."
           end
         end
-        
+
         # Truncate if too long
         summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
-        
+
         # Add to entries
         entries << {
           id: front_matter['id'] || File.basename(file, '.md'),
@@ -214,11 +214,11 @@ def generate_indexes
         }
       end
     end
-    
+
     # Generate index content
     index_content = "# #{dir.capitalize} Index\n\n"
     index_content += "This file contains an automatically generated list of all #{dir} with their one-line summaries.\n\n"
-    
+
     # Add entries in a table
     if entries.any?
       index_content += "| ID | Summary |\n"
@@ -229,7 +229,7 @@ def generate_indexes
     else
       index_content += "_No #{dir} defined yet._\n"
     end
-    
+
     # Write index file
     File.write("test_index/#{dir}/00-index.md", index_content)
     puts "Generated test_index/#{dir}/00-index.md with #{entries.size} entries"

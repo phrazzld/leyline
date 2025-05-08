@@ -5,21 +5,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
+
     # Setup Node.js for markdown-link-check
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-    
+
     # Install Python formatter
     - name: Install Python formatter
       run: pip install mdformat
-    
+
     # Install Node.js link checker
     - name: Install markdown link checker
       run: npm install -g markdown-link-check
-    
+
     - name: Format + link check
       run: |
         mdformat --check .

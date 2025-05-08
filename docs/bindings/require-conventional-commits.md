@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: require-conventional-commits
-last_modified: "2025-05-04"
-derived_from: automation
-enforced_by: commit hooks & CI checks
-applies_to:
+id: require-conventional-commits last_modified: "2025-05-04" derived_from: automation
+enforced_by: commit hooks & CI checks applies_to:
 
 - all
 
@@ -12,21 +9,45 @@ ______________________________________________________________________
 
 # Binding: Express Intent Through Structured Commit Messages
 
-All commit messages must follow the Conventional Commits specification, providing a consistent format that explicitly communicates the purpose and impact of each change. This structured approach enables automated versioning, changelog generation, and release management by making commit intent machine-readable while remaining human-friendly.
+All commit messages must follow the Conventional Commits specification, providing a
+consistent format that explicitly communicates the purpose and impact of each change.
+This structured approach enables automated versioning, changelog generation, and release
+management by making commit intent machine-readable while remaining human-friendly.
 
 ## Rationale
 
-This binding directly implements our automation tenet by transforming commit messages from unstructured text into structured data that can drive automated processes throughout the development lifecycle. When you adopt conventional commits, you're not just documenting changes—you're creating machine-readable metadata that enables automation to take over repetitive tasks like versioning, release notes, and deployment workflows.
+This binding directly implements our automation tenet by transforming commit messages
+from unstructured text into structured data that can drive automated processes
+throughout the development lifecycle. When you adopt conventional commits, you're not
+just documenting changes—you're creating machine-readable metadata that enables
+automation to take over repetitive tasks like versioning, release notes, and deployment
+workflows.
 
-Think of conventional commits like addressing an envelope correctly. Just as a properly formatted mailing address ensures your letter reaches its destination through multiple automated sorting systems, a properly formatted commit message ensures your code changes flow smoothly through automated versioning, changelog generation, and release processes. An incorrectly addressed envelope might eventually reach its destination through manual intervention, but it creates unnecessary friction. Similarly, unstructured commit messages might eventually be understood by humans reading them, but they create friction that prevents automation from reliably interpreting your intent.
+Think of conventional commits like addressing an envelope correctly. Just as a properly
+formatted mailing address ensures your letter reaches its destination through multiple
+automated sorting systems, a properly formatted commit message ensures your code changes
+flow smoothly through automated versioning, changelog generation, and release processes.
+An incorrectly addressed envelope might eventually reach its destination through manual
+intervention, but it creates unnecessary friction. Similarly, unstructured commit
+messages might eventually be understood by humans reading them, but they create friction
+that prevents automation from reliably interpreting your intent.
 
-The benefits of conventional commits compound as your project grows. For small projects with few contributors, inconsistent commit messages might seem like a minor inconvenience. But as teams scale and release frequency increases, the inability to automate versioning and changelog generation becomes a significant bottleneck. By establishing consistent commit message patterns from the start, you create the foundation for sustainable automation that scales with your project. The small upfront cost of learning and applying the convention pays enormous dividends in reduced manual work, more reliable releases, and clearer project history.
+The benefits of conventional commits compound as your project grows. For small projects
+with few contributors, inconsistent commit messages might seem like a minor
+inconvenience. But as teams scale and release frequency increases, the inability to
+automate versioning and changelog generation becomes a significant bottleneck. By
+establishing consistent commit message patterns from the start, you create the
+foundation for sustainable automation that scales with your project. The small upfront
+cost of learning and applying the convention pays enormous dividends in reduced manual
+work, more reliable releases, and clearer project history.
 
 ## Rule Definition
 
-This binding establishes structured commit messages as a fundamental project requirement:
+This binding establishes structured commit messages as a fundamental project
+requirement:
 
-- **Follow the Conventional Commits Format**: Every commit message must adhere to this pattern:
+- **Follow the Conventional Commits Format**: Every commit message must adhere to this
+  pattern:
 
   ```
   <type>[optional scope]: <description>
@@ -36,7 +57,8 @@ This binding establishes structured commit messages as a fundamental project req
   [optional footer(s)]
   ```
 
-- **Use Standardized Type Prefixes**: The `type` field must be one of these standardized values:
+- **Use Standardized Type Prefixes**: The `type` field must be one of these standardized
+  values:
 
   - `feat`: A new feature (correlates to a MINOR version bump in semantic versioning)
   - `fix`: A bug fix (correlates to a PATCH version bump)
@@ -60,12 +82,14 @@ This binding establishes structured commit messages as a fundamental project req
   - The description should be concise (50 characters or less) but descriptive
   - More detailed explanations belong in the commit body
 
-- **Scope Usage**: When applicable, include a scope in parentheses after the type to indicate which part of the codebase is affected:
+- **Scope Usage**: When applicable, include a scope in parentheses after the type to
+  indicate which part of the codebase is affected:
 
   - Scopes should be consistent across similar commits
   - Common scopes include module names, feature areas, or system components
 
-- **Compliance Checking**: All commits must pass automated validation before being accepted:
+- **Compliance Checking**: All commits must pass automated validation before being
+  accepted:
 
   - Pre-commit hooks should validate commit message format
   - CI/CD pipelines should reject non-compliant commit messages
@@ -75,7 +99,8 @@ This binding establishes structured commit messages as a fundamental project req
 
 Here are concrete strategies for implementing conventional commits effectively:
 
-1. **Set Up Tooling for Enforcement**: Add automated checks to prevent non-compliant commits:
+1. **Set Up Tooling for Enforcement**: Add automated checks to prevent non-compliant
+   commits:
 
    ```bash
    # Install commitlint and config-conventional
@@ -90,9 +115,11 @@ Here are concrete strategies for implementing conventional commits effectively:
    npx husky add .husky/commit-msg 'npx --no -- commitlint --edit $1'
    ```
 
-   These tools validate commit messages before they're accepted, providing immediate feedback when a message doesn't meet the convention.
+   These tools validate commit messages before they're accepted, providing immediate
+   feedback when a message doesn't meet the convention.
 
-1. **Provide Commit Message Generation Tools**: Use interactive tools to help developers create compliant messages:
+1. **Provide Commit Message Generation Tools**: Use interactive tools to help developers
+   create compliant messages:
 
    ```bash
    # Install Commitizen
@@ -105,7 +132,8 @@ Here are concrete strategies for implementing conventional commits effectively:
    # "scripts": { "commit": "cz" }
    ```
 
-   This creates an interactive commit process that guides developers through creating properly formatted messages without memorizing the specification.
+   This creates an interactive commit process that guides developers through creating
+   properly formatted messages without memorizing the specification.
 
 1. **Create Templates and Examples**: Provide clear guidance for your team:
 
@@ -144,9 +172,11 @@ Here are concrete strategies for implementing conventional commits effectively:
    git config --local commit.template .gitmessage.txt
    ```
 
-   This template provides guidance when developers write commit messages and serves as a quick reference for the convention.
+   This template provides guidance when developers write commit messages and serves as a
+   quick reference for the convention.
 
-1. **Set Up Automated Changelog Generation**: Leverage conventional commits for release automation:
+1. **Set Up Automated Changelog Generation**: Leverage conventional commits for release
+   automation:
 
    ```bash
    # Install standard-version
@@ -156,7 +186,8 @@ Here are concrete strategies for implementing conventional commits effectively:
    # "scripts": { "release": "standard-version" }
    ```
 
-   This automatically generates changelogs based on commit types, making release preparation faster and more consistent.
+   This automatically generates changelogs based on commit types, making release
+   preparation faster and more consistent.
 
 1. **Improve Commit Message Quality**: Focus on writing meaningful descriptions:
 
@@ -166,7 +197,8 @@ Here are concrete strategies for implementing conventional commits effectively:
    - Describe the impact on users or developers
    - Explain motivation in the commit body
 
-   Good commit messages provide context that helps future contributors understand why changes were made, not just what changed.
+   Good commit messages provide context that helps future contributors understand why
+   changes were made, not just what changed.
 
 ## Examples
 
@@ -235,8 +267,20 @@ Closes #256
 
 ## Related Bindings
 
-- [document-decisions](../tenets/document-decisions.md): Both bindings emphasize the importance of preserving context. While conventional commits provide structured history at the repository level, documenting decisions focuses on capturing context within the code. Together, they ensure the "why" behind changes is preserved at both the commit level and in the codebase itself.
+- [document-decisions](../tenets/document-decisions.md): Both bindings emphasize the
+  importance of preserving context. While conventional commits provide structured
+  history at the repository level, documenting decisions focuses on capturing context
+  within the code. Together, they ensure the "why" behind changes is preserved at both
+  the commit level and in the codebase itself.
 
-- [automate-changelog](automate-changelog.md): Conventional commits enable automated changelog generation by providing a structured format that tools can parse. These bindings work hand-in-hand—conventional commits provide the input data that automated changelog tools transform into organized release notes that highlight features, fixes, and breaking changes.
+- [automate-changelog](automate-changelog.md): Conventional commits enable automated
+  changelog generation by providing a structured format that tools can parse. These
+  bindings work hand-in-hand—conventional commits provide the input data that automated
+  changelog tools transform into organized release notes that highlight features, fixes,
+  and breaking changes.
 
-- [semantic-versioning](semantic-versioning.md): Conventional commits create a direct mapping to semantic version increments—features trigger minor version bumps, fixes trigger patch version bumps, and breaking changes trigger major version bumps. This connection ensures your versioning accurately reflects the nature of changes, giving users clear expectations about compatibility.
+- [semantic-versioning](semantic-versioning.md): Conventional commits create a direct
+  mapping to semantic version increments—features trigger minor version bumps, fixes
+  trigger patch version bumps, and breaking changes trigger major version bumps. This
+  connection ensures your versioning accurately reflects the nature of changes, giving
+  users clear expectations about compatibility.

@@ -163,10 +163,10 @@ Most LLMs have context length limitations. To manage this:
 ### Example: Shortened Version of a Tenet
 
 ```
-TENET (Simplicity): Prefer the simplest design that solves the problem. 
-Complexity causes defects and cognitive overload. Use YAGNI (You Aren't 
-Gonna Need It) rigorously, minimize moving parts, and value readability 
-over cleverness. Warning signs include over-engineering, premature 
+TENET (Simplicity): Prefer the simplest design that solves the problem.
+Complexity causes defects and cognitive overload. Use YAGNI (You Aren't
+Gonna Need It) rigorously, minimize moving parts, and value readability
+over cleverness. Warning signs include over-engineering, premature
 abstraction, and designing for imagined future requirements.
 ```
 
@@ -284,20 +284,20 @@ class DataProcessor {
 
   public process(data: any, operations: string[]): any {
     const cacheKey = JSON.stringify({ data, operations });
-    
+
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey);
     }
 
     let result = data;
-    
+
     for (const op of operations) {
       const processor = this.processors.get(op);
       if (processor) {
         result = processor(result);
       }
     }
-    
+
     this.cache.set(cacheKey, result);
     return result;
   }
@@ -325,7 +325,7 @@ Please review this code based on the Simplicity tenet. For each issue:
 This example shows how to request guidance on implementing proper error handling in Go.
 
 ```
-I'm implementing a Go service that interacts with a database and external API. 
+I'm implementing a Go service that interacts with a database and external API.
 Please help me design proper error handling based on our binding document below.
 
 BINDING: # Binding: Add Context to Errors as They Travel Upward

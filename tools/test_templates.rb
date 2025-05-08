@@ -12,7 +12,7 @@ begin
   puts "Testing templates against validation..."
   system('ruby tools/validate_front_matter.rb')
   status = $?.exitstatus
-  
+
   if status == 0
     puts "\n✅ Templates passed validation!"
   else

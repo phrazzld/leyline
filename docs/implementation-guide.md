@@ -6,7 +6,8 @@ To ensure repositories only receive relevant bindings, Leyline provides two appr
 
 ### 1. Front-matter Tags for Bindings
 
-All bindings should include language/context tags in their front-matter. This allows workflow scripts to filter bindings appropriately:
+All bindings should include language/context tags in their front-matter. This allows
+workflow scripts to filter bindings appropriately:
 
 ```yaml
 ---
@@ -14,7 +15,7 @@ id: ts-no-any
 last_modified: 2025-05-05
 derived_from: simplicity
 enforced_by: eslint("no-explicit-any") & tsconfig("noImplicitAny")
-applies_to: 
+applies_to:
   - typescript
   - javascript
 ---
@@ -34,13 +35,15 @@ Binding files should follow a consistent naming convention that makes filtering 
 
 ### 3. Using Language-Specific Workflows
 
-The example workflow in `examples/github-workflows/language-specific-sync.yml` demonstrates how to:
+The example workflow in `examples/github-workflows/language-specific-sync.yml`
+demonstrates how to:
 
 1. Detect languages used in a repository
 1. Sync only the relevant bindings based on language detection
 1. Always sync universal bindings that apply to all projects
 
-This approach ensures that a TypeScript project doesn't receive Go-specific bindings, while still receiving all relevant tenets and universal bindings.
+This approach ensures that a TypeScript project doesn't receive Go-specific bindings,
+while still receiving all relevant tenets and universal bindings.
 
 ## Implementation for Binding Authors
 
@@ -51,4 +54,5 @@ When creating a new binding:
 1. Be explicit about which languages and contexts the binding applies to
 1. For universal bindings, either omit the `applies_to` field or include `"all"`
 
-By following these conventions, consumer repositories will only receive bindings relevant to their context, making the integration more valuable and reducing noise.
+By following these conventions, consumer repositories will only receive bindings
+relevant to their context, making the integration more valuable and reducing noise.

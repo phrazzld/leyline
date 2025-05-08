@@ -1,10 +1,7 @@
 ______________________________________________________________________
 
-id: semantic-versioning
-last_modified: "2025-05-06"
-derived_from: explicit-over-implicit
-enforced_by: version checking tools & CI validation
-applies_to:
+id: semantic-versioning last_modified: "2025-05-06" derived_from: explicit-over-implicit
+enforced_by: version checking tools & CI validation applies_to:
 
 - all
 
@@ -12,15 +9,40 @@ ______________________________________________________________________
 
 # Binding: Make Breaking Changes Explicit with Semantic Versioning
 
-All projects must follow Semantic Versioning (SemVer) for release numbering, making compatibility guarantees explicit through version numbers. Version numbers must clearly signal the nature of changes: patch (bug fixes), minor (backward-compatible features), or major (breaking changes). This ensures developers can confidently update dependencies with a clear understanding of the potential impact, and enables automated dependency management tools to function correctly.
+All projects must follow Semantic Versioning (SemVer) for release numbering, making
+compatibility guarantees explicit through version numbers. Version numbers must clearly
+signal the nature of changes: patch (bug fixes), minor (backward-compatible features),
+or major (breaking changes). This ensures developers can confidently update dependencies
+with a clear understanding of the potential impact, and enables automated dependency
+management tools to function correctly.
 
 ## Rationale
 
-This binding directly implements our explicit-over-implicit tenet by bringing clarity to one of the most critical aspects of software engineering: managing compatibility between interdependent components. When you follow semantic versioning, you're transforming version numbers from arbitrary labels into meaningful contracts that explicitly communicate the compatibility implications of each release. This explicitness creates trust between producers and consumers of software components, fostering healthy ecosystems where developers can confidently build upon each other's work.
+This binding directly implements our explicit-over-implicit tenet by bringing clarity to
+one of the most critical aspects of software engineering: managing compatibility between
+interdependent components. When you follow semantic versioning, you're transforming
+version numbers from arbitrary labels into meaningful contracts that explicitly
+communicate the compatibility implications of each release. This explicitness creates
+trust between producers and consumers of software components, fostering healthy
+ecosystems where developers can confidently build upon each other's work.
 
-Think of semantic versioning like traffic signals at an intersection. Without clear signals, every intersection would require cautious negotiation, slowing traffic and increasing the risk of collisions. But with standardized signals, drivers can move efficiently with confidence because the rules are explicit and universally understood. Similarly, semantic versioning provides standardized signals about software changes, allowing developers to navigate dependencies efficiently without the "collision risk" of unexpected breaking changes or the inefficiency of overly cautious update avoidance.
+Think of semantic versioning like traffic signals at an intersection. Without clear
+signals, every intersection would require cautious negotiation, slowing traffic and
+increasing the risk of collisions. But with standardized signals, drivers can move
+efficiently with confidence because the rules are explicit and universally understood.
+Similarly, semantic versioning provides standardized signals about software changes,
+allowing developers to navigate dependencies efficiently without the "collision risk" of
+unexpected breaking changes or the inefficiency of overly cautious update avoidance.
 
-The benefits of semantic versioning compound as projects scale and dependencies multiply. In modern software development, even small applications might depend on dozens or hundreds of libraries, each with their own dependencies. Without semantic versioning, every update becomes a potential minefield of undocumented breaking changes, leading to "dependency hell" where projects become locked to specific versions, falling behind on important updates. By making compatibility guarantees explicit through version numbers, semantic versioning creates an ecosystem where automated tools can safely navigate these complex dependency networks, applying security fixes and performance improvements while avoiding breaking changes.
+The benefits of semantic versioning compound as projects scale and dependencies
+multiply. In modern software development, even small applications might depend on dozens
+or hundreds of libraries, each with their own dependencies. Without semantic versioning,
+every update becomes a potential minefield of undocumented breaking changes, leading to
+"dependency hell" where projects become locked to specific versions, falling behind on
+important updates. By making compatibility guarantees explicit through version numbers,
+semantic versioning creates an ecosystem where automated tools can safely navigate these
+complex dependency networks, applying security fixes and performance improvements while
+avoiding breaking changes.
 
 ## Rule Definition
 
@@ -132,7 +154,7 @@ Here are concrete strategies for implementing semantic versioning effectively:
    on:
      pull_request:
        branches: [main]
-       
+
    jobs:
      validate:
        runs-on: ubuntu-latest
@@ -140,24 +162,24 @@ Here are concrete strategies for implementing semantic versioning effectively:
          - uses: actions/checkout@v2
            with:
              fetch-depth: 0
-         
+
          - name: Check version increment
            run: |
              current_version=$(node -p "require('./package.json').version")
              main_version=$(git show origin/main:package.json | node -p "JSON.parse(process.stdin.read()).version")
-             
+
              # Check if version follows SemVer
              if ! [[ $current_version =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?(\+([0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*))?$ ]]; then
                echo "Error: Version $current_version does not follow semantic versioning"
                exit 1
              fi
-             
+
              # Compare with main version
              if [[ $current_version == $main_version ]]; then
                echo "Error: Version not incremented"
                exit 1
              fi
-             
+
              # Verify breaking changes warrant major version increment
              if [[ $(git log --oneline --grep "BREAKING CHANGE:" origin/main..HEAD | wc -l) -gt 0 ]]; then
                current_major=${current_version%%.*}
@@ -167,7 +189,7 @@ Here are concrete strategies for implementing semantic versioning effectively:
                  exit 1
                fi
              fi
-         
+
          - name: Validate API compatibility
            run: |
              npm ci
@@ -296,8 +318,23 @@ v1.3.0 -> v2.0.0 (redesigned authentication API)
 
 ## Related Bindings
 
-- [require-conventional-commits](require-conventional-commits.md): Conventional commit messages provide the structured metadata needed to automate semantic version increments. The type prefix in a conventional commit directly maps to SemVer increments: `fix:` triggers a patch, `feat:` triggers a minor version, and `feat!:` or `BREAKING CHANGE:` triggers a major version. Together, these bindings create a seamless workflow where commit messages drive both changelogs and versioning.
+- [require-conventional-commits](require-conventional-commits.md): Conventional commit
+  messages provide the structured metadata needed to automate semantic version
+  increments. The type prefix in a conventional commit directly maps to SemVer
+  increments: `fix:` triggers a patch, `feat:` triggers a minor version, and `feat!:` or
+  `BREAKING CHANGE:` triggers a major version. Together, these bindings create a
+  seamless workflow where commit messages drive both changelogs and versioning.
 
-- [automate-changelog](automate-changelog.md): Semantic versioning and automated changelogs work together to communicate changes clearly. While SemVer provides a quick signal about compatibility through version numbers, changelogs provide the details about what actually changed. These bindings complement each other by ensuring both high-level compatibility signals and detailed change information are available and accurate.
+- [automate-changelog](automate-changelog.md): Semantic versioning and automated
+  changelogs work together to communicate changes clearly. While SemVer provides a quick
+  signal about compatibility through version numbers, changelogs provide the details
+  about what actually changed. These bindings complement each other by ensuring both
+  high-level compatibility signals and detailed change information are available and
+  accurate.
 
-- [immutable-by-default](immutable-by-default.md): Both semantic versioning and immutability share a fundamental principle: once something is released or shared, it shouldn't change unexpectedly. With SemVer, we explicitly signal when breaking changes occur through major version increments; with immutability, we prevent unexpected changes to data. Both create more predictable, reliable systems by making changes explicit rather than implicit.
+- [immutable-by-default](immutable-by-default.md): Both semantic versioning and
+  immutability share a fundamental principle: once something is released or shared, it
+  shouldn't change unexpectedly. With SemVer, we explicitly signal when breaking changes
+  occur through major version increments; with immutability, we prevent unexpected
+  changes to data. Both create more predictable, reliable systems by making changes
+  explicit rather than implicit.
