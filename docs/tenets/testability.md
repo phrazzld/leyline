@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## id: testability last_modified: "2025-05-04"
+---
+id: testability
+last_modified: "2025-05-08"
+---
 
 # Tenet: Design for Testability
 

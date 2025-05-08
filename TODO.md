@@ -187,7 +187,7 @@
     1. Review content against style guide
   - **Depends‑on:** \[T001, T003\]
 
-- \[ \] **T065 · Feature · P1: Rewrite testability tenet in natural language format**
+- \[x\] **T065 · Feature · P1: Rewrite testability tenet in natural language format**
 
   - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
   - **Action:**
