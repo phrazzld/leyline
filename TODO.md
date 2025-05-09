@@ -370,7 +370,7 @@
     1. Ensure all required metadata fields are documented
   - **Depends‑on:** none
 
-- \[ \] **T076 · Chore · P1: Update templates to use standardized YAML front-matter**
+- \[x\] **T076 · Chore · P1: Update templates to use standardized YAML front-matter**
 
   - **Context:** Templates should use the standardized format for new content
   - **Action:**
