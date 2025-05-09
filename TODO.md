@@ -288,7 +288,7 @@
     1. Verify files pass validation tools
   - **Depends‑on:** none
 
-- \[ \] **T071 · Chore · P1: Fix validation for remaining tenets**
+- \[x\] **T071 · Chore · P1: Fix validation for remaining tenets**
 
   - **Context:** Some tenet files are failing validation
   - **Action:**
