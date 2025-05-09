@@ -338,7 +338,7 @@
     1. Run pre-commit hooks and verify format remains intact
   - **Depends‑on:** \[T072\]
 
-- \[ \] **T074 · Fix · P1: Update validate_front_matter.rb to enforce YAML standard**
+- \[x\] **T074 · Fix · P1: Update validate_front_matter.rb to enforce YAML standard**
 
   - **Context:** Validation tool needs to consistently enforce YAML front-matter
   - **Action:**
