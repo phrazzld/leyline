@@ -400,7 +400,7 @@
     1. Ensure all links are functional
   - **Depends‑on:** \[T075\]
 
-- \[ \] **T078 · Feature · P2: Convert all tenet files to standardized format**
+- \[x\] **T078 · Feature · P2: Convert all tenet files to standardized format**
 
   - **Context:** All tenet files need to use the standardized YAML front-matter
   - **Action:**
