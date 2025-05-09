@@ -20,6 +20,8 @@ repos:
         description: Format markdown files with mdformat
         # Exclude files with known formatting issues
         exclude: "docs/LLM_INTEGRATION.md|docs/bindings/automate-changelog.md"
-        args: ["--wrap", "88"]
+        # Configuration to ensure proper formatting while preserving YAML front-matter
+        args: ["--wrap", "88"]  # Match wrap setting from .mdformat.toml
         additional_dependencies:
-          - mdformat-frontmatter>=0.4.0  # For frontmatter support
+          # Front-matter support - preserves YAML metadata blocks at the top of markdown files
+          - mdformat-frontmatter>=0.4.0

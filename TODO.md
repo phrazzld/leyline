@@ -323,7 +323,7 @@
     1. Verify front-matter remains in YAML format after formatting
   - **Depends‑on:** none
 
-- \[ \] **T073 · Fix · P0: Update pre-commit configuration for front-matter support**
+- \[x\] **T073 · Fix · P0: Update pre-commit configuration for front-matter support**
 
   - **Context:** pre-commit hooks need to be configured to respect YAML front-matter
   - **Action:**
