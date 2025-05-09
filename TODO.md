@@ -385,7 +385,7 @@
     1. Check that templates are properly documented
   - **Depends‑on:** \[T075\]
 
-- \[ \] **T077 · Feature · P1: Update CONTRIBUTING.md with front-matter guidance**
+- \[x\] **T077 · Feature · P1: Update CONTRIBUTING.md with front-matter guidance**
 
   - **Context:** Contributors need clear guidance on front-matter standards
   - **Action:**

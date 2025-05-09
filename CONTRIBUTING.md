@@ -34,7 +34,27 @@ writing guidelines and examples.
 1. Run validation tools locally
 1. Submit a pull request with the appropriate label (`tenet` or `binding`)
 
-### Validation
+### Front-Matter Standards
+
+All tenet and binding documents **MUST** use YAML front-matter format for metadata. This
+format is standardized across the project and is required for our toolchain to function
+properly.
+
+### Key Front-Matter Requirements
+
+1. **Format**: Use YAML front-matter enclosed by triple dashes (`---`)
+1. **Required Fields**:
+   - For tenets: `id` and `last_modified`
+   - For bindings: `id`, `last_modified`, `derived_from`, and `enforced_by`
+1. **Optional Fields**:
+   - For bindings: `applies_to` (array of applicable languages/contexts)
+1. **All dates** must be in ISO format (YYYY-MM-DD) and enclosed in quotes (e.g.,
+   `'2025-05-09'`)
+
+For detailed guidance on front-matter requirements, including examples, format
+conversion, and troubleshooting, refer to [TENET_FORMATTING.md](TENET_FORMATTING.md).
+
+## Validation
 
 Before submitting your PR, please run the following validation tools locally:
 
@@ -63,11 +83,14 @@ mdformat --check .
 
 - Create file in `tenets/` directory with a descriptive slug (e.g., `simplicity.md`)
 - Use the [tenet template](docs/templates/tenet_template.md) as your starting point
-- Follow front-matter format:
+- Follow YAML front-matter format as specified in
+  [TENET_FORMATTING.md](TENET_FORMATTING.md):
   ```yaml
   ---
+  # Unique identifier for this tenet (must match filename without .md)
   id: your-tenet-slug
-  last_modified: "YYYY-MM-DD"
+  # Date of last modification in ISO format with single quotes
+  last_modified: '2025-05-09'
   ---
   ```
 - Use the standard markdown structure:
@@ -112,14 +135,20 @@ mdformat --check .
 
 - Use the [binding template](docs/templates/binding_template.md) as your starting point
 
-- Follow front-matter format:
+- Follow YAML front-matter format as specified in
+  [TENET_FORMATTING.md](TENET_FORMATTING.md):
 
   ```yaml
   ---
+  # Unique identifier for this binding (must match filename without .md)
   id: your-binding-slug
-  last_modified: "YYYY-MM-DD"
+  # Date of last modification in ISO format with single quotes
+  last_modified: '2025-05-09'
+  # ID of the parent tenet this binding implements
   derived_from: parent-tenet-id
+  # Tool, rule, or process that enforces this binding
   enforced_by: description of enforcement mechanism
+  # Optional: languages or contexts where this binding applies
   applies_to:
     - language or context
   ---
@@ -168,16 +197,22 @@ mdformat --check .
 **For Tenets:**
 
 - Changes should be clarifications, not fundamental alterations
-- Update `last_modified` date
+- Update `last_modified` date to today's date in ISO format with single quotes (e.g.,
+  `'2025-05-09'`)
 - Ensure changes maintain or improve natural language quality
 - Follow the [Natural Language Style Guide](docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
+- If the document uses the legacy horizontal rule format for metadata, convert it to
+  YAML front-matter as described in [TENET_FORMATTING.md](TENET_FORMATTING.md)
 
 **For Bindings:**
 
 - Can evolve more freely as implementation practices change
-- Update `last_modified` date
+- Update `last_modified` date to today's date in ISO format with single quotes
 - Ensure changes maintain or improve natural language quality
 - Follow the [Natural Language Style Guide](docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
+- Verify that all required front-matter fields are present and formatted correctly
+- If the document uses the legacy horizontal rule format for metadata, convert it to
+  YAML front-matter
 
 ## Writing Effective Natural Language Documentation
 
@@ -200,6 +235,10 @@ For detailed guidance with examples, see the
 - **MINOR Releases** (new bindings): Standard review process
 - **MAJOR Releases** (new/changed tenets, breaking binding changes): More thorough
   review
+
+Each release must maintain consistent front-matter standards. Changes that convert
+documents from legacy formats to YAML front-matter are considered **Patch Releases**
+when no other content changes are made.
 
 ## Code of Conduct
 
