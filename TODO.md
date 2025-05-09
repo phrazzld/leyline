@@ -260,7 +260,8 @@
 
   - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
   - **Action:**
-    1. Update `docs/tenets/no-secret-suppression.md` to ensure correct front-matter format
+    1. Update `docs/tenets/no-secret-suppression.md` to ensure correct front-matter
+       format
     1. Ensure content follows natural language style guide
     1. Validate content with validation tools
   - **Done‑when:**
@@ -306,8 +307,10 @@
 
 ## Front-Matter Standardization
 
-- \[ \] **T072 · Fix · P0: Configure mdformat to preserve YAML front-matter**
-  - **Context:** mdformat pre-commit hook converts YAML front-matter to horizontal rule format
+- \[x\] **T072 · Fix · P0: Configure mdformat to preserve YAML front-matter**
+
+  - **Context:** mdformat pre-commit hook converts YAML front-matter to horizontal rule
+    format
   - **Action:**
     1. Update `.mdformat.toml` to properly configure front-matter preservation
     1. Test configuration with sample files to verify front-matter remains intact
@@ -321,6 +324,7 @@
   - **Depends‑on:** none
 
 - \[ \] **T073 · Fix · P0: Update pre-commit configuration for front-matter support**
+
   - **Context:** pre-commit hooks need to be configured to respect YAML front-matter
   - **Action:**
     1. Update `.pre-commit-config.yaml` to ensure mdformat properly handles front-matter
@@ -335,6 +339,7 @@
   - **Depends‑on:** \[T072\]
 
 - \[ \] **T074 · Fix · P1: Update validate_front_matter.rb to enforce YAML standard**
+
   - **Context:** Validation tool needs to consistently enforce YAML front-matter
   - **Action:**
     1. Review `validate_front_matter.rb` to ensure it properly enforces YAML format
@@ -349,9 +354,11 @@
   - **Depends‑on:** none
 
 - \[ \] **T075 · Chore · P1: Document standardized front-matter format**
+
   - **Context:** Consistent documentation needed for front-matter standards
   - **Action:**
-    1. Update `TENET_FORMATTING.md` to clearly document YAML front-matter as the standard
+    1. Update `TENET_FORMATTING.md` to clearly document YAML front-matter as the
+       standard
     1. Include examples of correct format
     1. Add explanation of required metadata fields
     1. Include troubleshooting section for common issues
@@ -364,6 +371,7 @@
   - **Depends‑on:** none
 
 - \[ \] **T076 · Chore · P1: Update templates to use standardized YAML front-matter**
+
   - **Context:** Templates should use the standardized format for new content
   - **Action:**
     1. Update `docs/templates/tenet_template.md` to use YAML front-matter
@@ -378,6 +386,7 @@
   - **Depends‑on:** \[T075\]
 
 - \[ \] **T077 · Feature · P1: Update CONTRIBUTING.md with front-matter guidance**
+
   - **Context:** Contributors need clear guidance on front-matter standards
   - **Action:**
     1. Update `CONTRIBUTING.md` to reference the standardized front-matter format
@@ -392,6 +401,7 @@
   - **Depends‑on:** \[T075\]
 
 - \[ \] **T078 · Feature · P2: Convert all tenet files to standardized format**
+
   - **Context:** All tenet files need to use the standardized YAML front-matter
   - **Action:**
     1. Identify all tenet files still using horizontal rule format
@@ -407,6 +417,7 @@
   - **Depends‑on:** \[T072, T073, T074, T075\]
 
 - \[ \] **T079 · Feature · P2: Convert all binding files to standardized format**
+
   - **Context:** All binding files need to use the standardized YAML front-matter
   - **Action:**
     1. Identify all binding files still using horizontal rule format
@@ -422,6 +433,7 @@
   - **Depends‑on:** \[T072, T073, T074, T075\]
 
 - \[ \] **T080 · Test · P1: Verify complete toolchain with standardized format**
+
   - **Context:** Final verification that all tools work with the standardized format
   - **Action:**
     1. Run validation tools on all tenets and bindings
