@@ -272,7 +272,7 @@
     1. Review content against style guide
   - **Depends‑on:** \[T001, T003\]
 
-- \[ \] **T070 · Chore · P1: Document and standardize front-matter format**
+- \[x\] **T070 · Chore · P1: Document and standardize front-matter format**
 
   - **Context:** Consistently format tenet and binding front-matter
   - **Action:**
