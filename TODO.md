@@ -255,7 +255,7 @@
     1. Review content against style guide
   - **Depends‑on:** \[T001, T003\]
 
-- \[ \] **T069 · Feature · P1: Rewrite no-secret-suppression tenet in natural language
+- \[x\] **T069 · Feature · P1: Rewrite no-secret-suppression tenet in natural language
   format**
 
   - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
