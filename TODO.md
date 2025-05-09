@@ -353,7 +353,7 @@
     1. Verify it correctly identifies non-YAML formats as errors
   - **Depends‑on:** none
 
-- \[ \] **T075 · Chore · P1: Document standardized front-matter format**
+- \[x\] **T075 · Chore · P1: Document standardized front-matter format**
 
   - **Context:** Consistent documentation needed for front-matter standards
   - **Action:**
