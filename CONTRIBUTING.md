@@ -64,10 +64,18 @@ ruby tools/validate_front_matter.rb
 
 # Regenerate index files
 ruby tools/reindex.rb
-
-# If you have the tools installed, run formatting check
-mdformat --check .
 ```
+
+### Markdown Guidelines
+
+All markdown files in this repository should follow consistent style guidelines:
+
+1. **Write clear, readable markdown** - Focus on content over strict formatting
+2. **Use proper heading hierarchy** - Structure documents logically
+3. **Maintain appropriate whitespace** - Use blank lines to separate content sections
+4. **Be consistent with lists and indentation** - Follow standard markdown conventions
+
+The pre-commit hooks will handle basic formatting like trailing whitespace and line endings.
 
 ## Guidelines for Specific Contributions
 

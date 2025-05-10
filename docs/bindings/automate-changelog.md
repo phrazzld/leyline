@@ -212,7 +212,7 @@ Here are concrete strategies for implementing automated changelog generation:
          - name: Extract changelog for docs
            run: |
              # Extract the most recent complete release entry
-             awk '/^## \[[0-9]+\.[0-9]+\.[0-9]+\]/{p++;if(p==2)exit} {if(p==1)print}' CHANGELOG.md > docs/recent-changes.md
+             awk '/^## [[0-9]+\.[0-9]+\.[0-9]+]/{p++;if(p==2)exit} {if(p==1)print}' CHANGELOG.md > docs/recent-changes.md
 
          - name: Build docs
            run: mkdocs build

@@ -12,17 +12,12 @@ jobs:
       with:
         node-version: '20'
 
-    # Install Python formatter
-    - name: Install Python formatter
-      run: pip install mdformat
-
     # Install Node.js link checker
     - name: Install markdown link checker
       run: npm install -g markdown-link-check
 
-    - name: Format + link check
+    - name: Link check
       run: |
-        mdformat --check .
         markdown-link-check -q -c ./.mlc-config '**/*.md'
     - name: Schema validate
       run: ruby tools/validate_front_matter.rb

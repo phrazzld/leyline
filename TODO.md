@@ -307,38 +307,36 @@
 
 ## Front-Matter Standardization
 
-- \[x\] **T072 · Fix · P0: Configure mdformat to preserve YAML front-matter**
+- \[x\] **T072 · Fix · P0: ~~Configure mdformat to preserve YAML front-matter~~ SUPERSEDED BY T091**
 
-  - **Context:** mdformat pre-commit hook converts YAML front-matter to horizontal rule
-    format
+  - **Context:** Replaced by simpler approach that removed formatters
   - **Action:**
-    1. Update `.mdformat.toml` to properly configure front-matter preservation
-    1. Test configuration with sample files to verify front-matter remains intact
-    1. Document the configuration in code comments
+    1. ~~Update `.mdformat.toml` to properly configure front-matter preservation~~
+    1. ~~Test configuration with sample files to verify front-matter remains intact~~
+    1. ~~Document the configuration in code comments~~
   - **Done‑when:**
-    1. mdformat no longer converts YAML front-matter to horizontal rule format
-    1. Configuration file is properly documented
+    1. ~~mdformat no longer converts YAML front-matter to horizontal rule format~~
+    1. ~~Configuration file is properly documented~~
   - **Verification:**
-    1. Run mdformat manually on a test file with YAML front-matter
-    1. Verify front-matter remains in YAML format after formatting
+    1. ~~Run mdformat manually on a test file with YAML front-matter~~
+    1. ~~Verify front-matter remains in YAML format after formatting~~
   - **Depends‑on:** none
 
 ## CI Fixes (May 2025)
 
-- \[x\] **T082 · Fix · P0: Apply mdformat to all markdown files**
+- \[x\] **T082 · Fix · P0: ~~Apply mdformat to all markdown files~~ SUPERSEDED BY T091**
 
-  - **Context:** CI lint-docs job fails due to inconsistent markdown formatting across
-    49 files
+  - **Context:** Replaced by simpler approach that removed formatters
   - **Action:**
-    1. Install mdformat locally with front-matter support:
-       `pip install mdformat mdformat-frontmatter`
-    1. Format all markdown files: `mdformat --wrap 88 .`
-    1. Verify formatting has been applied correctly
+    1. ~~Install mdformat locally with front-matter support:
+       `pip install mdformat mdformat-frontmatter`~~
+    1. ~~Format all markdown files: `mdformat --wrap 88 .`~~
+    1. ~~Verify formatting has been applied correctly~~
   - **Done‑when:**
-    1. All markdown files have consistent formatting
-    1. mdformat runs without errors
+    1. ~~All markdown files have consistent formatting~~
+    1. ~~mdformat runs without errors~~
   - **Verification:**
-    1. Run `mdformat --check .` to confirm no formatting issues remain
+    1. ~~Run `mdformat --check .` to confirm no formatting issues remain~~
   - **Depends‑on:** none
 
 - \[x\] **T083 · Fix · P0: Update tenet_template.md with proper YAML front-matter
@@ -387,19 +385,40 @@
     1. All tests run without errors
   - **Depends‑on:** \[T082, T083, T084\]
 
-- \[x\] **T073 · Fix · P0: Update pre-commit configuration for front-matter support**
+## Markdown Approach
 
-  - **Context:** pre-commit hooks need to be configured to respect YAML front-matter
+- \[x\] **T091 · Fix · P0: Remove all automatic markdown formatters**
+
+  - **Context:** Markdown formatters are causing more issues than they solve
   - **Action:**
-    1. Update `.pre-commit-config.yaml` to ensure mdformat properly handles front-matter
-    1. Add necessary dependencies for mdformat-frontmatter
-    1. Test pre-commit hook with sample files
+    1. Remove all custom markdown formatters from the pre-commit hooks
+    2. Remove mdformat configuration from the pre-commit hooks
+    3. Delete custom formatter script and configuration files
+    4. Update documentation to focus on content over strict formatting
+    5. Simplify the development workflow
   - **Done‑when:**
-    1. Pre-commit hooks run without converting YAML front-matter
-    1. Configuration includes proper dependencies for front-matter support
+    1. All formatters are removed from pre-commit hooks
+    2. Custom formatter script and configuration are deleted
+    3. Documentation is updated to remove formatter references
+    4. Development workflow is simplified
   - **Verification:**
-    1. Make changes to a file with YAML front-matter
-    1. Run pre-commit hooks and verify format remains intact
+    1. Pre-commit hooks run without formatter errors
+    2. Common brackets and markdown syntax work without special handling
+  - **Depends‑on:** none
+
+- \[x\] **T073 · Fix · P0: ~~Update pre-commit configuration for front-matter support~~ SUPERSEDED BY T091**
+
+  - **Context:** Replaced by simpler approach that removed formatters
+  - **Action:**
+    1. ~~Update `.pre-commit-config.yaml` to ensure mdformat properly handles front-matter~~
+    1. ~~Add necessary dependencies for mdformat-frontmatter~~
+    1. ~~Test pre-commit hook with sample files~~
+  - **Done‑when:**
+    1. ~~Pre-commit hooks run without converting YAML front-matter~~
+    1. ~~Configuration includes proper dependencies for front-matter support~~
+  - **Verification:**
+    1. ~~Make changes to a file with YAML front-matter~~
+    1. ~~Run pre-commit hooks and verify format remains intact~~
   - **Depends‑on:** \[T072\]
 
 - \[x\] **T074 · Fix · P1: Update validate_front_matter.rb to enforce YAML standard**

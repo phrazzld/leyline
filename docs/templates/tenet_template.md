@@ -1,7 +1,6 @@
----
-id: tenet-id
-last_modified: '2025-05-09'
----
+______________________________________________________________________
+
+## id: tenet-id last_modified: '2025-05-09'
 
 <!-- Template instructions:
 - The id must be kebab-case, matching the filename without .md extension
