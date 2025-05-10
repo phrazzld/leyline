@@ -449,3 +449,24 @@
     1. Complete end-to-end testing of all toolchain components
     1. Verify no formatting issues are introduced during the process
   - **Depends‑on:** \[T078, T079\]
+
+- \[ \] **T081 · Chore · P0: Remove duplicated top-level tenets and bindings
+  directories**
+
+  - **Context:** Task T057 moved tenets/ and bindings/ to docs/tenets/ and
+    docs/bindings/, but the original directories still exist
+  - **Action:**
+    1. Verify that all content from top-level directories has been properly moved to
+       docs/
+    1. Check that all references have been updated to use the new paths
+    1. Remove the top-level tenets/ and bindings/ directories
+    1. Update any remaining references to the old paths
+  - **Done‑when:**
+    1. Top-level tenets/ and bindings/ directories no longer exist
+    1. All references point to docs/tenets/ and docs/bindings/
+    1. Documentation site builds correctly without errors
+  - **Verification:**
+    1. Run mkdocs build to verify no broken links
+    1. Run markdown-link-check to find any lingering references to old paths
+    1. Ensure no functionality is broken by the directory removal
+  - **Depends‑on:** \[T057, T058\]
