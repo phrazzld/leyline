@@ -1,11 +1,11 @@
----
-id: ts-async-patterns
-last_modified: '2025-05-04'
-derived_from: simplicity
-enforced_by: eslint rules & code review
-applies_to:
-  - typescript
----
+______________________________________________________________________
+
+id: ts-async-patterns last_modified: '2025-05-04' derived_from: simplicity enforced_by:
+eslint rules & code review applies_to:
+
+- typescript
+
+______________________________________________________________________
 
 # Binding: Structure TypeScript Async Code with Best Practices
 

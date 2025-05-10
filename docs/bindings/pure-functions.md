@@ -1,11 +1,11 @@
----
-id: pure-functions
-last_modified: '2025-05-05'
-derived_from: simplicity
-enforced_by: code review & linters
-applies_to:
-  - all
----
+______________________________________________________________________
+
+id: pure-functions last_modified: '2025-05-05' derived_from: simplicity enforced_by:
+code review & linters applies_to:
+
+- all
+
+______________________________________________________________________
 
 # Binding: Write Pure Functions, Isolate Side Effects
 

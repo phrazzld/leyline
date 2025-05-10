@@ -1,13 +1,13 @@
----
-id: immutable-by-default
-last_modified: '2025-05-04'
-derived_from: simplicity
-enforced_by: linters & code review
-applies_to:
-  - all
-  - typescript
-  - javascript
----
+______________________________________________________________________
+
+id: immutable-by-default last_modified: '2025-05-04' derived_from: simplicity
+enforced_by: linters & code review applies_to:
+
+- all
+- typescript
+- javascript
+
+______________________________________________________________________
 
 # Binding: Treat All Data as Unchangeable by Default
 

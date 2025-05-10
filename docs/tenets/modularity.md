@@ -1,7 +1,6 @@
----
-id: modularity
-last_modified: '2025-05-08'
----
+______________________________________________________________________
+
+## id: modularity last_modified: '2025-05-08'
 
 # Tenet: Modularity is Mandatory
 

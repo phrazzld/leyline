@@ -1,17 +1,30 @@
----
+______________________________________________________________________
+
 # Unique identifier for this binding (must be kebab-case, matching the filename without .md)
+
 id: binding-id
+
 # Date of last modification in ISO format (YYYY-MM-DD) with single quotes
+
 last_modified: '2025-05-09'
+
 # ID of the parent tenet this binding implements (must be an existing tenet ID)
+
 derived_from: tenet-id
+
 # Tool, rule, or process that enforces this binding
-enforced_by: '[enforcement mechanism]'
+
+enforced_by: '\[enforcement mechanism\]'
+
 # Languages or contexts where this binding applies
+
 # Valid values: typescript, javascript, go, rust, python, java, csharp, ruby, frontend, backend, mobile, desktop, cli, library, service, all
+
 applies_to:
-  - typescript
----
+
+- typescript
+
+______________________________________________________________________
 
 # Binding: \[Rule Name\]
 

@@ -1,11 +1,11 @@
----
-id: web-accessibility
-last_modified: '2025-05-06'
-derived_from: explicit-over-implicit
-enforced_by: Code review, Automated a11y testing
-applies_to:
-  - frontend
----
+______________________________________________________________________
+
+id: web-accessibility last_modified: '2025-05-06' derived_from: explicit-over-implicit
+enforced_by: Code review, Automated a11y testing applies_to:
+
+- frontend
+
+______________________________________________________________________
 
 # Binding: Web Accessibility
 

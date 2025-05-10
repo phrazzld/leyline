@@ -1,11 +1,11 @@
----
-id: go-error-wrapping
-last_modified: '2025-05-04'
-derived_from: explicit-over-implicit
-enforced_by: golangci-lint("wrapcheck") & code review
-applies_to:
-  - go
----
+______________________________________________________________________
+
+id: go-error-wrapping last_modified: '2025-05-04' derived_from: explicit-over-implicit
+enforced_by: golangci-lint("wrapcheck") & code review applies_to:
+
+- go
+
+______________________________________________________________________
 
 # Binding: Add Context to Errors as They Travel Upward
 

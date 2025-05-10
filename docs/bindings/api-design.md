@@ -1,11 +1,11 @@
----
-id: api-design
-last_modified: '2025-05-05'
-derived_from: explicit-over-implicit
-enforced_by: code review & style guides
-applies_to:
-  - all
----
+______________________________________________________________________
+
+id: api-design last_modified: '2025-05-05' derived_from: explicit-over-implicit
+enforced_by: code review & style guides applies_to:
+
+- all
+
+______________________________________________________________________
 
 # Binding: Design Clear, Explicit API Contracts
 

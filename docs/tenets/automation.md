@@ -1,7 +1,6 @@
----
-id: automation
-last_modified: '2025-05-08'
----
+______________________________________________________________________
+
+## id: automation last_modified: '2025-05-08'
 
 # Tenet: Automation as a Force Multiplier
 

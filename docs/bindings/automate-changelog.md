@@ -1,51 +1,84 @@
----
-id: automate-changelog
-last_modified: "2025-05-06"
-derived_from: automation
-enforced_by: CI checks & pre-release hooks
-applies_to:
-  - all
----
+______________________________________________________________________
+
+id: automate-changelog last_modified: "2025-05-06" derived_from: automation enforced_by:
+CI checks & pre-release hooks applies_to:
+
+- all
+
+______________________________________________________________________
 
 # Binding: Automate Changelog Generation from Structured Commits
 
-All projects must automatically generate changelogs using structured commit messages. Manually maintaining change logs is error-prone and time-consuming; instead, leverage conventional commits to automatically produce accurate, consistent documentation of changes across versions.
+All projects must automatically generate changelogs using structured commit messages.
+Manually maintaining change logs is error-prone and time-consuming; instead, leverage
+conventional commits to automatically produce accurate, consistent documentation of
+changes across versions.
 
 ## Rationale
 
-This binding directly implements our automation tenet by transforming manual documentation work into an automated process driven by data already captured in commit messages. When you follow structured commit practices and automate changelog generation, you're creating a system where documentation becomes a natural byproduct of your development workflow rather than an additional burden that requires separate effort and attention.
+This binding directly implements our automation tenet by transforming manual
+documentation work into an automated process driven by data already captured in commit
+messages. When you follow structured commit practices and automate changelog generation,
+you're creating a system where documentation becomes a natural byproduct of your
+development workflow rather than an additional burden that requires separate effort and
+attention.
 
-Think of automated changelogs like the difference between manually keeping a trip log versus using a GPS system that automatically records your journey. With a manual log, entries are often inconsistent, details get forgotten, and maintaining it requires constant attention that distracts from your primary focus—driving. A GPS system, however, silently records your exact route, stops, and timing without any additional effort on your part. Similarly, automated changelog generation captures the development journey without requiring developers to maintain a separate record, ensuring complete and accurate documentation while freeing mental bandwidth for more valuable creative work.
+Think of automated changelogs like the difference between manually keeping a trip log
+versus using a GPS system that automatically records your journey. With a manual log,
+entries are often inconsistent, details get forgotten, and maintaining it requires
+constant attention that distracts from your primary focus—driving. A GPS system,
+however, silently records your exact route, stops, and timing without any additional
+effort on your part. Similarly, automated changelog generation captures the development
+journey without requiring developers to maintain a separate record, ensuring complete
+and accurate documentation while freeing mental bandwidth for more valuable creative
+work.
 
-The benefits of automated changelogs become increasingly apparent as projects scale and release frequency increases. Manual changelog maintenance inevitably leads to inconsistencies in format, level of detail, and categorization, making changelog information less useful over time. Automated generation enforces consistent categorization (features, fixes, breaking changes) and detail level across all entries, regardless of how many developers contribute or how frequently releases occur. This consistency transforms the changelog from a loosely formatted text document into a queryable history that helps users understand exactly what changed between versions and how it might affect them.
+The benefits of automated changelogs become increasingly apparent as projects scale and
+release frequency increases. Manual changelog maintenance inevitably leads to
+inconsistencies in format, level of detail, and categorization, making changelog
+information less useful over time. Automated generation enforces consistent
+categorization (features, fixes, breaking changes) and detail level across all entries,
+regardless of how many developers contribute or how frequently releases occur. This
+consistency transforms the changelog from a loosely formatted text document into a
+queryable history that helps users understand exactly what changed between versions and
+how it might affect them.
 
 ## Rule Definition
 
-This binding establishes clear requirements for implementing automated changelog generation:
+This binding establishes clear requirements for implementing automated changelog
+generation:
 
-- **Commit Message Structure**: All commits must follow the Conventional Commits specification as defined in the [require-conventional-commits](require-conventional-commits.md) binding:
+- **Commit Message Structure**: All commits must follow the Conventional Commits
+  specification as defined in the
+  [require-conventional-commits](require-conventional-commits.md) binding:
+
   - Use standardized type prefixes (`feat`, `fix`, `docs`, etc.)
   - Mark breaking changes with `!` and `BREAKING CHANGE:` footer
   - Write clear, descriptive messages
 
 - **Automated Tooling**: Projects must implement automated changelog generation:
+
   - Configure tools to parse conventional commits
   - Generate changelogs automatically during release processes
   - Include version number, release date, and categorized changes
   - Maintain a complete history of changes across all versions
 
 - **Standard Format**: Generated changelogs must follow a consistent format:
+
   - Group changes by type (features, fixes, breaking changes)
   - Include commit authors for attribution
   - Link to issues or pull requests when referenced
   - Maintain a consistent style across all releases
 
-- **Release Integration**: Changelog generation must be integrated into the release process:
+- **Release Integration**: Changelog generation must be integrated into the release
+  process:
+
   - Trigger changelog updates when creating a new version
   - Include changelog updates in release commits
   - Publish changelog changes alongside released artifacts
 
 - **Exceptions**: The following are explicitly exempt from this binding:
+
   - Private exploratory repositories not intended for release
   - Single-use scripts and utilities without versioning
   - Repositories with fewer than 3 contributors and no public API
@@ -80,7 +113,7 @@ Here are concrete strategies for implementing automated changelog generation:
    }' > .versionrc
    ```
 
-2. **Configure CI/CD Integration**:
+1. **Configure CI/CD Integration**:
 
    ```yaml
    # GitHub Actions workflow example
@@ -121,7 +154,7 @@ Here are concrete strategies for implementing automated changelog generation:
              prerelease: false
    ```
 
-3. **Set Up Commit Validation**:
+1. **Set Up Commit Validation**:
 
    ```bash
    # Install commitlint and husky
@@ -135,7 +168,7 @@ Here are concrete strategies for implementing automated changelog generation:
    npx husky add .husky/commit-msg 'npx --no -- commitlint --edit $1'
    ```
 
-4. **Create a Changelog Template**:
+1. **Create a Changelog Template**:
 
    ```markdown
    # Changelog
@@ -150,7 +183,7 @@ Here are concrete strategies for implementing automated changelog generation:
    <!-- Automatically generated by release tooling -->
    ```
 
-5. **Integrate with Documentation Workflow**:
+1. **Integrate with Documentation Workflow**:
 
    ```yaml
    # Documentation site build workflow
@@ -249,7 +282,7 @@ All notable changes to this project will be documented in this file. See [standa
 5. Push changes and tags
 ```
 
-```
+````
 // ✅ GOOD: Integrated, automated release process
 # Release Process
 
@@ -257,18 +290,22 @@ All notable changes to this project will be documented in this file. See [standa
 2. Run the release script:
    ```bash
    npm run release
-   ```
-   This will:
-   - Determine the appropriate version bump based on commit messages
-   - Update package.json and package-lock.json
-   - Generate/update CHANGELOG.md from commit history
-   - Create a version commit
-   - Create a git tag
+````
+
+This will:
+
+- Determine the appropriate version bump based on commit messages
+- Update package.json and package-lock.json
+- Generate/update CHANGELOG.md from commit history
+- Create a version commit
+- Create a git tag
+
 3. Push changes and tags:
    ```bash
    git push --follow-tags origin main
    ```
-4. CI will automatically create a GitHub release with the generated changelog
+1. CI will automatically create a GitHub release with the generated changelog
+
 ```
 
 ## Related Bindings
@@ -276,3 +313,4 @@ All notable changes to this project will be documented in this file. See [standa
 - [require-conventional-commits](require-conventional-commits.md): Conventional commits provide the structured data that enables automated changelog generation. These bindings work together to create a seamless workflow—conventional commit messages act as the data source, and changelog automation transforms that data into valuable documentation without additional effort.
 
 - [semantic-versioning](semantic-versioning.md): Automated changelogs and semantic versioning are complementary practices. Conventional commits signal what kind of version change is needed (patch, minor, major), while changelog automation ensures that all relevant changes are documented for each version increment.
+```

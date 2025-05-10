@@ -1,11 +1,11 @@
----
-id: context-propagation
-last_modified: '2025-05-06'
-derived_from: explicit-over-implicit
-enforced_by: code review & integration tests
-applies_to:
-  - all
----
+______________________________________________________________________
+
+id: context-propagation last_modified: '2025-05-06' derived_from: explicit-over-implicit
+enforced_by: code review & integration tests applies_to:
+
+- all
+
+______________________________________________________________________
 
 # Binding: Propagate Request Context Across Service Boundaries
 

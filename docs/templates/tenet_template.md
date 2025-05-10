@@ -1,9 +1,14 @@
 ---
-# Unique identifier for this tenet (must be kebab-case, matching the filename without .md)
 id: tenet-id
-# Date of last modification in ISO format (YYYY-MM-DD) with single quotes
 last_modified: '2025-05-09'
 ---
+
+<!-- Template instructions:
+- The id must be kebab-case, matching the filename without .md extension
+- last_modified must be in ISO format (YYYY-MM-DD) with single quotes
+- Replace all placeholders enclosed in brackets [] with your content
+- Remove these comments in the final document
+-->
 
 # Tenet: \[Principle Name\]
 

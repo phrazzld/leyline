@@ -1,11 +1,11 @@
----
-id: go-package-design
-last_modified: '2025-05-04'
-derived_from: modularity
-enforced_by: code review & project structure linting
-applies_to:
-  - go
----
+______________________________________________________________________
+
+id: go-package-design last_modified: '2025-05-04' derived_from: modularity enforced_by:
+code review & project structure linting applies_to:
+
+- go
+
+______________________________________________________________________
 
 # Binding: Organize Go Code Into Purpose-Driven Packages
 

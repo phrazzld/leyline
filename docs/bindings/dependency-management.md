@@ -1,11 +1,11 @@
----
-id: dependency-management
-last_modified: '2025-05-05'
-derived_from: simplicity
-enforced_by: dependency scanners & code review
-applies_to:
-  - all
----
+______________________________________________________________________
+
+id: dependency-management last_modified: '2025-05-05' derived_from: simplicity
+enforced_by: dependency scanners & code review applies_to:
+
+- all
+
+______________________________________________________________________
 
 # Binding: Minimize and Maintain Dependencies Deliberately
 
