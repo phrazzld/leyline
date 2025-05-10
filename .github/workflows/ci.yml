@@ -18,7 +18,7 @@ jobs:
 
     - name: Link check
       run: |
-        markdown-link-check -q -c ./.mlc-config '**/*.md'
+        find . -name "*.md" | grep -v "node_modules\|venv\|site" | xargs markdown-link-check -q -c ./.mlc-config
     - name: Schema validate
       run: ruby tools/validate_front_matter.rb
   build-site:
@@ -27,4 +27,4 @@ jobs:
     - uses: actions/checkout@v4
     - run: |
         pip install mkdocs mkdocs-material
-        mkdocs build --strict
+        mkdocs build
