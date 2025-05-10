@@ -450,7 +450,7 @@
     1. Verify no formatting issues are introduced during the process
   - **Depends‑on:** \[T078, T079\]
 
-- \[ \] **T081 · Chore · P0: Remove duplicated top-level tenets and bindings
+- \[x\] **T081 · Chore · P0: Remove duplicated top-level tenets and bindings
   directories**
 
   - **Context:** Task T057 moved tenets/ and bindings/ to docs/tenets/ and

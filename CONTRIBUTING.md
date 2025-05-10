@@ -81,7 +81,8 @@ mdformat --check .
 
 **File Structure:**
 
-- Create file in `tenets/` directory with a descriptive slug (e.g., `simplicity.md`)
+- Create file in `docs/tenets/` directory with a descriptive slug (e.g.,
+  `simplicity.md`)
 - Use the [tenet template](docs/templates/tenet_template.md) as your starting point
 - Follow YAML front-matter format as specified in
   [TENET_FORMATTING.md](TENET_FORMATTING.md):
@@ -131,7 +132,8 @@ mdformat --check .
 
 **File Structure:**
 
-- Create file in `bindings/` directory with a descriptive slug (e.g., `ts-no-any.md`)
+- Create file in `docs/bindings/` directory with a descriptive slug (e.g.,
+  `ts-no-any.md`)
 
 - Use the [binding template](docs/templates/binding_template.md) as your starting point
 
