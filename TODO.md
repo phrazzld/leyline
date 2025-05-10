@@ -432,7 +432,7 @@
     1. Verify index generation works correctly
   - **Depends‑on:** \[T072, T073, T074, T075\]
 
-- \[ \] **T080 · Test · P1: Verify complete toolchain with standardized format**
+- \[x\] **T080 · Test · P1: Verify complete toolchain with standardized format**
 
   - **Context:** Final verification that all tools work with the standardized format
   - **Action:**
