@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: rust-ownership-patterns last_modified: "2025-05-04" derived_from: simplicity
-enforced_by: rust compiler & code review applies_to:
-
-- rust
-
-______________________________________________________________________
+---
+id: rust-ownership-patterns
+last_modified: '2025-05-04'
+derived_from: simplicity
+enforced_by: rust compiler & code review
+applies_to:
+  - rust
+---
 
 # Binding: Embrace Rust's Ownership System, Don't Fight It
 

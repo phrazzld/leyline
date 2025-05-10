@@ -1,14 +1,14 @@
-______________________________________________________________________
-
-id: use-structured-logging last_modified: "2025-05-04" derived_from: automation
-enforced_by: linters & code review applies_to:
-
-- all
-- typescript
-- javascript
-- go
-
-______________________________________________________________________
+---
+id: use-structured-logging
+last_modified: '2025-05-04'
+derived_from: automation
+enforced_by: linters & code review
+applies_to:
+  - all
+  - typescript
+  - javascript
+  - go
+---
 
 # Binding: Implement Complete Observability with Structured Logs, Metrics, and Traces
 

@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: frontend-state-management last_modified: "2025-05-06" derived_from: simplicity
-enforced_by: "Code review, Architecture reviews" applies_to:
-
-- frontend
-
-______________________________________________________________________
+---
+id: frontend-state-management
+last_modified: '2025-05-06'
+derived_from: simplicity
+enforced_by: Code review, Architecture reviews
+applies_to:
+  - frontend
+---
 
 # Binding: Frontend State Management
 

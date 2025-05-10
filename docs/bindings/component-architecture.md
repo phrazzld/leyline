@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: component-architecture last_modified: "2025-05-06" derived_from: modularity
-enforced_by: "Code review, Storybook organization" applies_to:
-
-- frontend
-
-______________________________________________________________________
+---
+id: component-architecture
+last_modified: '2025-05-06'
+derived_from: modularity
+enforced_by: Code review, Storybook organization
+applies_to:
+  - frontend
+---
 
 # Binding: Component Architecture
 

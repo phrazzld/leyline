@@ -1,6 +1,8 @@
 ---
-id: tenet-id # Unique identifier for this tenet (kebab-case)
-last_modified: "2025-05-04" # ISO format date of last modification (YYYY-MM-DD)
+# Unique identifier for this tenet (must be kebab-case, matching the filename without .md)
+id: tenet-id
+# Date of last modification in ISO format (YYYY-MM-DD) with single quotes
+last_modified: '2025-05-09'
 ---
 
 # Tenet: \[Principle Name\]

@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: code-size last_modified: "2025-05-05" derived_from: simplicity enforced_by: linters
-& code review applies_to:
-
-- all
-
-______________________________________________________________________
+---
+id: code-size
+last_modified: '2025-05-05'
+derived_from: simplicity
+enforced_by: linters & code review
+applies_to:
+  - all
+---
 
 # Binding: Keep Code Units Small and Focused
 

@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: ts-module-organization last_modified: "2025-05-04" derived_from: modularity
-enforced_by: code review & project linting rules applies_to:
-
-- typescript
-
-______________________________________________________________________
+---
+id: ts-module-organization
+last_modified: '2025-05-04'
+derived_from: modularity
+enforced_by: code review & project linting rules
+applies_to:
+  - typescript
+---
 
 # Binding: Organize TypeScript Code Into Feature-Focused Modules
 

@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: go-concurrency-patterns last_modified: "2025-05-04" derived_from: simplicity
-enforced_by: code review & race detector applies_to:
-
-- go
-
-______________________________________________________________________
+---
+id: go-concurrency-patterns
+last_modified: '2025-05-04'
+derived_from: simplicity
+enforced_by: code review & race detector
+applies_to:
+  - go
+---
 
 # Binding: Use Goroutines and Channels Judiciously with Explicit Coordination
 

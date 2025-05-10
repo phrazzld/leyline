@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: external-configuration last_modified: "2025-05-04" derived_from:
-no-secret-suppression enforced_by: linters & secret scanning applies_to:
-
-- all
-
-______________________________________________________________________
+---
+id: external-configuration
+last_modified: '2025-05-04'
+derived_from: no-secret-suppression
+enforced_by: linters & secret scanning
+applies_to:
+  - all
+---
 
 # Binding: Never Hardcode Configuration
 

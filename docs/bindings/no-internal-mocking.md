@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: no-internal-mocking last_modified: "2025-05-04" derived_from: testability
-enforced_by: code review & linters applies_to:
-
-- all
-
-______________________________________________________________________
+---
+id: no-internal-mocking
+last_modified: '2025-05-04'
+derived_from: testability
+enforced_by: code review & linters
+applies_to:
+  - all
+---
 
 # Binding: Mock External Systems Only, Never Internal Components
 

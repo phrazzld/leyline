@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: require-conventional-commits last_modified: "2025-05-04" derived_from: automation
-enforced_by: commit hooks & CI checks applies_to:
-
-- all
-
-______________________________________________________________________
+---
+id: require-conventional-commits
+last_modified: '2025-05-04'
+derived_from: automation
+enforced_by: commit hooks & CI checks
+applies_to:
+  - all
+---
 
 # Binding: Express Intent Through Structured Commit Messages
 

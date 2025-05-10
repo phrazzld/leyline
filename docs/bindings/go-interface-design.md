@@ -1,11 +1,11 @@
-______________________________________________________________________
-
-id: go-interface-design last_modified: "2025-05-04" derived_from: testability
-enforced_by: code review & linting applies_to:
-
-- go
-
-______________________________________________________________________
+---
+id: go-interface-design
+last_modified: '2025-05-04'
+derived_from: testability
+enforced_by: code review & linting
+applies_to:
+  - go
+---
 
 # Binding: Design Small, Focused Interfaces in Consumer Packages
 

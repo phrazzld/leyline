@@ -416,7 +416,7 @@
     1. Verify index generation works correctly
   - **Depends‑on:** \[T072, T073, T074, T075\]
 
-- \[ \] **T079 · Feature · P2: Convert all binding files to standardized format**
+- \[x\] **T079 · Feature · P2: Convert all binding files to standardized format**
 
   - **Context:** All binding files need to use the standardized YAML front-matter
   - **Action:**
