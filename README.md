@@ -32,9 +32,9 @@ tools/         # Validation and maintenance scripts
 The Leyline Warden is an automated system that synchronizes tenets and bindings across
 repositories:
 
-1. When a new version of Leyline is tagged (e.g., `v0.1.0`)
-1. Warden creates pull requests in all target repositories
-1. Each PR updates the local copies of tenets and bindings
+1. Whenever changes are pushed to the master branch of Leyline
+1. Warden automatically updates all target repositories
+1. Each update refreshes the local copies of tenets and bindings
 1. This ensures consistent standards across all codebases
 
 ### Integration
@@ -59,10 +59,12 @@ on:
   push:
 jobs:
   docs:
-    uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.0
+    uses: phrazzld/leyline/.github/workflows/vendor.yml@master
     with:
-      ref: v0.1.0
+      ref: master
 ```
+
+> **Note**: Using `master` instead of a version tag (e.g., `v0.1.0`) means your repository will automatically receive all updates to Leyline, including potential breaking changes. If you prefer a more controlled update process, use a specific version tag and update it manually when ready to upgrade.
 
 2. The first time the workflow runs, it will create `/docs/tenets` and `/docs/bindings`
    directories in your repository.
