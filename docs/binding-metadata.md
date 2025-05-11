@@ -1,6 +1,7 @@
 # Binding Metadata Schema
 
-This document outlines the metadata schema for binding files, including the new `applies_to` field for language and context filtering.
+This document outlines the metadata schema for binding files, including the new
+`applies_to` field for language and context filtering.
 
 ## Required Metadata
 
@@ -15,16 +16,16 @@ enforced_by: description of enforcement mechanism
 ---
 ```
 
-| Field | Description | Example |
-|-------|-------------|---------|
-| `id` | Unique identifier for the binding. Should match filename. | `ts-no-any` |
-| `last_modified` | Date of last modification in ISO format. | `"2025-05-02"` |
-| `derived_from` | ID of the tenet this binding implements. | `simplicity` |
-| `enforced_by` | Description of how this binding is enforced. | `eslint("no-explicit-any")` |
+| Field | Description | Example | |-------|-------------|---------| | `id` | Unique
+identifier for the binding. Should match filename. | `ts-no-any` | | `last_modified` |
+Date of last modification in ISO format. | `"2025-05-02"` | | `derived_from` | ID of the
+tenet this binding implements. | `simplicity` | | `enforced_by` | Description of how
+this binding is enforced. | `eslint("no-explicit-any")` |
 
 ## Language and Context Applicability
 
-To support automatic filtering based on repository language and context, bindings should include the `applies_to` field:
+To support automatic filtering based on repository language and context, bindings should
+include the `applies_to` field:
 
 ```yaml
 ---
@@ -42,6 +43,7 @@ applies_to:
 ### Valid `applies_to` Values
 
 #### Languages
+
 - `typescript`
 - `javascript`
 - `go`
@@ -52,6 +54,7 @@ applies_to:
 - `ruby`
 
 #### Environments/Contexts
+
 - `frontend`
 - `backend`
 - `mobile`
@@ -61,6 +64,7 @@ applies_to:
 - `service`
 
 #### Special Values
+
 - `all` - Indicates the binding applies to all contexts/languages
 
 ### Naming Convention and Auto-detection
@@ -73,18 +77,12 @@ Binding filenames should follow this pattern:
 
 The language prefix should correspond to the appropriate language in `applies_to`:
 
-| Prefix | Language |
-|--------|----------|
-| `ts-`  | typescript |
-| `js-`  | javascript |
-| `go-`  | go |
-| `rust-` | rust |
-| `py-`  | python |
-| `java-` | java |
-| `cs-`  | csharp |
-| `rb-`  | ruby |
+| Prefix | Language | |--------|----------| | `ts-` | typescript | | `js-` | javascript
+| | `go-` | go | | `rust-` | rust | | `py-` | python | | `java-` | java | | `cs-` |
+csharp | | `rb-` | ruby |
 
-For language-agnostic bindings, omit the language prefix and include `all` in the `applies_to` array.
+For language-agnostic bindings, omit the language prefix and include `all` in the
+`applies_to` array.
 
 ### Examples
 
@@ -134,7 +132,9 @@ applies_to:
 ## Validation
 
 The `tools/validate_front_matter.rb` script will validate:
+
 - All required fields are present
 - The `applies_to` field contains an array of strings
 - The values in `applies_to` are from the list of valid contexts
-- For bindings with language-specific prefixes, a warning is displayed if the corresponding language is not in `applies_to`
+- For bindings with language-specific prefixes, a warning is displayed if the
+  corresponding language is not in `applies_to`

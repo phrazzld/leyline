@@ -2,14 +2,17 @@
 
 ## Purpose
 
-This template provides a structured approach for auditing source philosophy documents to ensure complete coverage in tenets and bindings. It helps identify gaps where important principles or rules from the source documents haven't been properly represented in the Leyline system.
+This template provides a structured approach for auditing source philosophy documents to
+ensure complete coverage in tenets and bindings. It helps identify gaps where important
+principles or rules from the source documents haven't been properly represented in the
+Leyline system.
 
 ## Instructions
 
 1. Create a new audit file for each source document you're analyzing
-2. Work through the document section by section, identifying key principles and rules
-3. Map each identified item to existing tenets and bindings, or mark as a gap
-4. Use the resulting gap analysis to create new tenets and bindings
+1. Work through the document section by section, identifying key principles and rules
+1. Map each identified item to existing tenets and bindings, or mark as a gap
+1. Use the resulting gap analysis to create new tenets and bindings
 
 ## Audit File Format
 
@@ -117,21 +120,25 @@ The principle is covered at the tenet level, but no specific bindings enforce th
 ## Recommended Workflow
 
 1. **Preparation**:
+
    - Clone this template for each source document
    - Gather all source philosophy documents
    - List all existing tenets and bindings for reference
 
-2. **Systematic Analysis**:
+1. **Systematic Analysis**:
+
    - Work through each document section by section
    - Be thorough and precise in identifying both explicit and implicit principles
    - Quote actual text to maintain fidelity to the source
 
-3. **Gap Identification**:
+1. **Gap Identification**:
+
    - Be honest about coverage gaps
    - Consider not just presence but quality of coverage
    - Look for areas where the principles might be diluted or modified
 
-4. **Follow-up**:
+1. **Follow-up**:
+
    - Prioritize gap remediation
    - Create missing tenets and bindings
    - Track completion

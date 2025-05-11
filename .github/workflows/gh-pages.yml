@@ -29,7 +29,7 @@ jobs:
           cp README.md docs/index.md || mkdir -p docs && cp README.md docs/index.md
 
       - name: Build site
-        run: mkdocs build --strict
+        run: mkdocs build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3

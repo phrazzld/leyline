@@ -22,7 +22,7 @@ if find . -type f -name "*.ts" -o -name "*.tsx" -o -name "tsconfig.json" | grep 
   mv /tmp/repo-context.json.tmp /tmp/repo-context.json
 fi
 
-# Check for JavaScript 
+# Check for JavaScript
 if find . -type f -name "*.js" -o -name "*.jsx" -o -name "package.json" | grep -q .; then
   echo "Detected: JavaScript"
   jq '.languages += ["javascript"]' /tmp/repo-context.json > /tmp/repo-context.json.tmp

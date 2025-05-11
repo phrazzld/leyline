@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       # Call the reusable workflow from the Leyline repository
       # This will sync tenets and bindings into your docs directory
       - name: Sync Leyline Docs

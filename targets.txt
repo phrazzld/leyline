@@ -1,6 +1,6 @@
 # List of repositories that should receive automated Leyline updates
 # Format: user/repo
-# 
+#
 # These repositories will be updated automatically when new versions of Leyline are released.
 # The Warden system will create pull requests to update the tenets and bindings in each repository.
 
