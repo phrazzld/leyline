@@ -29,3 +29,4 @@
   articulations and various toolings and whatnot that make it clearer what is being
   tested and what is not and so on
 - refactor this repo from python to either typescript or go
+- set up generated website for displaying tenets and bindings
