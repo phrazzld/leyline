@@ -63,7 +63,7 @@ jobs:
       - name: Sync Tenets
         run: |
           mkdir -p docs/tenets
-          rsync -a --delete _leyline/tenets/ docs/tenets/
+          rsync -a --delete _leyline/docs/tenets/ docs/tenets/
 
       # Setup the bindings directory
       - name: Setup Bindings Directory
@@ -75,7 +75,7 @@ jobs:
         if: ${{ needs.detect-language.outputs.has_typescript == 'true' }}
         run: |
           mkdir -p _ts_bindings
-          grep -l "ts-" _leyline/bindings/*.md > _ts_files.txt || true
+          grep -l "ts-" _leyline/docs/bindings/*.md > _ts_files.txt || true
           while read file; do
             cp "$file" _ts_bindings/
           done < _ts_files.txt
@@ -86,7 +86,7 @@ jobs:
         if: ${{ needs.detect-language.outputs.has_go == 'true' }}
         run: |
           mkdir -p _go_bindings
-          grep -l "go-" _leyline/bindings/*.md > _go_files.txt || true
+          grep -l "go-" _leyline/docs/bindings/*.md > _go_files.txt || true
           while read file; do
             cp "$file" _go_bindings/
           done < _go_files.txt
@@ -97,7 +97,7 @@ jobs:
         if: ${{ needs.detect-language.outputs.has_rust == 'true' }}
         run: |
           mkdir -p _rust_bindings
-          grep -l "rust-" _leyline/bindings/*.md > _rust_files.txt || true
+          grep -l "rust-" _leyline/docs/bindings/*.md > _rust_files.txt || true
           while read file; do
             cp "$file" _rust_bindings/
           done < _rust_files.txt
@@ -108,19 +108,19 @@ jobs:
         run: |
           mkdir -p _common_bindings
           # Copy bindings that don't have a language prefix
-          find _leyline/bindings/ -name "*.md" -not -name "00-index.md" | grep -v -E '(ts-|go-|rust-)' > _common_files.txt || true
+          find _leyline/docs/bindings/ -name "*.md" -not -name "00-index.md" | grep -v -E '(ts-|go-|rust-)' > _common_files.txt || true
           while read file; do
             cp "$file" _common_bindings/
           done < _common_files.txt
-          cp _leyline/bindings/00-index.md _common_bindings/ || true
+          cp _leyline/docs/bindings/00-index.md _common_bindings/ || true
           rsync -a _common_bindings/ docs/bindings/
 
       # Regenerate the index file
       - name: Generate Bindings Index
         run: |
           cd _leyline
-          ruby tools/reindex.rb bindings
-          cp bindings/00-index.md ../docs/bindings/
+          ruby tools/reindex.rb docs/bindings
+          cp docs/bindings/00-index.md ../docs/bindings/
 
       # Create PR with changes
       - name: Create Pull Request

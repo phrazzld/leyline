@@ -73,7 +73,7 @@ jobs:
         mkdir -p docs/tenets docs/bindings
 
         # Always sync all tenets (they're language-agnostic)
-        rsync -a --delete _leyline/tenets/ docs/tenets/
+        rsync -a --delete _leyline/docs/tenets/ docs/tenets/
 
         # Sync filtered bindings
         rsync -a --delete filtered_bindings/ docs/bindings/

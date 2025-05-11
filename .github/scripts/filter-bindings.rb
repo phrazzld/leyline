@@ -17,12 +17,12 @@ puts "Repository contexts: #{contexts.join(', ')}"
 FileUtils.mkdir_p('filtered_bindings')
 
 # Copy index file
-if File.exist?('_leyline/bindings/00-index.md')
-  FileUtils.cp('_leyline/bindings/00-index.md', 'filtered_bindings/00-index.md')
+if File.exist?('_leyline/docs/bindings/00-index.md')
+  FileUtils.cp('_leyline/docs/bindings/00-index.md', 'filtered_bindings/00-index.md')
 end
 
 # Process all binding files
-binding_files = Dir.glob('_leyline/bindings/*.md').reject { |f| f =~ /00-index\.md$/ }
+binding_files = Dir.glob('_leyline/docs/bindings/*.md').reject { |f| f =~ /00-index\.md$/ }
 binding_files.each do |file|
   content = File.read(file)
 
