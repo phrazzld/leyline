@@ -138,7 +138,7 @@
         1. The `.github/workflows/vendor.yml` file includes the `categories` input definition.
     - **Depends‑on:** [T001]
 
-- [ ] **T012 · Feature · P0: Update `vendor.yml` to sync `tenets/`, `core/`, and specified `categories`**
+- [x] **T012 · Feature · P0: Update `vendor.yml` to sync `tenets/`, `core/`, and specified `categories`**
     - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (sync logic)
     - **Action:**
         1. Modify `vendor.yml` workflow logic to always sync `docs/tenets/`.

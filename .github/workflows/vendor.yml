@@ -75,13 +75,47 @@ jobs:
 
     - name: Sync Files
       run: |
-        mkdir -p docs/tenets docs/bindings
+        mkdir -p docs/tenets docs/bindings/core docs/bindings/categories
 
         # Always sync all tenets (they're language-agnostic)
         rsync -a --delete _leyline/docs/tenets/ docs/tenets/
 
-        # Sync filtered bindings
-        rsync -a --delete filtered_bindings/ docs/bindings/
+        # Always sync core bindings (applicable to all)
+        rsync -a --delete _leyline/docs/bindings/core/ docs/bindings/core/
+
+        # Process requested categories
+        if [ -n "${{ inputs.categories }}" ]; then
+          echo "Syncing requested categories: ${{ inputs.categories }}"
+
+          # Create array from comma-separated list
+          IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
+
+          # Process each category
+          for category in "${CATEGORIES[@]}"; do
+            # Trim whitespace
+            category=$(echo "$category" | xargs)
+
+            # Check if category directory exists
+            if [ -d "_leyline/docs/bindings/categories/$category" ]; then
+              echo "Syncing category: $category"
+
+              # Create target directory
+              mkdir -p "docs/bindings/categories/$category"
+
+              # Sync category files
+              rsync -a --delete "_leyline/docs/bindings/categories/$category/" "docs/bindings/categories/$category/"
+            else
+              echo "Warning: Category directory for '$category' does not exist in Leyline"
+            fi
+          done
+        else
+          echo "No specific categories requested, syncing only core bindings"
+        fi
+
+        # For backward compatibility, also sync filtered bindings (this will be removed in a future update)
+        if [ -d "filtered_bindings" ]; then
+          rsync -a filtered_bindings/ docs/bindings/
+        fi
 
     - name: Create Summary
       run: |
@@ -91,12 +125,39 @@ jobs:
         echo "" >> sync-summary.md
         echo "Detected languages: $(jq -r '.languages | join(", ")' repo-context.json)" >> sync-summary.md
         echo "Detected contexts: $(jq -r '.contexts | join(", ")' repo-context.json)" >> sync-summary.md
+        if [ -n "${{ inputs.categories }}" ]; then
+          echo "Requested categories: ${{ inputs.categories }}" >> sync-summary.md
+        fi
         echo "" >> sync-summary.md
 
         echo "## Synced Files" >> sync-summary.md
         echo "" >> sync-summary.md
         echo "- Tenets: $(find docs/tenets -type f -name "*.md" | wc -l)" >> sync-summary.md
-        echo "- Bindings: $(find docs/bindings -type f -name "*.md" | wc -l)" >> sync-summary.md
+        echo "- Core Bindings: $(find docs/bindings/core -type f -name "*.md" | wc -l)" >> sync-summary.md
+
+        # Count category bindings if any were synced
+        if [ -n "${{ inputs.categories }}" ]; then
+          # Generate report on which categories were synced
+          echo "- Category Bindings:" >> sync-summary.md
+
+          # Check each requested category
+          IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
+          for category in "${CATEGORIES[@]}"; do
+            category=$(echo "$category" | xargs)
+            if [ -d "docs/bindings/categories/$category" ]; then
+              count=$(find "docs/bindings/categories/$category" -type f -name "*.md" | wc -l)
+              echo "  - $category: $count" >> sync-summary.md
+            else
+              echo "  - $category: Not found" >> sync-summary.md
+            fi
+          done
+        else
+          echo "- Category Bindings: None requested" >> sync-summary.md
+        fi
+
+        # Total bindings count
+        total_bindings=$(find docs/bindings -type f -name "*.md" | wc -l)
+        echo "- Total Bindings: $total_bindings" >> sync-summary.md
 
         cat sync-summary.md
 
@@ -105,15 +166,32 @@ jobs:
         git config user.name  "Leyline Warden"
         git config user.email "leyline-warden@users.noreply.github.com"
         git add docs/tenets docs/bindings || true
-        if ! git diff --cached --quiet; then
-          git commit -m "docs: sync Leyline ${{ inputs.ref }}"
+
+        # Create commit message with category info if specified
+        commit_msg="docs: sync Leyline ${{ inputs.ref }}"
+        if [ -n "${{ inputs.categories }}" ]; then
+          commit_msg="$commit_msg with categories: ${{ inputs.categories }}"
         fi
+
+        if ! git diff --cached --quiet; then
+          git commit -m "$commit_msg"
+        fi
+
+    - name: Generate PR Body
+      run: |
+        echo "Automated vendor update by Leyline Warden." > pr-body.md
+        echo "" >> pr-body.md
+        echo "This update syncs:" >> pr-body.md
+        echo "- All tenets" >> pr-body.md
+        echo "- Core bindings (applicable to all projects)" >> pr-body.md
+        if [ -n "${{ inputs.categories }}" ]; then
+          echo "- Requested categories: ${{ inputs.categories }}" >> pr-body.md
+        fi
+        echo "" >> pr-body.md
+        cat sync-summary.md >> pr-body.md
 
     - name: Push PR
       uses: peter-evans/create-pull-request@v6
       with:
         title: "docs: sync Leyline ${{ inputs.ref }}"
-        body: |
-          Automated vendor update by Leyline Warden.
-
-          $(cat sync-summary.md)
+        body-path: pr-body.md
