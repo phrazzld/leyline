@@ -98,17 +98,38 @@ def process_bindings_dir
   end
 
   # 2. Process category bindings
-  Dir.glob("#{dir}/categories/*").select { |f| File.directory?(f) }.each do |category_dir|
+  # Get all category directories for processing
+  category_dirs = Dir.glob("#{dir}/categories/*").select { |f| File.directory?(f) }
+
+  # Track empty categories for informational purposes
+  empty_categories = []
+
+  category_dirs.each do |category_dir|
     category_name = File.basename(category_dir)
     category_entries[category_name] = []
 
-    Dir.glob("#{category_dir}/*.md").sort.each do |file|
+    # Look for markdown files in this category directory
+    binding_files = Dir.glob("#{category_dir}/*.md").sort
+
+    # If no binding files found, track this as an empty category
+    if binding_files.empty?
+      empty_categories << category_name
+    end
+
+    # Process each binding file (if any)
+    binding_files.each do |file|
       entry = process_binding_file(file)
       if entry
         entry[:path] = "./categories/#{category_name}/#{File.basename(file)}"
         category_entries[category_name] << entry
       end
     end
+  end
+
+  # Log empty categories if any were found
+  unless empty_categories.empty?
+    puts "NOTE: Found #{empty_categories.size} empty category directories: #{empty_categories.join(', ')}"
+    puts "      These categories will appear in the index with an 'empty' message."
   end
 
   # Generate index content
@@ -148,6 +169,8 @@ def process_bindings_dir
         index_content += "| [#{entry[:id]}](#{entry[:path]}) | #{entry[:summary]} |\n"
       end
     else
+      # Handle empty category gracefully with an informative message
+      # This ensures the section appears in the index but clearly indicates it's empty
       index_content += "_No #{category} bindings defined yet._\n"
     end
   end

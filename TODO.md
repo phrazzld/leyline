@@ -100,7 +100,7 @@
         2. Run `tools/reindex.rb` and verify an error is logged and the file is not in `00-index.md`.
     - **Depends‑on:** [T007]
 
-- [ ] **T009 · Feature · P1: Ensure `reindex.rb` gracefully handles empty category directories**
+- [x] **T009 · Feature · P1: Ensure `reindex.rb` gracefully handles empty category directories**
     - **Context:** Detailed Build Steps - Error & Edge‑Case Strategy - `reindex.rb`
     - **Action:**
         1. Modify `tools/reindex.rb` to correctly handle cases where a category directory (e.g., `docs/bindings/categories/new-empty-category/`) exists but contains no binding files.
