@@ -6,6 +6,11 @@ on:
         description: "Leyline tag"
         required: true
         type: string
+      categories:
+        description: "Comma-separated list of categories to sync (e.g., go,typescript,frontend)"
+        required: false
+        type: string
+        default: ""
       override_languages:
         description: "Override language detection (comma-separated list)"
         required: false

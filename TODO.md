@@ -130,7 +130,7 @@
     - **Depends‑on:** [T006]
 
 ## Workflow: `.github/workflows/vendor.yml`
-- [ ] **T011 · Feature · P0: Add `categories` input to `.github/workflows/vendor.yml`**
+- [x] **T011 · Feature · P0: Add `categories` input to `.github/workflows/vendor.yml`**
     - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.1; Architecture Blueprint - Public Interfaces / Contracts - `.github/workflows/vendor.yml` Inputs
     - **Action:**
         1. Add the new `categories` input to `.github/workflows/vendor.yml` with `description: 'Comma-separated list of categories...'`, `required: false`, and `default: ''`.
