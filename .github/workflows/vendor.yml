@@ -90,6 +90,10 @@ jobs:
           # Create array from comma-separated list
           IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
 
+          # Initialize arrays to track synced and missing categories
+          SYNCED_CATEGORIES=()
+          MISSING_CATEGORIES=()
+
           # Process each category
           for category in "${CATEGORIES[@]}"; do
             # Trim whitespace
@@ -98,6 +102,7 @@ jobs:
             # Check if category directory exists
             if [ -d "_leyline/docs/bindings/categories/$category" ]; then
               echo "Syncing category: $category"
+              SYNCED_CATEGORIES+=("$category")
 
               # Create target directory
               mkdir -p "docs/bindings/categories/$category"
@@ -105,9 +110,24 @@ jobs:
               # Sync category files
               rsync -a --delete "_leyline/docs/bindings/categories/$category/" "docs/bindings/categories/$category/"
             else
-              echo "Warning: Category directory for '$category' does not exist in Leyline"
+              echo "⚠️ WARNING: Category directory for '$category' does not exist in Leyline"
+              MISSING_CATEGORIES+=("$category")
             fi
           done
+
+          # Summarize results
+          if [ ${#SYNCED_CATEGORIES[@]} -gt 0 ]; then
+            echo "✅ Successfully synced ${#SYNCED_CATEGORIES[@]} categories: ${SYNCED_CATEGORIES[*]}"
+          else
+            echo "ℹ️ No categories were synced"
+          fi
+
+          if [ ${#MISSING_CATEGORIES[@]} -gt 0 ]; then
+            echo "⚠️ WARNING: ${#MISSING_CATEGORIES[@]} requested categories were not found: ${MISSING_CATEGORIES[*]}"
+            echo "::warning::The following requested categories do not exist in Leyline: ${MISSING_CATEGORIES[*]}"
+            # Save to file for later use in PR body
+            printf "%s\n" "${MISSING_CATEGORIES[@]}" > missing-categories.txt
+          fi
         else
           echo "No specific categories requested, syncing only core bindings"
         fi
@@ -137,20 +157,38 @@ jobs:
 
         # Count category bindings if any were synced
         if [ -n "${{ inputs.categories }}" ]; then
-          # Generate report on which categories were synced
           echo "- Category Bindings:" >> sync-summary.md
 
           # Check each requested category
           IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
+
+          # Track counts for summary
+          synced_count=0
+          missing_count=0
+
           for category in "${CATEGORIES[@]}"; do
             category=$(echo "$category" | xargs)
             if [ -d "docs/bindings/categories/$category" ]; then
               count=$(find "docs/bindings/categories/$category" -type f -name "*.md" | wc -l)
               echo "  - $category: $count" >> sync-summary.md
+              synced_count=$((synced_count + 1))
             else
-              echo "  - $category: Not found" >> sync-summary.md
+              echo "  - $category: ⚠️ Not found" >> sync-summary.md
+              missing_count=$((missing_count + 1))
             fi
           done
+
+          # Add summary of category sync status
+          echo "" >> sync-summary.md
+          echo "**Category Summary:**" >> sync-summary.md
+          echo "- Categories requested: ${#CATEGORIES[@]}" >> sync-summary.md
+          echo "- Categories found and synced: $synced_count" >> sync-summary.md
+
+          if [ $missing_count -gt 0 ]; then
+            echo "- Categories not found: $missing_count" >> sync-summary.md
+            echo "" >> sync-summary.md
+            echo "⚠️ Some requested categories were not found. Please check the spelling or verify they are available in the Leyline repository." >> sync-summary.md
+          fi
         else
           echo "- Category Bindings: None requested" >> sync-summary.md
         fi
@@ -184,9 +222,22 @@ jobs:
         echo "This update syncs:" >> pr-body.md
         echo "- All tenets" >> pr-body.md
         echo "- Core bindings (applicable to all projects)" >> pr-body.md
+
+        # Add requested categories information
         if [ -n "${{ inputs.categories }}" ]; then
           echo "- Requested categories: ${{ inputs.categories }}" >> pr-body.md
+
+          # Add warning about missing categories if any
+          if [ -f "missing-categories.txt" ]; then
+            echo "" >> pr-body.md
+            echo "⚠️ **WARNING:** The following requested categories were not found:" >> pr-body.md
+            echo "```" >> pr-body.md
+            cat missing-categories.txt >> pr-body.md
+            echo "```" >> pr-body.md
+            echo "Please verify the spelling of these categories or check if they are available in the Leyline repository." >> pr-body.md
+          fi
         fi
+
         echo "" >> pr-body.md
         cat sync-summary.md >> pr-body.md
 

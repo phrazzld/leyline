@@ -149,7 +149,7 @@
         2. `vendor.yml` syncs category-specific bindings from `docs/bindings/categories/<category>/` based on the `categories` input.
     - **Depends‑on:** [T011, T006]
 
-- [ ] **T013 · Feature · P1: Implement warning in `vendor.yml` for non-existent requested category directories**
+- [x] **T013 · Feature · P1: Implement warning in `vendor.yml` for non-existent requested category directories**
     - **Context:** Detailed Build Steps - Error & Edge‑Case Strategy - Workflow `vendor.yml`
     - **Action:**
         1. In `vendor.yml`, if a category specified in the `categories` input does not correspond to an existing directory in `docs/bindings/categories/` in the Leyline repo, log a warning.
