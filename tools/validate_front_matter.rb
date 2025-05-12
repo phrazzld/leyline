@@ -15,19 +15,15 @@ REQUIRED_KEYS = {
 # Optional keys that have validation rules when present
 OPTIONAL_KEYS = {
   'bindings' => {
-    'applies_to' => ->(value) { value.is_a?(Array) && value.all? { |v| v.is_a?(String) } }
+    # Note: 'applies_to' field has been removed as part of directory restructuring
+    # The binding category is now determined by its location in the directory structure
   }
 }
 
-# Valid values for applies_to field
-VALID_CONTEXTS = [
-  # Languages
-  'typescript', 'javascript', 'go', 'rust', 'python', 'java', 'csharp', 'ruby',
-  # Environments
-  'frontend', 'backend', 'mobile', 'desktop', 'cli', 'library', 'service',
-  # Special values
-  'all'
-]
+# Note: VALID_CONTEXTS constant has been removed as 'applies_to' is no longer used
+# Categories are now determined by the directory structure:
+# - docs/bindings/core/ for core bindings
+# - docs/bindings/categories/<category>/ for category-specific bindings
 
 # Setup command line options for strict mode
 require 'optparse'
@@ -47,9 +43,9 @@ end
 parser.parse!
 
 # Track all ids to ensure uniqueness
-all_ids = {}
-files_with_issues = []
-strict_mode = options[:strict]
+$all_ids = {}
+$files_with_issues = []
+$strict_mode = options[:strict]
 
 # Helper method to check if a file uses the old horizontal rule format
 def using_horizontal_rule_format?(content)
@@ -68,154 +64,185 @@ def detect_front_matter_format(content)
   end
 end
 
-# Process directories
-%w[docs/tenets docs/bindings].each do |dir|
-  dir_base = dir.split('/').last
+# Process directories and files
+def process_tenets_files
+  dir = 'docs/tenets'
+  dir_base = 'tenets'
   puts "Validating #{dir_base}..."
 
   # Skip index files
   Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.each do |file|
-    content = File.read(file)
-    format = detect_front_matter_format(content)
+    process_single_file(file, dir_base)
+  end
+end
 
-    # Check for horizontal rule format (now deprecated)
-    if format == :horizontal_rule
-      message = "  [WARNING] #{file}: Using deprecated horizontal rule format for metadata"
+def get_binding_files
+  files = []
 
-      if strict_mode
-        puts message.gsub("[WARNING]", "[ERROR]")
-        puts "  YAML front-matter is now required. See TENET_FORMATTING.md for the standard format."
-        puts "  Example:\n---\nid: example-id\nlast_modified: '2025-05-09'\n---"
+  # Core bindings
+  core_glob = "docs/bindings/core/*.md"
+  files.concat(Dir.glob(core_glob).reject { |f| f =~ /00-index\.md$/ })
+
+  # Category bindings
+  categories_glob = "docs/bindings/categories/*/*.md"
+  files.concat(Dir.glob(categories_glob).reject { |f| f =~ /00-index\.md$/ })
+
+  # Check for misplaced files in the root - these should be warned about
+  root_files = Dir.glob("docs/bindings/*.md").reject { |f| f =~ /00-index\.md$/ }
+  if root_files.any?
+    puts "  [WARNING] Found #{root_files.size} binding file(s) directly in docs/bindings/ directory."
+    puts "  These should be moved to either docs/bindings/core/ or docs/bindings/categories/<category>/:"
+    root_files.each do |file|
+      puts "    - #{file}"
+    end
+  end
+
+  files
+end
+
+def process_bindings_files(files)
+  puts "Validating bindings..."
+  dir_base = 'bindings'
+  files.each do |file|
+    process_single_file(file, dir_base)
+  end
+end
+
+def process_single_file(file, dir_base)
+  content = File.read(file)
+  format = detect_front_matter_format(content)
+
+  # Check for horizontal rule format (now deprecated)
+  if format == :horizontal_rule
+    message = "  [WARNING] #{file}: Using deprecated horizontal rule format for metadata"
+
+    if $strict_mode
+      puts message.gsub("[WARNING]", "[ERROR]")
+      puts "  YAML front-matter is now required. See TENET_FORMATTING.md for the standard format."
+      puts "  Example:\n---\nid: example-id\nlast_modified: '2025-05-09'\n---"
+      exit 1
+    else
+      puts message
+      puts "  Please convert to YAML front-matter format as described in TENET_FORMATTING.md."
+      $files_with_issues << file
+      return
+    end
+  end
+
+  # Extract front-matter - must use YAML format with triple dashes
+  if format == :yaml
+    yaml_content = content.match(/^---\n(.*?)\n---/m)[1]
+    begin
+      front_matter = YAML.safe_load(yaml_content)
+    rescue => e
+      message = "  [ERROR] #{file}: Invalid YAML in front-matter: #{e.message}"
+      puts message
+      puts "  YAML content: #{yaml_content.inspect}"
+      puts "  Front-matter must use valid YAML syntax. See TENET_FORMATTING.md for the standard format."
+      exit 1
+    end
+
+    if front_matter.nil?
+      puts "  [ERROR] #{file}: Empty YAML in front-matter"
+      puts "  Front-matter must include required fields. See TENET_FORMATTING.md for details."
+      exit 1
+    end
+
+    # Check required keys
+    missing_keys = REQUIRED_KEYS[dir_base] - front_matter.keys
+    unless missing_keys.empty?
+      puts "  [ERROR] #{file}: Missing required keys in YAML front-matter: #{missing_keys.join(', ')}"
+      puts "  #{dir_base.capitalize} must include: #{REQUIRED_KEYS[dir_base].join(', ')}"
+      puts "  See TENET_FORMATTING.md for the standard format."
+      exit 1
+    end
+
+    # Check for unique ID
+    id = front_matter['id']
+    if $all_ids[id]
+      puts "  [ERROR] #{file}: Duplicate ID '#{id}' in YAML front-matter (already used in #{$all_ids[id]})"
+      puts "  Each document must have a unique ID."
+      exit 1
+    end
+    $all_ids[id] = file
+
+    # Validate date format
+    date = front_matter['last_modified']
+    unless date.is_a?(Date) || date.is_a?(String) && date =~ /^\d{4}-\d{2}-\d{2}$/
+      puts "  [ERROR] #{file}: Invalid date format in 'last_modified' field"
+      puts "  Date must be in ISO format (YYYY-MM-DD) and enclosed in quotes."
+      puts "  Example: last_modified: '2025-05-09'"
+      exit 1
+    end
+
+    # For bindings, validate that derived_from exists
+    if dir_base == 'bindings' && front_matter['derived_from']
+      tenet_file = Dir.glob("docs/tenets/#{front_matter['derived_from']}.md").first
+      unless tenet_file
+        puts "  [ERROR] #{file}: References non-existent tenet '#{front_matter['derived_from']}'"
+        puts "  The 'derived_from' field must reference an existing tenet ID."
         exit 1
-      else
-        puts message
-        puts "  Please convert to YAML front-matter format as described in TENET_FORMATTING.md."
-        files_with_issues << file
-        next
       end
     end
 
-    # Extract front-matter - must use YAML format with triple dashes
-    if format == :yaml
-      yaml_content = content.match(/^---\n(.*?)\n---/m)[1]
-      begin
-        front_matter = YAML.safe_load(yaml_content)
-      rescue => e
-        message = "  [ERROR] #{file}: Invalid YAML in front-matter: #{e.message}"
-        puts message
-        puts "  YAML content: #{yaml_content.inspect}"
-        puts "  Front-matter must use valid YAML syntax. See TENET_FORMATTING.md for the standard format."
-        exit 1
-      end
-
-      if front_matter.nil?
-        puts "  [ERROR] #{file}: Empty YAML in front-matter"
-        puts "  Front-matter must include required fields. See TENET_FORMATTING.md for details."
-        exit 1
-      end
-
-      # Check required keys
-      missing_keys = REQUIRED_KEYS[dir_base] - front_matter.keys
-      unless missing_keys.empty?
-        puts "  [ERROR] #{file}: Missing required keys in YAML front-matter: #{missing_keys.join(', ')}"
-        puts "  #{dir_base.capitalize} must include: #{REQUIRED_KEYS[dir_base].join(', ')}"
-        puts "  See TENET_FORMATTING.md for the standard format."
-        exit 1
-      end
-
-      # Check for unique ID
-      id = front_matter['id']
-      if all_ids[id]
-        puts "  [ERROR] #{file}: Duplicate ID '#{id}' in YAML front-matter (already used in #{all_ids[id]})"
-        puts "  Each document must have a unique ID."
-        exit 1
-      end
-      all_ids[id] = file
-
-      # Validate date format
-      date = front_matter['last_modified']
-      unless date.is_a?(Date) || date.is_a?(String) && date =~ /^\d{4}-\d{2}-\d{2}$/
-        puts "  [ERROR] #{file}: Invalid date format in 'last_modified' field"
-        puts "  Date must be in ISO format (YYYY-MM-DD) and enclosed in quotes."
-        puts "  Example: last_modified: '2025-05-09'"
-        exit 1
-      end
-
-      # For bindings, validate that derived_from exists
-      if dir_base == 'bindings' && front_matter['derived_from']
-        tenet_file = Dir.glob("docs/tenets/#{front_matter['derived_from']}.md").first
-        unless tenet_file
-          puts "  [ERROR] #{file}: References non-existent tenet '#{front_matter['derived_from']}'"
-          puts "  The 'derived_from' field must reference an existing tenet ID."
-          exit 1
-        end
-      end
-
-      # Validate optional keys if present
-      if dir_base == 'bindings' && OPTIONAL_KEYS['bindings']
-        OPTIONAL_KEYS['bindings'].each do |key, validator|
-          if front_matter.key?(key)
-            unless validator.call(front_matter[key])
-              puts "  [ERROR] #{file}: Invalid format for '#{key}' in YAML front-matter"
-              puts "  For 'applies_to', value must be an array of strings."
-              puts "  Example: applies_to: ['typescript', 'frontend']"
-              exit 1
-            end
-
-            # Additional validation for applies_to values
-            if key == 'applies_to'
-              invalid_contexts = front_matter[key] - VALID_CONTEXTS
-              unless invalid_contexts.empty?
-                puts "  [WARNING] #{file}: Unknown context(s) in 'applies_to': #{invalid_contexts.join(', ')}"
-                puts "  Valid contexts are: #{VALID_CONTEXTS.join(', ')}"
-              end
-
-              # Auto-detect language specific bindings without proper applies_to
-              if file =~ /\/(ts|js|go|rust|py|java|cs|rb)-/ && !front_matter[key].any? { |v| v =~ /^(typescript|javascript|go|rust|python|java|csharp|ruby)$/ }
-                prefix = $1
-                language_map = {
-                  'ts' => 'typescript', 'js' => 'javascript', 'go' => 'go',
-                  'rust' => 'rust', 'py' => 'python', 'java' => 'java',
-                  'cs' => 'csharp', 'rb' => 'ruby'
-                }
-                puts "  [WARNING] #{file}: Has prefix '#{prefix}-' but doesn't include '#{language_map[prefix]}' in applies_to"
-              end
-            end
+    # Validate optional keys if present (if any are defined)
+    if dir_base == 'bindings' && OPTIONAL_KEYS['bindings'] && !OPTIONAL_KEYS['bindings'].empty?
+      OPTIONAL_KEYS['bindings'].each do |key, validator|
+        if front_matter.key?(key)
+          unless validator.call(front_matter[key])
+            puts "  [ERROR] #{file}: Invalid format for '#{key}' in YAML front-matter"
+            exit 1
           end
         end
       end
+    end
 
-      puts "  [OK] #{file}"
+    # Check for legacy applies_to field and warn to remove it
+    if dir_base == 'bindings' && front_matter.key?('applies_to')
+      puts "  [WARNING] #{file}: Contains deprecated 'applies_to' field"
+      puts "  The 'applies_to' field is no longer used as categories are now determined by directory structure."
+      puts "  Please remove this field from the front matter."
+    end
+
+    puts "  [OK] #{file}"
+  else
+    message = "  [ERROR] #{file}: No front-matter found"
+
+    if $strict_mode
+      puts message
+      puts "  All #{dir_base} files must begin with YAML front-matter between triple dashes."
+      puts "  See TENET_FORMATTING.md for the standard format."
+      puts "  Example:\n  ---\n  id: example-id\n  last_modified: '2025-05-09'\n  ---"
+      exit 1
     else
-      message = "  [ERROR] #{file}: No front-matter found"
-
-      if strict_mode
-        puts message
-        puts "  All #{dir_base} files must begin with YAML front-matter between triple dashes."
-        puts "  See TENET_FORMATTING.md for the standard format."
-        puts "  Example:\n  ---\n  id: example-id\n  last_modified: '2025-05-09'\n  ---"
-        exit 1
-      else
-        puts message.gsub("[ERROR]", "[WARNING]")
-        puts "  Please add YAML front-matter as described in TENET_FORMATTING.md."
-        files_with_issues << file
-      end
+      puts message.gsub("[ERROR]", "[WARNING]")
+      puts "  Please add YAML front-matter as described in TENET_FORMATTING.md."
+      $files_with_issues << file
     end
   end
 end
 
+# Run the validation process
+process_tenets_files
+
+# Get binding files from the new directory structure
+binding_files = get_binding_files
+
+# Process the binding files
+process_bindings_files(binding_files)
+
 # Summarize results
-if files_with_issues.empty?
+if $files_with_issues.empty?
   puts "All files validated successfully with standard YAML front-matter!"
 else
-  issues_count = files_with_issues.length
+  issues_count = $files_with_issues.length
 
   puts "\n#{issues_count} file(s) need conversion to YAML front-matter format:"
-  files_with_issues.each do |file|
+  $files_with_issues.each do |file|
     puts "  - #{file}"
   end
 
-  if strict_mode
+  if $strict_mode
     puts "\nStandard YAML front-matter validation failed!"
     puts "Run reindex.rb to ensure indexes are still generated correctly."
     exit 1

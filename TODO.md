@@ -114,7 +114,7 @@
     - **Depends‑on:** [T007]
 
 ## Tooling: `validate_front_matter.rb`
-- [ ] **T010 · Feature · P0: Modify `validate_front_matter.rb` to remove `applies_to` validation and support new structure**
+- [x] **T010 · Feature · P0: Modify `validate_front_matter.rb` to remove `applies_to` validation and support new structure**
     - **Context:** Detailed Build Steps - 6. Update Tooling - `validate_front_matter.rb`
     - **Action:**
         1. Modify `tools/validate_front_matter.rb` to stop expecting or validating the `applies_to` field in binding documents.
