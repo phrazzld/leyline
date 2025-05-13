@@ -124,4 +124,4 @@ Here are some example tenets and their derived bindings:
 ## Documentation
 
 Browse through the tenets and bindings directories in this repository for the complete
-documentation. A static site will be available in the future.
+documentation. Note that the site URL will change when the project is fully deployed.
