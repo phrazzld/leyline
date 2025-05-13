@@ -642,6 +642,6 @@ async function processAllItems(items: Item[]): Promise<Result[]> {
 - [testability](../tenets/testability.md): Async code requires special consideration in
   testing. Well-structured async patterns make tests more reliable and easier to write.
 
-- [pure-functions](pure-functions.md): While async functions inherently involve side
+- [pure-functions](docs/bindings/core/pure-functions.md): While async functions inherently involve side
   effects, following pure function principles for the logic within async functions
   improves maintainability and testability.

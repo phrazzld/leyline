@@ -427,12 +427,12 @@ function Modal({ isOpen, onClose, title, children }) {
 
 ## Related Bindings
 
-- [component-architecture.md](component-architecture.md): Properly structured components
+- [component-architecture.md](docs/bindings/core/component-architecture.md): Properly structured components
   following Atomic Design principles provide a solid foundation for accessibility. This
   binding extends component architecture by adding accessibility requirements to the
   component design process.
 
-- [frontend-state-management.md](frontend-state-management.md): Effective state
+- [frontend-state-management.md](docs/bindings/categories/frontend/state-management.md): Effective state
   management is crucial for tracking UI states that affect accessibility, such as
   whether a component is expanded, focused, or in an error state. The state management
   binding complements accessibility by providing patterns for managing these states.
@@ -442,7 +442,7 @@ function Modal({ isOpen, onClose, title, children }) {
   to explicitly consider and implement accessibility features rather than making
   implicit assumptions about how users interact with interfaces.
 
-- [api-design.md](api-design.md): For frontend components, the API is the props
+- [api-design.md](docs/bindings/core/api-design.md): For frontend components, the API is the props
   interface. Accessible components need well-designed, explicit APIs that provide all
   necessary properties for accessibility (labels, descriptions, ARIA attributes),
   connecting these two bindings.

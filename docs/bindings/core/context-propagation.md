@@ -702,7 +702,7 @@ async function publishOrderEvent(event: string, data: any) {
 
 ## Related Bindings
 
-- [use-structured-logging](use-structured-logging.md): Context propagation and
+- [use-structured-logging](docs/bindings/core/use-structured-logging.md): Context propagation and
   structured logging work hand-in-hand to create comprehensive observability. When
   context is propagated across services, structured logs can include consistent
   correlation IDs and other context fields, allowing logs from different services to be
@@ -710,7 +710,7 @@ async function publishOrderEvent(event: string, data: any) {
   transform disconnected log entries into a coherent narrative across service
   boundaries.
 
-- [dependency-inversion](dependency-inversion.md): For effective context propagation,
+- [dependency-inversion](docs/bindings/core/dependency-inversion.md): For effective context propagation,
   services should depend on context abstractions rather than specific implementations.
   This allows for different context propagation strategies in different environments
   (HTTP, message queues, etc.) while maintaining consistent behavior. By applying

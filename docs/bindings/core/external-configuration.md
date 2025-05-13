@@ -378,13 +378,13 @@ def process_image(image_data, config):
   maintainability, but from different angles—implementing both creates multiple layers
   of protection against security issues.
 
-- [dependency-inversion](dependency-inversion.md): Proper external configuration
+- [dependency-inversion](docs/bindings/core/dependency-inversion.md): Proper external configuration
   complements dependency inversion by creating a clean separation between business logic
   and its environmental dependencies. When configuration is injected rather than
   hardcoded, your domain logic becomes more testable and portable across different
   environments—key benefits that dependency inversion also promotes.
 
-- [hex-domain-purity](hex-domain-purity.md): External configuration supports domain
+- [hex-domain-purity](docs/bindings/core/hex-domain-purity.md): External configuration supports domain
   purity by ensuring that environment-specific details don't contaminate your business
   logic. Configuration becomes an infrastructure concern that's kept at the boundaries
   of your application, allowing your domain code to remain focused on the business

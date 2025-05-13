@@ -124,5 +124,4 @@ Here are some example tenets and their derived bindings:
 ## Documentation
 
 Browse through the tenets and bindings directories in this repository for the complete
-documentation. A static site will be available in the future at
-https://phrazzld.github.io/leyline/.
+documentation. A static site will be available in the future.

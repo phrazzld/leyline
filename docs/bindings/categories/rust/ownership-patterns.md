@@ -532,16 +532,16 @@ fn process_file(path: &str) -> Result<Vec<u8>, std::io::Error> {
 
 ## Related Bindings
 
-- [immutable-by-default](immutable-by-default.md): Rust's ownership system naturally
+- [immutable-by-default](docs/bindings/core/immutable-by-default.md): Rust's ownership system naturally
   encourages immutability through shared references (`&T`). When data is borrowed
   immutably, the compiler guarantees it won't change, creating the same benefits as
   explicit immutability patterns in other languages.
 
-- [no-internal-mocking](no-internal-mocking.md): Rust's trait system combined with
+- [no-internal-mocking](docs/bindings/core/no-internal-mocking.md): Rust's trait system combined with
   ownership makes it natural to define abstractions that can be easily tested without
   complex mocking. Clear ownership boundaries create natural seams for testing.
 
-- [dependency-inversion](dependency-inversion.md): In Rust, dependency inversion is
+- [dependency-inversion](docs/bindings/core/dependency-inversion.md): In Rust, dependency inversion is
   often implemented through traits, which pair naturally with the ownership system. The
   ownership constraints of trait objects add clarity about who owns what, making
   dependency relationships more explicit.

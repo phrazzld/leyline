@@ -266,19 +266,19 @@ export interface UserRepository {
 
 ## Related Bindings
 
-- [hex-domain-purity](hex-domain-purity.md): These bindings work in tandem to create a
+- [hex-domain-purity](docs/bindings/core/hex-domain-purity.md): These bindings work in tandem to create a
   clean architecture. While dependency inversion focuses on the direction of
   dependencies, hex-domain purity ensures that no infrastructure concepts leak into your
   domain layer. Together, they create a strong boundary that protects your business
   logic from technical details.
 
-- [no-internal-mocking](no-internal-mocking.md): Dependency inversion enables proper
+- [no-internal-mocking](docs/bindings/core/no-internal-mocking.md): Dependency inversion enables proper
   testing without internal mocking. When your code follows dependency inversion, you can
   inject test doubles at the boundaries rather than mocking internal collaborators,
   resulting in more maintainable tests that don't break when implementation details
   change.
 
-- [immutable-by-default](immutable-by-default.md): Both bindings promote predictability
+- [immutable-by-default](docs/bindings/core/immutable-by-default.md): Both bindings promote predictability
   and maintainability. Dependency inversion makes module interactions predictable by
   defining clear interfaces, while immutability makes data flow predictable by
   preventing unexpected mutations. Together, they significantly reduce the cognitive
