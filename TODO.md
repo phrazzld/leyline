@@ -317,7 +317,7 @@
         6. All tests pass successfully
     - **Depends‑on:** [T007, T008, T009]
 
-- [ ] **T027 · Test · P1: Add unit tests for updated `validate_front_matter.rb`**
+- [x] **T027 · Test · P1: Add unit tests for updated `validate_front_matter.rb`**
     - **Context:** Testing Strategy - Unit Tests for `validate_front_matter.rb`
     - **Action:**
         1. Create unit tests for `validate_front_matter.rb` covering:
@@ -327,7 +327,12 @@
     - **Done‑when:**
         1. Unit tests cover critical logic in `validate_front_matter.rb` with >80% coverage.
     - **Verification:**
-        1. Run tests and verify they pass.
+        1. Created `test_validate_front_matter.rb` with comprehensive tests that verify:
+           - The script correctly validates bindings in the new directory structure (core/ and categories/)
+           - It warns about but doesn't error on deprecated `applies_to` field
+           - It detects misplaced files in the root bindings directory
+           - It supports both formats in normal mode but enforces YAML in strict mode
+           - All 9 test assertions pass successfully
     - **Depends‑on:** [T010]
 
 - [ ] **T028 · Test · P0: Perform integration testing with test consumer repository**
