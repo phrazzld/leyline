@@ -22,36 +22,38 @@ nav:
     - No Secret Suppression: tenets/no-secret-suppression.md
   - Bindings:
     - Overview: bindings/00-index.md
+    - Core Bindings:
+      - API Design: bindings/core/api-design.md
+      - Automate Changelog: bindings/core/automate-changelog.md
+      - Code Size: bindings/core/code-size.md
+      - Component Architecture: bindings/core/component-architecture.md
+      - Context Propagation: bindings/core/context-propagation.md
+      - Dependency Inversion: bindings/core/dependency-inversion.md
+      - Dependency Management: bindings/core/dependency-management.md
+      - External Configuration: bindings/core/external-configuration.md
+      - Hex Domain Purity: bindings/core/hex-domain-purity.md
+      - Immutable By Default: bindings/core/immutable-by-default.md
+      - No Internal Mocking: bindings/core/no-internal-mocking.md
+      - No Lint Suppression: bindings/core/no-lint-suppression.md
+      - Pure Functions: bindings/core/pure-functions.md
+      - Require Conventional Commits: bindings/core/require-conventional-commits.md
+      - Semantic Versioning: bindings/core/semantic-versioning.md
+      - Use Structured Logging: bindings/core/use-structured-logging.md
     - TypeScript:
-      - No Any: bindings/ts-no-any.md
-      - Module Organization: bindings/ts-module-organization.md
-      - Async Patterns: bindings/ts-async-patterns.md
+      - No Any: bindings/categories/typescript/no-any.md
+      - Module Organization: bindings/categories/typescript/module-organization.md
+      - Async Patterns: bindings/categories/typescript/async-patterns.md
     - Go:
-      - Error Wrapping: bindings/go-error-wrapping.md
-      - Interface Design: bindings/go-interface-design.md
-      - Package Design: bindings/go-package-design.md
-      - Concurrency Patterns: bindings/go-concurrency-patterns.md
+      - Error Wrapping: bindings/categories/go/error-wrapping.md
+      - Interface Design: bindings/categories/go/interface-design.md
+      - Package Design: bindings/categories/go/package-design.md
+      - Concurrency Patterns: bindings/categories/go/concurrency-patterns.md
     - Rust:
-      - Error Handling: bindings/rust-error-handling.md
-      - Ownership Patterns: bindings/rust-ownership-patterns.md
+      - Error Handling: bindings/categories/rust/error-handling.md
+      - Ownership Patterns: bindings/categories/rust/ownership-patterns.md
     - Frontend:
-      - State Management: bindings/frontend-state-management.md
-      - Web Accessibility: bindings/web-accessibility.md
-      - Component Architecture: bindings/component-architecture.md
-    - Architecture:
-      - Hex Domain Purity: bindings/hex-domain-purity.md
-      - Dependency Inversion: bindings/dependency-inversion.md
-      - External Configuration: bindings/external-configuration.md
-      - Code Size: bindings/code-size.md
-      - API Design: bindings/api-design.md
-    - Best Practices:
-      - Immutable By Default: bindings/immutable-by-default.md
-      - Pure Functions: bindings/pure-functions.md
-      - No Internal Mocking: bindings/no-internal-mocking.md
-      - No Lint Suppression: bindings/no-lint-suppression.md
-      - Require Conventional Commits: bindings/require-conventional-commits.md
-      - Use Structured Logging: bindings/use-structured-logging.md
-      - Dependency Management: bindings/dependency-management.md
+      - State Management: bindings/categories/frontend/state-management.md
+      - Web Accessibility: bindings/categories/frontend/web-accessibility.md
   - Integration:
     - Migration Guide: migration-guide.md
     - Implementation Guide: implementation-guide.md

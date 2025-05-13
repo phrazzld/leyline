@@ -1,7 +1,43 @@
 # Binding Metadata Schema
 
-This document outlines the metadata schema for binding files, including the new
-`applies_to` field for language and context filtering.
+This document outlines the metadata schema for binding files and explains the directory-based approach to categorization.
+
+## Directory-Based Categorization
+
+Binding applicability is now determined by its location within the directory structure:
+
+```
+docs/bindings/
+  ├── core/                # Core bindings (applicable to all projects)
+  └── categories/          # Category-specific bindings
+      ├── go/              # Go-specific bindings
+      ├── rust/            # Rust-specific bindings
+      ├── typescript/      # TypeScript-specific bindings
+      ├── cli/             # CLI-specific bindings
+      ├── frontend/        # Frontend-specific bindings
+      └── backend/         # Backend-specific bindings
+```
+
+### Categorization Guidelines
+
+When creating a new binding:
+
+1. **Core Bindings**: Place in `docs/bindings/core/` if the binding:
+   - Applies to all projects regardless of language or context
+   - Represents a fundamental principle that transcends specific languages or environments
+   - Can be described in language-agnostic terms
+
+2. **Category-Specific Bindings**: Place in `docs/bindings/categories/<category>/` if the binding:
+   - Applies primarily to a specific programming language or context
+   - Uses language-specific syntax or features
+   - Addresses concerns specific to a particular category
+
+### Cross-Cutting Bindings Strategy
+
+For bindings that apply to multiple categories:
+- Identify the primary category where the binding is most relevant
+- Place the binding in that primary category directory
+- In the binding document, clearly explain its applicability to other categories
 
 ## Required Metadata
 
@@ -16,90 +52,28 @@ enforced_by: description of enforcement mechanism
 ---
 ```
 
-| Field | Description | Example | |-------|-------------|---------| | `id` | Unique
-identifier for the binding. Should match filename. | `ts-no-any` | | `last_modified` |
-Date of last modification in ISO format. | `"2025-05-02"` | | `derived_from` | ID of the
-tenet this binding implements. | `simplicity` | | `enforced_by` | Description of how
-this binding is enforced. | `eslint("no-explicit-any")` |
+| Field | Description | Example |
+|-------|-------------|---------|
+| `id` | Unique identifier for the binding. Should match filename without extension. | `no-any` |
+| `last_modified` | Date of last modification in ISO format. | `"2025-05-02"` |
+| `derived_from` | ID of the tenet this binding implements. | `simplicity` |
+| `enforced_by` | Description of how this binding is enforced. | `eslint("@typescript-eslint/no-explicit-any")` |
 
-## Language and Context Applicability
-
-To support automatic filtering based on repository language and context, bindings should
-include the `applies_to` field:
-
-```yaml
----
-id: ts-no-any
-last_modified: "2025-05-02"
-derived_from: simplicity
-enforced_by: eslint("no-explicit-any")
-applies_to:
-  - typescript
-  - frontend
-  - backend
----
-```
-
-### Valid `applies_to` Values
-
-#### Languages
-
-- `typescript`
-- `javascript`
-- `go`
-- `rust`
-- `python`
-- `java`
-- `csharp`
-- `ruby`
-
-#### Environments/Contexts
-
-- `frontend`
-- `backend`
-- `mobile`
-- `desktop`
-- `cli`
-- `library`
-- `service`
-
-#### Special Values
-
-- `all` - Indicates the binding applies to all contexts/languages
-
-### Naming Convention and Auto-detection
+## Filename Conventions
 
 Binding filenames should follow this pattern:
 
 ```
-[language-prefix]-[binding-name].md
+[binding-name].md
 ```
 
-The language prefix should correspond to the appropriate language in `applies_to`:
+- Use descriptive, kebab-case names without language prefixes
+- The `id` in the front-matter should match the filename (without the `.md` extension)
+- For example, use `no-any.md` instead of `ts-no-any.md`
 
-| Prefix | Language | |--------|----------| | `ts-` | typescript | | `js-` | javascript
-| | `go-` | go | | `rust-` | rust | | `py-` | python | | `java-` | java | | `cs-` |
-csharp | | `rb-` | ruby |
+## Examples
 
-For language-agnostic bindings, omit the language prefix and include `all` in the
-`applies_to` array.
-
-### Examples
-
-#### TypeScript-specific binding:
-
-```yaml
----
-id: ts-no-any
-last_modified: "2025-05-02"
-derived_from: simplicity
-enforced_by: eslint("@typescript-eslint/no-explicit-any")
-applies_to:
-  - typescript
----
-```
-
-#### Language-agnostic binding:
+### Core Binding:
 
 ```yaml
 ---
@@ -107,34 +81,43 @@ id: require-conventional-commits
 last_modified: "2025-05-02"
 derived_from: automation
 enforced_by: commitlint
-applies_to:
-  - all
 ---
 ```
 
-#### Multi-language binding:
+*Location: `/docs/bindings/core/require-conventional-commits.md`*
+
+### Category-Specific Binding:
 
 ```yaml
 ---
-id: no-internal-mocking
+id: no-any
 last_modified: "2025-05-02"
-derived_from: testability
-enforced_by: code review
-applies_to:
-  - typescript
-  - javascript
-  - go
-  - python
-  - java
+derived_from: simplicity
+enforced_by: eslint("@typescript-eslint/no-explicit-any")
 ---
 ```
+
+*Location: `/docs/bindings/categories/typescript/no-any.md`*
+
+### Cross-Cutting Binding (placed in primary category):
+
+```yaml
+---
+id: error-wrapping
+last_modified: "2025-05-02"
+derived_from: modularity
+enforced_by: linter and code review
+---
+```
+
+*Location: `/docs/bindings/categories/go/error-wrapping.md`*
+*Note: This file should contain explanation that while primarily for Go, the principles may be relevant to other languages.*
 
 ## Validation
 
 The `tools/validate_front_matter.rb` script will validate:
 
 - All required fields are present
-- The `applies_to` field contains an array of strings
-- The values in `applies_to` are from the list of valid contexts
-- For bindings with language-specific prefixes, a warning is displayed if the
-  corresponding language is not in `applies_to`
+- The `id` field matches the filename (without the `.md` extension)
+- The location of the binding file matches the new directory structure
+- The script will issue warnings for files found directly in `docs/bindings/` that don't follow the new structure

@@ -335,7 +335,7 @@
            - All 9 test assertions pass successfully
     - **Depends‑on:** [T010]
 
-- [ ] **T028 · Test · P0: Perform integration testing with test consumer repository**
+- [~] **T028 · Test · P0: Perform integration testing with test consumer repository**
     - **Context:** Testing Strategy - Integration Tests
     - **Action:**
         1. Set up a dedicated test GitHub repository that calls `vendor.yml` from the feature branch.

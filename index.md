@@ -13,16 +13,22 @@ development principles through two core concepts:
 
 For example, the [simplicity](docs/tenets/simplicity.md) tenet establishes the principle
 that we should "prefer the simplest design that works," while the
-[ts-no-any](docs/bindings/ts-no-any.md) binding is a specific, enforceable rule derived
+[no-any](docs/bindings/categories/typescript/no-any.md) binding is a specific, enforceable rule derived
 from that tenet.
 
 ## Repository Structure
 
 ```
-docs/tenets/   # Foundational principles (immutable truths)
-docs/bindings/ # Enforceable rules (derived from tenets)
-tools/        # Validation and maintenance scripts
-.github/      # Automation workflows
+docs/tenets/                     # Foundational principles (immutable truths)
+docs/bindings/                   # Enforceable rules (derived from tenets)
+  ├── core/                      # Bindings that apply to all contexts
+  └── categories/                # Category-specific bindings
+      ├── typescript/            # TypeScript-specific bindings
+      ├── go/                    # Go-specific bindings
+      ├── rust/                  # Rust-specific bindings
+      └── frontend/              # Frontend-specific bindings
+tools/                           # Validation and maintenance scripts
+.github/                         # Automation workflows
 ```
 
 ## How It Works
@@ -62,6 +68,7 @@ jobs:
     uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.0
     with:
       ref: v0.1.0
+      categories: "typescript,frontend"  # Specify categories relevant to your project
 ```
 
 2. The first time the workflow runs, it will create `/docs/tenets` and `/docs/bindings`
@@ -74,14 +81,15 @@ templates and best practices for maintaining synchronized copies of tenets and b
 ### Language-Specific Integration
 
 To ensure repositories only receive relevant bindings (e.g., TypeScript projects don't
-pull Go bindings), Leyline provides language-specific integration options:
+pull Go bindings), Leyline provides category-specific integration options:
 
-- Binding files use language prefixes (e.g., `ts-`, `go-`, `rust-`) for easy filtering
+- Bindings are organized in category-specific directories for easy filtering
+- You can specify which categories to sync using the `categories` parameter
 - The
   [language-specific workflow example](examples/github-workflows/language-specific-sync.yml)
-  detects repository languages and syncs only relevant bindings
+  detects repository languages and syncs only relevant binding categories
 - See the [implementation guide](docs/implementation-guide.md) for detailed instructions
-  on language-specific integration
+  on category-specific integration
 
 ## Contributing
 
@@ -98,13 +106,13 @@ changes.
 Here are some example tenets and their derived bindings:
 
 - **[Simplicity](docs/tenets/simplicity.md)** →
-  [hex-domain-purity](docs/bindings/hex-domain-purity.md),
-  [ts-no-any](docs/bindings/ts-no-any.md)
+  [hex-domain-purity](docs/bindings/core/hex-domain-purity.md),
+  [no-any](docs/bindings/categories/typescript/no-any.md)
 - **[Automation](docs/tenets/automation.md)** →
-  [go-error-wrapping](docs/bindings/go-error-wrapping.md),
-  [require-conventional-commits](docs/bindings/require-conventional-commits.md)
+  [error-wrapping](docs/bindings/categories/go/error-wrapping.md),
+  [require-conventional-commits](docs/bindings/core/require-conventional-commits.md)
 - **[Testability](docs/tenets/testability.md)** →
-  [no-internal-mocking](docs/bindings/no-internal-mocking.md)
+  [no-internal-mocking](docs/bindings/core/no-internal-mocking.md)
 
 ## Documentation
 

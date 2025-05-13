@@ -13,16 +13,24 @@ development principles through two core concepts:
 
 For example, the [simplicity](./docs/tenets/simplicity.md) tenet establishes the
 principle that we should "prefer the simplest design that works," while the
-[ts-no-any](./docs/bindings/ts-no-any.md) binding is a specific, enforceable rule
+[no-any](./docs/bindings/categories/typescript/no-any.md) binding is a specific, enforceable rule
 derived from that tenet.
 
 ## Repository Structure
 
 ```
-docs/tenets/   # Foundational principles (immutable truths)
-docs/bindings/ # Enforceable rules (derived from tenets)
-tools/         # Validation and maintenance scripts
-.github/       # Automation workflows
+docs/tenets/                     # Foundational principles (immutable truths)
+docs/bindings/                   # Enforceable rules (derived from tenets)
+  ├── core/                      # Core bindings applicable to all projects
+  └── categories/                # Category-specific bindings
+      ├── go/                    # Go language bindings
+      ├── rust/                  # Rust language bindings
+      ├── typescript/            # TypeScript language bindings
+      ├── cli/                   # CLI application bindings
+      ├── frontend/              # Frontend application bindings
+      └── backend/               # Backend application bindings
+tools/                           # Validation and maintenance scripts
+.github/                         # Automation workflows
 ```
 
 ## How It Works
@@ -62,6 +70,7 @@ jobs:
     uses: phrazzld/leyline/.github/workflows/vendor.yml@master
     with:
       ref: master
+      categories: go,typescript # Optional: Specify the categories you want to sync
 ```
 
 > **Note**: Using `master` instead of a version tag (e.g., `v0.1.0`) means your repository will automatically receive all updates to Leyline, including potential breaking changes. If you prefer a more controlled update process, use a specific version tag and update it manually when ready to upgrade.
@@ -73,17 +82,21 @@ For complete integration examples, including pre-commit hooks and Renovate
 configurations, see the [examples directory](./examples/). These examples provide
 templates and best practices for maintaining synchronized copies of tenets and bindings.
 
-### Language-Specific Integration
+### Category-Specific Integration
 
 To ensure repositories only receive relevant bindings (e.g., TypeScript projects don't
-pull Go bindings), Leyline provides language-specific integration options:
+pull Go bindings), Leyline provides category-specific integration options:
 
-- Binding files use language prefixes (e.g., `ts-`, `go-`, `rust-`) for easy filtering
-- The
-  [language-specific workflow example](./examples/github-workflows/language-specific-sync.yml)
-  detects repository languages and syncs only relevant bindings
+- Binding files are organized by category directories (e.g., `categories/typescript/`, `categories/go/`) for clean organization
+- Use the `categories` input parameter to specify which categories to sync:
+  ```yaml
+  with:
+    ref: master
+    categories: go,typescript,frontend
+  ```
+- The workflow will always sync core bindings (applicable to all projects) and tenets, along with the categories you specify
 - See the [implementation guide](./docs/implementation-guide.md) for detailed
-  instructions on language-specific integration
+  instructions on category-specific integration
 
 ## Contributing
 
@@ -100,13 +113,13 @@ changes.
 Here are some example tenets and their derived bindings:
 
 - **[Simplicity](./docs/tenets/simplicity.md)** →
-  [hex-domain-purity](./docs/bindings/hex-domain-purity.md),
-  [ts-no-any](./docs/bindings/ts-no-any.md)
+  [hex-domain-purity](./docs/bindings/core/hex-domain-purity.md),
+  [no-any](./docs/bindings/categories/typescript/no-any.md)
 - **[Automation](./docs/tenets/automation.md)** →
-  [go-error-wrapping](./docs/bindings/go-error-wrapping.md),
-  [require-conventional-commits](./docs/bindings/require-conventional-commits.md)
+  [error-wrapping](./docs/bindings/categories/go/error-wrapping.md),
+  [require-conventional-commits](./docs/bindings/core/require-conventional-commits.md)
 - **[Testability](./docs/tenets/testability.md)** →
-  [no-internal-mocking](./docs/bindings/no-internal-mocking.md)
+  [no-internal-mocking](./docs/bindings/core/no-internal-mocking.md)
 
 ## Documentation
 

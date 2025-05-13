@@ -2,57 +2,52 @@
 
 ## Language-Specific Integration
 
-To ensure repositories only receive relevant bindings, Leyline provides two approaches:
+To ensure repositories only receive relevant bindings, Leyline uses a directory-based organizational approach:
 
-### 1. Front-matter Tags for Bindings
+### 1. Directory-Based Binding Organization
 
-All bindings should include language/context tags in their front-matter. This allows
-workflow scripts to filter bindings appropriately:
+Bindings are organized in a hierarchical directory structure that makes filtering and syncing easier:
 
-```yaml
----
-id: ts-no-any
-last_modified: 2025-05-05
-derived_from: simplicity
-enforced_by: eslint("no-explicit-any") & tsconfig("noImplicitAny")
-applies_to:
-  - typescript
-  - javascript
----
-```
+- Core bindings (applicable to all contexts) are stored in the `docs/bindings/core/` directory
+- Category-specific bindings are stored in appropriate subdirectories under `docs/bindings/categories/`:
+  - `docs/bindings/categories/typescript/` - TypeScript-specific bindings
+  - `docs/bindings/categories/go/` - Go-specific bindings
+  - `docs/bindings/categories/rust/` - Rust-specific bindings
+  - `docs/bindings/categories/frontend/` - Frontend-specific bindings
+  - etc.
 
-The `applies_to` field can contain one or more of:
+This structure allows workflows to easily sync only the relevant categories of bindings for a specific repository.
 
-- Language identifiers: `typescript`, `go`, `rust`, etc.
-- Context identifiers: `frontend`, `backend`, `cli`, `library`, etc.
+### 2. Using Category-Specific Workflows
 
-### 2. Binding File Naming Conventions
+The example workflow in `examples/github-workflows/vendor.yml` demonstrates how to:
 
-Binding files should follow a consistent naming convention that makes filtering easier:
-
-- Language-specific bindings should have a prefix: `ts-`, `go-`, `rust-`, etc.
-- General bindings applicable to all contexts should have no language prefix
-
-### 3. Using Language-Specific Workflows
-
-The example workflow in `examples/github-workflows/language-specific-sync.yml`
-demonstrates how to:
-
-1. Detect languages used in a repository
-1. Sync only the relevant bindings based on language detection
-1. Always sync universal bindings that apply to all projects
+1. Specify which binding categories to sync using the `categories` input parameter
+2. Sync only the selected binding categories to the target repository
+3. Always sync core bindings that apply to all projects
+4. Clean up any old bindings that no longer exist in the source
 
 This approach ensures that a TypeScript project doesn't receive Go-specific bindings,
-while still receiving all relevant tenets and universal bindings.
+while still receiving all relevant tenets and core bindings.
+
+### 3. Cross-Cutting Bindings
+
+Some bindings might apply to multiple categories but not all repositories. For these:
+
+1. Place the binding in the most appropriate category directory
+2. When syncing, include all relevant categories in the `categories` parameter
+3. In the binding, clearly document all the contexts where it applies
 
 ## Implementation for Binding Authors
 
 When creating a new binding:
 
-1. Use the appropriate file name prefix for language-specific bindings
-1. Include the `applies_to` field in the front-matter
-1. Be explicit about which languages and contexts the binding applies to
-1. For universal bindings, either omit the `applies_to` field or include `"all"`
+1. Place the binding in the appropriate directory:
+   - `docs/bindings/core/` for universally applicable bindings
+   - `docs/bindings/categories/<category>/` for category-specific bindings
+2. Use a descriptive filename without language prefixes (e.g., `no-any.md` instead of `ts-no-any.md`)
+3. Ensure the `id` in the front-matter matches the filename (without `.md`)
+4. The directory structure itself defines the binding's applicability - no `applies_to` field is needed
 
 By following these conventions, consumer repositories will only receive bindings
 relevant to their context, making the integration more valuable and reducing noise.

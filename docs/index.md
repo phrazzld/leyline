@@ -13,16 +13,24 @@ development principles through two core concepts:
 
 For example, the [simplicity](tenets/simplicity.md) tenet establishes the principle that
 we should "prefer the simplest design that works," while the
-[ts-no-any](bindings/ts-no-any.md) binding is a specific, enforceable rule derived from
+[no-any](bindings/categories/typescript/no-any.md) binding is a specific, enforceable rule derived from
 that tenet.
 
 ## Repository Structure
 
 ```
-tenets/       # Foundational principles (immutable truths)
-bindings/     # Enforceable rules (derived from tenets)
-tools/        # Validation and maintenance scripts
-.github/      # Automation workflows
+tenets/                        # Foundational principles (immutable truths)
+bindings/                      # Enforceable rules (derived from tenets)
+  ├── core/                    # Core bindings applicable to all projects
+  └── categories/              # Category-specific bindings
+      ├── go/                  # Go language bindings
+      ├── rust/                # Rust language bindings
+      ├── typescript/          # TypeScript language bindings
+      ├── cli/                 # CLI application bindings
+      ├── frontend/            # Frontend application bindings
+      └── backend/             # Backend application bindings
+tools/                         # Validation and maintenance scripts
+.github/                       # Automation workflows
 ```
 
 ## How It Works
@@ -54,7 +62,15 @@ jobs:
     uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.0
     with:
       ref: v0.1.0
+      categories: go,typescript,frontend # Optional: Specify the categories you want to sync
 ```
+
+The workflow accepts the following inputs:
+
+- `ref`: The Leyline tag to sync from (required)
+- `categories`: A comma-separated list of categories to sync (optional)
+  - If not specified, only core bindings and tenets will be synced
+  - Valid categories: `go`, `rust`, `typescript`, `cli`, `frontend`, `backend`
 
 2. The first time the workflow runs, it will create `/docs/tenets` and `/docs/bindings`
    directories in your repository.
@@ -74,12 +90,13 @@ changes.
 Here are some example tenets and their derived bindings:
 
 - **[Simplicity](tenets/simplicity.md)** →
-  [hex-domain-purity](bindings/hex-domain-purity.md), [ts-no-any](bindings/ts-no-any.md)
+  [hex-domain-purity](bindings/core/hex-domain-purity.md),
+  [no-any](bindings/categories/typescript/no-any.md)
 - **[Automation](tenets/automation.md)** →
-  [go-error-wrapping](bindings/go-error-wrapping.md),
-  [require-conventional-commits](bindings/require-conventional-commits.md)
+  [error-wrapping](bindings/categories/go/error-wrapping.md),
+  [require-conventional-commits](bindings/core/require-conventional-commits.md)
 - **[Testability](tenets/testability.md)** →
-  [no-internal-mocking](bindings/no-internal-mocking.md)
+  [no-internal-mocking](bindings/core/no-internal-mocking.md)
 
 ## Documentation
 

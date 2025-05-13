@@ -137,7 +137,12 @@ issues:
 
 **File Structure:**
 
-- Create file in `bindings/` directory with a descriptive slug (e.g., `ts-no-any.md`)
+- Place the file in the appropriate directory based on its applicability:
+  - `bindings/core/` for bindings that apply to all projects
+  - `bindings/categories/<category>/` for category-specific bindings
+    - Valid categories: `go`, `rust`, `typescript`, `cli`, `frontend`, `backend`
+
+- Use a descriptive filename without category prefixes (e.g., `no-any.md` rather than `ts-no-any.md`)
 
 - Use the [binding template](templates/binding_template.md) as your starting point
 
@@ -149,8 +154,6 @@ issues:
   last_modified: "YYYY-MM-DD"
   derived_from: parent-tenet-id
   enforced_by: description of enforcement mechanism
-  applies_to:
-    - language or context
   ---
   ```
 
@@ -207,6 +210,28 @@ issues:
 - Update `last_modified` date
 - Ensure changes maintain or improve natural language quality
 - Follow the [Natural Language Style Guide](STYLE_GUIDE_NATURAL_LANGUAGE.md)
+
+### Cross-Cutting Bindings Strategy
+
+Some bindings may be applicable across multiple categories. When deciding where to place such bindings, follow these guidelines:
+
+1. **Core Bindings**:
+   - Place a binding in `bindings/core/` if:
+     - It applies to virtually all projects regardless of language or context
+     - It represents a fundamental principle that transcends specific languages or environments
+     - It can be described in language-agnostic terms
+
+2. **Category Bindings**:
+   - Place a binding in `bindings/categories/<category>/` if:
+     - It applies primarily to a specific programming language or context
+     - It uses language-specific syntax or features
+     - It addresses concerns specific to a particular category
+
+3. **Cross-Cutting Decision Process**:
+   - Identify the primary category where the binding is most relevant
+   - Place the binding in that primary category directory
+   - In the binding document, clearly explain its applicability to other categories
+   - Reference the binding from relevant documentation in other categories
 
 ## Writing Effective Natural Language Documentation
 
