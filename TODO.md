@@ -158,7 +158,7 @@
         1. `vendor.yml` logs a warning and continues when a requested category directory does not exist.
     - **Depends‑on:** [T012]
 
-- [ ] **T014 · Feature · P1: Implement failure in `vendor.yml` for invalid `categories` input format**
+- [x] **T014 · Feature · P1: Implement failure in `vendor.yml` for invalid `categories` input format**
     - **Context:** Detailed Build Steps - Error & Edge‑Case Strategy - Workflow `vendor.yml`
     - **Action:**
         1. Add validation to `vendor.yml` to check if the `categories` input string contains unexpected characters (e.g., not alphanumeric, comma, or hyphen).
@@ -167,7 +167,7 @@
         1. `vendor.yml` fails with a clear error message if the `categories` input has an invalid format.
     - **Depends‑on:** [T012]
 
-- [ ] **T015 · Feature · P0: Implement cleanup step in `vendor.yml` to remove old flat binding structure in consumer repo**
+- [x] **T015 · Feature · P0: Implement cleanup step in `vendor.yml` to remove old flat binding structure in consumer repo**
     - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (cleanup step)
     - **Action:**
         1. Add a step to `vendor.yml` that, when run in the consumer repository, removes any files/directories from the *previous* flat `docs/bindings/` structure before copying new files.
@@ -177,7 +177,7 @@
         1. As part of integration testing, ensure that after a sync, no stale files from a previous flat structure remain in `docs/bindings/` in the test consumer repo.
     - **Depends‑on:** [T012]
 
-- [ ] **T016 · Feature · P0: Ensure `vendor.yml` runs `reindex.rb` in consumer repo post-sync**
+- [x] **T016 · Feature · P0: Ensure `vendor.yml` runs `reindex.rb` in consumer repo post-sync**
     - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (reindex step)
     - **Action:**
         1. Add a step to `vendor.yml` to execute `tools/reindex.rb` (from the synced Leyline content) in the consumer repository *after* all files are synced and old files are cleaned up.
@@ -187,7 +187,7 @@
         1. As part of integration testing, verify that `docs/bindings/00-index.md` in the test consumer repo is correctly regenerated.
     - **Depends‑on:** [T015, T007]
 
-- [ ] **T017 · Feature · P2: Update PR message in `vendor.yml` to list synced categories**
+- [x] **T017 · Feature · P2: Update PR message in `vendor.yml` to list synced categories**
     - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (PR message step)
     - **Action:**
         1. Modify the part of `vendor.yml` that generates a Pull Request in the consumer repository.
@@ -199,7 +199,7 @@
     - **Depends‑on:** [T012]
 
 ## CI: `.github/workflows/ci.yml`
-- [ ] **T018 · Feature · P1: Update `.github/workflows/ci.yml` to run `tools/validate_front_matter.rb --strict`**
+- [x] **T018 · Feature · P1: Update `.github/workflows/ci.yml` to run `tools/validate_front_matter.rb --strict`**
     - **Context:** Detailed Build Steps - 8. Update Leyline CI - `.github/workflows/ci.yml` - 8.1
     - **Action:**
         1. Ensure the `.github/workflows/ci.yml` workflow executes `tools/validate_front_matter.rb --strict`.
@@ -209,7 +209,7 @@
         1. CI build logs show the execution of the script with the `--strict` flag.
     - **Depends‑on:** [T010]
 
-- [ ] **T019 · Feature · P1: Update `.github/workflows/ci.yml` to run `tools/reindex.rb` and check `00-index.md` consistency**
+- [x] **T019 · Feature · P1: Update `.github/workflows/ci.yml` to run `tools/reindex.rb` and check `00-index.md` consistency**
     - **Context:** Detailed Build Steps - 8. Update Leyline CI - `.github/workflows/ci.yml` - 8.2
     - **Action:**
         1. Ensure the `.github/workflows/ci.yml` workflow executes `tools/reindex.rb`.
@@ -222,7 +222,7 @@
     - **Depends‑on:** [T007]
 
 ## Documentation Updates
-- [ ] **T020 · Docs · P1: Update `README.md` / `docs/index.md` for new structure and `vendor.yml` usage**
+- [x] **T020 · Docs · P1: Update `README.md` / `docs/index.md` for new structure and `vendor.yml` usage**
     - **Context:** Detailed Build Steps - 9. Update Documentation - 9.1
     - **Action:**
         1. In `README.md` and/or `docs/index.md`, explain the new `docs/bindings/core/` and `docs/bindings/categories/` directory structure.
@@ -233,7 +233,7 @@
         1. Review the updated documentation for clarity and correctness.
     - **Depends‑on:** [T005, T011]
 
-- [ ] **T021 · Docs · P1: Update `CONTRIBUTING.md` for new binding placement, front matter, and cross-cutting strategy**
+- [x] **T021 · Docs · P1: Update `CONTRIBUTING.md` for new binding placement, front matter, and cross-cutting strategy**
     - **Context:** Detailed Build Steps - 9. Update Documentation - 9.2
     - **Action:**
         1. Update `CONTRIBUTING.md` to guide contributors on where to place new bindings (in `core/` or `categories/<category>/`).
@@ -245,7 +245,7 @@
         1. Review `CONTRIBUTING.md` to ensure the new guidelines are easy to understand and follow.
     - **Depends‑on:** [T005, T006]
 
-- [ ] **T022 · Docs · P0: Create `docs/migration-guide.md` for consumer workflow updates**
+- [x] **T022 · Docs · P0: Create `docs/migration-guide.md` for consumer workflow updates**
     - **Context:** Detailed Build Steps - 9. Update Documentation - 9.3
     - **Action:**
         1. Create a new file `docs/migration-guide.md`.
@@ -259,7 +259,7 @@
         1. Review the migration guide for clarity, completeness, and correctness.
     - **Depends‑on:** [T012]
 
-- [ ] **T023 · Docs · P1: Update `docs/binding-metadata.md` or `TENET_FORMATTING.md` for binding categorization**
+- [x] **T023 · Docs · P1: Update `docs/binding-metadata.md` or `TENET_FORMATTING.md` for binding categorization**
     - **Context:** Detailed Build Steps - 9. Update Documentation - 9.4
     - **Action:**
         1. Update relevant documentation to reflect the removal of `applies_to` field.
@@ -271,7 +271,7 @@
         1. Review the updated documentation for clarity and correctness.
     - **Depends‑on:** [T006]
 
-- [ ] **T024 · Docs · P1: Update `mkdocs.yml` navigation section**
+- [x] **T024 · Docs · P1: Update `mkdocs.yml` navigation section**
     - **Context:** Detailed Build Steps - 9. Update Documentation - 9.5
     - **Action:**
         1. Update the `nav` section in `mkdocs.yml` to correctly point to all bindings in their new locations.
@@ -281,7 +281,7 @@
         1. Run `mkdocs serve` locally and verify all navigation links work correctly.
     - **Depends‑on:** [T005]
 
-- [ ] **T025 · Docs · P2: Review and update other documentation references**
+- [x] **T025 · Docs · P2: Review and update other documentation references**
     - **Context:** Detailed Build Steps - 9. Update Documentation - 9.6
     - **Action:**
         1. Search for references to the old structure or `applies_to` across the codebase.
@@ -290,10 +290,15 @@
         1. No references to the old structure or `applies_to` remain in documentation.
     - **Verification:**
         1. Search for keywords like "applies_to" and review results.
+        2. Updated binding_template.md to remove applies_to field
+        3. Updated implementation-guide.md to reflect the new directory-based approach
+        4. Updated language-specific-sync.yml example workflow to work with the new directory structure
+        5. Updated index.md to reflect new paths and structure
+        6. Updated audit.md to correct all binding paths
     - **Depends‑on:** [T023]
 
 ## Testing
-- [ ] **T026 · Test · P1: Add unit tests for updated `reindex.rb`**
+- [x] **T026 · Test · P1: Add unit tests for updated `reindex.rb`**
     - **Context:** Testing Strategy - Unit Tests for `reindex.rb`
     - **Action:**
         1. Create unit tests for `reindex.rb` covering:
@@ -304,7 +309,12 @@
     - **Done‑when:**
         1. Unit tests cover critical logic in `reindex.rb` with >80% coverage.
     - **Verification:**
-        1. Run tests and verify they pass.
+        1. Created `test_reindex_updates.rb` with comprehensive tests for new directory structure
+        2. Tests verify core bindings and category-specific bindings are correctly processed
+        3. Tests verify empty categories are handled gracefully with proper message
+        4. Tests verify misplaced files in the root directory are detected and reported
+        5. Tests verify links are correctly generated with updated relative paths
+        6. All tests pass successfully
     - **Depends‑on:** [T007, T008, T009]
 
 - [ ] **T027 · Test · P1: Add unit tests for updated `validate_front_matter.rb`**
