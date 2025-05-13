@@ -19,8 +19,8 @@ jobs:
     - name: Link check
       run: |
         find . -name "*.md" | grep -v "node_modules\|venv\|site" | xargs markdown-link-check -q -c ./.mlc-config
-    - name: Schema validate (strict)
-      run: ruby tools/validate_front_matter.rb --strict
+    - name: Validate metadata
+      run: ruby tools/validate_front_matter.rb
 
     - name: Check index consistency
       run: |

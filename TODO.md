@@ -397,6 +397,7 @@
         1. Verify consumers have received the communication.
     - **Depends‑on:** [T031]
 
+
 ## Open Questions
 - [ ] **Issue: Strict validation of categories input values**
     - **Context:** Open Questions - Strict validation of `categories` input values in `vendor.yml`

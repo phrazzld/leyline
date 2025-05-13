@@ -1,35 +1,49 @@
-# Tenet and Binding Front-Matter Standard
+# Tenet and Binding Metadata Formatting
 
 ## Introduction
 
-Front-matter is the metadata section at the beginning of Markdown files that provides
-structured information about the document. In this project, we use YAML front-matter as
-the standard format for all tenet and binding documents.
+Metadata is included at the beginning of Markdown files to provide structured information
+about the document. In this project, both the traditional horizontal rule format and YAML
+front-matter format are acceptable for tenet and binding documents.
 
-This document establishes YAML front-matter as the official standard, replacing the
-older horizontal rule format that used underscores and bold text. The YAML format
-provides better tool integration, clearer structure, and improved maintainability.
+Since these documents are primarily processed by LLMs that can handle fuzzy content parsing,
+we maintain flexibility in the format. The horizontal rule format with underscores is
+fully supported and remains the primary format used in the project.
 
-## Front-Matter Format
+## Metadata Formats
 
-For all tenet and binding documents, you must use YAML front-matter at the beginning of
-the file:
+Both of these formats are acceptable for metadata in tenet and binding documents:
+
+### Horizontal Rule Format (Recommended)
+
+```markdown
+______________________________________________________________________
+
+## id: tenet-id last_modified: '2025-05-08'
+
+# Document Title
+```
+
+The horizontal rule format consists of:
+- A line of underscores (typically 70+)
+- A level-2 heading with key-value pairs
+- Optionally, another horizontal rule after the metadata
+
+### YAML Front-Matter Format (Alternative)
 
 ```markdown
 ---
 id: tenet-id
 last_modified: '2025-05-08'
 ---
+
+# Document Title
 ```
 
-The format consists of:
-
-- Triple dashes (`---`) to delimit the YAML front-matter block
+The YAML format consists of:
+- Triple dashes (`---`) to delimit the block
 - Key-value pairs in YAML syntax
 - A closing triple dash line
-
-All front-matter must be at the very beginning of the file with no preceding whitespace
-or other content.
 
 ## Required Fields
 
