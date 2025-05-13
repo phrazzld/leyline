@@ -31,6 +31,16 @@ jobs:
         ref: ${{ inputs.ref }}
         path: _leyline
 
+    - name: Validate Categories Input
+      if: inputs.categories != ''
+      run: |
+        # Check if categories input contains only valid characters (alphanumeric, comma, hyphen)
+        if ! [[ "${{ inputs.categories }}" =~ ^[a-zA-Z0-9,\-]+$ ]]; then
+          echo "::error::Invalid format for categories input: '${{ inputs.categories }}'. Only alphanumeric characters, commas, and hyphens are allowed."
+          exit 1
+        fi
+        echo "Categories input validation passed: '${{ inputs.categories }}'"
+
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -73,9 +83,38 @@ jobs:
         # Run filtering
         ./filter-bindings.rb
 
+    - name: Clean Up Old Flat Structure
+      run: |
+        echo "Cleaning up old flat binding structure in docs/bindings/"
+
+        # First, make sure the target directories exist
+        mkdir -p docs/tenets docs/bindings/core docs/bindings/categories
+
+        # Find and list all .md files directly in docs/bindings/
+        # (excluding 00-index.md which gets regenerated anyway)
+        old_files=$(find docs/bindings -maxdepth 1 -type f -name "*.md" ! -name "00-index.md" 2>/dev/null || true)
+
+        # Count removed files for summary
+        removed_count=0
+
+        if [ -n "$old_files" ]; then
+          echo "Found old flat structure files to remove:"
+          echo "$old_files" | while read -r file; do
+            echo "  - $file"
+            rm -f "$file"
+            removed_count=$((removed_count + 1))
+          done
+          echo "✅ Removed $removed_count old flat structure files."
+        else
+          echo "No old flat structure files found in docs/bindings/."
+        fi
+
+        # Save count for use in summary
+        echo "$removed_count" > cleanup-count.txt
+
     - name: Sync Files
       run: |
-        mkdir -p docs/tenets docs/bindings/core docs/bindings/categories
+        # Directories already created in the cleanup step
 
         # Always sync all tenets (they're language-agnostic)
         rsync -a --delete _leyline/docs/tenets/ docs/tenets/
@@ -118,6 +157,8 @@ jobs:
           # Summarize results
           if [ ${#SYNCED_CATEGORIES[@]} -gt 0 ]; then
             echo "✅ Successfully synced ${#SYNCED_CATEGORIES[@]} categories: ${SYNCED_CATEGORIES[*]}"
+            # Save to file for later use in PR body
+            printf "%s\n" "${SYNCED_CATEGORIES[@]}" > synced-categories.txt
           else
             echo "ℹ️ No categories were synced"
           fi
@@ -137,6 +178,30 @@ jobs:
           rsync -a filtered_bindings/ docs/bindings/
         fi
 
+    - name: Run reindex.rb to regenerate 00-index.md
+      run: |
+        echo "Regenerating docs/bindings/00-index.md using reindex.rb"
+
+        # Copy the reindex.rb script from Leyline to consumer repo if needed
+        if [ ! -d "tools" ]; then
+          mkdir -p tools
+        fi
+
+        # Copy the script
+        cp _leyline/tools/reindex.rb tools/
+        chmod +x tools/reindex.rb
+
+        # Run reindex.rb to regenerate the index
+        cd tools && ruby reindex.rb
+
+        # Verify the index file was generated
+        if [ -f "../docs/bindings/00-index.md" ]; then
+          echo "✅ Successfully regenerated docs/bindings/00-index.md"
+        else
+          echo "❌ ERROR: Failed to generate docs/bindings/00-index.md"
+          exit 1
+        fi
+
     - name: Create Summary
       run: |
         echo "# Leyline Sync Summary" > sync-summary.md
@@ -148,6 +213,20 @@ jobs:
         if [ -n "${{ inputs.categories }}" ]; then
           echo "Requested categories: ${{ inputs.categories }}" >> sync-summary.md
         fi
+        echo "" >> sync-summary.md
+
+        # Add cleanup information if any files were removed
+        if [ -f "cleanup-count.txt" ] && [ "$(cat cleanup-count.txt)" -gt 0 ]; then
+          echo "## Cleanup" >> sync-summary.md
+          echo "" >> sync-summary.md
+          echo "🧹 Removed $(cat cleanup-count.txt) old flat structure files from docs/bindings/" >> sync-summary.md
+          echo "" >> sync-summary.md
+        fi
+
+        # Add reindex information
+        echo "## Index Regeneration" >> sync-summary.md
+        echo "" >> sync-summary.md
+        echo "📋 Regenerated docs/bindings/00-index.md to include all synced bindings" >> sync-summary.md
         echo "" >> sync-summary.md
 
         echo "## Synced Files" >> sync-summary.md
@@ -223,9 +302,20 @@ jobs:
         echo "- All tenets" >> pr-body.md
         echo "- Core bindings (applicable to all projects)" >> pr-body.md
 
-        # Add requested categories information
+        # Add categories information
         if [ -n "${{ inputs.categories }}" ]; then
           echo "- Requested categories: ${{ inputs.categories }}" >> pr-body.md
+
+          # Add synced categories info if any were synced
+          if [ -f "synced-categories.txt" ]; then
+            echo "" >> pr-body.md
+            echo "✅ **Successfully synced categories:**" >> pr-body.md
+            echo "```" >> pr-body.md
+            while read -r category; do
+              echo "- $category" >> pr-body.md
+            done < synced-categories.txt
+            echo "```" >> pr-body.md
+          fi
 
           # Add warning about missing categories if any
           if [ -f "missing-categories.txt" ]; then
@@ -238,11 +328,41 @@ jobs:
           fi
         fi
 
+        # Add information about cleanup if any files were removed
+        if [ -f "cleanup-count.txt" ] && [ "$(cat cleanup-count.txt)" -gt 0 ]; then
+          echo "" >> pr-body.md
+          echo "🧹 **Cleanup:** Removed $(cat cleanup-count.txt) old flat structure binding files from docs/bindings/" >> pr-body.md
+          echo "" >> pr-body.md
+          echo "**Note:** This updates your binding files to use the new directory-based structure. See [Migration Guide](https://github.com/phrazzld/leyline/blob/main/docs/migration-guide.md) for details." >> pr-body.md
+        fi
+
+        # Add information about index regeneration
+        echo "" >> pr-body.md
+        echo "📋 **Index:** Regenerated the bindings index file to reflect the new directory structure" >> pr-body.md
+
         echo "" >> pr-body.md
         cat sync-summary.md >> pr-body.md
 
     - name: Push PR
+      run: |
+        # Create PR title with synced categories info
+        pr_title="docs: sync Leyline ${{ inputs.ref }}"
+
+        # Add synced categories to PR title if available
+        if [ -f "synced-categories.txt" ]; then
+          # Create a comma-separated list of synced categories
+          synced_list=$(cat synced-categories.txt | tr '\n' ',' | sed 's/,$//')
+          if [ -n "$synced_list" ]; then
+            pr_title="$pr_title with categories: $synced_list"
+          fi
+        fi
+
+        # Save PR title to file
+        echo "$pr_title" > pr-title.txt
+
+      # Create the PR
+    - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
       with:
-        title: "docs: sync Leyline ${{ inputs.ref }}"
+        title-path: pr-title.txt
         body-path: pr-body.md
