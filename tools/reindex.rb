@@ -98,23 +98,27 @@ def process_bindings_dir
   end
 
   # 2. Process category bindings
-  # Get all category directories for processing
+  # Define standard categories that should always be included
+  standard_categories = ['backend', 'cli', 'frontend', 'go', 'rust', 'typescript']
+
+  # Initialize all standard categories
+  standard_categories.each do |category|
+    category_entries[category] = []
+  end
+
+  # Get all category directories for processing, adding any non-standard ones
   category_dirs = Dir.glob("#{dir}/categories/*").select { |f| File.directory?(f) }
-
-  # Track empty categories for informational purposes
-  empty_categories = []
-
   category_dirs.each do |category_dir|
     category_name = File.basename(category_dir)
-    category_entries[category_name] = []
+    category_entries[category_name] ||= []
+  end
+
+  # Now process files in each category
+  category_dirs.each do |category_dir|
+    category_name = File.basename(category_dir)
 
     # Look for markdown files in this category directory
     binding_files = Dir.glob("#{category_dir}/*.md").sort
-
-    # If no binding files found, track this as an empty category
-    if binding_files.empty?
-      empty_categories << category_name
-    end
 
     # Process each binding file (if any)
     binding_files.each do |file|
@@ -126,11 +130,9 @@ def process_bindings_dir
     end
   end
 
-  # Log empty categories if any were found
-  unless empty_categories.empty?
-    puts "NOTE: Found #{empty_categories.size} empty category directories: #{empty_categories.join(', ')}"
-    puts "      These categories will appear in the index with an 'empty' message."
-  end
+  # Log the categories we found
+  puts "Found #{category_entries.keys.size} category directories: #{category_entries.keys.sort.join(', ')}"
+  puts "#{category_entries.values.flatten.size} binding files found across all categories"
 
   # Generate index content
   index_content = "# Bindings Index\n\n"
@@ -148,17 +150,8 @@ def process_bindings_dir
     index_content += "_No core bindings defined yet._\n\n"
   end
 
-  # Add empty backend and CLI sections
-  index_content += "\n## Backend Bindings\n\n"
-  index_content += "_No backend bindings defined yet._\n"
-
-  index_content += "\n## Cli Bindings\n\n"
-  index_content += "_No cli bindings defined yet._\n"
-
-  # Category sections
-  category_entries.keys.sort.each do |category|
-    # Skip backend and cli categories as they're handled separately
-    next if category == "backend" || category == "cli"
+  # Category sections - process all standard categories in fixed order, then any additional ones
+  (standard_categories + (category_entries.keys - standard_categories).sort).each do |category|
 
     entries = category_entries[category]
 

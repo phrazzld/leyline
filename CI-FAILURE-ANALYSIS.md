@@ -42,6 +42,9 @@ The failure is happening because the checked-in version of the index file doesn'
 The script is now configured to only generate sections for categories that have actual files or directories, and both "backend" and "cli" directories are empty according to the script's output.
 
 ## Resolution Plan
-1. Run the `reindex.rb` script locally
-2. Commit the updated index file
+1. Improve the `reindex.rb` script to handle standard categories properly:
+   - Define a list of standard categories that should always be included
+   - Process all categories in a consistent way
+   - Display categories in a consistent order
+2. Commit the updated script
 3. Push the changes to trigger a new CI run
