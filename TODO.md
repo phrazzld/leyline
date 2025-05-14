@@ -1,555 +1,412 @@
-# Todo: Natural Language Rewrite of Tenets and Bindings
-
-## Phase 1: Framework, Templates & Prototypes
-
-- \[x\] **T001 · Feature · P1: create natural language tenet template**
-  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template
-    Documents
-  - **Action:**
-    1. Create `docs/templates/tenet_template.md` adhering to the revised tenet structure
-       (Front-Matter, Core Belief, Practical Guidelines, Warning Signs, Related Tenets).
-  - **Done‑when:**
-    1. Template file exists and matches the structure defined in PLAN.md.
-    1. Template includes placeholders and explanatory comments for each section.
-  - **Verification:**
-    1. Manually inspect template against PLAN.md structure.
-  - **Depends‑on:** none
-- \[x\] **T002 · Feature · P1: create natural language binding template**
-  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template
-    Documents
-  - **Action:**
-    1. Create `docs/templates/binding_template.md` adhering to the revised binding
-       structure (Front-Matter, Rationale, Rule Definition, Practical Implementation,
-       Examples, Related Bindings).
-  - **Done‑when:**
-    1. Template file exists and matches the structure defined in PLAN.md.
-    1. Template includes placeholders and explanatory comments for each section.
-  - **Verification:**
-    1. Manually inspect template against PLAN.md structure.
-  - **Depends‑on:** none
-- \[x\] **T003 · Feature · P1: document style guide for natural language approach**
-  - **Context:** PLAN.md > Phase 1: Framework and Templates > 1. Create Template
-    Documents & Natural Language Guidelines
-  - **Action:**
-    1. Create `docs/STYLE_GUIDE_NATURAL_LANGUAGE.md` detailing conversational tone,
-       principle-first approach, context/connections, and narrative structure.
-    1. Include examples of preferred phrasing and anti-patterns.
-  - **Done‑when:**
-    1. Style guide exists and covers all guidelines from PLAN.md.
-    1. Style guide is reviewed for clarity.
-  - **Verification:**
-    1. Peer review style guide against PLAN.md guidelines.
-  - **Depends‑on:** none
-
-\[... other completed tasks ...\]
-
-## CI Fixes
-
-- \[x\] **T056 · Chore · P0: Fix markdown-link-check installation in CI**
-
-  - **Context:** CI failing due to incorrect package manager for markdown-link-check
-  - **Action:**
-    1. Update `.github/workflows/ci.yml` to install Node.js
-    1. Change pip install to npm install for markdown-link-check
-    1. Ensure the tool is properly executed in the workflow
-  - **Done‑when:**
-    1. CI workflow installs markdown-link-check using npm
-    1. Lint-docs job passes successfully
-  - **Verification:**
-    1. CI run shows successful installation and execution
-  - **Depends‑on:** none
-
-- \[x\] **T057 · Chore · P0: Restructure project for proper documentation organization**
-
-  - **Context:** Project structure should align with its purpose as a documentation
-    project
-  - **Action:**
-    1. ✅ Move `/tenets/` directory to `/docs/tenets/`
-    1. ✅ Move `/bindings/` directory to `/docs/bindings/`
-    1. ✅ Copy CONTRIBUTING.md to docs or reference it properly
-    1. ✅ Update mkdocs.yml to reference the new paths with detailed navigation
-  - **Done‑when:**
-    1. ✅ All tenets and bindings are contained within the docs directory
-    1. ⏳ All internal links work correctly with the new structure (will be addressed in
-       T058)
-  - **Verification:**
-    1. ✅ Run mkdocs build locally to verify structure works
-    1. ⏳ Check that all cross-references work in the generated site (will be addressed
-       in T058)
-  - **Depends‑on:** none
-
-- \[x\] **T058 · Chore · P0: Update all cross-references for new document paths**
-
-  - **Context:** Moving files will break existing references between documents
-  - **Action:**
-    1. Update all references between tenets and bindings to use the new paths
-    1. Fix any relative links in the index files
-    1. Update links in any examples or documentation
-  - **Done‑when:**
-    1. All cross-references use the new path structure
-    1. No broken links are present in the documentation
-  - **Verification:**
-    1. Run markdown-link-check or similar to find any broken links
-    1. Manually review key documents for correct references
-  - **Depends‑on:** \[T057\]
-
-- \[x\] **T059 · Test · P0: Verify clean project build and documentation**
-
-  - **Context:** Ensure restructured project works correctly
-  - **Action:**
-    1. Run all validation tools on the restructured project
-    1. Ensure MkDocs builds successfully in strict mode
-    1. Test documentation site navigation and links
-  - **Done‑when:**
-    1. All validation tools pass without errors
-    1. MkDocs builds without warnings in strict mode
-    1. Documentation site functions correctly
-  - **Verification:**
-    1. Run validation tools locally
-    1. Run mkdocs build --strict and view the generated site
-  - **Depends‑on:** \[T056, T057, T058\]
-
-- \[x\] **T060 · Fix · P0: Fix broken links causing MkDocs build failure**
-
-  - **Context:** CI deploy job fails in strict mode due to invalid links in index.md
-  - **Action:**
-    1. Fix relative links in index.md that use the ./docs/ prefix
-    1. Update link to examples/github-workflows/language-specific-sync.yml
-    1. Verify all links are using correct paths in the docs structure
-  - **Done‑when:**
-    1. All links in index.md correctly point to their targets
-    1. MkDocs builds without warnings in strict mode
-  - **Verification:**
-    1. Run mkdocs build --strict locally to verify no warnings
-    1. Run CI checks to verify successful build
-  - **Depends‑on:** none
-
-- \[x\] **T061 · Fix · P0: Apply consistent markdown formatting**
-
-  - **Context:** CI lint-docs job fails due to inconsistent markdown formatting
-  - **Action:**
-    1. Install mdformat locally
-    1. Run mdformat on all markdown files
-    1. Commit the formatting changes
-  - **Done‑when:**
-    1. All markdown files pass the CI formatting check
-  - **Verification:**
-    1. Run local formatting check: mdformat --check .
-    1. Run CI checks to verify successful lint-docs job
-  - **Depends‑on:** none
-
-- \[x\] **T062 · Chore · P1: Add markdown formatting pre-commit hook**
-
-  - **Context:** Prevent future formatting inconsistencies
-  - **Action:**
-    1. Update the pre-commit configuration to include mdformat
-    1. Add documentation about markdown formatting requirements
-    1. Update CONTRIBUTING.md to mention formatting requirements
-  - **Done‑when:**
-    1. Pre-commit hook is configured to run mdformat
-    1. Documentation is updated with formatting guidance
-  - **Verification:**
-    1. Make a change to a markdown file and verify pre-commit hook runs
-    1. Verify updated documentation is clear about formatting requirements
-  - **Depends‑on:** \[T061\]
-
-## Phase 2: Tenet Rewrites
-
-- \[x\] **T063 · Feature · P1: Rewrite simplicity tenet in natural language format**
-
-  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
-  - **Action:**
-    1. Update `docs/tenets/simplicity.md` to use proper YAML front-matter format
-    1. Ensure content follows natural language style guide
-    1. Validate content with validation tools
-  - **Done‑when:**
-    1. Tenet document passes validation
-    1. Content follows natural language approach
-    1. Tenet appears correctly in index
-  - **Verification:**
-    1. Run validation tools to verify format
-    1. Review content against style guide
-  - **Depends‑on:** \[T001, T003\]
-
-- \[x\] **T064 · Feature · P1: Rewrite modularity tenet in natural language format**
-
-  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
-  - **Action:**
-    1. Update `docs/tenets/modularity.md` to use proper YAML front-matter format
-    1. Ensure content follows natural language style guide
-    1. Validate content with validation tools
-  - **Done‑when:**
-    1. Tenet document passes validation
-    1. Content follows natural language approach
-    1. Tenet appears correctly in index
-  - **Verification:**
-    1. Run validation tools to verify format
-    1. Review content against style guide
-  - **Depends‑on:** \[T001, T003\]
-
-- \[x\] **T065 · Feature · P1: Rewrite testability tenet in natural language format**
-
-  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
-  - **Action:**
-    1. Update `docs/tenets/testability.md` to use proper YAML front-matter format
-    1. Ensure content follows natural language style guide
-    1. Validate content with validation tools
-  - **Done‑when:**
-    1. Tenet document passes validation
-    1. Content follows natural language approach
-    1. Tenet appears correctly in index
-  - **Verification:**
-    1. Run validation tools to verify format
-    1. Review content against style guide
-  - **Depends‑on:** \[T001, T003\]
-
-- \[x\] **T066 · Feature · P1: Rewrite explicit-over-implicit tenet in natural language
-  format**
-
-  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
-  - **Action:**
-    1. Update `docs/tenets/explicit-over-implicit.md` to use proper YAML front-matter
-       format
-    1. Ensure content follows natural language style guide
-    1. Validate content with validation tools
-  - **Done‑when:**
-    1. Tenet document passes validation
-    1. Content follows natural language approach
-    1. Tenet appears correctly in index
-  - **Verification:**
-    1. Run validation tools to verify format
-    1. Review content against style guide
-  - **Depends‑on:** \[T001, T003\]
-
-- \[x\] **T067 · Feature · P1: Rewrite document-decisions tenet in natural language
-  format**
-
-  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
-  - **Action:**
-    1. Update `docs/tenets/document-decisions.md` to ensure correct front-matter format
-    1. Ensure content follows natural language style guide
-    1. Validate content with validation tools
-  - **Done‑when:**
-    1. Tenet document passes validation
-    1. Content follows natural language approach
-    1. Tenet appears correctly in index
-  - **Verification:**
-    1. Run validation tools to verify format
-    1. Review content against style guide
-  - **Depends‑on:** \[T001, T003\]
-
-- \[x\] **T068 · Feature · P1: Rewrite maintainability tenet in natural language
-  format**
-
-  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
-  - **Action:**
-    1. Update `docs/tenets/maintainability.md` to ensure correct front-matter format
-    1. Ensure content follows natural language style guide
-    1. Validate content with validation tools
-  - **Done‑when:**
-    1. Tenet document passes validation
-    1. Content follows natural language approach
-    1. Tenet appears correctly in index
-  - **Verification:**
-    1. Run validation tools to verify format
-    1. Review content against style guide
-  - **Depends‑on:** \[T001, T003\]
-
-- \[x\] **T069 · Feature · P1: Rewrite no-secret-suppression tenet in natural language
-  format**
-
-  - **Context:** PLAN.md > Phase 2: Tenet Rewrites > 1. Rewrite Core Tenets
-  - **Action:**
-    1. Update `docs/tenets/no-secret-suppression.md` to ensure correct front-matter
-       format
-    1. Ensure content follows natural language style guide
-    1. Validate content with validation tools
-  - **Done‑when:**
-    1. Tenet document passes validation
-    1. Content follows natural language approach
-    1. Tenet appears correctly in index
-  - **Verification:**
-    1. Run validation tools to verify format
-    1. Review content against style guide
-  - **Depends‑on:** \[T001, T003\]
-
-- \[x\] **T070 · Chore · P1: Document and standardize front-matter format**
-
-  - **Context:** Consistently format tenet and binding front-matter
-  - **Action:**
-    1. Document the standard format for metadata in tenets and bindings
-    1. Update any non-conforming files to match the standard format
-    1. Create TENET_FORMATTING.md to document the standard approach
-  - **Done‑when:**
-    1. Consistent front-matter format is documented
-    1. All tenet files use the standardized format
-    1. Documentation clearly explains the format and rationale
-  - **Verification:**
-    1. Check that documentation matches actual file formatting
-    1. Verify files pass validation tools
-  - **Depends‑on:** none
-
-- \[x\] **T071 · Chore · P1: Fix validation for remaining tenets**
-
-  - **Context:** Some tenet files are failing validation
-  - **Action:**
-    1. Run validation tools to identify all failing tenets
-    1. Fix validation errors across all tenet files
-    1. Ensure consistent front-matter format across all files
-  - **Done‑when:**
-    1. All tenet files pass validation tools
-    1. Front-matter is consistently formatted
-    1. Index files are correctly generated
-  - **Verification:**
-    1. Run validation tools on all tenet files
-    1. Verify all files appear correctly in the index
-  - **Depends‑on:** \[T070\]
-
-## Front-Matter Standardization
-
-- \[x\] **T072 · Fix · P0: ~~Configure mdformat to preserve YAML front-matter~~ SUPERSEDED BY T091**
-
-  - **Context:** Replaced by simpler approach that removed formatters
-  - **Action:**
-    1. ~~Update `.mdformat.toml` to properly configure front-matter preservation~~
-    1. ~~Test configuration with sample files to verify front-matter remains intact~~
-    1. ~~Document the configuration in code comments~~
-  - **Done‑when:**
-    1. ~~mdformat no longer converts YAML front-matter to horizontal rule format~~
-    1. ~~Configuration file is properly documented~~
-  - **Verification:**
-    1. ~~Run mdformat manually on a test file with YAML front-matter~~
-    1. ~~Verify front-matter remains in YAML format after formatting~~
-  - **Depends‑on:** none
-
-## CI Fixes (May 2025)
-
-- \[x\] **T082 · Fix · P0: ~~Apply mdformat to all markdown files~~ SUPERSEDED BY T091**
-
-  - **Context:** Replaced by simpler approach that removed formatters
-  - **Action:**
-    1. ~~Install mdformat locally with front-matter support:
-       `pip install mdformat mdformat-frontmatter`~~
-    1. ~~Format all markdown files: `mdformat --wrap 88 .`~~
-    1. ~~Verify formatting has been applied correctly~~
-  - **Done‑when:**
-    1. ~~All markdown files have consistent formatting~~
-    1. ~~mdformat runs without errors~~
-  - **Verification:**
-    1. ~~Run `mdformat --check .` to confirm no formatting issues remain~~
-  - **Depends‑on:** none
-
-- \[x\] **T083 · Fix · P0: Update tenet_template.md with proper YAML front-matter
-  comments**
-
-  - **Context:** The template file has explanatory comments mixed into YAML which breaks
-    validation
-  - **Action:**
-    1. Update the tenet_template.md file to place explanatory comments outside the YAML
-       front-matter section
-    1. Use proper YAML syntax for all front-matter fields
-    1. Ensure the template demonstrates the correct format for others to follow
-  - **Done‑when:**
-    1. Template file has valid YAML front-matter
-    1. Explanatory comments appear outside the YAML block
-  - **Verification:**
-    1. Run validation tool to verify the template passes front-matter validation
-  - **Depends‑on:** none
-
-- \[x\] **T084 · Fix · P0: Ensure tenets index file is properly formatted**
-
-  - **Context:** The docs/tenets/00-index.md file appears to have formatting issues
-  - **Action:**
-    1. Check the format of docs/tenets/00-index.md
-    1. Apply proper markdown formatting to the file
-    1. Ensure any links in the index file are correctly formatted
-  - **Done‑when:**
-    1. Index file passes the formatting check
-    1. All links in the index file work correctly
-  - **Verification:**
-    1. Run mdformat check on the index file
-    1. Run markdown-link-check to verify links
-  - **Depends‑on:** none
-
-- \[x\] **T085 · Test · P0: Run full CI validation locally**
-
-  - **Context:** Need to verify all fixes will pass the CI before pushing changes
-  - **Action:**
-    1. Run mdformat check on all files: `mdformat --check .`
-    1. Run markdown link validation: `markdown-link-check -q -c ./.mlc-config '**/*.md'`
-    1. Run mkdocs build to verify site generation: `mkdocs build --strict`
-  - **Done‑when:**
-    1. All validation tools pass without errors
-    1. Site builds successfully without warnings
-  - **Verification:**
-    1. All tests run without errors
-  - **Depends‑on:** \[T082, T083, T084\]
-
-## Markdown Approach
-
-- \[x\] **T091 · Fix · P0: Remove all automatic markdown formatters**
-
-  - **Context:** Markdown formatters are causing more issues than they solve
-  - **Action:**
-    1. Remove all custom markdown formatters from the pre-commit hooks
-    2. Remove mdformat configuration from the pre-commit hooks
-    3. Delete custom formatter script and configuration files
-    4. Update documentation to focus on content over strict formatting
-    5. Simplify the development workflow
-  - **Done‑when:**
-    1. All formatters are removed from pre-commit hooks
-    2. Custom formatter script and configuration are deleted
-    3. Documentation is updated to remove formatter references
-    4. Development workflow is simplified
-  - **Verification:**
-    1. Pre-commit hooks run without formatter errors
-    2. Common brackets and markdown syntax work without special handling
-  - **Depends‑on:** none
-
-- \[x\] **T073 · Fix · P0: ~~Update pre-commit configuration for front-matter support~~ SUPERSEDED BY T091**
-
-  - **Context:** Replaced by simpler approach that removed formatters
-  - **Action:**
-    1. ~~Update `.pre-commit-config.yaml` to ensure mdformat properly handles front-matter~~
-    1. ~~Add necessary dependencies for mdformat-frontmatter~~
-    1. ~~Test pre-commit hook with sample files~~
-  - **Done‑when:**
-    1. ~~Pre-commit hooks run without converting YAML front-matter~~
-    1. ~~Configuration includes proper dependencies for front-matter support~~
-  - **Verification:**
-    1. ~~Make changes to a file with YAML front-matter~~
-    1. ~~Run pre-commit hooks and verify format remains intact~~
-  - **Depends‑on:** \[T072\]
-
-- \[x\] **T074 · Fix · P1: Update validate_front_matter.rb to enforce YAML standard**
-
-  - **Context:** Validation tool needs to consistently enforce YAML front-matter
-  - **Action:**
-    1. Review `validate_front_matter.rb` to ensure it properly enforces YAML format
-    1. Update any code that might accept alternative formats
-    1. Improve error messages to be clear about expected YAML format
-  - **Done‑when:**
-    1. Validation tool consistently requires YAML front-matter
-    1. Error messages clearly indicate the expected format
-  - **Verification:**
-    1. Run validation tool on files with different formats
-    1. Verify it correctly identifies non-YAML formats as errors
-  - **Depends‑on:** none
-
-- \[x\] **T075 · Chore · P1: Document standardized front-matter format**
-
-  - **Context:** Consistent documentation needed for front-matter standards
-  - **Action:**
-    1. Update `TENET_FORMATTING.md` to clearly document YAML front-matter as the
-       standard
-    1. Include examples of correct format
-    1. Add explanation of required metadata fields
-    1. Include troubleshooting section for common issues
-  - **Done‑when:**
-    1. Documentation clearly establishes YAML front-matter as the standard
-    1. Examples and requirements are comprehensive
-  - **Verification:**
-    1. Review documentation for clarity and completeness
-    1. Ensure all required metadata fields are documented
-  - **Depends‑on:** none
-
-- \[x\] **T076 · Chore · P1: Update templates to use standardized YAML front-matter**
-
-  - **Context:** Templates should use the standardized format for new content
-  - **Action:**
-    1. Update `docs/templates/tenet_template.md` to use YAML front-matter
-    1. Update `docs/templates/binding_template.md` to use YAML front-matter
-    1. Ensure all required fields are included in templates
-  - **Done‑when:**
-    1. Templates use standard YAML front-matter
-    1. Templates include all required metadata fields
-  - **Verification:**
-    1. Verify templates pass validation tools
-    1. Check that templates are properly documented
-  - **Depends‑on:** \[T075\]
-
-- \[x\] **T077 · Feature · P1: Update CONTRIBUTING.md with front-matter guidance**
-
-  - **Context:** Contributors need clear guidance on front-matter standards
-  - **Action:**
-    1. Update `CONTRIBUTING.md` to reference the standardized front-matter format
-    1. Add section on metadata requirements for new content
-    1. Link to `TENET_FORMATTING.md` for detailed guidance
-  - **Done‑when:**
-    1. Contribution guidelines clearly reference YAML front-matter standard
-    1. Guidelines provide sufficient guidance for contributors
-  - **Verification:**
-    1. Review updated guidelines for clarity
-    1. Ensure all links are functional
-  - **Depends‑on:** \[T075\]
-
-- \[x\] **T078 · Feature · P2: Convert all tenet files to standardized format**
-
-  - **Context:** All tenet files need to use the standardized YAML front-matter
-  - **Action:**
-    1. Identify all tenet files still using horizontal rule format
-    1. Convert each file to use YAML front-matter
-    1. Preserve all metadata during conversion
-    1. Validate each file after conversion
-  - **Done‑when:**
-    1. All tenet files use YAML front-matter
-    1. All files pass validation tools
-  - **Verification:**
-    1. Run validation tools on all tenet files
-    1. Verify index generation works correctly
-  - **Depends‑on:** \[T072, T073, T074, T075\]
-
-- \[x\] **T079 · Feature · P2: Convert all binding files to standardized format**
-
-  - **Context:** All binding files need to use the standardized YAML front-matter
-  - **Action:**
-    1. Identify all binding files still using horizontal rule format
-    1. Convert each file to use YAML front-matter
-    1. Preserve all metadata during conversion
-    1. Validate each file after conversion
-  - **Done‑when:**
-    1. All binding files use YAML front-matter
-    1. All files pass validation tools
-  - **Verification:**
-    1. Run validation tools on all binding files
-    1. Verify index generation works correctly
-  - **Depends‑on:** \[T072, T073, T074, T075\]
-
-- \[x\] **T080 · Test · P1: Verify complete toolchain with standardized format**
-
-  - **Context:** Final verification that all tools work with the standardized format
-  - **Action:**
-    1. Run validation tools on all tenets and bindings
-    1. Generate indexes and verify correctness
-    1. Run pre-commit hooks on sample changes to verify format preservation
-    1. Run a complete build of the documentation site
-  - **Done‑when:**
-    1. All validation tools pass without errors
-    1. Index generation works correctly
-    1. Pre-commit hooks preserve YAML front-matter
-    1. Documentation site builds correctly
-  - **Verification:**
-    1. Complete end-to-end testing of all toolchain components
-    1. Verify no formatting issues are introduced during the process
-  - **Depends‑on:** \[T078, T079\]
-
-- \[x\] **T081 · Chore · P0: Remove duplicated top-level tenets and bindings
-  directories**
-
-  - **Context:** Task T057 moved tenets/ and bindings/ to docs/tenets/ and
-    docs/bindings/, but the original directories still exist
-  - **Action:**
-    1. Verify that all content from top-level directories has been properly moved to
-       docs/
-    1. Check that all references have been updated to use the new paths
-    1. Remove the top-level tenets/ and bindings/ directories
-    1. Update any remaining references to the old paths
-  - **Done‑when:**
-    1. Top-level tenets/ and bindings/ directories no longer exist
-    1. All references point to docs/tenets/ and docs/bindings/
-    1. Documentation site builds correctly without errors
-  - **Verification:**
-    1. Run mkdocs build to verify no broken links
-    1. Run markdown-link-check to find any lingering references to old paths
-    1. Ensure no functionality is broken by the directory removal
-  - **Depends‑on:** \[T057, T058\]
+# Todo
+
+## Project Setup & Communication
+- [x] **T001 · Chore · P2: Create feature branch for documentation restructure**
+    - **Context:** Detailed Build Steps - 1. Preparation & Communication - 1.1
+    - **Action:**
+        1. Create a new Git branch named `feature/doc-directory-restructure` from the main branch.
+    - **Done‑when:**
+        1. The branch `feature/doc-directory-restructure` exists in the repository.
+    - **Verification:**
+        1. `git branch` shows the new branch locally.
+        2. Branch is pushed to remote.
+    - **Depends‑on:** none
+
+- [x] **T002 · Chore · P1: Announce upcoming breaking change and migration path**
+    - **Context:** Detailed Build Steps - 1. Preparation & Communication - 1.2
+    - **Note:** This task is skipped since the project isn't actively used by consumers yet.
+    - **Depends‑on:** [T001]
+
+## Directory Structure & Content Migration
+- [x] **T003 · Feature · P0: Create base directories `docs/bindings/core/` and `docs/bindings/categories/`**
+    - **Context:** Detailed Build Steps - 2. Directory Creation - 2.1
+    - **Action:**
+        1. Create the directory `docs/bindings/core/`.
+        2. Create the directory `docs/bindings/categories/`.
+    - **Done‑when:**
+        1. Both `docs/bindings/core/` and `docs/bindings/categories/` directories exist.
+    - **Verification:**
+        1. `ls docs/bindings/` shows `core/` and `categories/`.
+    - **Depends‑on:** [T001]
+
+- [x] **T004 · Feature · P0: Create initial category subdirectories in `docs/bindings/categories/`**
+    - **Context:** Detailed Build Steps - 2. Directory Creation - 2.2
+    - **Action:**
+        1. Create `docs/bindings/categories/go/`.
+        2. Create `docs/bindings/categories/rust/`.
+        3. Create `docs/bindings/categories/typescript/`.
+        4. Create `docs/bindings/categories/cli/`.
+        5. Create `docs/bindings/categories/frontend/`.
+        6. Create `docs/bindings/categories/backend/`.
+    - **Done‑when:**
+        1. All specified initial category directories exist under `docs/bindings/categories/`.
+    - **Verification:**
+        1. `ls docs/bindings/categories/` shows all created subdirectories.
+    - **Depends‑on:** [T003]
+
+- [x] **T005 · Refactor · P0: Move and rename binding files to new directory structure**
+    - **Context:** Detailed Build Steps - 3. Move and Rename Bindings
+    - **Action:**
+        1. For each binding `.md` file in `docs/bindings/`, determine its primary category (core or specific) and move it to the corresponding new directory (`core/` or `categories/<category>/`).
+        2. Rename the file to remove any category prefix (e.g., `ts-no-any.md` becomes `no-any.md`).
+        3. Apply the cross-cutting binding strategy for bindings that applied to multiple categories (generalize to `core/` or place in primary specific category, clarifying content).
+    - **Done‑when:**
+        1. All binding files are moved from the root of `docs/bindings/` to their respective new subdirectories.
+        2. All moved binding files are renamed according to the new convention.
+    - **Verification:**
+        1. No binding `.md` files remain directly under `docs/bindings/`.
+        2. Spot-check a sample of files in `core/` and `categories/*/` for correct placement and naming.
+    - **Depends‑on:** [T004]
+
+- [x] **T006 · Refactor · P0: Update binding front matter: remove `applies_to`, update `id`, verify required fields**
+    - **Context:** Detailed Build Steps - 4. Update Binding Front Matter; Architecture Blueprint - Public Interfaces / Contracts - Binding File Front Matter
+    - **Action:**
+        1. For all binding files in their new locations, remove the `applies_to` field entirely from the front matter.
+        2. Ensure the `id` field in the front matter matches the new filename (without `.md` and path).
+        3. Verify `last_modified`, `derived_from`, and `enforced_by` fields are present and correct.
+    - **Done‑when:**
+        1. No binding file front matter contains the `applies_to` field.
+        2. All binding file front matters have an `id` field matching their filename.
+        3. All binding files have `last_modified`, `derived_from`, and `enforced_by` fields.
+    - **Verification:**
+        1. Run `tools/validate_front_matter.rb` (once updated by T009) and confirm it passes for all bindings regarding these changes.
+        2. Manually inspect a sample of binding front matters.
+    - **Depends‑on:** [T005]
+
+## Tooling: `reindex.rb`
+- [x] **T007 · Feature · P0: Modify `reindex.rb` to scan new structure, group index, and update links**
+    - **Context:** Detailed Build Steps - 5. Update Tooling - `reindex.rb` - 5.1, 5.2, 5.3
+    - **Action:**
+        1. Modify `tools/reindex.rb` to scan recursively within `docs/bindings/core/` and `docs/bindings/categories/*/`.
+        2. Ensure the generated `docs/bindings/00-index.md` includes clear sections for "Core" and each category.
+        3. Update links in the generated index to reflect the new relative paths (e.g., `[Binding Name](./categories/go/error-wrapping.md)`).
+    - **Done‑when:**
+        1. `reindex.rb` generates `docs/bindings/00-index.md` with "Core" and per-category sections.
+        2. All links in the generated index point to the correct new file locations.
+    - **Verification:**
+        1. Run `tools/reindex.rb` locally.
+        2. Inspect the generated `docs/bindings/00-index.md` for correct structure, sections, and functional links.
+    - **Depends‑on:** [T006]
+
+- [x] **T008 · Feature · P1: Enhance `reindex.rb` to log error and skip misplaced files in `docs/bindings/` root**
+    - **Context:** Detailed Build Steps - Error & Edge‑Case Strategy - `reindex.rb`
+    - **Action:**
+        1. Add logic to `tools/reindex.rb` to detect if a binding file is found directly under `docs/bindings/` (not in `core/` or `categories/*`).
+        2. If a misplaced file is found, log an error message specifying the file and skip processing it for the index.
+    - **Done‑when:**
+        1. `reindex.rb` logs an error and skips any binding file found directly under `docs/bindings/`.
+    - **Verification:**
+        1. Temporarily place a test binding file in `docs/bindings/`.
+        2. Run `tools/reindex.rb` and verify an error is logged and the file is not in `00-index.md`.
+    - **Depends‑on:** [T007]
+
+- [x] **T009 · Feature · P1: Ensure `reindex.rb` gracefully handles empty category directories**
+    - **Context:** Detailed Build Steps - Error & Edge‑Case Strategy - `reindex.rb`
+    - **Action:**
+        1. Modify `tools/reindex.rb` to correctly handle cases where a category directory (e.g., `docs/bindings/categories/new-empty-category/`) exists but contains no binding files.
+        2. Ensure the script does not fail and the generated index correctly reflects the empty category (e.g., by omitting the section or noting it's empty).
+    - **Done‑when:**
+        1. `reindex.rb` completes successfully when encountering empty category directories.
+        2. The generated `00-index.md` handles empty categories as expected (e.g., section exists but is empty, or section is omitted).
+    - **Verification:**
+        1. Create an empty category directory (e.g., `docs/bindings/categories/test-empty/`).
+        2. Run `tools/reindex.rb` and verify it completes without error and the index is correctly formatted.
+    - **Depends‑on:** [T007]
+
+## Tooling: `validate_front_matter.rb`
+- [x] **T010 · Feature · P0: Modify `validate_front_matter.rb` to remove `applies_to` validation and support new structure**
+    - **Context:** Detailed Build Steps - 6. Update Tooling - `validate_front_matter.rb`
+    - **Action:**
+        1. Modify `tools/validate_front_matter.rb` to stop expecting or validating the `applies_to` field in binding documents.
+        2. Update the script to correctly locate and process binding files in their new nested subdirectories (`docs/bindings/core/` and `docs/bindings/categories/*/`).
+        3. Ensure it continues to validate `id` (matching filename), `last_modified`, `derived_from`, and `enforced_by`.
+    - **Done‑when:**
+        1. `validate_front_matter.rb` no longer flags missing `applies_to` in bindings as an error.
+        2. The script correctly finds and validates all bindings in the new structure.
+        3. Other required fields are still validated correctly.
+    - **Verification:**
+        1. Run `tools/validate_front_matter.rb` on the restructured bindings.
+        2. Confirm it passes for correctly formatted files and fails appropriately for files with issues in other required fields.
+    - **Depends‑on:** [T006]
+
+## Workflow: `.github/workflows/vendor.yml`
+- [x] **T011 · Feature · P0: Add `categories` input to `.github/workflows/vendor.yml`**
+    - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.1; Architecture Blueprint - Public Interfaces / Contracts - `.github/workflows/vendor.yml` Inputs
+    - **Action:**
+        1. Add the new `categories` input to `.github/workflows/vendor.yml` with `description: 'Comma-separated list of categories...'`, `required: false`, and `default: ''`.
+    - **Done‑when:**
+        1. The `.github/workflows/vendor.yml` file includes the `categories` input definition.
+    - **Depends‑on:** [T001]
+
+- [x] **T012 · Feature · P0: Update `vendor.yml` to sync `tenets/`, `core/`, and specified `categories`**
+    - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (sync logic)
+    - **Action:**
+        1. Modify `vendor.yml` workflow logic to always sync `docs/tenets/`.
+        2. Modify `vendor.yml` to always sync `docs/bindings/core/`.
+        3. Parse the `inputs.categories` string (comma-separated list). For each specified category, if `docs/bindings/categories/<category>/` exists in the Leyline repo, sync its contents to the consumer.
+    - **Done‑when:**
+        1. `vendor.yml` syncs `docs/tenets/` and `docs/bindings/core/` unconditionally.
+        2. `vendor.yml` syncs category-specific bindings from `docs/bindings/categories/<category>/` based on the `categories` input.
+    - **Depends‑on:** [T011, T006]
+
+- [x] **T013 · Feature · P1: Implement warning in `vendor.yml` for non-existent requested category directories**
+    - **Context:** Detailed Build Steps - Error & Edge‑Case Strategy - Workflow `vendor.yml`
+    - **Action:**
+        1. In `vendor.yml`, if a category specified in the `categories` input does not correspond to an existing directory in `docs/bindings/categories/` in the Leyline repo, log a warning.
+        2. Ensure the workflow skips that category and continues processing other valid categories.
+    - **Done‑when:**
+        1. `vendor.yml` logs a warning and continues when a requested category directory does not exist.
+    - **Depends‑on:** [T012]
+
+- [x] **T014 · Feature · P1: Implement failure in `vendor.yml` for invalid `categories` input format**
+    - **Context:** Detailed Build Steps - Error & Edge‑Case Strategy - Workflow `vendor.yml`
+    - **Action:**
+        1. Add validation to `vendor.yml` to check if the `categories` input string contains unexpected characters (e.g., not alphanumeric, comma, or hyphen).
+        2. If the format is invalid, fail the workflow with a clear error message.
+    - **Done‑when:**
+        1. `vendor.yml` fails with a clear error message if the `categories` input has an invalid format.
+    - **Depends‑on:** [T012]
+
+- [x] **T015 · Feature · P0: Implement cleanup step in `vendor.yml` to remove old flat binding structure in consumer repo**
+    - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (cleanup step)
+    - **Action:**
+        1. Add a step to `vendor.yml` that, when run in the consumer repository, removes any files/directories from the *previous* flat `docs/bindings/` structure before copying new files.
+    - **Done‑when:**
+        1. The `vendor.yml` workflow effectively cleans up the old binding structure in the consumer repository.
+    - **Verification:**
+        1. As part of integration testing, ensure that after a sync, no stale files from a previous flat structure remain in `docs/bindings/` in the test consumer repo.
+    - **Depends‑on:** [T012]
+
+- [x] **T016 · Feature · P0: Ensure `vendor.yml` runs `reindex.rb` in consumer repo post-sync**
+    - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (reindex step)
+    - **Action:**
+        1. Add a step to `vendor.yml` to execute `tools/reindex.rb` (from the synced Leyline content) in the consumer repository *after* all files are synced and old files are cleaned up.
+    - **Done‑when:**
+        1. `vendor.yml` successfully runs `reindex.rb` in the consumer repository, updating `docs/bindings/00-index.md`.
+    - **Verification:**
+        1. As part of integration testing, verify that `docs/bindings/00-index.md` in the test consumer repo is correctly regenerated.
+    - **Depends‑on:** [T015, T007]
+
+- [x] **T017 · Feature · P2: Update PR message in `vendor.yml` to list synced categories**
+    - **Context:** Detailed Build Steps - 7. Update Workflow - `.github/workflows/vendor.yml` - 7.2 (PR message step)
+    - **Action:**
+        1. Modify the part of `vendor.yml` that generates a Pull Request in the consumer repository.
+        2. Update the PR message to list the categories of bindings that were synced (e.g., "Synced core bindings and categories: go, rust.").
+    - **Done‑when:**
+        1. PRs created by `vendor.yml` in the consumer repository include a list of the categories synced.
+    - **Verification:**
+        1. As part of integration testing, inspect the PR message generated in the test consumer repo.
+    - **Depends‑on:** [T012]
+
+## CI: `.github/workflows/ci.yml`
+- [x] **T018 · Feature · P1: Update `.github/workflows/ci.yml` to run `tools/validate_front_matter.rb --strict`**
+    - **Context:** Detailed Build Steps - 8. Update Leyline CI - `.github/workflows/ci.yml` - 8.1
+    - **Action:**
+        1. Ensure the `.github/workflows/ci.yml` workflow executes `tools/validate_front_matter.rb --strict`.
+    - **Done‑when:**
+        1. The Leyline CI pipeline runs `tools/validate_front_matter.rb --strict` on relevant code changes.
+    - **Verification:**
+        1. CI build logs show the execution of the script with the `--strict` flag.
+    - **Depends‑on:** [T010]
+
+- [x] **T019 · Feature · P1: Update `.github/workflows/ci.yml` to run `tools/reindex.rb` and check `00-index.md` consistency**
+    - **Context:** Detailed Build Steps - 8. Update Leyline CI - `.github/workflows/ci.yml` - 8.2
+    - **Action:**
+        1. Ensure the `.github/workflows/ci.yml` workflow executes `tools/reindex.rb`.
+        2. Add a step to check if `docs/bindings/00-index.md` has uncommitted changes after running `reindex.rb`; if so, fail the CI build.
+    - **Done‑when:**
+        1. The Leyline CI pipeline runs `tools/reindex.rb` and fails if `docs/bindings/00-index.md` is not up-to-date.
+    - **Verification:**
+        1. Intentionally make `00-index.md` outdated, push, and verify CI fails.
+        2. Commit the correct `00-index.md`, push, and verify CI passes.
+    - **Depends‑on:** [T007]
+
+## Documentation Updates
+- [x] **T020 · Docs · P1: Update `README.md` / `docs/index.md` for new structure and `vendor.yml` usage**
+    - **Context:** Detailed Build Steps - 9. Update Documentation - 9.1
+    - **Action:**
+        1. In `README.md` and/or `docs/index.md`, explain the new `docs/bindings/core/` and `docs/bindings/categories/` directory structure.
+        2. Document how to use the updated `vendor.yml` workflow with the new `categories` input.
+    - **Done‑when:**
+        1. `README.md` and/or `docs/index.md` accurately describe the new structure and `vendor.yml` usage.
+    - **Verification:**
+        1. Review the updated documentation for clarity and correctness.
+    - **Depends‑on:** [T005, T011]
+
+- [x] **T021 · Docs · P1: Update `CONTRIBUTING.md` for new binding placement, front matter, and cross-cutting strategy**
+    - **Context:** Detailed Build Steps - 9. Update Documentation - 9.2
+    - **Action:**
+        1. Update `CONTRIBUTING.md` to guide contributors on where to place new bindings (in `core/` or `categories/<category>/`).
+        2. Document the updated front matter requirements (no `applies_to`, `id` matches filename).
+        3. Explain the strategy for handling cross-cutting bindings.
+    - **Done‑when:**
+        1. `CONTRIBUTING.md` provides clear and accurate guidance for contributors.
+    - **Verification:**
+        1. Review `CONTRIBUTING.md` to ensure the new guidelines are easy to understand and follow.
+    - **Depends‑on:** [T005, T006]
+
+- [x] **T022 · Docs · P0: Create `docs/migration-guide.md` for consumer workflow updates**
+    - **Context:** Detailed Build Steps - 9. Update Documentation - 9.3
+    - **Action:**
+        1. Create a new file `docs/migration-guide.md`.
+        2. Document step-by-step instructions for existing consumers to update their workflows:
+           - How to update `vendor.yml` workflow call with the new `categories` input
+           - What happens with the cleanup step and reindexing
+           - How to select the appropriate categories for their needs
+    - **Done‑when:**
+        1. `docs/migration-guide.md` exists with clear migration instructions.
+    - **Verification:**
+        1. Review the migration guide for clarity, completeness, and correctness.
+    - **Depends‑on:** [T012]
+
+- [x] **T023 · Docs · P1: Update `docs/binding-metadata.md` or `TENET_FORMATTING.md` for binding categorization**
+    - **Context:** Detailed Build Steps - 9. Update Documentation - 9.4
+    - **Action:**
+        1. Update relevant documentation to reflect the removal of `applies_to` field.
+        2. Document the new directory-based categorization approach.
+        3. Update any examples or schemas to match the new front matter structure.
+    - **Done‑when:**
+        1. Documentation accurately reflects the new approach to binding categorization.
+    - **Verification:**
+        1. Review the updated documentation for clarity and correctness.
+    - **Depends‑on:** [T006]
+
+- [x] **T024 · Docs · P1: Update `mkdocs.yml` navigation section**
+    - **Context:** Detailed Build Steps - 9. Update Documentation - 9.5
+    - **Action:**
+        1. Update the `nav` section in `mkdocs.yml` to correctly point to all bindings in their new locations.
+    - **Done‑when:**
+        1. `mkdocs.yml` navigation reflects the new directory structure.
+    - **Verification:**
+        1. Run `mkdocs serve` locally and verify all navigation links work correctly.
+    - **Depends‑on:** [T005]
+
+- [x] **T025 · Docs · P2: Review and update other documentation references**
+    - **Context:** Detailed Build Steps - 9. Update Documentation - 9.6
+    - **Action:**
+        1. Search for references to the old structure or `applies_to` across the codebase.
+        2. Update any found references to match the new approach.
+    - **Done‑when:**
+        1. No references to the old structure or `applies_to` remain in documentation.
+    - **Verification:**
+        1. Search for keywords like "applies_to" and review results.
+        2. Updated binding_template.md to remove applies_to field
+        3. Updated implementation-guide.md to reflect the new directory-based approach
+        4. Updated language-specific-sync.yml example workflow to work with the new directory structure
+        5. Updated index.md to reflect new paths and structure
+        6. Updated audit.md to correct all binding paths
+    - **Depends‑on:** [T023]
+
+## Testing
+- [x] **T026 · Test · P1: Add unit tests for updated `reindex.rb`**
+    - **Context:** Testing Strategy - Unit Tests for `reindex.rb`
+    - **Action:**
+        1. Create unit tests for `reindex.rb` covering:
+           - Scanning nested directory structure
+           - Generating sections for core and categories
+           - Handling empty categories
+           - Link generation logic
+    - **Done‑when:**
+        1. Unit tests cover critical logic in `reindex.rb` with >80% coverage.
+    - **Verification:**
+        1. Created `test_reindex_updates.rb` with comprehensive tests for new directory structure
+        2. Tests verify core bindings and category-specific bindings are correctly processed
+        3. Tests verify empty categories are handled gracefully with proper message
+        4. Tests verify misplaced files in the root directory are detected and reported
+        5. Tests verify links are correctly generated with updated relative paths
+        6. All tests pass successfully
+    - **Depends‑on:** [T007, T008, T009]
+
+- [x] **T027 · Test · P1: Add unit tests for updated `validate_front_matter.rb`**
+    - **Context:** Testing Strategy - Unit Tests for `validate_front_matter.rb`
+    - **Action:**
+        1. Create unit tests for `validate_front_matter.rb` covering:
+           - No longer validating `applies_to`
+           - Validating correct `id`, `last_modified`, `derived_from`, `enforced_by`
+           - Finding bindings in nested directories
+    - **Done‑when:**
+        1. Unit tests cover critical logic in `validate_front_matter.rb` with >80% coverage.
+    - **Verification:**
+        1. Created `test_validate_front_matter.rb` with comprehensive tests that verify:
+           - The script correctly validates bindings in the new directory structure (core/ and categories/)
+           - It warns about but doesn't error on deprecated `applies_to` field
+           - It detects misplaced files in the root bindings directory
+           - It supports both formats in normal mode but enforces YAML in strict mode
+           - All 9 test assertions pass successfully
+    - **Depends‑on:** [T010]
+
+- [~] **T028 · Test · P0: Perform integration testing with test consumer repository**
+    - **Context:** Testing Strategy - Integration Tests
+    - **Action:**
+        1. Set up a dedicated test GitHub repository that calls `vendor.yml` from the feature branch.
+        2. Test with various inputs:
+           - No `categories` (should sync only `tenets/` and `core/`)
+           - Specific categories (e.g., `"go,typescript"`)
+           - Multiple categories (e.g., `"go,frontend"`)
+           - Non-existent categories
+    - **Done‑when:**
+        1. The workflow correctly syncs files based on inputs, cleans up old files, regenerates the index, and creates a PR with appropriate message.
+    - **Verification:**
+        1. Verify the correct files are present in the consumer repo.
+        2. Verify no stale files remain.
+        3. Verify the index is correctly generated.
+    - **Depends‑on:** [T016]
+
+- [ ] **T029 · Test · P2: Perform end-to-end test with real consumer**
+    - **Context:** Testing Strategy - End-to-End (E2E) Tests
+    - **Action:**
+        1. After release, assist a real consumer repository in updating to the new Leyline version.
+        2. Support them through the migration process.
+    - **Done‑when:**
+        1. A real consumer successfully migrates to the new structure and their documentation is correctly synced.
+    - **Verification:**
+        1. Work with the consumer to verify successful migration.
+    - **Depends‑on:** [T031]
+
+## Release & Communication
+- [ ] **T030 · Chore · P1: Merge feature branch to main**
+    - **Context:** Detailed Build Steps - 11. Merge, Release, and Communicate - 11.1
+    - **Action:**
+        1. Create PR from `feature/doc-directory-restructure` to `main`.
+        2. Ensure all checks pass and PR is reviewed.
+        3. Merge to `main`.
+    - **Done‑when:**
+        1. Branch is merged to `main`.
+    - **Verification:**
+        1. Verify the commit is present in `main`.
+    - **Depends‑on:** [T020, T021, T022, T023, T024, T025, T028]
+
+- [ ] **T031 · Chore · P0: Tag new release with breaking change**
+    - **Context:** Detailed Build Steps - 11. Merge, Release, and Communicate - 11.2
+    - **Action:**
+        1. Tag a new release with an appropriate version bump (likely minor or major).
+        2. Include release notes detailing the breaking change and migration path.
+    - **Done‑when:**
+        1. New release tag exists on the repository.
+    - **Verification:**
+        1. Verify the tag exists and release notes are correct.
+    - **Depends‑on:** [T030]
+
+- [ ] **T032 · Chore · P1: Communicate release and migration guide to consumers**
+    - **Context:** Detailed Build Steps - 11. Merge, Release, and Communicate - 11.3
+    - **Action:**
+        1. Re-communicate the release to consumers, pointing to the new version and migration guide.
+    - **Done‑when:**
+        1. Communication is sent to consumers.
+    - **Verification:**
+        1. Verify consumers have received the communication.
+    - **Depends‑on:** [T031]
+
+
+## Open Questions
+- [ ] **Issue: Strict validation of categories input values**
+    - **Context:** Open Questions - Strict validation of `categories` input values in `vendor.yml`
+    - **Description:** Determine whether to implement strict validation of `categories` input values against a predefined list now or defer to later.
+    - **Decision:** Current decision is to attempt to use any string provided in `categories`. If the directory doesn't exist, log a warning and skip.
+    - **Blocking?:** No
+
+- [ ] **Issue: Process for handling newly created category directories**
+    - **Context:** Open Questions - Handling of newly created category directories in Leyline
+    - **Description:** Define the process for how consumers will be informed about and receive content from newly added category directories in Leyline.
+    - **Decision:** Consumers will only receive content for categories they explicitly request and that exist in their synced version of Leyline.
+    - **Blocking?:** No

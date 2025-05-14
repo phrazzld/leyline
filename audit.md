@@ -57,31 +57,31 @@ Document Decisions, Not Mechanics | Complete | Tenet:
 | Architecture Guideline | Coverage | Mapping |
 |------------------------|----------|---------| | 1. Unix Philosophy | Complete | Tenet:
 [modularity.md](/tenets/modularity.md) | | 2. Strict Separation of Concerns | Complete |
-Binding: [hex-domain-purity.md](/bindings/hex-domain-purity.md) | | 3. Dependency
+Binding: [hex-domain-purity.md](/bindings/core/hex-domain-purity.md) | | 3. Dependency
 Inversion Principle | Complete | Binding:
-[dependency-inversion.md](/bindings/dependency-inversion.md) | | 4. Package/Module
+[dependency-inversion.md](/bindings/core/dependency-inversion.md) | | 4. Package/Module
 Structure | Partial | Aspects covered in [modularity.md](/tenets/modularity.md) | | 5.
 API Design | Partial | Aspects covered in
 [explicit-over-implicit.md](/tenets/explicit-over-implicit.md) | | 6. Configuration
 Management | Complete | Binding:
-[external-configuration.md](/bindings/external-configuration.md) | | 7. Consistent Error
-Handling | Complete | Binding: [go-error-wrapping.md](/bindings/go-error-wrapping.md)
+[external-configuration.md](/bindings/core/external-configuration.md) | | 7. Consistent Error
+Handling | Complete | Binding: [error-wrapping.md](/bindings/categories/go/error-wrapping.md)
 for Go | | 8. Design for Observability | Partial | Binding:
-[use-structured-logging.md](/bindings/use-structured-logging.md) covers logging aspect |
+[use-structured-logging.md](/bindings/core/use-structured-logging.md) covers logging aspect |
 
 ### Coding Standards Coverage
 
 | Coding Standard | Coverage | Mapping | |-----------------|----------|---------| | 1.
 Maximize Language Strictness | Complete | Bindings:
-[ts-no-any.md](/bindings/ts-no-any.md),
-[no-lint-suppression.md](/bindings/no-lint-suppression.md) | | 2. Leverage Types
-Diligently | Complete | Binding: [ts-no-any.md](/bindings/ts-no-any.md) | | 3. Default
+[no-any.md](/bindings/categories/typescript/no-any.md),
+[no-lint-suppression.md](/bindings/core/no-lint-suppression.md) | | 2. Leverage Types
+Diligently | Complete | Binding: [no-any.md](/bindings/categories/typescript/no-any.md) | | 3. Default
 to Immutability | Complete | Binding:
-[immutable-by-default.md](/bindings/immutable-by-default.md) | | 4. Prioritize Pure
-Functions | Partial | Aspects in [hex-domain-purity.md](/bindings/hex-domain-purity.md)
+[immutable-by-default.md](/bindings/core/immutable-by-default.md) | | 4. Prioritize Pure
+Functions | Partial | Aspects in [hex-domain-purity.md](/bindings/core/hex-domain-purity.md)
 | | 5. Meaningful Naming | Partial | Aspects covered in multiple tenets | | 6. Address
 Violations, Don't Suppress | Complete | Binding:
-[no-lint-suppression.md](/bindings/no-lint-suppression.md) | | 7. Disciplined Dependency
+[no-lint-suppression.md](/bindings/core/no-lint-suppression.md) | | 7. Disciplined Dependency
 Management | Missing | No specific binding covers this | | 8. Adhere to Length
 Guidelines | Missing | No specific binding covers this |
 
@@ -91,7 +91,7 @@ Guidelines | Missing | No specific binding covers this |
 1\. Guiding Principles | Complete | Tenet: [testability.md](/tenets/testability.md) | |
 2\. Test Focus and Types | Partial | Aspects in [testability.md](/tenets/testability.md)
 | | 3. Mocking Policy | Complete | Binding:
-[no-internal-mocking.md](/bindings/no-internal-mocking.md) | | 4. Test Coverage
+[no-internal-mocking.md](/bindings/core/no-internal-mocking.md) | | 4. Test Coverage
 Enforcement | Partial | Aspects in [testability.md](/tenets/testability.md) |
 
 ### Automation & CI/CD Coverage
@@ -106,7 +106,7 @@ Deployment | Partial | Aspects in [automation.md](/tenets/automation.md) |
 
 | Guideline | Coverage | Mapping | |-----------|----------|---------| | 1. Conventional
 Commits | Complete | Binding:
-[require-conventional-commits.md](/bindings/require-conventional-commits.md) | | 2.
+[require-conventional-commits.md](/bindings/core/require-conventional-commits.md) | | 2.
 Automated Version Bumping | Partial | Aspects in [automation.md](/tenets/automation.md)
 |
 
@@ -114,9 +114,9 @@ Automated Version Bumping | Partial | Aspects in [automation.md](/tenets/automat
 
 | Logging Guideline | Coverage | Mapping | |-------------------|----------|---------| |
 1\. Structured Logging | Complete | Binding:
-[use-structured-logging.md](/bindings/use-structured-logging.md) | | 2-7. Logging
+[use-structured-logging.md](/bindings/core/use-structured-logging.md) | | 2-7. Logging
 Practices | Partial | Aspects in
-[use-structured-logging.md](/bindings/use-structured-logging.md) |
+[use-structured-logging.md](/bindings/core/use-structured-logging.md) |
 
 ### Security Coverage
 
@@ -132,41 +132,44 @@ Practices | Partial | Aspects in
 
 | Go-Specific Guideline | Coverage | Mapping |
 |----------------------|----------|---------| | 2-3. Formatting & Linting | Partial |
-Aspects in [no-lint-suppression.md](/bindings/no-lint-suppression.md) | | 8. Error
-Handling | Complete | Binding: [go-error-wrapping.md](/bindings/go-error-wrapping.md) |
+Aspects in [no-lint-suppression.md](/bindings/core/no-lint-suppression.md) | | 8. Error
+Handling | Complete | Binding: [error-wrapping.md](/bindings/categories/go/error-wrapping.md) |
 | 10. Testing | Partial | Binding:
-[no-internal-mocking.md](/bindings/no-internal-mocking.md) | | 11. Logging | Complete |
-Binding: [use-structured-logging.md](/bindings/use-structured-logging.md) | | Other Go
+[no-internal-mocking.md](/bindings/core/no-internal-mocking.md) | | 11. Logging | Complete |
+Binding: [use-structured-logging.md](/bindings/core/use-structured-logging.md) | | Other Go
 Guidelines | Missing | No specific bindings cover these |
 
 ### TypeScript Appendix Coverage
 
 | TypeScript-Specific Guideline | Coverage | Mapping |
 |------------------------------|----------|---------| | 3. Linting | Partial | Binding:
-[no-lint-suppression.md](/bindings/no-lint-suppression.md) | | 4. TypeScript
-Configuration | Partial | Aspects in [ts-no-any.md](/bindings/ts-no-any.md) | | 5. Types
-and Interfaces | Complete | Binding: [ts-no-any.md](/bindings/ts-no-any.md) | | 7.
+[no-lint-suppression.md](/bindings/core/no-lint-suppression.md) | | 4. TypeScript
+Configuration | Partial | Aspects in [no-any.md](/bindings/categories/typescript/no-any.md) | | 5. Types
+and Interfaces | Complete | Binding: [no-any.md](/bindings/categories/typescript/no-any.md) | | 7.
 Immutability | Complete | Binding:
-[immutable-by-default.md](/bindings/immutable-by-default.md) | | Other TypeScript
+[immutable-by-default.md](/bindings/core/immutable-by-default.md) | | Other TypeScript
 Guidelines | Missing | No specific bindings cover these |
 
 ### Rust Appendix Coverage
 
 | Rust-Specific Guideline | Coverage | Mapping |
 |------------------------|----------|---------| | 3. Linting | Partial | Binding:
-[no-lint-suppression.md](/bindings/no-lint-suppression.md) | | 7. Ownership &
+[no-lint-suppression.md](/bindings/core/no-lint-suppression.md) | | 7. Ownership &
 Immutability | Partial | Binding:
-[immutable-by-default.md](/bindings/immutable-by-default.md) | | 8. Error Handling |
-Missing | No Rust-specific error handling binding | | 11. Testing | Partial | Binding:
-[no-internal-mocking.md](/bindings/no-internal-mocking.md) | | 12. Logging | Partial |
-Binding: [use-structured-logging.md](/bindings/use-structured-logging.md) | | Other Rust
+[immutable-by-default.md](/bindings/core/immutable-by-default.md) | | 8. Error Handling |
+Complete | Binding: [error-handling.md](/bindings/categories/rust/error-handling.md) | | 11. Testing | Partial | Binding:
+[no-internal-mocking.md](/bindings/core/no-internal-mocking.md) | | 12. Logging | Partial |
+Binding: [use-structured-logging.md](/bindings/core/use-structured-logging.md) | | Other Rust
 Guidelines | Missing | No specific bindings cover these |
 
 ### Frontend Appendix Coverage
 
 | Frontend-Specific Guideline | Coverage | Mapping |
-|----------------------------|----------|---------| | 1-14. Frontend Guidelines |
-Missing | No frontend-specific bindings exist |
+|----------------------------|----------|---------| | 1. Component Architecture | Complete | Binding:
+[component-architecture.md](/bindings/categories/frontend/component-architecture.md) | | 2. State Management | Complete | Binding:
+[state-management.md](/bindings/categories/frontend/state-management.md) | | 3. Web Accessibility | Complete | Binding:
+[web-accessibility.md](/bindings/categories/frontend/web-accessibility.md) | | 4-14. Other Frontend Guidelines |
+Missing | No specific bindings cover these yet |
 
 ## Gap Analysis
 

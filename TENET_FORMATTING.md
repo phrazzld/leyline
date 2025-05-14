@@ -1,35 +1,49 @@
-# Tenet and Binding Front-Matter Standard
+# Tenet and Binding Metadata Formatting
 
 ## Introduction
 
-Front-matter is the metadata section at the beginning of Markdown files that provides
-structured information about the document. In this project, we use YAML front-matter as
-the standard format for all tenet and binding documents.
+Metadata is included at the beginning of Markdown files to provide structured information
+about the document. In this project, both the traditional horizontal rule format and YAML
+front-matter format are acceptable for tenet and binding documents.
 
-This document establishes YAML front-matter as the official standard, replacing the
-older horizontal rule format that used underscores and bold text. The YAML format
-provides better tool integration, clearer structure, and improved maintainability.
+Since these documents are primarily processed by LLMs that can handle fuzzy content parsing,
+we maintain flexibility in the format. The horizontal rule format with underscores is
+fully supported and remains the primary format used in the project.
 
-## Front-Matter Format
+## Metadata Formats
 
-For all tenet and binding documents, you must use YAML front-matter at the beginning of
-the file:
+Both of these formats are acceptable for metadata in tenet and binding documents:
+
+### Horizontal Rule Format (Recommended)
+
+```markdown
+______________________________________________________________________
+
+## id: tenet-id last_modified: '2025-05-08'
+
+# Document Title
+```
+
+The horizontal rule format consists of:
+- A line of underscores (typically 70+)
+- A level-2 heading with key-value pairs
+- Optionally, another horizontal rule after the metadata
+
+### YAML Front-Matter Format (Alternative)
 
 ```markdown
 ---
 id: tenet-id
 last_modified: '2025-05-08'
 ---
+
+# Document Title
 ```
 
-The format consists of:
-
-- Triple dashes (`---`) to delimit the YAML front-matter block
+The YAML format consists of:
+- Triple dashes (`---`) to delimit the block
 - Key-value pairs in YAML syntax
 - A closing triple dash line
-
-All front-matter must be at the very beginning of the file with no preceding whitespace
-or other content.
 
 ## Required Fields
 
@@ -70,12 +84,13 @@ fields for each type.
 
   - Examples: "Linter rules", "Code review", "CI checks"
 
-### Optional Fields
+### Deprecated Fields
 
-- **applies_to** (bindings only): Array of contexts where this binding applies
-  - Can include languages (e.g., `typescript`, `go`, `rust`)
-  - Can include environments (e.g., `frontend`, `backend`)
-  - Use `all` for globally applicable bindings
+- **applies_to**: This field is now deprecated
+  - Binding applicability is now determined by directory location
+  - Core bindings (applicable to all) go in `docs/bindings/core/`
+  - Category-specific bindings go in `docs/bindings/categories/<category>/`
+  - See [binding-metadata.md](docs/binding-metadata.md) for more details
 
 ## Examples with Comments
 
@@ -98,7 +113,7 @@ The tenet content begins here...
 
 ```markdown
 ---
-# Unique identifier for this binding
+# Unique identifier for this binding (must match filename without .md)
 id: automate-changelog
 # Last modified date with quotes
 last_modified: '2025-05-08'
@@ -106,15 +121,14 @@ last_modified: '2025-05-08'
 derived_from: automation
 # How this binding is enforced
 enforced_by: CI checks & pre-release hooks
-# Optional: contexts where this binding applies
-applies_to:
-  - all
 ---
 
 # Binding: Automate Changelog Generation
 
 The binding content begins here...
 ```
+
+Note: This binding would be saved as `docs/bindings/core/automate-changelog.md` since it applies to all projects.
 
 ## Converting from Horizontal Rule Format
 
@@ -142,13 +156,15 @@ id: old-format
 last_modified: '2025-05-05'
 derived_from: some-tenet
 enforced_by: code review
-applies_to:
-  - typescript
-  - frontend
 ---
 
 # Document title
 ```
+
+Note: After converting, move the file to the appropriate directory based on its applicability:
+- If it's a core binding: `docs/bindings/core/`
+- If it's category-specific: `docs/bindings/categories/<category>/`
+  (e.g., `docs/bindings/categories/typescript/` in this example)
 
 Note the key differences:
 
@@ -225,15 +241,13 @@ section)
 **Solution**: Ensure dates are in ISO format (YYYY-MM-DD) and enclosed in quotes (e.g.,
 `'2025-05-08'`)
 
-### Issue: "Invalid format for 'applies_to' in YAML front-matter"
+### Issue: "File in incorrect directory or missing applies_to field"
 
-**Solution**: Make sure `applies_to` is formatted as a proper YAML array:
-
-```yaml
-applies_to:
-  - typescript
-  - frontend
-```
+**Solution**:
+- The `applies_to` field is deprecated
+- Move the binding file to the appropriate directory:
+  - Core bindings go in `docs/bindings/core/`
+  - Category-specific bindings go in `docs/bindings/categories/<category>/`
 
 ### Issue: "Invalid YAML in front-matter"
 

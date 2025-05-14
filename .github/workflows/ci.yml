@@ -19,8 +19,22 @@ jobs:
     - name: Link check
       run: |
         find . -name "*.md" | grep -v "node_modules\|venv\|site" | xargs markdown-link-check -q -c ./.mlc-config
-    - name: Schema validate
+    - name: Validate metadata
       run: ruby tools/validate_front_matter.rb
+
+    - name: Check index consistency
+      run: |
+        echo "Running reindex.rb to check if docs/bindings/00-index.md is up-to-date"
+        ruby tools/reindex.rb
+
+        # Check if there are any changes to the index file
+        if ! git diff --exit-code docs/bindings/00-index.md; then
+          echo "::error::The docs/bindings/00-index.md file is not up-to-date!"
+          echo "::error::Please run 'ruby tools/reindex.rb' locally and commit the updated index file."
+          exit 1
+        else
+          echo "✅ Index file is up-to-date"
+        fi
   build-site:
     runs-on: ubuntu-latest
     steps:

@@ -46,10 +46,12 @@ properly.
 1. **Required Fields**:
    - For tenets: `id` and `last_modified`
    - For bindings: `id`, `last_modified`, `derived_from`, and `enforced_by`
-1. **Optional Fields**:
-   - For bindings: `applies_to` (array of applicable languages/contexts)
 1. **All dates** must be in ISO format (YYYY-MM-DD) and enclosed in quotes (e.g.,
    `'2025-05-09'`)
+
+**Note**: The `applies_to` field has been deprecated. Binding applicability is now determined by its location in the directory structure:
+- `/docs/bindings/core/` - Core bindings that apply to all projects
+- `/docs/bindings/categories/<category>/` - Category-specific bindings
 
 For detailed guidance on front-matter requirements, including examples, format
 conversion, and troubleshooting, refer to [TENET_FORMATTING.md](TENET_FORMATTING.md).
@@ -140,8 +142,12 @@ The pre-commit hooks will handle basic formatting like trailing whitespace and l
 
 **File Structure:**
 
-- Create file in `docs/bindings/` directory with a descriptive slug (e.g.,
-  `ts-no-any.md`)
+- Place the file in the appropriate directory based on its applicability:
+  - `docs/bindings/core/` for bindings that apply to all projects
+  - `docs/bindings/categories/<category>/` for category-specific bindings
+    - Valid categories: `go`, `rust`, `typescript`, `cli`, `frontend`, `backend`
+
+- Use a descriptive filename without category prefixes (e.g., `no-any.md` rather than `ts-no-any.md`)
 
 - Use the [binding template](docs/templates/binding_template.md) as your starting point
 
@@ -158,9 +164,6 @@ The pre-commit hooks will handle basic formatting like trailing whitespace and l
   derived_from: parent-tenet-id
   # Tool, rule, or process that enforces this binding
   enforced_by: description of enforcement mechanism
-  # Optional: languages or contexts where this binding applies
-  applies_to:
-    - language or context
   ---
   ```
 
@@ -201,6 +204,28 @@ The pre-commit hooks will handle basic formatting like trailing whitespace and l
   ```
 
   ```
+
+### Cross-Cutting Bindings Strategy
+
+Some bindings may be applicable across multiple categories. When deciding where to place such bindings, follow these guidelines:
+
+1. **Core Bindings**:
+   - Place a binding in `docs/bindings/core/` if:
+     - It applies to virtually all projects regardless of language or context
+     - It represents a fundamental principle that transcends specific languages or environments
+     - It can be described in language-agnostic terms
+
+2. **Category Bindings**:
+   - Place a binding in `docs/bindings/categories/<category>/` if:
+     - It applies primarily to a specific programming language or context
+     - It uses language-specific syntax or features
+     - It addresses concerns specific to a particular category
+
+3. **Cross-Cutting Decision Process**:
+   - Identify the primary category where the binding is most relevant
+   - Place the binding in that primary category directory
+   - In the binding document, clearly explain its applicability to other categories
+   - Reference the binding from relevant documentation in other categories
 
 ### Editing Existing Documents
 
