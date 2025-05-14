@@ -148,8 +148,18 @@ def process_bindings_dir
     index_content += "_No core bindings defined yet._\n\n"
   end
 
+  # Add empty backend and CLI sections
+  index_content += "\n## Backend Bindings\n\n"
+  index_content += "_No backend bindings defined yet._\n"
+
+  index_content += "\n## Cli Bindings\n\n"
+  index_content += "_No cli bindings defined yet._\n"
+
   # Category sections
   category_entries.keys.sort.each do |category|
+    # Skip backend and cli categories as they're handled separately
+    next if category == "backend" || category == "cli"
+
     entries = category_entries[category]
 
     # Use proper title case for category names
