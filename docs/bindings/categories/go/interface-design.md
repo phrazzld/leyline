@@ -490,25 +490,25 @@ func Process[T constraints.Ordered](input T) T {
 
 ## Related Bindings
 
-- [dependency-inversion](docs/bindings/core/dependency-inversion.md): Go's consumer-defined interfaces
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Go's consumer-defined interfaces
   directly implement dependency inversion by having high-level modules define interfaces
   that low-level modules implement. This binding provides the concrete Go pattern for
   achieving dependency inversion, which creates more testable, modular code by
   decoupling components and focusing on behaviors rather than implementations.
 
-- [go-package-design](docs/bindings/categories/go/package-design.md): Interface design and package design work
+- [go-package-design](../../docs/bindings/categories/go/package-design.md): Interface design and package design work
   together closely in Go. Well-designed interfaces define the boundaries between
   packages and enable clean dependency management. The consumer-defined interface
   approach helps prevent circular dependencies between packages, and clear interface
   boundaries promote better package organization.
 
-- [testability](../tenets/testability.md): Small interfaces make testing dramatically
+- [testability](../../docs/tenets/testability.md): Small interfaces make testing dramatically
   easier, as they can be readily mocked with simple test implementations rather than
   complex mocking frameworks. This binding implements the "No Mocking Internal
   Components" guideline by providing natural seams for substituting test implementations
   at package boundaries.
 
-- [hex-domain-purity](docs/bindings/core/hex-domain-purity.md): Go interfaces are a key enabler for
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Go interfaces are a key enabler for
   hexagonal architecture by providing the adapters between the domain and external
   concerns. Domain logic can remain pure by depending on interfaces rather than concrete
   implementations of infrastructure components, with the interfaces defined by the

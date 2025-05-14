@@ -264,19 +264,19 @@ Closes #256
 
 ## Related Bindings
 
-- [document-decisions](../tenets/document-decisions.md): Both bindings emphasize the
+- [document-decisions](../../docs/tenets/document-decisions.md): Both bindings emphasize the
   importance of preserving context. While conventional commits provide structured
   history at the repository level, documenting decisions focuses on capturing context
   within the code. Together, they ensure the "why" behind changes is preserved at both
   the commit level and in the codebase itself.
 
-- [automate-changelog](docs/bindings/core/automate-changelog.md): Conventional commits enable automated
+- [automate-changelog](../../docs/bindings/core/automate-changelog.md): Conventional commits enable automated
   changelog generation by providing a structured format that tools can parse. These
   bindings work hand-in-hand—conventional commits provide the input data that automated
   changelog tools transform into organized release notes that highlight features, fixes,
   and breaking changes.
 
-- [semantic-versioning](docs/bindings/core/semantic-versioning.md): Conventional commits create a direct
+- [semantic-versioning](../../docs/bindings/core/semantic-versioning.md): Conventional commits create a direct
   mapping to semantic version increments—features trigger minor version bumps, fixes
   trigger patch version bumps, and breaking changes trigger major version bumps. This
   connection ensures your versioning accurately reflects the nature of changes, giving

@@ -1447,35 +1447,35 @@ function handleCheckout(req, res) {
 
 ## Related Bindings
 
-- [context-propagation](docs/bindings/core/context-propagation.md): Complete observability depends on
+- [context-propagation](../../docs/bindings/core/context-propagation.md): Complete observability depends on
   proper context propagation to maintain correlation IDs and other contextual
   information across service boundaries. These bindings work together to create
   end-to-end traceability in distributed systems, with context propagation providing the
   means to connect observability signals from different services into a coherent
   narrative.
 
-- [external-configuration](docs/bindings/core/external-configuration.md): Observability configuration (log
+- [external-configuration](../../docs/bindings/core/external-configuration.md): Observability configuration (log
   levels, metrics sampling, trace sampling rates) should be managed through external
   configuration rather than hardcoded. This allows for environment-specific settings and
   dynamic adjustment of telemetry verbosity without code changes. Together, these
   bindings ensure that observability is both comprehensive and adaptable to different
   operational needs.
 
-- [explicit-over-implicit](../tenets/explicit-over-implicit.md): Structured
+- [explicit-over-implicit](../../docs/tenets/explicit-over-implicit.md): Structured
   observability is a perfect application of the explicit-over-implicit principle, as it
   makes the context and meaning of all telemetry explicit rather than buried in
   unstructured text or isolated signals. Where traditional monitoring often relies on
   implicit context and human pattern recognition, structured observability makes all
   relevant data explicit, queryable, and machine-processable across all three pillars.
 
-- [dependency-inversion](docs/bindings/core/dependency-inversion.md): A well-designed observability system
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): A well-designed observability system
   should use dependency inversion to abstract the concrete telemetry implementations
   behind interfaces. This allows for swapping out logging, metrics, or tracing providers
   without changing business logic. By depending on abstractions rather than concrete
   implementations, systems can evolve their observability stack independently of
   application code.
 
-- [hex-domain-purity](docs/bindings/core/hex-domain-purity.md): Observability instrumentation should
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Observability instrumentation should
   respect domain purity by ensuring that core domain logic remains free from direct
   observability concerns. Instead, observability is typically implemented in the
   adapters and infrastructure layers of a hexagonal architecture, with domain events

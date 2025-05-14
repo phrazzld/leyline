@@ -70,7 +70,7 @@ def fix_links(binding_map)
       updated = true
     end
 
-    # Fix relative links between bindings
+    # Fix relative links between bindings (files in docs/bindings/core and docs/bindings/categories/*)
     binding_directories = [
       "docs/bindings/core",
       *Dir.glob("docs/bindings/categories/*")
@@ -78,10 +78,40 @@ def fix_links(binding_map)
 
     if binding_directories.any? { |dir| file.start_with?(dir) }
       # This is a binding file, fix references to other bindings
-      binding_map.each do |name, path|
-        content.gsub!(/\]\(#{name}\.md\)/, "](#{path})")
+
+      # Fix relative links to tenets from bindings
+      if content.match(%r{\]\(\.\./tenets/([a-z0-9-]+\.md)\)})
+        content.gsub!(%r{\]\(\.\./tenets/([a-z0-9-]+\.md)\)}, "](../../docs/tenets/\\1)")
+        updated = true
       end
-      updated = true
+
+      # Fix relative links to bindings
+      content.gsub!(%r{\]\(docs/bindings/([^)]+)\)}) do |match|
+        puts "  Fixed absolute binding path in #{file}: #{match}"
+        "](../../docs/bindings/#{$1})"
+      end
+
+      # Fix simple relative bindings like "](name.md)"
+      binding_map.each do |name, path|
+        if content.match(/\]\(#{Regexp.escape(name)}\.md\)/)
+          content.gsub!(/\]\(#{Regexp.escape(name)}\.md\)/, "](../../#{path})")
+          updated = true
+        end
+      end
+
+      # Fix directory-based references like "./name.md"
+      if content.match(%r{\]\(\./([a-z0-9-]+)\.md\)})
+        content.gsub!(%r{\]\(\./([a-z0-9-]+)\.md\)}) do |match|
+          name = $1
+          if binding_map[name]
+            "](../../#{binding_map[name]})"
+          else
+            puts "  Warning: Could not find binding for ./#{name}.md in #{file}"
+            match
+          end
+        end
+        updated = true
+      end
     end
 
     # Write back if updated

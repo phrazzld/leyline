@@ -512,11 +512,11 @@ const userService = new UserService(orderService);
 
 ## Related Bindings
 
-- [modularity](../tenets/modularity.md): This binding is a TypeScript-specific
+- [modularity](../../docs/tenets/modularity.md): This binding is a TypeScript-specific
   implementation of our core modularity tenet, providing concrete guidance on how to
   achieve modularity in TypeScript projects specifically.
 
-- [dependency-inversion](docs/bindings/core/dependency-inversion.md): Proper module organization works
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Proper module organization works
   hand-in-hand with dependency inversion. By depending on abstractions (interfaces)
   rather than concrete implementations, modules can communicate without creating tight
   coupling or circular dependencies.
@@ -525,10 +525,10 @@ const userService = new UserService(orderService);
   avoiding `any`, you create explicit contracts between modules that are enforced by the
   TypeScript compiler.
 
-- [hex-domain-purity](docs/bindings/core/hex-domain-purity.md): Feature-based module organization naturally
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Feature-based module organization naturally
   supports hexagonal architecture by creating separate modules for domain logic and
   adapters, ensuring clean separation of concerns.
 
-- [immutable-by-default](docs/bindings/core/immutable-by-default.md): Module boundaries are more effective
+- [immutable-by-default](../../docs/bindings/core/immutable-by-default.md): Module boundaries are more effective
   when data passed between them is immutable, preventing unexpected side effects when
   one module modifies data used by another.

@@ -444,22 +444,22 @@ function ProductPage({ productId }) {
 
 ## Related Bindings
 
-- [component-architecture.md](docs/bindings/core/component-architecture.md): Component architecture and
+- [component-architecture.md](../../docs/bindings/core/component-architecture.md): Component architecture and
   state management work hand in hand. Well-designed component boundaries make state
   management simpler by encapsulating related state and behavior. This binding builds on
   component architecture by defining how state should flow through the component
   hierarchy.
 
-- [immutable-by-default.md](docs/bindings/core/immutable-by-default.md): State immutability is a
+- [immutable-by-default.md](../../docs/bindings/core/immutable-by-default.md): State immutability is a
   fundamental requirement for predictable frontend applications. This binding reinforces
   the immutable-by-default binding by applying it specifically to React's state
   management patterns, ensuring state updates are predictable and traceable.
 
-- [pure-functions.md](docs/bindings/core/pure-functions.md): State management logic should follow pure
+- [pure-functions.md](../../docs/bindings/core/pure-functions.md): State management logic should follow pure
   function principles. Reducers, selectors, and state transformations should be pure
   functions without side effects, making state changes predictable and testable.
 
-- [dependency-management.md](docs/bindings/core/dependency-management.md): Careful selection of state
+- [dependency-management.md](../../docs/bindings/core/dependency-management.md): Careful selection of state
   management libraries is an important aspect of dependency management. This binding
   complements dependency management by providing guidance on when to introduce state
   management libraries versus using built-in React capabilities.

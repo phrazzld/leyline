@@ -296,11 +296,11 @@ processUserInput({ isvalid: true, userData: { name: "User" } });
 
 ## Related Bindings
 
-- [external-configuration](./external-configuration.md) - Type safety extends to
+- [external-configuration](../../docs/bindings/core/external-configuration.md) - Type safety extends to
   configuration, preventing undefined configuration values from causing runtime failures
-- [immutable-by-default](./immutable-by-default.md) - Type safety works best with
+- [immutable-by-default](../../docs/bindings/core/immutable-by-default.md) - Type safety works best with
   immutable data, creating a stronger guarantee of correctness
-- [no-lint-suppression](./no-lint-suppression.md) - Enforces that developers don't
+- [no-lint-suppression](../../docs/bindings/core/no-lint-suppression.md) - Enforces that developers don't
   suppress TypeScript type errors or linter warnings without documented justification
-- [hex-domain-purity](./hex-domain-purity.md) - Well-typed domain code ensures business
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md) - Well-typed domain code ensures business
   logic operates on valid, properly structured data

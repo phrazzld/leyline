@@ -626,7 +626,7 @@ async function processAllItems(items: Item[]): Promise<Result[]> {
 
 ## Related Bindings
 
-- [simplicity](../tenets/simplicity.md): Well-structured async code is inherently
+- [simplicity](../../docs/tenets/simplicity.md): Well-structured async code is inherently
   simpler to understand and maintain, even though asynchronous operations are complex by
   nature. This binding provides specific patterns that reduce the complexity of async
   operations.
@@ -639,9 +639,9 @@ async function processAllItems(items: Item[]): Promise<Result[]> {
   async operations more manageable by defining what data and operations cross
   boundaries, simplifying testing and error handling.
 
-- [testability](../tenets/testability.md): Async code requires special consideration in
+- [testability](../../docs/tenets/testability.md): Async code requires special consideration in
   testing. Well-structured async patterns make tests more reliable and easier to write.
 
-- [pure-functions](docs/bindings/core/pure-functions.md): While async functions inherently involve side
+- [pure-functions](../../docs/bindings/core/pure-functions.md): While async functions inherently involve side
   effects, following pure function principles for the logic within async functions
   improves maintainability and testability.

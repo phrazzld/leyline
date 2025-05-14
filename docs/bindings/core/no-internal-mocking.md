@@ -459,19 +459,19 @@ def test_order_processing_with_real_components():
 
 ## Related Bindings
 
-- [dependency-inversion](docs/bindings/core/dependency-inversion.md): Dependency inversion is essential for
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Dependency inversion is essential for
   implementing this no-internal-mocking binding. By depending on abstractions rather
   than concrete implementations, you can achieve testability without resorting to mocks.
   These bindings work together—dependency inversion creates the structure that makes
   testing without internal mocks practical and effective.
 
-- [hex-domain-purity](docs/bindings/core/hex-domain-purity.md): Domain purity and no-internal-mocking are
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Domain purity and no-internal-mocking are
   complementary approaches to testable architecture. By keeping your business logic free
   from infrastructure concerns, you naturally create a system where core components can
   be tested without elaborate mocking. The hexagonal architecture pattern provides the
   structure that makes no-internal-mocking practical to implement.
 
-- [immutable-by-default](docs/bindings/core/immutable-by-default.md): Immutable data structures make
+- [immutable-by-default](../../docs/bindings/core/immutable-by-default.md): Immutable data structures make
   testing without mocks significantly easier. When data doesn't change unexpectedly,
   tests become more predictable and less prone to order dependencies or side effects.
   Together, these bindings create systems that are both more testable and more reliable.

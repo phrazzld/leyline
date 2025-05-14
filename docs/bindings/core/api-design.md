@@ -547,19 +547,19 @@ program.parse(process.argv);
 
 ## Related Bindings
 
-- [explicit-over-implicit](../tenets/explicit-over-implicit.md): This binding is a
+- [explicit-over-implicit](../../docs/tenets/explicit-over-implicit.md): This binding is a
   direct application of the explicit-over-implicit tenet to API design. While the tenet
   provides the general principle that explicitness is better than implicitness, this
   binding specifies concrete practices for applying that principle to API design
   specifically.
 
-- [dependency-inversion](docs/bindings/core/dependency-inversion.md): Well-designed APIs with clear
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Well-designed APIs with clear
   contracts complement dependency inversion by enabling clean interfaces between
   high-level and low-level components. When APIs are explicit, dependency inversion
   becomes easier to implement because the contracts between components are clearly
   defined.
 
-- [hex-domain-purity](docs/bindings/core/hex-domain-purity.md): Explicit API design supports hexagonal
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Explicit API design supports hexagonal
   architecture by creating clear boundaries between the domain and infrastructure
   layers. The API contracts serve as ports that explicitly define how the domain
   interacts with the outside world, keeping the domain logic pure and free from

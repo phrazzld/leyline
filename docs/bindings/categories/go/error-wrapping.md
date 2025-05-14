@@ -208,9 +208,9 @@ Without proper wrapping, we might only see "connection refused" with no context.
 
 ## Related Bindings
 
-- [use-structured-logging](./use-structured-logging.md) - Error context should be
+- [use-structured-logging](../../docs/bindings/core/use-structured-logging.md) - Error context should be
   included in logs using structured formats
-- [external-configuration](./external-configuration.md) - Error messages shouldn't
+- [external-configuration](../../docs/bindings/core/external-configuration.md) - Error messages shouldn't
   contain hardcoded configuration values
-- [hex-domain-purity](./hex-domain-purity.md) - Domain logic shouldn't depend on
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md) - Domain logic shouldn't depend on
   specific error implementation details

@@ -315,21 +315,21 @@ v1.3.0 -> v2.0.0 (redesigned authentication API)
 
 ## Related Bindings
 
-- [require-conventional-commits](docs/bindings/core/require-conventional-commits.md): Conventional commit
+- [require-conventional-commits](../../docs/bindings/core/require-conventional-commits.md): Conventional commit
   messages provide the structured metadata needed to automate semantic version
   increments. The type prefix in a conventional commit directly maps to SemVer
   increments: `fix:` triggers a patch, `feat:` triggers a minor version, and `feat!:` or
   `BREAKING CHANGE:` triggers a major version. Together, these bindings create a
   seamless workflow where commit messages drive both changelogs and versioning.
 
-- [automate-changelog](docs/bindings/core/automate-changelog.md): Semantic versioning and automated
+- [automate-changelog](../../docs/bindings/core/automate-changelog.md): Semantic versioning and automated
   changelogs work together to communicate changes clearly. While SemVer provides a quick
   signal about compatibility through version numbers, changelogs provide the details
   about what actually changed. These bindings complement each other by ensuring both
   high-level compatibility signals and detailed change information are available and
   accurate.
 
-- [immutable-by-default](docs/bindings/core/immutable-by-default.md): Both semantic versioning and
+- [immutable-by-default](../../docs/bindings/core/immutable-by-default.md): Both semantic versioning and
   immutability share a fundamental principle: once something is released or shared, it
   shouldn't change unexpectedly. With SemVer, we explicitly signal when breaking changes
   occur through major version increments; with immutability, we prevent unexpected

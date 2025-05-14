@@ -702,7 +702,7 @@ async function publishOrderEvent(event: string, data: any) {
 
 ## Related Bindings
 
-- [use-structured-logging](docs/bindings/core/use-structured-logging.md): Context propagation and
+- [use-structured-logging](../../docs/bindings/core/use-structured-logging.md): Context propagation and
   structured logging work hand-in-hand to create comprehensive observability. When
   context is propagated across services, structured logs can include consistent
   correlation IDs and other context fields, allowing logs from different services to be
@@ -710,20 +710,20 @@ async function publishOrderEvent(event: string, data: any) {
   transform disconnected log entries into a coherent narrative across service
   boundaries.
 
-- [dependency-inversion](docs/bindings/core/dependency-inversion.md): For effective context propagation,
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): For effective context propagation,
   services should depend on context abstractions rather than specific implementations.
   This allows for different context propagation strategies in different environments
   (HTTP, message queues, etc.) while maintaining consistent behavior. By applying
   dependency inversion to context handling, systems can evolve their propagation
   mechanisms independently of business logic.
 
-- [explicit-over-implicit](../tenets/explicit-over-implicit.md): Context propagation is
+- [explicit-over-implicit](../../docs/tenets/explicit-over-implicit.md): Context propagation is
   a direct application of making implicit relationships explicit. Without context
   propagation, the relationships between distributed operations remain implicit and
   invisible; with it, these relationships become explicit and traceable. This binding
   enforces the explicitness principle at the distributed systems level.
 
-- [testability](../tenets/testability.md): Good context propagation improves testability
+- [testability](../../docs/tenets/testability.md): Good context propagation improves testability
   by making it easier to track and validate cross-service interactions. Tests can verify
   that context is properly maintained across boundaries, and debugging becomes much
   easier when distributed transactions maintain their context. By propagating context
