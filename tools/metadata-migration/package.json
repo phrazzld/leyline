@@ -1,0 +1,17 @@
+{
+  "name": "metadata-migration",
+  "version": "1.0.0",
+  "description": "Script to convert legacy horizontal rule metadata to YAML front-matter in Markdown files",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["metadata", "migration", "markdown", "yaml"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "typescript": "^5.8.3"
+  }
+}

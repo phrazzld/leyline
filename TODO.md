@@ -10,7 +10,7 @@
         1. The directory exists with README.md
     - **Depends‑on:** none
 
-- [ ] **T002 · Chore · P1: Initialize Node.js project with TypeScript**
+- [x] **T002 · Chore · P1: Initialize Node.js project with TypeScript**
     - **Context:** Implementation Steps - 1. Project Setup
     - **Action:**
         1. Initialize a Node.js project (npm init -y)
