@@ -19,7 +19,7 @@
         1. package.json exists with TypeScript as a dev dependency
     - **Depends‑on:** [T001]
 
-- [ ] **T003 · Chore · P1: Configure necessary project dependencies**
+- [x] **T003 · Chore · P1: Configure necessary project dependencies**
     - **Context:** Implementation Steps - 1. Project Setup
     - **Action:**
         1. Install production dependencies: glob, js-yaml (or yaml)
