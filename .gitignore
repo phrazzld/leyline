@@ -1,5 +1,10 @@
+.DS_STORE
 **/.claude/settings.local.json
 test-repo/
 site/
 CODE_REVIEW.md
 T*-plan.md
+node_modules/
+**/node_modules/
+dist/
+**/dist/
