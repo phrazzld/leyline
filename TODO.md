@@ -28,7 +28,7 @@
         1. All dependencies are installed and listed in package.json
     - **Depends‑on:** [T002]
 
-- [ ] **T004 · Chore · P1: Setup tsconfig and npm scripts**
+- [~] **T004 · Chore · P1: Setup tsconfig and npm scripts**
     - **Context:** Implementation Steps - 1. Project Setup
     - **Action:**
         1. Create tsconfig.json with strict settings
@@ -42,7 +42,7 @@
     - **Depends‑on:** [T003]
 
 ## Core Data Structures
-- [ ] **T005 · Feature · P1: Define core data structure interfaces**
+- [x] **T005 · Feature · P1: Define core data structure interfaces**
     - **Context:** Core Data Structures
     - **Action:**
         1. Create a types.ts file
