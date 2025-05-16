@@ -28,7 +28,7 @@
         1. All dependencies are installed and listed in package.json
     - **Depends‑on:** [T002]
 
-- [~] **T004 · Chore · P1: Setup tsconfig and npm scripts**
+- [x] **T004 · Chore · P1: Setup tsconfig and npm scripts**
     - **Context:** Implementation Steps - 1. Project Setup
     - **Action:**
         1. Create tsconfig.json with strict settings
@@ -201,7 +201,7 @@
         1. Dry run completes successfully and logs expected changes
     - **Depends‑on:** [T013, T014, T017]
 
-- [ ] **T021 · Chore · P0: Create backup of docs directory**
+- [x] **T021 · Chore · P0: Create backup of docs directory**
     - **Context:** Implementation Steps - Validation & Execution
     - **Action:**
         1. Create a full backup of the docs directory before execution
