@@ -52,7 +52,7 @@
     - **Depends‑on:** [T002]
 
 ## Core Modules
-- [ ] **T006 · Feature · P1: Implement Logger module**
+- [x] **T006 · Feature · P1: Implement Logger module**
     - **Context:** Key Components - Logger
     - **Action:**
         1. Create src/logger.ts
