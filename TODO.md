@@ -139,7 +139,7 @@
     - **Depends‑on:** [T003, T004, T013]
 
 ## Testing
-- [ ] **T015 · Chore · P1: Create test fixtures**
+- [x] **T015 · Chore · P1: Create test fixtures**
     - **Context:** Testing Strategy
     - **Action:**
         1. Create test/fixtures/ directory
