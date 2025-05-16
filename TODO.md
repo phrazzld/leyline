@@ -70,7 +70,7 @@
         1. Module can identify and return markdown file paths
     - **Depends‑on:** [T004, T005]
 
-- [ ] **T008 · Feature · P1: Implement MetadataInspector module**
+- [x] **T008 · Feature · P1: Implement MetadataInspector module**
     - **Context:** Key Components - MetadataInspector
     - **Action:**
         1. Create src/metadataInspector.ts
