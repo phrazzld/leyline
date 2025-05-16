@@ -80,7 +80,7 @@
         1. Module correctly detects formats and separates metadata from content
     - **Depends‑on:** [T004, T005]
 
-- [~] **T009 · Feature · P1: Implement LegacyParser module**
+- [x] **T009 · Feature · P1: Implement LegacyParser module**
     - **Context:** Key Components - LegacyParser
     - **Action:**
         1. Create src/legacyParser.ts
