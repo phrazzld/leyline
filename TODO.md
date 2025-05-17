@@ -119,7 +119,7 @@
         1. Module can write files atomically and create backups
     - **Depends‑on:** [T004, T005, T008, T011]
 
-- [ ] **T013 · Feature · P1: Implement MigrationOrchestrator module**
+- [x] **T013 · Feature · P1: Implement MigrationOrchestrator module**
     - **Context:** Key Components - MigrationOrchestrator
     - **Action:**
         1. Create src/migrationOrchestrator.ts
@@ -129,7 +129,7 @@
         1. Module correctly processes files through the full workflow
     - **Depends‑on:** [T006, T007, T008, T009, T010, T011, T012]
 
-- [ ] **T014 · Feature · P1: Implement CliHandler module**
+- [x] **T014 · Feature · P1: Implement CliHandler module**
     - **Context:** Key Components - CliHandler
     - **Action:**
         1. Create src/cliHandler.ts

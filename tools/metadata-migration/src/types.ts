@@ -118,18 +118,76 @@ export interface MigrationResult {
 export interface MigrationSummary {
   /** Total number of files processed */
   totalFiles: number;
+  /** Number of files actually processed (attempted) */
+  processedFiles: number;
   /** Number of successful migrations */
-  successCount: number;
+  succeededCount: number;
   /** Number of failed migrations */
-  failureCount: number;
+  failedCount: number;
   /** Number of files that were already in YAML format */
   alreadyYamlCount: number;
   /** Number of files with no metadata */
   noMetadataCount: number;
+  /** Number of files with unknown metadata format */
+  unknownFormatCount: number;
   /** Number of files that were modified */
   modifiedCount: number;
   /** Number of backups created */
   backupsCreated: number;
   /** List of errors encountered */
-  errors: Array<{ filePath: string; error: string }>;
+  errors: Array<{ filePath: string; message: string }>;
+}
+
+/**
+ * Options for configuring the migration orchestrator.
+ */
+export interface MigrationOrchestratorOptions {
+  /** Target paths to process (directories or files) */
+  paths: string[];
+  /** Whether to run in dry-run mode (no file modifications) */
+  dryRun: boolean;
+  /** Directory to store backups of modified files */
+  backupDir?: string;
+  /** Optional progress callback for UI integration */
+  onProgress?: (progress: ProgressReport) => void;
+}
+
+/**
+ * Progress report for tracking migration progress.
+ */
+export interface ProgressReport {
+  /** Total number of files to process */
+  totalFiles: number;
+  /** Number of files processed so far */
+  processedFiles: number;
+  /** Path of the current file being processed */
+  currentFilePath: string;
+  /** Status of current file processing */
+  status: "processing" | "completed" | "failed";
+}
+
+/**
+ * Result of processing a single file.
+ */
+export interface FileProcessingResult {
+  /** Path of the processed file */
+  filePath: string;
+  /** Whether the processing was successful */
+  success: boolean;
+  /** Whether the file was actually modified */
+  modified: boolean;
+  /** Format before migration */
+  originalFormat: MetadataFormat;
+  /** Path to backup file if created */
+  backupPath?: string;
+  /** Error message if processing failed */
+  error?: string;
+}
+
+/**
+ * Abstraction for file system operations.
+ */
+export interface IFileSystemAdapter {
+  /** Read file content as string */
+  readFile(filePath: string): Promise<string>;
 }

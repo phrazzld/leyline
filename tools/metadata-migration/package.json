@@ -2,7 +2,10 @@
   "name": "metadata-migration",
   "version": "1.0.0",
   "description": "Script to convert legacy horizontal rule metadata to YAML front-matter in Markdown files",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": {
+    "metadata-migration": "dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
