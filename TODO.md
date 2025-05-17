@@ -109,7 +109,7 @@
         1. Module produces valid YAML front-matter strings
     - **Depends‑on:** [T003, T004, T005]
 
-- [ ] **T012 · Feature · P1: Implement FileRewriter module**
+- [x] **T012 · Feature · P1: Implement FileRewriter module**
     - **Context:** Key Components - FileRewriter
     - **Action:**
         1. Create src/fileRewriter.ts
