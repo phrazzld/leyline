@@ -81,7 +81,9 @@ export function parseLegacyMetadata(rawMetadata: string): ParseResult {
   // Check for empty metadata
   if (!rawMetadata || rawMetadata.trim() === "") {
     logger.error("Empty metadata provided for parsing");
-    errors.push(new LegacyParseError("Metadata is empty or contains only whitespace"));
+    errors.push(
+      new LegacyParseError("Metadata is empty or contains only whitespace"),
+    );
     return { metadata: null, errors, warnings };
   }
 
@@ -93,7 +95,7 @@ export function parseLegacyMetadata(rawMetadata: string): ParseResult {
 
   // Check for missing closing delimiter first (do this before validation)
   const lines = rawMetadata.split(/\r\n|\r|\n/);
-  const delimiterLines = lines.filter(line => line.includes("_____"));
+  const delimiterLines = lines.filter((line) => line.includes("_____"));
   if (delimiterLines.length < 2) {
     warnings.push("Metadata may be missing closing delimiter");
   }
@@ -101,25 +103,35 @@ export function parseLegacyMetadata(rawMetadata: string): ParseResult {
   // Validate required fields
   for (const requiredField of REQUIRED_FIELDS) {
     if (!mappedData[requiredField]) {
-      errors.push(new LegacyParseError(`Missing required field: ${requiredField}`, requiredField));
+      errors.push(
+        new LegacyParseError(
+          `Missing required field: ${requiredField}`,
+          requiredField,
+        ),
+      );
     }
   }
 
   // If there are critical errors, check if we can return partial metadata
   if (errors.length > 0) {
-    logger.warn("Critical errors found during parsing", { errorCount: errors.length });
+    logger.warn("Critical errors found during parsing", {
+      errorCount: errors.length,
+    });
 
     // If we at least have an ID, return partial metadata with errors
     if (mappedData.id) {
       const partialMetadata: LegacyMetadata = {
         id: mappedData.id as string,
-        lastModified: mappedData.lastModified as string || "",
+        lastModified: (mappedData.lastModified as string) || "",
       };
 
       // Add optional fields if they exist
-      if (mappedData.derivedFrom) partialMetadata.derivedFrom = mappedData.derivedFrom as string;
-      if (mappedData.enforcedBy) partialMetadata.enforcedBy = mappedData.enforcedBy as string;
-      if (mappedData.appliesTo) partialMetadata.appliesTo = mappedData.appliesTo as string;
+      if (mappedData.derivedFrom)
+        partialMetadata.derivedFrom = mappedData.derivedFrom as string;
+      if (mappedData.enforcedBy)
+        partialMetadata.enforcedBy = mappedData.enforcedBy as string;
+      if (mappedData.appliesTo)
+        partialMetadata.appliesTo = mappedData.appliesTo as string;
 
       return { metadata: partialMetadata, errors, warnings };
     }
@@ -134,8 +146,10 @@ export function parseLegacyMetadata(rawMetadata: string): ParseResult {
   };
 
   // Add optional fields
-  if (mappedData.derivedFrom) metadata.derivedFrom = mappedData.derivedFrom as string;
-  if (mappedData.enforcedBy) metadata.enforcedBy = mappedData.enforcedBy as string;
+  if (mappedData.derivedFrom)
+    metadata.derivedFrom = mappedData.derivedFrom as string;
+  if (mappedData.enforcedBy)
+    metadata.enforcedBy = mappedData.enforcedBy as string;
   if (mappedData.appliesTo) metadata.appliesTo = mappedData.appliesTo as string;
 
   // Add any additional fields that weren't mapped
@@ -168,7 +182,7 @@ function parseKeyValuePairs(
   // Normalize line endings and remove leading hashes
   const lines = rawMetadata
     .split(/\r\n|\r|\n/)
-    .map(line => line.replace(/^#+\s*/, ""));
+    .map((line) => line.replace(/^#+\s*/, ""));
 
   // Find the first content line
   let firstContentLine = "";
@@ -210,7 +224,11 @@ function parseKeyValuePairs(
   const lineEndsWithValue = cleanedFirstLine.trim().match(/:\s*[^:]+$/);
   const isMixedFormat = keyPatterns.length > 1 && !lineEndsWithValue;
 
-  const formatType = isMixedFormat ? "mixed" : (keyPatterns.length > 1 ? "single-line" : "multiline");
+  const formatType = isMixedFormat
+    ? "mixed"
+    : keyPatterns.length > 1
+      ? "single-line"
+      : "multiline";
 
   if (formatType === "single-line") {
     // For single-line format, parse all keys that look valid
@@ -225,10 +243,27 @@ function parseKeyValuePairs(
 
       // Accept keys that are in the valid list or look like reasonable metadata keys
       // Reject common URL parts and suspicious patterns
-      const isUrlPart = ["https", "http", "ftp", "www", "com", "org", "net", "localhost"].includes(key);
-      const isSuspicious = key === "chars" && cleanedFirstLine.substring(actualStart - 10, actualStart).includes("special");
+      const isUrlPart = [
+        "https",
+        "http",
+        "ftp",
+        "www",
+        "com",
+        "org",
+        "net",
+        "localhost",
+      ].includes(key);
+      const isSuspicious =
+        key === "chars" &&
+        cleanedFirstLine
+          .substring(actualStart - 10, actualStart)
+          .includes("special");
 
-      if (!isUrlPart && !isSuspicious && (VALID_KEYS.has(key) || key.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/))) {
+      if (
+        !isUrlPart &&
+        !isSuspicious &&
+        (VALID_KEYS.has(key) || key.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/))
+      ) {
         keys.push({ key, startPos: actualStart });
       }
     }
@@ -390,7 +425,7 @@ function parseKeyValuePairs(
     if (currentKey) {
       // For empty lines, preserve them with special marker
       const joinedValue = currentValue
-        .map(v => v === "" ? "  " : v)
+        .map((v) => (v === "" ? "  " : v))
         .join(" ")
         .trim()
         .replace(/\s{2,}/g, "  "); // Preserve double spaces as line breaks

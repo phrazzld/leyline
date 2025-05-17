@@ -16,14 +16,16 @@ function readFixture(filename: string): string {
 // Helper to extract metadata from fixture content
 function extractMetadataSection(content: string): string {
   const lines = content.split(/\r\n|\r|\n/);
-  const startIndex = lines.findIndex(line => line.includes("_____"));
+  const startIndex = lines.findIndex((line) => line.includes("_____"));
 
   if (startIndex === -1) {
     return "";
   }
 
   // Check for metadata between two delimiters (standard format)
-  const endIndex = lines.findIndex((line, index) => index > startIndex && line.includes("_____"));
+  const endIndex = lines.findIndex(
+    (line, index) => index > startIndex && line.includes("_____"),
+  );
 
   if (endIndex !== -1) {
     // Standard format: metadata between two delimiters
@@ -62,7 +64,9 @@ function extractMetadataSection(content: string): string {
       return metadataLines.join("\n");
     } else {
       // Add ending delimiter for other cases
-      metadataLines.push("______________________________________________________________________");
+      metadataLines.push(
+        "______________________________________________________________________",
+      );
       return metadataLines.join("\n");
     }
   }
@@ -79,7 +83,9 @@ describe("LegacyParser", () => {
       expect(result.metadata).not.toBeNull();
       expect(result.metadata?.id).toBe("no-any");
       expect(result.metadata?.derivedFrom).toBe("simplicity");
-      expect(result.metadata?.enforcedBy).toBe("eslint(\"@typescript-eslint/no-explicit-any\") & tsconfig(\"noImplicitAny\")");
+      expect(result.metadata?.enforcedBy).toBe(
+        'eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")',
+      );
       expect(result.metadata?.lastModified).toBe("'2025-01-15'");
     });
 
@@ -103,9 +109,15 @@ describe("LegacyParser", () => {
       expect(result.errors).toHaveLength(0);
       expect(result.metadata).not.toBeNull();
       expect(result.metadata?.id).toBe("require-conventional-commits");
-      expect(result.metadata?.["summary"]).toBe("Use conventional commit format for all commit messages");
-      expect(result.metadata?.["description"]).toContain("All commit messages MUST follow");
-      expect(result.metadata?.["description"]).toContain("to understand the semantic meaning of changes.");
+      expect(result.metadata?.["summary"]).toBe(
+        "Use conventional commit format for all commit messages",
+      );
+      expect(result.metadata?.["description"]).toContain(
+        "All commit messages MUST follow",
+      );
+      expect(result.metadata?.["description"]).toContain(
+        "to understand the semantic meaning of changes.",
+      );
     });
 
     test("handles special characters in values", () => {
@@ -115,7 +127,7 @@ describe("LegacyParser", () => {
 
       expect(result.errors).toHaveLength(0);
       expect(result.metadata).not.toBeNull();
-      expect(result.metadata?.["special_field"]).toContain("\"quotes\"");
+      expect(result.metadata?.["special_field"]).toContain('"quotes"');
       expect(result.metadata?.["special_field"]).toContain("'apostrophes'");
       expect(result.metadata?.["special_field"]).toContain("!@#$%^&*()");
     });
@@ -185,7 +197,8 @@ describe("LegacyParser", () => {
 
   describe("field mapping and normalization", () => {
     test("maps snake_case to camelCase", () => {
-      const metadata = "id: test last_modified: '2025-01-15' derived_from: parent enforced_by: tool";
+      const metadata =
+        "id: test last_modified: '2025-01-15' derived_from: parent enforced_by: tool";
       const result = parseLegacyMetadata(metadata);
 
       expect(result.errors).toHaveLength(0);
@@ -196,7 +209,8 @@ describe("LegacyParser", () => {
     });
 
     test("preserves additional fields", () => {
-      const metadata = "id: test last_modified: '2025-01-15' custom_field: value another_field: data";
+      const metadata =
+        "id: test last_modified: '2025-01-15' custom_field: value another_field: data";
       const result = parseLegacyMetadata(metadata);
 
       expect(result.errors).toHaveLength(0);
@@ -208,7 +222,8 @@ describe("LegacyParser", () => {
 
   describe("edge cases", () => {
     test("handles CRLF line endings", () => {
-      const metadata = "id: test\r\nlast_modified: '2025-01-15'\r\nderived_from: parent";
+      const metadata =
+        "id: test\r\nlast_modified: '2025-01-15'\r\nderived_from: parent";
       const result = parseLegacyMetadata(metadata);
 
       expect(result.errors).toHaveLength(0);
@@ -218,7 +233,8 @@ describe("LegacyParser", () => {
     });
 
     test("handles mixed line endings", () => {
-      const metadata = "id: test\nlast_modified: '2025-01-15'\r\nderived_from: parent\r";
+      const metadata =
+        "id: test\nlast_modified: '2025-01-15'\r\nderived_from: parent\r";
       const result = parseLegacyMetadata(metadata);
 
       expect(result.errors).toHaveLength(0);
@@ -228,12 +244,15 @@ describe("LegacyParser", () => {
     });
 
     test("handles unicode characters", () => {
-      const metadata = "id: test last_modified: '2025-01-15' unicode_field: Emoji 🚀 and symbols ∑∏";
+      const metadata =
+        "id: test last_modified: '2025-01-15' unicode_field: Emoji 🚀 and symbols ∑∏";
       const result = parseLegacyMetadata(metadata);
 
       expect(result.errors).toHaveLength(0);
       expect(result.metadata).not.toBeNull();
-      expect(result.metadata?.["unicode_field"]).toBe("Emoji 🚀 and symbols ∑∏");
+      expect(result.metadata?.["unicode_field"]).toBe(
+        "Emoji 🚀 and symbols ∑∏",
+      );
     });
 
     test("handles very long values", () => {
@@ -247,7 +266,8 @@ describe("LegacyParser", () => {
     });
 
     test("handles metadata with only colons in values", () => {
-      const metadata = "id: test last_modified: '2025-01-15' url: https://example.com:8080/path";
+      const metadata =
+        "id: test last_modified: '2025-01-15' url: https://example.com:8080/path";
       const result = parseLegacyMetadata(metadata);
 
       expect(result.errors).toHaveLength(0);
@@ -279,8 +299,12 @@ Line 4`;
       expect(result.errors).toHaveLength(0);
       expect(result.metadata).not.toBeNull();
       expect(result.metadata?.["description"]).toContain("First line");
-      expect(result.metadata?.["description"]).toContain("indented continuation");
-      expect(result.metadata?.["description"]).toContain("more indented continuation");
+      expect(result.metadata?.["description"]).toContain(
+        "indented continuation",
+      );
+      expect(result.metadata?.["description"]).toContain(
+        "more indented continuation",
+      );
     });
   });
 });
