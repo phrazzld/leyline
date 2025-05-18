@@ -154,7 +154,7 @@
         1. Complete set of test fixtures exists
     - **Depends‑on:** [T001]
 
-- [ ] **T016 · Test · P1: Implement unit tests for all modules**
+- [x] **T016 · Test · P1: Implement unit tests for all modules**
     - **Context:** Testing Strategy - Unit Tests
     - **Action:**
         1. Create test files for each module

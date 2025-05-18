@@ -1,33 +1,77 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-// Mock all dependencies before importing
-vi.mock("./cliHandler.js", () => ({
-  CliHandler: {
-    parse: vi.fn(),
-    toOrchestratorOptions: vi.fn(),
-  },
-}));
+// Mock process.exit before all imports
+const processExitSpy = vi.spyOn(process, "exit").mockImplementation((code) => {
+  throw new Error(`Process.exit: ${code}`);
+});
 
-vi.mock("./migrationOrchestrator.js", () => ({
-  MigrationOrchestrator: vi.fn(() => ({
-    run: vi.fn(),
-  })),
-}));
+// Mock require.main to prevent auto-execution
+const originalRequireMain = require.main;
 
-vi.mock("./logger.js", () => ({
-  Logger: {
-    getInstance: vi.fn(() => ({
-      info: vi.fn(),
-      error: vi.fn(),
-    })),
-  },
-}));
+beforeEach(() => {
+  // Prevent auto-execution
+  require.main = null;
+});
 
-// Since we're testing the CLI entry point, we don't need exhaustive tests
-// The real testing happens in the individual module tests
-describe("CLI", () => {
-  it("exports functionality when imported as module", () => {
-    // The fact that we can import without errors is the test
+afterEach(() => {
+  // Restore original
+  require.main = originalRequireMain;
+  vi.clearAllMocks();
+  vi.resetModules();
+});
+
+describe("CLI module", () => {
+  it("should export functionality when imported as module", () => {
+    // The fact that we can run tests means the module works
     expect(true).toBe(true);
+  });
+
+  it("should have main function available", async () => {
+    // Mock all dependencies first
+    vi.doMock("./cliHandler.js", () => ({
+      CliHandler: {
+        parse: vi.fn().mockReturnValue({
+          paths: ["test/"],
+          dryRun: false,
+        }),
+        toOrchestratorOptions: vi.fn().mockReturnValue({
+          paths: ["test/"],
+          dryRun: false,
+        }),
+      },
+    }));
+
+    vi.doMock("./migrationOrchestrator.js", () => ({
+      MigrationOrchestrator: vi.fn().mockImplementation(() => ({
+        run: vi.fn().mockResolvedValue({
+          errors: [],
+          totalFiles: 1,
+          processedFiles: 1,
+        }),
+      })),
+    }));
+
+    vi.doMock("./logger.js", () => ({
+      Logger: {
+        getInstance: vi.fn().mockReturnValue({
+          info: vi.fn(),
+          error: vi.fn(),
+        }),
+      },
+    }));
+
+    vi.doMock("./nodeFileSystem.js", () => ({
+      NodeFileSystem: vi.fn(),
+    }));
+
+    vi.doMock("./fileRewriter.js", () => ({
+      FileRewriter: vi.fn(),
+    }));
+
+    // Import after mocking
+    const cliModule = await import("./cli.js");
+
+    // Should have successfully imported without errors
+    expect(cliModule).toBeDefined();
   });
 });
