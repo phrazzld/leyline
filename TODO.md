@@ -173,7 +173,7 @@
     - **Depends‑on:** [T013, T015, T016]
 
 ## Documentation
-- [ ] **T018 · Docs · P2: Write comprehensive README**
+- [x] **T018 · Docs · P2: Write comprehensive README**
     - **Context:** Implementation Steps - CLI & Documentation
     - **Action:**
         1. Document purpose, installation, usage examples
