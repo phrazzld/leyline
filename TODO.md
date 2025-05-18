@@ -192,7 +192,7 @@
     - **Depends‑on:** [T006, T007, T008, T009, T010, T011, T012, T013, T014]
 
 ## Validation & Execution
-- [ ] **T020 · Test · P1: Validate script on actual repository (dry-run)**
+- [x] **T020 · Test · P1: Validate script on actual repository (dry-run)**
     - **Context:** Implementation Steps - Validation & Execution
     - **Action:**
         1. Run migration with --dry-run flag on actual repository files
