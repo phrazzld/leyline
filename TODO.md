@@ -209,7 +209,22 @@
         1. Backup exists and integrity verified
     - **Depends‑on:** none
 
-- [ ] **T022 · Feature · P1: Execute migration on repository**
+- [ ] **T022 · Chore · P0: Fix missing lastModified dates in repository**
+    - **Context:** Dry-run validation revealed 27 binding files are missing required lastModified field
+    - **Action:**
+        1. Review all 27 binding files identified in T020 validation
+        2. Add appropriate lastModified dates based on git history or default date
+        3. Files requiring fix (from validation report):
+            - `/docs/bindings/core/use-structured-logging.md`
+            - `/docs/bindings/core/semantic-versioning.md`
+            - `/docs/bindings/core/require-conventional-commits.md`
+            - All other binding files with legacy metadata (27 total)
+    - **Done‑when:**
+        1. All binding files have valid lastModified dates in metadata
+        2. Re-run dry-run validates all files successfully
+    - **Depends‑on:** [T020]
+
+- [ ] **T023 · Feature · P1: Execute migration on repository**
     - **Context:** Implementation Steps - Validation & Execution
     - **Action:**
         1. Run the migration script on the actual repository
@@ -219,10 +234,10 @@
     - **Verification:**
         1. Manually inspect a sample of converted files
         2. No errors or warnings in the logs that indicate data loss
-    - **Depends‑on:** [T020, T021]
+    - **Depends‑on:** [T022, T021]
 
 ## Final Verification
-- [ ] **T023 · Test · P1: Verify success criteria**
+- [ ] **T024 · Test · P1: Verify success criteria**
     - **Context:** Success Criteria
     - **Action:**
         1. Check that all files with legacy HR metadata were converted
@@ -232,4 +247,4 @@
         5. Verify script is idempotent (run again and confirm it skips already converted files)
     - **Done‑when:**
         1. All success criteria confirmed
-    - **Depends‑on:** [T022]
+    - **Depends‑on:** [T023]
