@@ -163,7 +163,7 @@
         1. All modules have comprehensive unit tests with >90% coverage
     - **Depends‑on:** [T006, T007, T008, T009, T010, T011, T012, T013, T014, T015]
 
-- [~] **T017 · Test · P1: Implement integration tests**
+- [x] **T017 · Test · P1: Implement integration tests**
     - **Context:** Testing Strategy - Integration Tests
     - **Action:**
         1. Create tests for end-to-end workflow
