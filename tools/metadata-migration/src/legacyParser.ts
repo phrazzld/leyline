@@ -1,16 +1,39 @@
 /**
  * LegacyParser module for parsing legacy horizontal rule metadata format.
- * Converts raw legacy metadata strings into structured LegacyMetadata objects.
+ *
+ * This module handles the complex task of parsing various formats of legacy metadata
+ * that appear at the bottom of Markdown files between horizontal rules. It converts
+ * raw metadata strings into structured LegacyMetadata objects while handling errors
+ * and edge cases gracefully.
+ *
+ * @remarks
+ * The legacy parser is designed to be flexible and forgiving, as legacy metadata
+ * exists in multiple formats throughout the codebase:
+ * - Single-line format: Multiple key-value pairs on one line
+ * - Multiline format: Each key-value pair on separate lines
+ * - Mixed format: Combination of single and multiline formats
+ *
+ * The parser extracts required fields (id, lastModified) and optional fields
+ * while collecting warnings about potential issues. It attempts to return partial
+ * metadata even when critical errors occur, as long as an ID is present.
  */
 
 import { LegacyMetadata } from "./types.js";
 import { logger } from "./logger.js";
 
 /**
- * Result of parsing legacy metadata
+ * Result of parsing legacy metadata.
+ *
+ * @remarks
+ * The parser returns both the parsed metadata and any errors or warnings
+ * encountered during parsing. This allows callers to make informed decisions
+ * about how to handle partially valid metadata.
  */
 export interface ParseResult {
-  /** Parsed metadata object or null if critical errors occurred */
+  /**
+   * Parsed metadata object or null if critical errors occurred
+   * @remarks May be partial metadata if some errors occurred but ID was present
+   */
   metadata: LegacyMetadata | null;
   /** Array of parsing errors encountered */
   errors: LegacyParseError[];
@@ -19,9 +42,21 @@ export interface ParseResult {
 }
 
 /**
- * Error class for legacy metadata parsing failures
+ * Error class for legacy metadata parsing failures.
+ *
+ * @remarks
+ * Provides structured error information including the specific field
+ * and line number where the error occurred, enabling better error reporting
+ * and debugging.
  */
 export class LegacyParseError extends Error {
+  /**
+   * Creates a new LegacyParseError.
+   *
+   * @param message - Error message describing the parsing failure
+   * @param field - Optional field name where the error occurred
+   * @param lineNumber - Optional line number where the error occurred
+   */
   constructor(
     message: string,
     public field?: string,
@@ -32,7 +67,10 @@ export class LegacyParseError extends Error {
   }
 }
 
-// Field mapping from snake_case to camelCase
+/**
+ * Field mapping from snake_case to camelCase.
+ * Maps legacy field names to the standardized camelCase format.
+ */
 const FIELD_MAPPINGS: Record<string, keyof LegacyMetadata> = {
   id: "id",
   last_modified: "lastModified",
@@ -41,10 +79,16 @@ const FIELD_MAPPINGS: Record<string, keyof LegacyMetadata> = {
   applies_to: "appliesTo",
 };
 
-// Required fields that must be present
+/**
+ * Required fields that must be present in valid metadata.
+ * These fields are essential for the metadata to be considered valid.
+ */
 const REQUIRED_FIELDS = ["id", "lastModified"] as const;
 
-// Valid metadata keys that we should recognize
+/**
+ * Valid metadata keys that we should recognize.
+ * This set helps distinguish legitimate metadata keys from content or noise.
+ */
 const VALID_KEYS = new Set([
   "id",
   "last_modified",
@@ -67,8 +111,33 @@ const VALID_KEYS = new Set([
 
 /**
  * Parses raw legacy metadata string into a structured LegacyMetadata object.
- * @param rawMetadata Raw metadata string to parse
+ *
+ * @param rawMetadata - Raw metadata string to parse
  * @returns ParseResult containing metadata and any errors/warnings
+ *
+ * @remarks
+ * This is the main entry point for parsing legacy metadata. The function:
+ * 1. Validates the input is not empty
+ * 2. Parses key-value pairs using format detection
+ * 3. Maps field names from snake_case to camelCase
+ * 4. Validates required fields are present
+ * 5. Returns parsed metadata or errors
+ *
+ * The parser attempts to be resilient, returning partial metadata when possible
+ * even if some fields are missing or malformed.
+ *
+ * @example
+ * ```typescript
+ * const result = parseLegacyMetadata(`
+ *   ID: example-doc
+ *   Last-Modified: 2024-03-15
+ *   Derived-From: parent-doc
+ * `);
+ *
+ * if (result.metadata) {
+ *   console.log(result.metadata.id); // "example-doc"
+ * }
+ * ```
  */
 export function parseLegacyMetadata(rawMetadata: string): ParseResult {
   const errors: LegacyParseError[] = [];
@@ -168,10 +237,21 @@ export function parseLegacyMetadata(rawMetadata: string): ParseResult {
 }
 
 /**
- * Parses raw metadata into key-value pairs
- * @param rawMetadata Raw metadata string
- * @param warnings Array to collect warnings
+ * Parses raw metadata into key-value pairs.
+ *
+ * @param rawMetadata - Raw metadata string
+ * @param _warnings - Array to collect warnings (currently unused)
  * @returns Record of key-value pairs
+ *
+ * @remarks
+ * This function handles the complex task of parsing various legacy metadata formats:
+ * - Single-line format: All key-value pairs on one line
+ * - Multiline format: Each key-value pair on separate lines
+ * - Mixed format: Combination of both
+ *
+ * The parser detects the format automatically and applies appropriate parsing logic.
+ * It handles edge cases like commented metadata (## prefix), URL patterns, and
+ * multi-line values that span several lines.
  */
 function parseKeyValuePairs(
   rawMetadata: string,
@@ -280,7 +360,7 @@ function parseKeyValuePairs(
         valueEnd = keys[i + 1].startPos;
       }
 
-      let value = cleanedFirstLine.substring(valueStart, valueEnd).trim();
+      const value = cleanedFirstLine.substring(valueStart, valueEnd).trim();
       data[key] = value;
     }
 
@@ -365,7 +445,7 @@ function parseKeyValuePairs(
         valueEnd = keys[i + 1].startPos;
       }
 
-      let value = cleanedFirstLine.substring(valueStart, valueEnd).trim();
+      const value = cleanedFirstLine.substring(valueStart, valueEnd).trim();
       data[key] = value;
     }
 
@@ -437,9 +517,15 @@ function parseKeyValuePairs(
 }
 
 /**
- * Maps field names from snake_case to camelCase
- * @param data Record of key-value pairs
+ * Maps field names from snake_case to camelCase.
+ *
+ * @param data - Record of key-value pairs
  * @returns Record with mapped field names
+ *
+ * @remarks
+ * This function standardizes field names by converting snake_case names
+ * (e.g., "last_modified") to camelCase (e.g., "lastModified"). Fields not
+ * in the mapping table are preserved as-is.
  */
 function mapFieldNames(data: Record<string, string>): Record<string, string> {
   const mapped: Record<string, string> = {};

@@ -183,7 +183,7 @@
         1. README provides complete usage guidance
     - **Depends‑on:** [T014]
 
-- [ ] **T019 · Docs · P2: Add TSDoc comments**
+- [~] **T019 · Docs · P2: Add TSDoc comments**
     - **Context:** Documentation
     - **Action:**
         1. Add detailed TSDoc comments to all exported functions, classes, and interfaces

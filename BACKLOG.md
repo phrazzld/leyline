@@ -1,5 +1,7 @@
 # BACKLOG
 
+- incorporate top tier pragmatic programming principles
+
 ## High Priority
 
 ### System Architecture Simplification & Core Tooling
