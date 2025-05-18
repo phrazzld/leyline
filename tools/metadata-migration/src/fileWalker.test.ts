@@ -33,7 +33,7 @@ describe("FileWalker", () => {
       const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
       const mockGlob = glob as unknown as ReturnType<typeof vi.fn>;
 
-      mockStat.mockResolvedValue({ isDirectory: () => true });
+      mockStat.mockResolvedValue({ isDirectory: () => true, isFile: () => false });
       mockGlob.mockResolvedValue([
         "/test/dir/file1.md",
         "/test/dir/subdir/file2.md",
@@ -57,11 +57,34 @@ describe("FileWalker", () => {
       );
     });
 
+    it("should accept single markdown files", async () => {
+      const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
+
+      mockStat.mockResolvedValue({ isDirectory: () => false, isFile: () => true });
+
+      const result = await findMarkdownFiles(["/test/file.md"]);
+
+      expect(result).toEqual([expect.stringContaining("/test/file.md")]);
+      expect(mockStat).toHaveBeenCalledWith(
+        expect.stringContaining("/test/file.md"),
+      );
+    });
+
+    it("should ignore non-markdown files", async () => {
+      const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
+
+      mockStat.mockResolvedValue({ isDirectory: () => false, isFile: () => true });
+
+      const result = await findMarkdownFiles(["/test/file.txt"]);
+
+      expect(result).toEqual([]);
+    });
+
     it("should find markdown files in multiple directories", async () => {
       const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
       const mockGlob = glob as unknown as ReturnType<typeof vi.fn>;
 
-      mockStat.mockResolvedValue({ isDirectory: () => true });
+      mockStat.mockResolvedValue({ isDirectory: () => true, isFile: () => false });
       mockGlob
         .mockResolvedValueOnce(["/test/dir1/file1.md"])
         .mockResolvedValueOnce(["/test/dir2/file2.md"]);
@@ -73,11 +96,28 @@ describe("FileWalker", () => {
       expect(mockGlob).toHaveBeenCalledTimes(2);
     });
 
+    it("should handle mixed files and directories", async () => {
+      const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
+      const mockGlob = glob as unknown as ReturnType<typeof vi.fn>;
+
+      mockStat
+        .mockResolvedValueOnce({ isDirectory: () => false, isFile: () => true })
+        .mockResolvedValueOnce({ isDirectory: () => true, isFile: () => false });
+      mockGlob.mockResolvedValue(["/test/dir/file2.md"]);
+
+      const result = await findMarkdownFiles(["/test/file1.md", "/test/dir"]);
+
+      expect(result).toEqual([
+        expect.stringContaining("/test/file1.md"),
+        "/test/dir/file2.md",
+      ]);
+    });
+
     it("should remove duplicate files", async () => {
       const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
       const mockGlob = glob as unknown as ReturnType<typeof vi.fn>;
 
-      mockStat.mockResolvedValue({ isDirectory: () => true });
+      mockStat.mockResolvedValue({ isDirectory: () => true, isFile: () => false });
       mockGlob
         .mockResolvedValueOnce(["/test/dir/file1.md", "/test/dir/file2.md"])
         .mockResolvedValueOnce(["/test/dir/file2.md", "/test/dir/file3.md"]);
@@ -91,23 +131,23 @@ describe("FileWalker", () => {
       ]);
     });
 
-    it("should throw error if directory does not exist", async () => {
+    it("should throw error if path does not exist", async () => {
       const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
       const error = new Error("ENOENT") as NodeJS.ErrnoException;
       error.code = "ENOENT";
       mockStat.mockRejectedValue(error);
 
       await expect(findMarkdownFiles(["/nonexistent"])).rejects.toThrow(
-        "Directory does not exist: /nonexistent",
+        "Path does not exist: /nonexistent",
       );
     });
 
-    it("should throw error if path is not a directory", async () => {
+    it("should throw error if path is neither file nor directory", async () => {
       const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
-      mockStat.mockResolvedValue({ isDirectory: () => false });
+      mockStat.mockResolvedValue({ isDirectory: () => false, isFile: () => false });
 
-      await expect(findMarkdownFiles(["/test/file.txt"])).rejects.toThrow(
-        "Path is not a directory: /test/file.txt",
+      await expect(findMarkdownFiles(["/test/special"])).rejects.toThrow(
+        "Path is neither a file nor directory: /test/special",
       );
     });
 
@@ -115,7 +155,7 @@ describe("FileWalker", () => {
       const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
       const mockGlob = glob as unknown as ReturnType<typeof vi.fn>;
 
-      mockStat.mockResolvedValue({ isDirectory: () => true });
+      mockStat.mockResolvedValue({ isDirectory: () => true, isFile: () => false });
       mockGlob.mockRejectedValue(new Error("Glob error"));
 
       await expect(findMarkdownFiles(["/test/dir"])).rejects.toThrow(
@@ -127,7 +167,7 @@ describe("FileWalker", () => {
       const mockStat = stat as unknown as ReturnType<typeof vi.fn>;
       const mockGlob = glob as unknown as ReturnType<typeof vi.fn>;
 
-      mockStat.mockResolvedValue({ isDirectory: () => true });
+      mockStat.mockResolvedValue({ isDirectory: () => true, isFile: () => false });
       mockGlob.mockResolvedValue([]);
 
       const result = await findMarkdownFiles(["/empty/dir"]);

@@ -123,10 +123,12 @@ function extractLegacyHrMetadata(
   lines: string[],
   lineBreakType: string,
 ): InspectedContent | null {
-  // Look for the start of legacy metadata
+  // Look for the start of legacy metadata with underscore pattern
   let startIndex = -1;
+  const underscorePattern = /^_{3,}$/;
+
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith("#### ---")) {
+    if (underscorePattern.test(lines[i])) {
       startIndex = i;
       break;
     }
@@ -134,63 +136,28 @@ function extractLegacyHrMetadata(
 
   if (startIndex === -1) return null;
 
-  // Find the end of the metadata block
-  let endIndex = startIndex;
-  let inMetadata = true;
-
+  // Find the closing underscore pattern
+  let endIndex = -1;
   for (let i = startIndex + 1; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmedLine = line.trim();
-
-    if (trimmedLine === "") {
-      // Empty line might be part of metadata or signal its end
-      // Continue checking next lines
-      continue;
-    }
-
-    // Check if this line is metadata (contains colon)
-    if (line.includes(":") && !line.startsWith("#")) {
+    if (underscorePattern.test(lines[i])) {
       endIndex = i;
-      inMetadata = true;
-    } else {
-      // Found non-metadata content
-      if (inMetadata) {
-        // We were in metadata, now we found content
-        // Check if there were empty lines before this
-        let checkIndex = i - 1;
-        while (checkIndex > endIndex && lines[checkIndex].trim() === "") {
-          checkIndex--;
-        }
-        endIndex = checkIndex;
-        break;
-      }
+      break;
     }
   }
 
-  // If we reached the end without finding content, metadata goes to the end
-  if (
-    endIndex === lines.length - 1 ||
-    (endIndex < lines.length - 1 &&
-      lines.slice(endIndex + 1).every((l) => l.trim() === ""))
-  ) {
-    endIndex = lines.length - 1;
-  }
+  if (endIndex === -1) return null;
 
-  const metadataLines = lines.slice(startIndex, endIndex + 1);
+  // Extract metadata between the two underscore lines
+  const metadataLines = lines.slice(startIndex + 1, endIndex);
   const contentLines = lines.slice(endIndex + 1);
 
-  // Ensure content doesn't start with empty line when it's not needed
+  // Skip empty lines at the start of content
   let contentStart = 0;
   while (
     contentStart < contentLines.length &&
-    contentLines[contentStart] === ""
+    contentLines[contentStart].trim() === ""
   ) {
     contentStart++;
-  }
-
-  // Keep one empty line if there was one between metadata and content
-  if (contentStart > 0 && contentLines.length > 0) {
-    contentStart = Math.max(0, contentStart - 1);
   }
 
   return {

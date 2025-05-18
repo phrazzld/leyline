@@ -159,11 +159,11 @@ describe("MetadataInspector", () => {
     });
 
     describe("legacy HR metadata detection", () => {
-      it("should detect legacy HR metadata", () => {
+      it("should detect legacy HR metadata with underscores", () => {
         const file: FileContext = {
           path: "/test/legacy.md",
           content:
-            "#### ---------------------------------------------------------------------------\nid: test-id\nlastModified: 2024-01-01\nappliesTo: frontend\n\n# Content\n\nThis is the content.",
+            "______________________________________________________________________\n\nid: test-id\nlastModified: 2024-01-01\nappliesTo: frontend\n\n______________________________________________________________________\n\n# Content\n\nThis is the content.",
           exists: true,
         };
 
@@ -171,18 +171,17 @@ describe("MetadataInspector", () => {
 
         expect(result).toEqual({
           format: MetadataFormat.LegacyHr,
-          metadata:
-            "#### ---------------------------------------------------------------------------\nid: test-id\nlastModified: 2024-01-01\nappliesTo: frontend",
-          content: "\n# Content\n\nThis is the content.",
+          metadata: "\nid: test-id\nlastModified: 2024-01-01\nappliesTo: frontend\n",
+          content: "# Content\n\nThis is the content.",
           lineBreakType: "\n",
         });
       });
 
-      it("should handle legacy metadata at end of file", () => {
+      it("should handle legacy metadata without empty lines", () => {
         const file: FileContext = {
-          path: "/test/legacy-end.md",
+          path: "/test/legacy-compact.md",
           content:
-            "# Title\n\nSome content\n\n#### ---------------------------------------------------------------------------\nid: test-id\nlastModified: 2024-01-01",
+            "______________________________________________________________________\nid: test-id\nlastModified: 2024-01-01\n______________________________________________________________________\n\n# Content",
           exists: true,
         };
 
@@ -190,9 +189,8 @@ describe("MetadataInspector", () => {
 
         expect(result).toEqual({
           format: MetadataFormat.LegacyHr,
-          metadata:
-            "#### ---------------------------------------------------------------------------\nid: test-id\nlastModified: 2024-01-01",
-          content: "",
+          metadata: "id: test-id\nlastModified: 2024-01-01",
+          content: "# Content",
           lineBreakType: "\n",
         });
       });
@@ -201,7 +199,7 @@ describe("MetadataInspector", () => {
         const file: FileContext = {
           path: "/test/legacy-empty.md",
           content:
-            "#### ---------------------------------------------------------------------------\nid: test-id\n\nlastModified: 2024-01-01\n\n# Content",
+            "______________________________________________________________________\n\nid: test-id\n\nlastModified: 2024-01-01\n\n______________________________________________________________________\n\n# Content",
           exists: true,
         };
 
@@ -209,11 +207,23 @@ describe("MetadataInspector", () => {
 
         expect(result).toEqual({
           format: MetadataFormat.LegacyHr,
-          metadata:
-            "#### ---------------------------------------------------------------------------\nid: test-id\n\nlastModified: 2024-01-01",
-          content: "\n# Content",
+          metadata: "\nid: test-id\n\nlastModified: 2024-01-01\n",
+          content: "# Content",
           lineBreakType: "\n",
         });
+      });
+
+      it("should require closing underscores", () => {
+        const file: FileContext = {
+          path: "/test/legacy-unclosed.md",
+          content:
+            "______________________________________________________________________\n\nid: test-id\nlastModified: 2024-01-01\n\n# Content",
+          exists: true,
+        };
+
+        const result = inspectFile(file);
+
+        expect(result.format).not.toBe(MetadataFormat.LegacyHr);
       });
     });
 
