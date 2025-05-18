@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: context-propagation enforced_by: code review & integration tests applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Propagate Request Context Across Service Boundaries

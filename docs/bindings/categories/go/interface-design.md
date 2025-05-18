@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: interface-design enforced_by: code review & linting applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Design Small, Focused Interfaces in Consumer Packages

@@ -209,7 +209,7 @@
         1. Backup exists and integrity verified
     - **Depends‑on:** none
 
-- [ ] **T022 · Chore · P0: Fix missing lastModified dates in repository**
+- [x] **T022 · Chore · P0: Fix missing lastModified dates in repository**
     - **Context:** Dry-run validation revealed 27 binding files are missing required lastModified field
     - **Action:**
         1. Review all 27 binding files identified in T020 validation

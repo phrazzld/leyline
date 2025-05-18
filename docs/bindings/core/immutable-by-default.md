@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: immutable-by-default enforced_by: linters & code review applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Treat All Data as Unchangeable by Default

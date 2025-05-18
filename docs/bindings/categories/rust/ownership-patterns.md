@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: ownership-patterns enforced_by: rust compiler & code review applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Embrace Rust's Ownership System, Don't Fight It

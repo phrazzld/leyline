@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: web-accessibility enforced_by: Code review, Automated a11y testing applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Web Accessibility

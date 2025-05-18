@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: async-patterns
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Structure TypeScript Async Code with Best Practices

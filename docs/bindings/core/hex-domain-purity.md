@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: hex-domain-purity
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Keep Business Logic Pure and Infrastructure-Free

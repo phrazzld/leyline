@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: state-management enforced_by: Code review, Architecture reviews applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Frontend State Management

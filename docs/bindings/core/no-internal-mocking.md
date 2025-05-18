@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: no-internal-mocking enforced_by: code review & linters applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Mock External Systems Only, Never Internal Components

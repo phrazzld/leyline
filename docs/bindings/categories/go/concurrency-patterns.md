@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: concurrency-patterns enforced_by: code review & race detector applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Use Goroutines and Channels Judiciously with Explicit Coordination

@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: no-lint-suppression enforced_by: code review & custom linters applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Document Why You're Silencing Warnings

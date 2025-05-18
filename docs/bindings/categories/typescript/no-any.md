@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: no-any enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Make Types Explicit, Never Use `any`

@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: dependency-inversion enforced_by: code review & architecture analysis applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Design Against Abstractions, Not Implementations

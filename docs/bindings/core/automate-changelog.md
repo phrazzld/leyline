@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: automate-changelog
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Automate Changelog Generation from Structured Commits

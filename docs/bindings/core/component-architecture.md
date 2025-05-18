@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: component-architecture enforced_by: Code review, Storybook organization applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Component Architecture

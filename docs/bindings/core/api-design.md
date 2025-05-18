@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: api-design enforced_by: code review & style guides applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Design Clear, Explicit API Contracts

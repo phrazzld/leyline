@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: use-structured-logging enforced_by: linters & code review applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Implement Complete Observability with Structured Logs, Metrics, and Traces

@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: dependency-management enforced_by: dependency scanners & code review applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Minimize and Maintain Dependencies Deliberately

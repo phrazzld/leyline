@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: semantic-versioning enforced_by: version checking tools & CI validation applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Make Breaking Changes Explicit with Semantic Versioning

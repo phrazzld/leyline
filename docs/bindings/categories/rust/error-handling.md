@@ -2,6 +2,8 @@ ______________________________________________________________________
 
 id: error-handling enforced_by: Code review, Clippy static analysis applies_to:
 
+lastModified: 2025-05-14
+
 ______________________________________________________________________
 
 # Binding: Rust Error Handling
