@@ -237,7 +237,7 @@
     - **Depends‑on:** [T022, T021]
 
 ## Final Verification
-- [ ] **T024 · Test · P1: Verify success criteria**
+- [x] **T024 · Test · P1: Verify success criteria**
     - **Context:** Success Criteria
     - **Action:**
         1. Check that all files with legacy HR metadata were converted
