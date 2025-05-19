@@ -1,1 +1,4 @@
 coverage/
+dry-run-output.json
+migration-output.log
+src/dry-run-summary.ts
