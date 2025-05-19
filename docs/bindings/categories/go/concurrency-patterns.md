@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: concurrency-patterns enforced_by: code review & race detector applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: concurrency-patterns
+last_modified: "2025-05-14"
+enforced_by: code review & race detector
+---
 # Binding: Use Goroutines and Channels Judiciously with Explicit Coordination
 
 Implement Go concurrency using clear patterns that prevent leaks, race conditions, and

@@ -1,11 +1,7 @@
-______________________________________________________________________
-
+---
 id: code-size
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+last_modified: "2025-05-14"
+---
 # Binding: Keep Code Units Small and Focused
 
 Limit the size of all code units—functions, methods, classes, and files—to maintain

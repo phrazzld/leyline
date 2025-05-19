@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: web-accessibility enforced_by: Code review, Automated a11y testing applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: web-accessibility
+last_modified: "2025-05-14"
+enforced_by: Code review, Automated a11y testing
+---
 # Binding: Web Accessibility
 
 Make all web interfaces accessible to people with disabilities by following WCAG 2.1 AA

@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: use-structured-logging enforced_by: linters & code review applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: use-structured-logging
+last_modified: "2025-05-14"
+enforced_by: linters & code review
+---
 # Binding: Implement Complete Observability with Structured Logs, Metrics, and Traces
 
 All systems must implement the three pillars of observability: structured logs, metrics,

@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: component-architecture enforced_by: Code review, Storybook organization applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: component-architecture
+last_modified: "2025-05-14"
+enforced_by: Code review, Storybook organization
+---
 # Binding: Component Architecture
 
 Structure UI components using Atomic Design principles, organizing elements into a

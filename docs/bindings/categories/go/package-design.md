@@ -1,11 +1,7 @@
-______________________________________________________________________
-
+---
 id: package-design
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+last_modified: "2025-05-14"
+---
 # Binding: Organize Go Code Into Purpose-Driven Packages
 
 Design Go packages as cohesive units with clear, focused responsibilities and

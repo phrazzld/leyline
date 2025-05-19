@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: api-design enforced_by: code review & style guides applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: api-design
+last_modified: "2025-05-14"
+enforced_by: code review & style guides
+---
 # Binding: Design Clear, Explicit API Contracts
 
 Design APIs with clear, explicit contracts that fully communicate their behavior,

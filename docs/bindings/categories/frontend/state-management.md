@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: state-management enforced_by: Code review, Architecture reviews applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: state-management
+last_modified: "2025-05-14"
+enforced_by: Code review, Architecture reviews
+---
 # Binding: Frontend State Management
 
 Apply minimalist state management by using the right approach for each need: local

@@ -1,11 +1,7 @@
-______________________________________________________________________
-
+---
 id: async-patterns
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+last_modified: "2025-05-14"
+---
 # Binding: Structure TypeScript Async Code with Best Practices
 
 Use async/await for all asynchronous operations in TypeScript, with proper error

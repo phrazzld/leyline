@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: semantic-versioning enforced_by: version checking tools & CI validation applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: semantic-versioning
+last_modified: "2025-05-14"
+enforced_by: version checking tools & CI validation
+---
 # Binding: Make Breaking Changes Explicit with Semantic Versioning
 
 All projects must follow Semantic Versioning (SemVer) for release numbering, making

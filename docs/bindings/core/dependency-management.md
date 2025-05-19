@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: dependency-management enforced_by: dependency scanners & code review applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: dependency-management
+last_modified: "2025-05-14"
+enforced_by: dependency scanners & code review
+---
 # Binding: Minimize and Maintain Dependencies Deliberately
 
 Choose third-party dependencies deliberately, preferring minimal solutions that solve

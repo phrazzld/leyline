@@ -1,11 +1,7 @@
-______________________________________________________________________
-
+---
 id: external-configuration
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+last_modified: "2025-05-14"
+---
 # Binding: Never Hardcode Configuration
 
 Never embed configuration values in your source code. Keep all environment-specific

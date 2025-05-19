@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: error-wrapping enforced_by: golangci-lint("wrapcheck") & code review applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: error-wrapping
+last_modified: "2025-05-14"
+enforced_by: golangci-lint("wrapcheck") & code review
+---
 # Binding: Add Context to Errors as They Travel Upward
 
 When errors cross package boundaries in Go, wrap them with contextual information using

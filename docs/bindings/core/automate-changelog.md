@@ -1,11 +1,7 @@
-______________________________________________________________________
-
+---
 id: automate-changelog
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+last_modified: "2025-05-14"
+---
 # Binding: Automate Changelog Generation from Structured Commits
 
 All projects must automatically generate changelogs using structured commit messages.

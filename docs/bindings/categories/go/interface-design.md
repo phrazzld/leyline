@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: interface-design enforced_by: code review & linting applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: interface-design
+last_modified: "2025-05-14"
+enforced_by: code review & linting
+---
 # Binding: Design Small, Focused Interfaces in Consumer Packages
 
 In Go, define interfaces where they are used (consumer packages), not where they are

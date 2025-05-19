@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: error-handling enforced_by: Code review, Clippy static analysis applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: error-handling
+last_modified: "2025-05-14"
+enforced_by: Code review, Clippy static analysis
+---
 # Binding: Rust Error Handling
 
 Handle errors explicitly in Rust using the type system. Return `Result` for all

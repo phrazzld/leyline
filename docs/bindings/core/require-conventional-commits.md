@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: require-conventional-commits enforced_by: commit hooks & CI checks applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: require-conventional-commits
+last_modified: "2025-05-14"
+enforced_by: commit hooks & CI checks
+---
 # Binding: Express Intent Through Structured Commit Messages
 
 All commit messages must follow the Conventional Commits specification, providing a

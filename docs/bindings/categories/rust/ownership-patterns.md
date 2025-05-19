@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: ownership-patterns enforced_by: rust compiler & code review applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: ownership-patterns
+last_modified: "2025-05-14"
+enforced_by: rust compiler & code review
+---
 # Binding: Embrace Rust's Ownership System, Don't Fight It
 
 Design Rust code to work with the ownership system, not against it. Use ownership,

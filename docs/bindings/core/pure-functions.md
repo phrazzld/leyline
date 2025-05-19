@@ -1,11 +1,7 @@
-______________________________________________________________________
-
+---
 id: pure-functions
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+last_modified: "2025-05-14"
+---
 # Binding: Write Pure Functions, Isolate Side Effects
 
 Structure your code to maximize the use of pure functions that always produce the same

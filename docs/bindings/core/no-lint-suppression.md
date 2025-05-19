@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: no-lint-suppression enforced_by: code review & custom linters applies_to:
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: no-lint-suppression
+last_modified: "2025-05-14"
+enforced_by: code review & custom linters
+---
 # Binding: Document Why You're Silencing Warnings
 
 Never disable or suppress linter warnings, static analysis errors, or type checking

@@ -224,7 +224,7 @@
         2. Re-run dry-run validates all files successfully
     - **Depends‑on:** [T020]
 
-- [ ] **T023 · Feature · P1: Execute migration on repository**
+- [x] **T023 · Feature · P1: Execute migration on repository**
     - **Context:** Implementation Steps - Validation & Execution
     - **Action:**
         1. Run the migration script on the actual repository

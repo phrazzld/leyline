@@ -1,11 +1,8 @@
-______________________________________________________________________
-
-id: no-any enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
-
-lastModified: 2025-05-14
-
-______________________________________________________________________
-
+---
+id: no-any
+last_modified: "2025-05-14"
+enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
+---
 # Binding: Make Types Explicit, Never Use `any`
 
 Never use the `any` type in TypeScript code. Instead, always create proper type
