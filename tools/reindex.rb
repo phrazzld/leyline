@@ -13,8 +13,9 @@ def process_tenets_dir
   Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.sort.each do |file|
     content = File.read(file)
 
-    # Extract front-matter and first paragraph after title
+    # Extract front-matter and first paragraph after title using YAML format
     if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
+      # Use safe_load for security
       front_matter = YAML.safe_load($1) rescue {}
       title = $2.strip
       first_para = $3.strip.gsub(/\s+/, ' ')
@@ -187,56 +188,9 @@ end
 def process_binding_file(file)
   content = File.read(file)
 
-  # Extract front-matter (using the underscores format) and first paragraph after title
-  # The format is:
-  # ______________________________________________________________________
-  #
-  # id: some-id enforced_by: some-value
-  #
-  # ______________________________________________________________________
-  if content =~ /^______________________________________________________________________\n\n(.*?)\n\n______________________________________________________________________\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
-    front_matter_text = $1
-    title = $2.strip
-    first_para = $3.strip.gsub(/\s+/, ' ')
-
-    # Parse the front matter
-    front_matter = {}
-    front_matter_text.scan(/(\w+(?:-\w+)*): ([^:]*)(?=\s+\w+:|\s*$)/).each do |key, value|
-      front_matter[key] = value.strip
-    end
-
-    # Skip placeholder text that's enclosed in brackets
-    if first_para =~ /^\[.*\]$/
-      # Try to find the first real paragraph in the Core Belief/Rationale section
-      if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
-        section_text = $2.strip.gsub(/\s+/, ' ')
-
-        # Skip if this is also a placeholder
-        if section_text =~ /^\[.*\]$/
-          first_para = "See document for details."
-        else
-          first_para = section_text
-        end
-      else
-        first_para = "See document for details."
-      end
-    # This handles the non-bracketed placeholder case that might appear in templates
-    elsif first_para.include?("Write a") && (first_para.include?("paragraph") || first_para.include?("explanation"))
-      first_para = "See document for details."
-    end
-
-    # Truncate if too long
-    summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
-
-    # Return entry data
-    return {
-      id: front_matter['id'] || File.basename(file, '.md'),
-      summary: summary
-    }
-  end
-
-  # If we couldn't match the custom format, try the standard YAML format
+  # Extract front-matter using YAML format
   if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
+    # Use safe_load for security
     front_matter = YAML.safe_load($1) rescue {}
     title = $2.strip
     first_para = $3.strip.gsub(/\s+/, ' ')

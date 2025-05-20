@@ -83,7 +83,7 @@
     - **Depends‑on:** [T003]
 
 ### Reindex Tool
-- [ ] **T005 · Refactor · P0: Remove legacy format parsing from reindex.rb**
+- [x] **T005 · Refactor · P0: Remove legacy format parsing from reindex.rb**
     - **Context:** Core tool refactoring for YAML-only indexing
     - **Action:**
         1. Remove all code paths related to parsing metadata from the legacy horizontal rule format

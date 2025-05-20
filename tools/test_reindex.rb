@@ -66,11 +66,23 @@ MARKDOWN
   # Temporarily modify the script to use our test directories
   original_reindex = File.read('tools/reindex.rb')
   test_reindex = original_reindex.gsub(
+    'dir = \'docs/tenets\'',
+    'dir = \'tenets\''
+  ).gsub(
+    'dir = \'docs/bindings\'',
+    'dir = \'bindings\''
+  ).gsub(
     'Dir.glob("#{dir}/*.md")',
     'Dir.glob("test_reindex/#{dir}/*.md")'
   ).gsub(
     'File.write("#{dir}/00-index.md"',
     'File.write("test_reindex/#{dir}/00-index.md"'
+  ).gsub(
+    'Dir.glob("#{dir}/core/*.md")',
+    'Dir.glob("test_reindex/#{dir}/core/*.md")'
+  ).gsub(
+    'Dir.glob("#{dir}/categories/*")',
+    'Dir.glob("test_reindex/#{dir}/categories/*")'
   )
   File.write('tools/reindex_test.rb', test_reindex)
 
