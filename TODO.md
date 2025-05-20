@@ -248,3 +248,22 @@
     - **Done‑when:**
         1. All success criteria confirmed
     - **Depends‑on:** [T023]
+
+## CI Fix
+- [x] **T025 · Fix · P0: Add missing derived_from field to all binding files**
+    - **Context:** CI lint-docs check is failing because binding files are missing required `derived_from` field
+    - **Action:**
+        1. Analyze each binding file to determine which tenet it implements
+        2. Create mapping of binding ID → tenet ID relationships
+        3. Add `derived_from` field to YAML front-matter in all 27 binding files
+        4. Run Ruby validation script locally to verify fix
+        5. Push changes to fix CI
+    - **Done‑when:**
+        1. All binding files have valid `derived_from` fields
+        2. Ruby validation script passes locally
+        3. CI lint-docs check passes on GitHub
+    - **Depends‑on:** none (urgent CI fix)
+    - **Example mapping:**
+        - `api-design` → `explicit-over-implicit`
+        - `no-internal-mocking` → `testability`
+        - `immutable-by-default` → `simplicity`
