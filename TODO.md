@@ -134,7 +134,7 @@
         1. Analysis is complete with clear determination if script uses metadata and how
     - **Depends‑on:** none
 
-- [ ] **T009 · Refactor · P2: Refactor fix_cross_references.rb for YAML-only (if applicable)**
+- [x] **T009 · Refactor · P2: Refactor fix_cross_references.rb for YAML-only (if applicable)**
     - **Context:** Conditional refactoring based on analysis
     - **Action:**
         1. If T008 found metadata usage, remove any legacy format parsing logic
