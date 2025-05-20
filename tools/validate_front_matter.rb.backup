@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # tools/validate_front_matter.rb - Validates metadata in Markdown files
-# Enforces YAML front-matter format only
-# See TENET_FORMATTING.md for documentation on the required format
+# Accepts both horizontal rule and YAML front-matter formats
+# See TENET_FORMATTING.md for documentation on the acceptable formats
 
 require 'yaml'
 require 'date'
@@ -25,14 +25,14 @@ OPTIONAL_KEYS = {
 # - docs/bindings/core/ for core bindings
 # - docs/bindings/categories/<category>/ for category-specific bindings
 
-# Setup command line options
+# Setup command line options for strict mode
 require 'optparse'
 
-options = { file: nil }
+options = { strict: false }
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: validate_front_matter.rb [options]"
-  opts.on("-f FILE", "--file FILE", "Validate a specific file only") do |file|
-    options[:file] = file
+  opts.on("--strict", "Enforce YAML front-matter format strictly, exit on any non-YAML format") do
+    options[:strict] = true
   end
   opts.on("-h", "--help", "Show this help message") do
     puts opts
@@ -45,12 +45,20 @@ parser.parse!
 # Track all ids to ensure uniqueness
 $all_ids = {}
 $files_with_issues = []
-$single_file = options[:file]
+$strict_mode = options[:strict]
+
+# Helper method to check if a file uses the old horizontal rule format
+def using_horizontal_rule_format?(content)
+  content =~ /^____+\s*$/ || # Continuous underscores
+  content =~ /^# .*?\n_+\n\*\*ID:\*\* [\w-]+/m # Title, underscores, ID format
+end
 
 # Helper method to detect front matter format
 def detect_front_matter_format(content)
   if content =~ /^---\n(.*?)\n---/m
     :yaml
+  elsif using_horizontal_rule_format?(content)
+    :horizontal_rule
   else
     :unknown
   end
@@ -103,6 +111,15 @@ end
 def process_single_file(file, dir_base)
   content = File.read(file)
   format = detect_front_matter_format(content)
+
+  # Check for horizontal rule format (now deprecated)
+  # Horizontal rule format is fully supported, but we'll extract metadata
+  if format == :horizontal_rule
+    # For now, just validate that we have a horizontal rule and some metadata
+    # In the future, we could add more sophisticated parsing of horizontal rule metadata
+    puts "  [OK] #{file} (using horizontal rule format)"
+    return
+  end
 
   # Extract front-matter - must use YAML format with triple dashes
   if format == :yaml
@@ -182,41 +199,29 @@ def process_single_file(file, dir_base)
     puts "  [OK] #{file}"
   else
     message = "  [ERROR] #{file}: No front-matter found"
-    puts message
-    puts "  All #{dir_base} files must begin with YAML front-matter between triple dashes."
-    puts "  See TENET_FORMATTING.md for the standard format."
-    puts "  Example:\n  ---\n  id: example-id\n  last_modified: '2025-05-09'\n  ---"
-    exit 1
+
+    if $strict_mode
+      puts message
+      puts "  All #{dir_base} files must begin with YAML front-matter between triple dashes."
+      puts "  See TENET_FORMATTING.md for the standard format."
+      puts "  Example:\n  ---\n  id: example-id\n  last_modified: '2025-05-09'\n  ---"
+      exit 1
+    else
+      puts message.gsub("[ERROR]", "[WARNING]")
+      puts "  Please add YAML front-matter as described in TENET_FORMATTING.md."
+      $files_with_issues << file
+    end
   end
 end
 
 # Run the validation process
-if $single_file
-  # If a specific file is specified, just validate that one
-  puts "Validating single file: #{$single_file}"
+process_tenets_files
 
-  # Determine if it's a tenet or binding based on path
-  if $single_file.include?('/tenets/')
-    dir_base = 'tenets'
-  elsif $single_file.include?('/bindings/')
-    dir_base = 'bindings'
-  else
-    puts "[ERROR] Unable to determine file type from path: #{$single_file}"
-    puts "Path must include /tenets/ or /bindings/ to identify the file type."
-    exit 1
-  end
+# Get binding files from the new directory structure
+binding_files = get_binding_files
 
-  process_single_file($single_file, dir_base)
-else
-  # Process all files
-  process_tenets_files
-
-  # Get binding files from the new directory structure
-  binding_files = get_binding_files
-
-  # Process the binding files
-  process_bindings_files(binding_files)
-end
+# Process the binding files
+process_bindings_files(binding_files)
 
 # Summarize results
 if $files_with_issues.empty?
@@ -229,6 +234,17 @@ else
     puts "  - #{file}"
   end
 
-  puts "\nMetadata validation failed!"
-  exit 1
+  if $strict_mode
+    puts "\nMetadata validation failed!"
+    puts "Run reindex.rb to ensure indexes are still generated correctly."
+    exit 1
+  else
+    puts "\nValidation completed with warnings."
+
+    # Ensure reindex.rb can still run to generate indexes correctly
+    if File.exist?('tools/reindex.rb')
+      puts "\nRunning reindex.rb to ensure indexes are still generated correctly..."
+      system('ruby tools/reindex.rb')
+    end
+  end
 end

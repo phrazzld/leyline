@@ -38,7 +38,7 @@
 ## Ruby Tool Refactoring
 
 ### Validate Front Matter Tool
-- [ ] **T002 · Refactor · P0: Remove legacy format logic from validate_front_matter.rb**
+- [x] **T002 · Refactor · P0: Remove legacy format logic from validate_front_matter.rb**
     - **Context:** Core tool refactoring for YAML-only validation
     - **Action:**
         1. Delete all code handling detection, parsing, or validation of legacy horizontal rule format

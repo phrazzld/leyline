@@ -92,33 +92,13 @@ This binding is misplaced in the root bindings directory.
 MARKDOWN
   File.write("#{TEST_DIR}/docs/bindings/misplaced-binding.md", misplaced_binding)
 
-  # Create an old-format binding using horizontal rules
-  old_format_binding = <<~MARKDOWN
-______________________________________________________________________
+  # Create a file with no front-matter
+  no_front_matter = <<~MARKDOWN
+# Binding: No Front Matter
 
-# Unique identifier for this binding (must be kebab-case, matching the filename without .md)
-
-id: old-format-binding
-
-# Date of last modification in ISO format (YYYY-MM-DD) with single quotes
-
-last_modified: '2025-05-10'
-
-# ID of the parent tenet this binding implements (must be an existing tenet ID)
-
-derived_from: test-tenet
-
-# Tool, rule, or process that enforces this binding
-
-enforced_by: 'manual review'
-
-______________________________________________________________________
-
-# Binding: Old Format
-
-This binding uses the old horizontal rule format.
+This binding has no front-matter at all.
 MARKDOWN
-  File.write("#{TEST_DIR}/docs/bindings/core/old-format-binding.md", old_format_binding)
+  File.write("#{TEST_DIR}/docs/bindings/core/no-front-matter.md", no_front_matter)
 
   puts "Test environment setup complete."
 end
@@ -143,6 +123,9 @@ def create_test_validator
   ).gsub(
     "root_files = Dir.glob(\"docs/bindings/*.md\")",
     "root_files = Dir.glob(\"#{TEST_DIR}/docs/bindings/*.md\")"
+  ).gsub(
+    "tenet_file = Dir.glob(\"docs/tenets/\#{front_matter['derived_from']}.md\").first",
+    "tenet_file = Dir.glob(\"#{TEST_DIR}/docs/tenets/\#{front_matter['derived_from']}.md\").first"
   )
 
   # Save the modified validator
@@ -153,11 +136,11 @@ def create_test_validator
 end
 
 # Function to run the validator and return results
-def run_validator(strict_mode = false)
+def run_validator(args = nil)
   command = "ruby #{TEST_DIR}/validate_front_matter_test.rb"
-  command += " --strict" if strict_mode
+  command += " #{args}" if args
 
-  puts "Running validator#{strict_mode ? ' in strict mode' : ''}..."
+  puts "Running validator#{args ? " with args: #{args}" : ''}..."
   output = `#{command} 2>&1`
   exit_code = $?.exitstatus
 
@@ -168,70 +151,70 @@ end
 def verify_validator_behavior
   puts "\nVerifying validator behavior..."
 
-  # Normal mode test
+  # Run validation test for valid files
   output, exit_code = run_validator
 
-  # Check for specific behaviors in normal mode
-  normal_mode_checks = {
-    "Finds core bindings" => output.include?("#{TEST_DIR}/docs/bindings/core/valid-core-binding.md"),
-    "Finds category bindings" => output.include?("#{TEST_DIR}/docs/bindings/categories/typescript/valid-ts-binding.md"),
-    "Warns about applies_to field" => output.include?("Contains deprecated 'applies_to' field"),
-    "Explains applies_to deprecation" => output.include?("The 'applies_to' field is no longer used"),
+  # The regular validation will fail because of the no-front-matter file, so we'll test individual files
+  valid_binding_output, _ = run_validator("-f #{TEST_DIR}/docs/bindings/core/valid-core-binding.md")
+  category_binding_output, _ = run_validator("-f #{TEST_DIR}/docs/bindings/categories/typescript/valid-ts-binding.md")
+  applies_to_output, _ = run_validator("-f #{TEST_DIR}/docs/bindings/core/binding-with-applies-to.md")
+
+  # Check for specific behaviors with valid files
+  valid_file_checks = {
+    "Validates core bindings" => valid_binding_output.include?("[OK] #{TEST_DIR}/docs/bindings/core/valid-core-binding.md"),
+    "Validates category bindings" => category_binding_output.include?("[OK] #{TEST_DIR}/docs/bindings/categories/typescript/valid-ts-binding.md"),
+    "Warns about applies_to field" => applies_to_output.include?("Contains deprecated 'applies_to' field"),
+    "Explains applies_to deprecation" => applies_to_output.include?("The 'applies_to' field is no longer used"),
     "Detects misplaced files" => output.include?("Found 1 binding file(s) directly in docs/bindings/ directory"),
     "Suggests correct locations" => output.include?("These should be moved to either docs/bindings/core/ or docs/bindings/categories"),
-    "Warns about horizontal rule format" => output.include?("Using deprecated horizontal rule format"),
-    "Normal mode passes with warnings" => exit_code == 0
   }
 
-  passed = 0
-  total = normal_mode_checks.size
+  puts "\nValid file checks:"
+  valid_passed = run_checks(valid_file_checks)
 
-  puts "\nNormal mode checks:"
-  normal_mode_checks.each do |check, result|
-    if result
-      puts "✓ #{check}"
-      passed += 1
-    else
-      puts "✗ #{check}"
-    end
-  end
-
-  # Strict mode test
-  strict_output, strict_exit_code = run_validator(true)
-
-  # Check for specific behaviors in strict mode
-  strict_mode_checks = {
-    "Strict mode fails for old format files" => strict_exit_code != 0 && strict_output.include?("horizontal rule format")
+  # Test with no front-matter file
+  no_front_matter_output, no_front_matter_exit_code = run_validator("-f #{TEST_DIR}/docs/bindings/core/no-front-matter.md")
+  error_checks = {
+    "Fails for files without front-matter" => no_front_matter_exit_code != 0 && no_front_matter_output.include?("No front-matter found")
   }
 
-  puts "\nStrict mode checks:"
-  strict_mode_checks.each do |check, result|
-    if result
-      puts "✓ #{check}"
-      passed += 1
-    else
-      puts "✗ #{check}"
-    end
-  end
+  puts "\nError case checks:"
+  error_passed = run_checks(error_checks)
 
-  total += strict_mode_checks.size
+  total_passed = valid_passed + error_passed
+  total = valid_file_checks.size + error_checks.size
 
   # Output overall results
-  puts "\nTest Results: #{passed} of #{total} checks passed"
+  puts "\nTest Results: #{total_passed} of #{total} checks passed"
 
-  if passed == total
+  if total_passed == total
     puts "\nAll checks passed! The validate_front_matter.rb script correctly:"
     puts "1. Validates bindings in the new directory structure (core/ and categories/)"
-    puts "2. Warns about but doesn't error on deprecated applies_to field"
+    puts "2. Warns about deprecated applies_to field"
     puts "3. Detects misplaced files in the root bindings directory"
-    puts "4. Supports both formats in normal mode but enforces YAML in strict mode"
+    puts "4. Enforces YAML front-matter format only"
+    puts "5. Fails validation for files without YAML front-matter"
   else
     puts "\nSome checks failed. Review the output for details."
-    puts "Output from normal mode:"
+    puts "Standard validation output:"
     puts output
-    puts "\nOutput from strict mode:"
-    puts strict_output
+    puts "\nNo front-matter validation output:"
+    puts no_front_matter_output
   end
+end
+
+# Helper to run checks and count passed tests
+def run_checks(checks)
+  passed = 0
+  checks.each do |check, result|
+    if result
+      puts "✓ #{check}"
+      passed += 1
+    else
+      puts "✗ #{check}"
+    end
+  end
+  passed
 end
 
 # Function to clean up test files
