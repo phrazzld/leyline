@@ -53,7 +53,7 @@
         2. Running script against legacy format file produces explicit failure
     - **Depends‑on:** [T001, T001a]
 
-- [ ] **T003 · Refactor · P1: Implement strict YAML validation in validate_front_matter.rb**
+- [x] **T003 · Refactor · P1: Implement strict YAML validation in validate_front_matter.rb**
     - **Context:** Ensure robust validation for YAML-only format
     - **Action:**
         1. Implement validation for required YAML keys (e.g., `id`, `last_modified`, `derived_from` for bindings)
