@@ -21,7 +21,7 @@
         - Additional migration step required before proceeding with T002
 
 ## Additional Task (Required)
-- [ ] **T001a · Chore · P0: Complete metadata migration for tenet files**
+- [x] **T001a · Chore · P0: Complete metadata migration for tenet files**
     - **Context:** Address incomplete migration discovered in T001
     - **Action:**
         1. Create a script or manually convert all tenet files from legacy horizontal rule format to YAML front-matter

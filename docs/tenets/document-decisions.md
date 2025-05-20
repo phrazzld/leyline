@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## id: document-decisions last_modified: '2025-05-08'
+---
+id: document-decisions
+last_modified: '2025-05-08'
+---
 
 # Tenet: Document Decisions, Not Mechanics
 

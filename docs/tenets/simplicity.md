@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## id: simplicity last_modified: '2025-05-08'
+---
+id: simplicity
+last_modified: '2025-05-08'
+---
 
 # Tenet: Simplicity Above All
 
