@@ -1,7 +1,8 @@
 ---
-id: error-wrapping
-last_modified: "2025-05-14"
+derived_from: explicit-over-implicit
 enforced_by: golangci-lint("wrapcheck") & code review
+id: error-wrapping
+last_modified: '2025-05-14'
 ---
 # Binding: Add Context to Errors as They Travel Upward
 

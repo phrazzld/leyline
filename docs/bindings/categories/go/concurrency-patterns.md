@@ -1,7 +1,8 @@
 ---
-id: concurrency-patterns
-last_modified: "2025-05-14"
+derived_from: simplicity
 enforced_by: code review & race detector
+id: concurrency-patterns
+last_modified: '2025-05-14'
 ---
 # Binding: Use Goroutines and Channels Judiciously with Explicit Coordination
 

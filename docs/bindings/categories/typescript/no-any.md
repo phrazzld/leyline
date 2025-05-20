@@ -1,7 +1,8 @@
 ---
-id: no-any
-last_modified: "2025-05-14"
+derived_from: explicit-over-implicit
 enforced_by: eslint("@typescript-eslint/no-explicit-any") & tsconfig("noImplicitAny")
+id: no-any
+last_modified: '2025-05-14'
 ---
 # Binding: Make Types Explicit, Never Use `any`
 

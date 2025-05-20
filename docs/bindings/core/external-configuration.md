@@ -1,6 +1,8 @@
 ---
+derived_from: no-secret-suppression
 id: external-configuration
-last_modified: "2025-05-14"
+last_modified: '2025-05-14'
+enforced_by: code review & style guides
 ---
 # Binding: Never Hardcode Configuration
 

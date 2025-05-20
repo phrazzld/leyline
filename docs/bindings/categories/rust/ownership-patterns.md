@@ -1,7 +1,8 @@
 ---
-id: ownership-patterns
-last_modified: "2025-05-14"
+derived_from: simplicity
 enforced_by: rust compiler & code review
+id: ownership-patterns
+last_modified: '2025-05-14'
 ---
 # Binding: Embrace Rust's Ownership System, Don't Fight It
 

@@ -1,6 +1,8 @@
 ---
+derived_from: modularity
 id: package-design
-last_modified: "2025-05-14"
+last_modified: '2025-05-14'
+enforced_by: code review & style guides
 ---
 # Binding: Organize Go Code Into Purpose-Driven Packages
 

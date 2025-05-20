@@ -1,7 +1,8 @@
 ---
-id: interface-design
-last_modified: "2025-05-14"
+derived_from: testability
 enforced_by: code review & linting
+id: interface-design
+last_modified: '2025-05-14'
 ---
 # Binding: Design Small, Focused Interfaces in Consumer Packages
 

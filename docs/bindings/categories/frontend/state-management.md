@@ -1,7 +1,8 @@
 ---
-id: state-management
-last_modified: "2025-05-14"
+derived_from: simplicity
 enforced_by: Code review, Architecture reviews
+id: state-management
+last_modified: '2025-05-14'
 ---
 # Binding: Frontend State Management
 

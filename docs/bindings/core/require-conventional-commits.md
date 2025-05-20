@@ -1,7 +1,8 @@
 ---
-id: require-conventional-commits
-last_modified: "2025-05-14"
+derived_from: automation
 enforced_by: commit hooks & CI checks
+id: require-conventional-commits
+last_modified: '2025-05-14'
 ---
 # Binding: Express Intent Through Structured Commit Messages
 

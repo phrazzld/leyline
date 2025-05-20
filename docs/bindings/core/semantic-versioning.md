@@ -1,7 +1,8 @@
 ---
-id: semantic-versioning
-last_modified: "2025-05-14"
+derived_from: explicit-over-implicit
 enforced_by: version checking tools & CI validation
+id: semantic-versioning
+last_modified: '2025-05-14'
 ---
 # Binding: Make Breaking Changes Explicit with Semantic Versioning
 

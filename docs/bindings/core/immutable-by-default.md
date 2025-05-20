@@ -1,7 +1,8 @@
 ---
-id: immutable-by-default
-last_modified: "2025-05-14"
+derived_from: simplicity
 enforced_by: linters & code review
+id: immutable-by-default
+last_modified: '2025-05-14'
 ---
 # Binding: Treat All Data as Unchangeable by Default
 

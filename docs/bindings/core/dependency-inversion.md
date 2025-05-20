@@ -1,7 +1,8 @@
 ---
-id: dependency-inversion
-last_modified: "2025-05-14"
+derived_from: testability
 enforced_by: code review & architecture analysis
+id: dependency-inversion
+last_modified: '2025-05-14'
 ---
 # Binding: Design Against Abstractions, Not Implementations
 

@@ -1,6 +1,8 @@
 ---
+derived_from: simplicity
 id: pure-functions
-last_modified: "2025-05-14"
+last_modified: '2025-05-14'
+enforced_by: code review & style guides
 ---
 # Binding: Write Pure Functions, Isolate Side Effects
 

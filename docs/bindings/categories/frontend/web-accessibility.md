@@ -1,7 +1,8 @@
 ---
-id: web-accessibility
-last_modified: "2025-05-14"
+derived_from: explicit-over-implicit
 enforced_by: Code review, Automated a11y testing
+id: web-accessibility
+last_modified: '2025-05-14'
 ---
 # Binding: Web Accessibility
 
