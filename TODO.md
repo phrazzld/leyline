@@ -68,7 +68,7 @@
         1. Test with files: valid YAML, malformed YAML, missing front-matter, missing required keys
     - **Depends‑on:** [T002]
 
-- [ ] **T004 · Test · P1: Update tests for validate_front_matter.rb**
+- [x] **T004 · Test · P1: Update tests for validate_front_matter.rb**
     - **Context:** Ensure test coverage for YAML-only functionality
     - **Action:**
         1. Remove unit tests specifically designed for legacy format validation
