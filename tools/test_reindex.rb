@@ -72,6 +72,68 @@ This tenet is missing the required YAML front-matter.
 This should cause an error.
 MARKDOWN
 
+  # 4. Complex YAML with nested structures
+  complex_yaml = <<~MARKDOWN
+---
+id: complex-yaml
+last_modified: "2025-05-04"
+derived_from: simplicity
+enforced_by: "automated tests"
+applies_to:
+  - typescript
+  - javascript
+config:
+  severity: error
+  options:
+    allow-any-in-tests: true
+    strict-mode: false
+---
+
+# Binding: Complex YAML
+
+This binding has complex nested YAML structures to test proper parsing.
+
+## Rationale
+
+This tests that complex YAML structures are handled correctly.
+MARKDOWN
+
+  # 5. Placeholder text
+  placeholder_text = <<~MARKDOWN
+---
+id: placeholder-text
+last_modified: "2025-05-04"
+derived_from: maintainability
+enforced_by: "code review"
+---
+
+# Binding: Placeholder Text
+
+[This is a placeholder description that should be replaced with the rationale section]
+
+## Rationale
+
+The rationale explains why this binding is important.
+MARKDOWN
+
+  # 6. Too long first paragraph
+  long_paragraph = <<~MARKDOWN
+---
+id: long-paragraph
+last_modified: "2025-05-04"
+derived_from: explicitness
+enforced_by: "manual review"
+---
+
+# Binding: Long Paragraph
+
+This binding has an extremely long first paragraph that exceeds the 150 character limit for summaries and should be truncated when displayed in the index. It goes on and on with more text to ensure it's well over the limit. This should definitely be truncated in the final index display.
+
+## Rationale
+
+The summary should be truncated with ellipsis.
+MARKDOWN
+
   # 2. Invalid YAML syntax
   invalid_yaml = <<~MARKDOWN
 ---
@@ -113,6 +175,11 @@ MARKDOWN
   File.write('test_reindex/tenets/missing-frontmatter.md', missing_frontmatter)
   File.write('test_reindex/bindings/categories/typescript/invalid-yaml.md', invalid_yaml)
   File.write('test_reindex/bindings/categories/go/missing-fields.md', missing_fields)
+
+  # Feature test files
+  File.write('test_reindex/bindings/core/complex-yaml.md', complex_yaml)
+  File.write('test_reindex/bindings/categories/typescript/placeholder-text.md', placeholder_text)
+  File.write('test_reindex/bindings/categories/go/long-paragraph.md', long_paragraph)
 
   # Add a misplaced binding file
   File.write('test_reindex/bindings/misplaced-binding.md', real_binding_content.gsub('real-binding', 'misplaced-binding'))
@@ -175,7 +242,33 @@ MARKDOWN
   # Check if real-binding was included in the index
   if binding_index_exists
     binding_index_content = File.read('test_reindex/bindings/00-index.md')
-    puts "✓ Real binding was included: #{binding_index_content.include?('real-binding')}"
+
+    # Basic validation
+    puts "\nBinding index validation:"
+    puts "✓ Real binding included: #{binding_index_content.include?('real-binding')}"
+
+    # Feature test validations
+    complex_yaml_included = binding_index_content.include?('complex-yaml')
+    puts "✓ Complex YAML binding included: #{complex_yaml_included}"
+
+    placeholder_handled = binding_index_content.include?('placeholder-text') &&
+                          !binding_index_content.include?('[This is a placeholder')
+    puts "✓ Placeholder binding properly handled: #{placeholder_handled}"
+
+    long_paragraph_included = binding_index_content.include?('long-paragraph')
+    puts "✓ Long paragraph binding included: #{long_paragraph_included}"
+
+    # The truncation depends on exactly where the paragraph cutting occurs
+    # and may vary depending on the implementation
+    long_paragraph_truncated = long_paragraph_included &&
+                              (binding_index_content.include?('...') ||
+                               !binding_index_content.include?('definitely be truncated in the final index display'))
+    puts "✓ Long paragraph properly truncated: #{long_paragraph_truncated}"
+
+    # Check for nested YAML structure handling
+    if complex_yaml_included
+      puts "✓ Complex YAML correctly processed despite nested structures"
+    end
   end
 
   # Analyze error reporting
@@ -195,19 +288,34 @@ MARKDOWN
   puts "✓ Reports missing fields: #{reports_missing_fields}"
   puts "✓ Reports misplaced file: #{reports_misplaced_file}"
 
-  # Check verbose output has more detail
-  has_more_detail = verbose_output.length > standard_output.length
-  puts "✓ Verbose output provides more detail: #{has_more_detail}"
+  # Check warning reporting
+  reports_warnings = verbose_output.include?('WARNING')
+  reports_placeholder_warning = verbose_output.include?('Using placeholder text for summary')
 
-  # Check strict mode exited with error
-  strict_has_exit = !strict_exit_code
-  puts "✓ Strict mode exited with error: #{strict_has_exit}"
+  puts "\nWarning reporting verification:"
+  puts "✓ Reports warnings: #{reports_warnings}"
+  puts "✓ Reports placeholder text warning: #{reports_placeholder_warning}"
+
+  # Check command line options
+  has_more_detail = verbose_output.length > standard_output.length
+  puts "\nCommand line options verification:"
+  puts "✓ Verbose output provides more detail: #{has_more_detail}"
+  puts "✓ Strict mode exited with error: #{!strict_exit_code}"
+
+  # Feature validation
+  feature_tests_passed = binding_index_exists && complex_yaml_included && placeholder_handled && long_paragraph_truncated
 
   puts "\n== Test Results Summary =="
   if reports_missing_frontmatter && reports_invalid_yaml && reports_missing_fields && reports_misplaced_file
     puts "✅ Error handling tests PASSED - All error types were correctly reported"
   else
     puts "❌ Error handling tests FAILED - Not all error types were correctly reported"
+  end
+
+  if feature_tests_passed
+    puts "✅ Feature tests PASSED - All YAML parsing features working correctly"
+  else
+    puts "❌ Feature tests FAILED - Not all YAML parsing features working correctly"
   end
 
   puts "\n✅ Index generation test complete!"

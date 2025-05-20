@@ -110,7 +110,7 @@
         1. Test with valid YAML files, malformed YAML files, and files missing required metadata
     - **Depends‑on:** [T005]
 
-- [ ] **T007 · Test · P1: Update tests for reindex.rb**
+- [x] **T007 · Test · P1: Update tests for reindex.rb**
     - **Context:** Ensure test coverage for YAML-only functionality
     - **Action:**
         1. Remove unit tests specifically designed for legacy format parsing
