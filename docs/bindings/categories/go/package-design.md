@@ -1,9 +1,9 @@
-______________________________________________________________________
-
+---
+derived_from: modularity
 id: package-design
-
-______________________________________________________________________
-
+last_modified: '2025-05-14'
+enforced_by: code review & style guides
+---
 # Binding: Organize Go Code Into Purpose-Driven Packages
 
 Design Go packages as cohesive units with clear, focused responsibilities and

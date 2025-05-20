@@ -1,9 +1,9 @@
-______________________________________________________________________
-
-id: dependency-inversion enforced_by: code review & architecture analysis applies_to:
-
-______________________________________________________________________
-
+---
+derived_from: testability
+enforced_by: code review & architecture analysis
+id: dependency-inversion
+last_modified: '2025-05-14'
+---
 # Binding: Design Against Abstractions, Not Implementations
 
 High-level modules containing your business logic should never depend on low-level

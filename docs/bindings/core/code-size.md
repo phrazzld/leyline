@@ -1,9 +1,9 @@
-______________________________________________________________________
-
+---
+derived_from: simplicity
 id: code-size
-
-______________________________________________________________________
-
+last_modified: '2025-05-14'
+enforced_by: code review & style guides
+---
 # Binding: Keep Code Units Small and Focused
 
 Limit the size of all code units—functions, methods, classes, and files—to maintain

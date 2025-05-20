@@ -1,9 +1,9 @@
-______________________________________________________________________
-
-id: module-organization enforced_by: code review & project linting rules applies_to:
-
-______________________________________________________________________
-
+---
+derived_from: modularity
+enforced_by: code review & project linting rules
+id: module-organization
+last_modified: '2025-05-14'
+---
 # Binding: Organize TypeScript Code Into Feature-Focused Modules
 
 Structure TypeScript code into cohesive modules organized by features or domains rather

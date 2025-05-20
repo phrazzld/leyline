@@ -1,9 +1,9 @@
-______________________________________________________________________
-
-id: immutable-by-default enforced_by: linters & code review applies_to:
-
-______________________________________________________________________
-
+---
+derived_from: simplicity
+enforced_by: linters & code review
+id: immutable-by-default
+last_modified: '2025-05-14'
+---
 # Binding: Treat All Data as Unchangeable by Default
 
 Never modify data after it's created. When you need to update state, create entirely new

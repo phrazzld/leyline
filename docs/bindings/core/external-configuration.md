@@ -1,9 +1,9 @@
-______________________________________________________________________
-
+---
+derived_from: no-secret-suppression
 id: external-configuration
-
-______________________________________________________________________
-
+last_modified: '2025-05-14'
+enforced_by: code review & style guides
+---
 # Binding: Never Hardcode Configuration
 
 Never embed configuration values in your source code. Keep all environment-specific

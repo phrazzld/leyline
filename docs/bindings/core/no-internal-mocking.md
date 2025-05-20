@@ -1,9 +1,9 @@
-______________________________________________________________________
-
-id: no-internal-mocking enforced_by: code review & linters applies_to:
-
-______________________________________________________________________
-
+---
+derived_from: testability
+enforced_by: code review & linters
+id: no-internal-mocking
+last_modified: '2025-05-14'
+---
 # Binding: Mock External Systems Only, Never Internal Components
 
 Never mock, stub, or fake components that live within your application's boundaries.

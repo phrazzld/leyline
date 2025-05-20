@@ -1,9 +1,9 @@
-______________________________________________________________________
-
-id: context-propagation enforced_by: code review & integration tests applies_to:
-
-______________________________________________________________________
-
+---
+derived_from: explicit-over-implicit
+enforced_by: code review & integration tests
+id: context-propagation
+last_modified: '2025-05-14'
+---
 # Binding: Propagate Request Context Across Service Boundaries
 
 All services must propagate context information across process boundaries to maintain
