@@ -125,7 +125,7 @@
     - **Depends‑on:** [T006]
 
 ### Cross-References Tool
-- [ ] **T008 · Chore · P2: Analyze fix_cross_references.rb for metadata parsing**
+- [x] **T008 · Chore · P2: Analyze fix_cross_references.rb for metadata parsing**
     - **Context:** Determine if additional refactoring is needed
     - **Action:**
         1. Investigate if `tools/fix_cross_references.rb` parses or relies on tenet/binding metadata structure
