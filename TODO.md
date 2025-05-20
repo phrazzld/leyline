@@ -97,7 +97,7 @@
         1. Code review confirms removal of legacy parsing logic
     - **Depends‑on:** [T001, T001a]
 
-- [ ] **T006 · Refactor · P1: Implement error handling in reindex.rb**
+- [x] **T006 · Refactor · P1: Implement error handling in reindex.rb**
     - **Context:** Ensure robust handling of invalid files
     - **Action:**
         1. Implement behavior to fail loudly if a file cannot be parsed as valid YAML or lacks expected metadata
