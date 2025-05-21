@@ -483,12 +483,39 @@ jobs:
         # Save PR title to file
         echo "$pr_title" > pr-title.txt
 
-      # Create the PR if create_pr is true
+      # Create the PR if create_pr is true and changes exist
     - name: Create Pull Request
       if: inputs.create_pr == true
+      id: create-pr
       uses: peter-evans/create-pull-request@v6
       with:
+        # Use the provided GitHub token for authentication
         token: ${{ inputs.token }}
+        # Use the generated PR title (supports custom input via inputs.pr_title)
         title-path: pr-title.txt
+        # Use the generated PR body with sync summary and details
         body-path: pr-body.md
+        # Use the custom branch name (supports custom input via inputs.pr_branch_name)
         branch: ${{ inputs.pr_branch_name }}
+        # Only create PR if there are actual changes to commit
+        commit-message: ${{ inputs.commit_message }}
+
+    # Log PR creation results for transparency
+    - name: Log PR Creation Results
+      if: inputs.create_pr == true
+      run: |
+        if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
+          echo "✅ Pull Request created successfully"
+          echo "PR Number: ${{ steps.create-pr.outputs.pull-request-number }}"
+          echo "PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
+          echo "Branch: ${{ inputs.pr_branch_name }}"
+        else
+          echo "ℹ️ No Pull Request created (no changes detected)"
+        fi
+
+    # Log when PR creation is disabled
+    - name: Log PR Creation Skipped
+      if: inputs.create_pr == false
+      run: |
+        echo "ℹ️ Pull Request creation disabled (create_pr = false)"
+        echo "Changes have been committed directly to the current branch"

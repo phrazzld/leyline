@@ -82,7 +82,7 @@
         1. Sync version A of Leyline. Then sync version B (where a file from A is removed). Verify the removed file is no longer in `target_path`.
     - **Depends‑on:** [T007]
 
-- [ ] **T009 · Feature · P1: implement Pull Request creation logic in `sync-leyline-content.yml`**
+- [x] **T009 · Feature · P1: implement Pull Request creation logic in `sync-leyline-content.yml`**
     - **Context:** Detailed Build Steps #2, Public Interfaces / Contracts - Outputs
     - **Action:**
         1. Integrate `peter-evans/create-pull-request@vX` action.
