@@ -13,7 +13,7 @@
     - **Depends‑on:** none
 
 ## Reusable Workflow: `leyline/.github/workflows/sync-leyline-content.yml`
-- [ ] **T002 · Refactor · P1: review existing `vendor.yml` and rename to `sync-leyline-content.yml`**
+- [x] **T002 · Refactor · P1: review existing `vendor.yml` and rename to `sync-leyline-content.yml`**
     - **Context:** Detailed Build Steps #2, Architecture Blueprint - `leyline/.github/workflows/sync-leyline-content.yml`
     - **Action:**
         1. Locate and analyze any existing `vendor.yml` or similar workflow for reusable logic.
