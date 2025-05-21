@@ -188,7 +188,7 @@
         1. Test commit/PR with valid, invalid, and legacy format files to verify expected CI behavior
     - **Depends‑on:** [T003, T006]
 
-- [ ] **T013 · Chore · P0: Update pre-commit hooks for YAML-only validation**
+- [x] **T013 · Chore · P0: Update pre-commit hooks for YAML-only validation**
     - **Context:** Ensure local validation enforces new standard
     - **Action:**
         1. Update the `.pre-commit-config.yaml` file

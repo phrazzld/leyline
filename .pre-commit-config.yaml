@@ -10,3 +10,32 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+
+  # Local hooks
+  - repo: local
+    hooks:
+      # YAML-only front-matter validation - enforces valid YAML front-matter structure
+      - id: validate-yaml-front-matter
+        name: Validate YAML front-matter in markdown files
+        description: Ensures markdown files use valid YAML front-matter (legacy horizontal rule format not supported)
+        # Pre-commit passes one file at a time
+        entry: bash -c 'ruby tools/validate_front_matter.rb -f "$1"' --
+        language: system
+        files: ^docs/(tenets|bindings)/.*\.md$
+        exclude: ^docs/(tenets|bindings)/00-index\.md$
+        types: [markdown]
+        fail_fast: true
+        verbose: true
+
+      # Run reindex.rb in strict mode to ensure all files can be properly indexed
+      # This validates YAML parsing and metadata extraction
+      - id: check-index-with-yaml-validation
+        name: Check index consistency with YAML validation
+        description: Validates all files can be properly indexed (YAML validation)
+        entry: ruby tools/reindex.rb --strict
+        language: system
+        files: ^docs/(tenets|bindings)/.*\.md$
+        exclude: ^docs/(tenets|bindings)/00-index\.md$
+        pass_filenames: false
+        types: [markdown]
+        stages: [commit]
