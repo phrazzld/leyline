@@ -68,16 +68,70 @@ jobs:
         echo "Target path: ${{ inputs.target_path }}"
         echo "Create PR: ${{ inputs.create_pr }}"
 
-    - uses: actions/checkout@v4   # consumer repo
-      with:
-        token: ${{ inputs.token }}
-    - name: Clone Leyline
+    # Checkout the consumer repository (where the workflow is being called from)
+    - name: Checkout Consumer Repository
       uses: actions/checkout@v4
       with:
-        repository: phrazzld/leyline
-        ref: ${{ inputs.leyline_ref }}
         token: ${{ inputs.token }}
+
+    # Checkout the Leyline repository at the specified reference
+    - name: Checkout Leyline Content
+      id: checkout-leyline
+      uses: actions/checkout@v4
+      with:
+        # Use the phrazzld/leyline repository as the source
+        repository: phrazzld/leyline
+        # Use the specified leyline_ref (tag, branch, or commit SHA)
+        ref: ${{ inputs.leyline_ref }}
+        # Use the provided token for authentication
+        token: ${{ inputs.token }}
+        # Checkout to a temporary directory named _leyline
         path: _leyline
+        # Only fetch what's needed to minimize checkout time
+        fetch-depth: 1
+
+    # Verify that the Leyline content was checked out successfully
+    - name: Verify Leyline Checkout
+      run: |
+        echo "Verifying Leyline content checkout..."
+
+        # Check if the _leyline directory exists
+        if [ ! -d "_leyline" ]; then
+          echo "::error::Failed to checkout Leyline repository - _leyline directory not found"
+          echo "This could indicate an issue with the repository access or the specified reference: ${{ inputs.leyline_ref }}"
+          exit 1
+        fi
+
+        # Check if essential directories exist
+        if [ ! -d "_leyline/docs" ]; then
+          echo "::error::Leyline checkout appears invalid - docs directory not found"
+          echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version"
+          exit 1
+        fi
+
+        if [ ! -d "_leyline/docs/tenets" ]; then
+          echo "::error::Leyline checkout appears invalid - tenets directory not found"
+          echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version with the expected structure"
+          exit 1
+        fi
+
+        if [ ! -d "_leyline/docs/bindings" ]; then
+          echo "::error::Leyline checkout appears invalid - bindings directory not found"
+          echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version with the expected structure"
+          exit 1
+        fi
+
+        # Get and display the actual commit that was checked out
+        cd _leyline
+        actual_commit=$(git rev-parse HEAD)
+        echo "✅ Successfully checked out Leyline content"
+        echo "Reference requested: ${{ inputs.leyline_ref }}"
+        echo "Actual commit: $actual_commit"
+
+        # Count available content for logging
+        tenet_count=$(find docs/tenets -name "*.md" 2>/dev/null | wc -l || echo "0")
+        binding_count=$(find docs/bindings -name "*.md" 2>/dev/null | wc -l || echo "0")
+        echo "Available content: $tenet_count tenets, $binding_count bindings"
 
     - name: Validate Categories Input
       if: inputs.categories != ''

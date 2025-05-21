@@ -52,7 +52,7 @@
         1. Workflow correctly parses PR-specific inputs and applies dynamic defaults.
     - **Depends‑on:** [T003]
 
-- [ ] **T006 · Feature · P1: implement Leyline content checkout logic in `sync-leyline-content.yml`**
+- [x] **T006 · Feature · P1: implement Leyline content checkout logic in `sync-leyline-content.yml`**
     - **Context:** Detailed Build Steps #2
     - **Action:**
         1. Use `actions/checkout@vX` to check out the Leyline repository.
