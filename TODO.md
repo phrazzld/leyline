@@ -71,7 +71,7 @@
         1. `tenets`, `core` bindings, and specified `categories` are copied to the consumer repository's workspace at `inputs.target_path`.
     - **Depends‑on:** [T004, T006]
 
-- [ ] **T008 · Feature · P2: implement efficient file copying with stale file removal in `sync-leyline-content.yml`**
+- [x] **T008 · Feature · P2: implement efficient file copying with stale file removal in `sync-leyline-content.yml`**
     - **Context:** Detailed Build Steps #2 (efficient file copying)
     - **Action:**
         1. Implement file copying (e.g., using `rsync --delete` or equivalent `cp` and `rm` logic) to ensure files/directories in `inputs.target_path` that are no longer in the source Leyline content (for the synced set) are removed.

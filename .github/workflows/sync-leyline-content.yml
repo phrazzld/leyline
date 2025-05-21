@@ -221,16 +221,18 @@ jobs:
         # Directories already created in the cleanup step
 
         # Always sync all tenets (they're language-agnostic and apply to all projects)
+        # The --delete flag ensures stale files are removed for efficient sync
         echo "📚 Syncing tenets from _leyline/docs/tenets/ to ${{ inputs.target_path }}/tenets/"
         rsync -a --delete _leyline/docs/tenets/ "${{ inputs.target_path }}/tenets/"
         tenet_count=$(find "${{ inputs.target_path }}/tenets" -name "*.md" 2>/dev/null | wc -l || echo "0")
-        echo "✅ Synced $tenet_count tenet files"
+        echo "✅ Synced $tenet_count tenet files (stale files automatically removed)"
 
         # Always sync core bindings (applicable to all projects regardless of language/context)
+        # The --delete flag ensures stale files are removed for efficient sync
         echo "🔗 Syncing core bindings from _leyline/docs/bindings/core/ to ${{ inputs.target_path }}/bindings/core/"
         rsync -a --delete _leyline/docs/bindings/core/ "${{ inputs.target_path }}/bindings/core/"
         core_count=$(find "${{ inputs.target_path }}/bindings/core" -name "*.md" 2>/dev/null | wc -l || echo "0")
-        echo "✅ Synced $core_count core binding files"
+        echo "✅ Synced $core_count core binding files (stale files automatically removed)"
 
         # Process requested categories (if any specified)
         if [ -n "${{ inputs.categories }}" ]; then
@@ -256,12 +258,12 @@ jobs:
               # Create target directory
               mkdir -p "${{ inputs.target_path }}/bindings/categories/$category"
 
-              # Sync category files using rsync with --delete to remove stale files
+              # Sync category files using rsync with --delete to efficiently remove stale files
               rsync -a --delete "_leyline/docs/bindings/categories/$category/" "${{ inputs.target_path }}/bindings/categories/$category/"
 
               # Count synced files for this category
               category_count=$(find "${{ inputs.target_path }}/bindings/categories/$category" -name "*.md" 2>/dev/null | wc -l || echo "0")
-              echo "✅ Synced $category_count files for category '$category'"
+              echo "✅ Synced $category_count files for category '$category' (stale files automatically removed)"
             else
               echo "⚠️ WARNING: Category directory for '$category' does not exist in Leyline"
               MISSING_CATEGORIES+=("$category")
@@ -288,6 +290,7 @@ jobs:
         fi
 
         echo "📁 File synchronization completed successfully"
+        echo "🗑️ Stale file removal: All rsync operations use --delete flag for efficient cleanup"
 
         # For backward compatibility, also sync filtered bindings (this will be removed in a future update)
         if [ -d "filtered_bindings" ]; then
