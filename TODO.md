@@ -158,7 +158,7 @@
         2. Findings are documented with list of any other identified tooling
     - **Depends‑on:** [T001]
 
-- [ ] **T011 · Refactor · P2: Refactor identified tooling for YAML-only**
+- [x] **T011 · Refactor · P2: Refactor identified tooling for YAML-only**
     - **Context:** Conditional refactoring based on search
     - **Action:**
         1. For each tool identified in T010 that uses metadata:
