@@ -173,7 +173,7 @@
     - **Depends‑on:** [T010]
 
 ## CI/CD and Pre-commit Integration
-- [ ] **T012 · Chore · P0: Update CI workflows for YAML-only validation**
+- [x] **T012 · Chore · P0: Update CI workflows for YAML-only validation**
     - **Context:** Ensure automated builds enforce new standard
     - **Action:**
         1. Update relevant CI workflow files (`.github/workflows/`)
