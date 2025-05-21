@@ -11,7 +11,7 @@
     *   **Rationale**: Supporting both YAML front-matter and legacy horizontal rule formats increases tooling complexity, introduces contributor confusion, and creates parsing brittleness. Standardization is key to Simplicity and Automation.
     *   **Expected Outcome**: All tenet and binding Markdown files use exclusively YAML front-matter. All validation, indexing, and generation tools are simplified, containing no logic for the legacy format. Documentation is updated to reflect the YAML-only approach.
     *   **Dependencies**: "Create One-Time Migration Script for Legacy Metadata".
--   **[Chore]**: **Create One-Time Migration Script for Legacy Metadata to YAML**
+-   [x] **[Chore]**: **Create One-Time Migration Script for Legacy Metadata to YAML**
     *   **Complexity**: Simple
     *   **Rationale**: To support the "Eliminate Dual Metadata Formats" initiative by programmatically converting all existing files, ensuring no data loss and minimizing manual effort.
     *   **Expected Outcome**: A robust script that reliably converts all legacy horizontal rule metadata blocks to YAML front-matter. All existing documents in the repository are successfully migrated.
@@ -83,6 +83,9 @@
         *   Python
         *   Bash scripting
         *   CLI (Command Line Interface) design
+        *   Swift / iOS
+        *   Android / Kotlin
+        *   Mobile in general
         *   Chrome Browser Extension development
     *   **Dependencies**: "Use Directory Structure as Single Source of Truth for Binding Categorization", "Rewrite All Tenets and Bindings to be Natural Language First".
 -   **[Enhancement/Operational Excellence]**: **Automate Security and Dependency Auditing for Leyline Itself**
@@ -90,33 +93,3 @@
     *   **Rationale**: To ensure Leyline's own toolchain and dependencies are secure and up-to-date, practicing what it preaches regarding software quality and security.
     *   **Expected Outcome**: CI pipeline for Leyline is enhanced with automated security vulnerability scans (e.g., `npm audit`, `cargo audit`, `govulncheck` depending on chosen CLI language) and dependency update checks.
     *   **Dependencies**: "Unify Leyline Tooling into a CLI and Rewrite in TypeScript or Go".
-
-## Future Considerations
-
-### Innovation & Long-Term Vision
-
--   **[Research]**: **Migrate to a Fully Structured Data Source for Tenets/Bindings**
-    *   **Complexity**: Complex
-    *   **Rationale**: Moving beyond Markdown+YAML to a more structured data model (e.g., dedicated YAML/JSON files with Markdown content embedded) could enable advanced querying, more sophisticated LLM context generation, dynamic documentation, and easier integration with other tools.
-    *   **Expected Outcome**: A research document and potential PoC outlining a new data model, its benefits, migration path, and impact on tooling and content creation.
-    *   **Dependencies**: Most core simplification and content structure work should be complete.
--   **[Innovation]**: **Develop Advanced LLM Context Generator**
-    *   **Complexity**: Complex
-    *   **Rationale**: To build tools or services that consume Leyline's standards (ideally from a structured data source) to provide highly relevant, fine-grained, and context-aware inputs for LLMs, tailored to specific code snippets or development tasks.
-    *   **Expected Outcome**: A prototype or functional tool that can intelligently select and format Leyline content for optimal LLM performance.
-    *   **Dependencies**: "Rewrite All Tenets and Bindings to be Natural Language First", potentially "Migrate to a Fully Structured Data Source".
--   **[Innovation]**: **Develop IDE Extensions or Enhanced Web UI for Leyline Consumption**
-    *   **Complexity**: Complex
-    *   **Rationale**: To bring Leyline guidance directly into the developer's workflow via IDE extensions or to provide a more interactive and dynamic web experience for exploring and understanding standards.
-    *   **Expected Outcome**: Prototype IDE extension (e.g., for VS Code) or an enhanced web UI with features like interactive filtering, cross-referencing, and personalized views.
-    *   **Dependencies**: Stable and accessible content (API or structured data).
--   **[Innovation]**: **Explore Automated Compliance Checking in Consumer Repositories**
-    *   **Complexity**: Complex
-    *   **Rationale**: To develop tools (potentially leveraging linters, static analysis, or even LLMs) that can scan consumer codebases for adherence to Leyline bindings, providing automated feedback and compliance reports.
-    *   **Expected Outcome**: A PoC or framework for automated compliance checking against a subset of Leyline bindings.
-    *   **Dependencies**: Clear, machine-interpretable aspects of bindings.
--   **[Content]**: **Add Advanced Context Categories**
-    *   **Complexity**: Medium (per category)
-    *   **Rationale**: To extend Leyline's reach into more specialized or emerging domains as they become relevant to the organization.
-    *   **Expected Outcome**: New top-level categories and corresponding tenets/bindings for areas like Machine Learning Operations (MLOps), Data Engineering, Infrastructure-as-Code, etc.
-    *   **Dependencies**: Established process for adding new categories and content.
