@@ -3,33 +3,17 @@
 ## Introduction
 
 Metadata is included at the beginning of Markdown files to provide structured information
-about the document. In this project, both the traditional horizontal rule format and YAML
-front-matter format are acceptable for tenet and binding documents.
+about the document. This project exclusively uses YAML front-matter format for tenet and
+binding documents, which provides a standardized, machine-readable way to define document
+metadata.
 
-Since these documents are primarily processed by LLMs that can handle fuzzy content parsing,
-we maintain flexibility in the format. The horizontal rule format with underscores is
-fully supported and remains the primary format used in the project.
+YAML front-matter is an industry standard format that is widely used in static site
+generators, documentation systems, and content management tools. It is essential for
+our validation tools, indexing systems, and LLM integration.
 
-## Metadata Formats
+## Metadata Format
 
-Both of these formats are acceptable for metadata in tenet and binding documents:
-
-### Horizontal Rule Format (Recommended)
-
-```markdown
-______________________________________________________________________
-
-## id: tenet-id last_modified: '2025-05-08'
-
-# Document Title
-```
-
-The horizontal rule format consists of:
-- A line of underscores (typically 70+)
-- A level-2 heading with key-value pairs
-- Optionally, another horizontal rule after the metadata
-
-### YAML Front-Matter Format (Alternative)
+All tenet and binding documents must use YAML front-matter at the beginning of the file:
 
 ```markdown
 ---
@@ -130,48 +114,20 @@ The binding content begins here...
 
 Note: This binding would be saved as `docs/bindings/core/automate-changelog.md` since it applies to all projects.
 
-## Converting from Horizontal Rule Format
+## File Location Standards
 
-If you encounter documents using the older horizontal rule format:
+Binding files must be placed in the appropriate directory based on their applicability:
 
-```markdown
-______________________________________________________________________
+- `docs/bindings/core/` - For bindings that apply to all projects regardless of language or technology
+- `docs/bindings/categories/<category>/` - For category-specific bindings
 
-id: old-format last_modified: "2025-05-05" derived_from: some-tenet
-enforced_by: code review applies_to:
-
-- typescript
-- frontend
-
-______________________________________________________________________
-
-# Document title
-```
-
-You should convert them to the YAML format as follows:
-
-```markdown
----
-id: old-format
-last_modified: '2025-05-05'
-derived_from: some-tenet
-enforced_by: code review
----
-
-# Document title
-```
-
-Note: After converting, move the file to the appropriate directory based on its applicability:
-- If it's a core binding: `docs/bindings/core/`
-- If it's category-specific: `docs/bindings/categories/<category>/`
-  (e.g., `docs/bindings/categories/typescript/` in this example)
-
-Note the key differences:
-
-- Each field is on a separate line
-- Values are properly indented under their keys
-- Dates are enclosed in quotes
-- No horizontal rules with underscores
+Valid categories include:
+- `go`
+- `rust`
+- `typescript`
+- `frontend`
+- `backend`
+- `cli`
 
 ## Rationale
 
@@ -195,11 +151,14 @@ Our validation tool (`tools/validate_front_matter.rb`) checks for front-matter
 compliance:
 
 ```bash
-# Normal mode - warns about non-YAML format files
+# Validate all files
 ruby tools/validate_front_matter.rb
 
-# Strict mode - enforces YAML format only
-ruby tools/validate_front_matter.rb --strict
+# Validate a specific file
+ruby tools/validate_front_matter.rb -f path/to/file.md
+
+# Validate with detailed output
+ruby tools/validate_front_matter.rb -v
 ```
 
 The validator checks:
@@ -209,15 +168,14 @@ The validator checks:
 1. Valid date format for `last_modified`
 1. Unique `id` across all documents
 1. Valid `derived_from` references for bindings (must reference an existing tenet)
-1. Correct format for `applies_to` arrays
+1. Correct format for optional fields
 
 ### Pre-commit Hooks
 
-Our pre-commit configuration includes hooks to validate and preserve front-matter:
+Our pre-commit configuration includes hooks to validate front-matter:
 
-1. **mdformat** with the **mdformat-frontmatter** plugin preserves YAML front-matter
-   during Markdown formatting
-1. Custom validation hooks ensure all required metadata is present
+1. Automatic validation of YAML front-matter in all markdown files
+2. Blocking of commits that contain invalid front-matter
 
 ## Common Issues and Solutions
 
@@ -225,11 +183,6 @@ Our pre-commit configuration includes hooks to validate and preserve front-matte
 
 **Solution**: Ensure your document starts with `---`, followed by YAML properties,
 followed by another `---`
-
-### Issue: "Using deprecated horizontal rule format for metadata"
-
-**Solution**: Convert to YAML front-matter format as described in the "Converting"
-section above
 
 ### Issue: "Missing required keys in YAML front-matter"
 
@@ -257,11 +210,6 @@ section)
 - Quotes around values with special characters
 - No tabs (use spaces for indentation)
 - No trailing commas
-
-### Issue: "Front-matter is converted after formatting"
-
-**Solution**: Ensure your `.mdformat.toml` and `.pre-commit-config.yaml` files include
-proper configuration for preserving front-matter
 
 ## Command-Line Tools
 
@@ -306,7 +254,7 @@ Our toolchain is fully configured to work with YAML front-matter:
    files
 1. **Formatting**: `mdformat` with the frontmatter plugin preserves front-matter during
    formatting
-1. **Pre-commit hooks**: Validate and preserve front-matter during the commit process
+1. **Pre-commit hooks**: Validate front-matter during the commit process
 1. **Templates**: Template files include the correct front-matter structure to follow
 
 ## Further Resources

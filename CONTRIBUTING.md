@@ -236,8 +236,7 @@ Some bindings may be applicable across multiple categories. When deciding where 
   `'2025-05-09'`)
 - Ensure changes maintain or improve natural language quality
 - Follow the [Natural Language Style Guide](docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
-- If the document uses the legacy horizontal rule format for metadata, convert it to
-  YAML front-matter as described in [TENET_FORMATTING.md](TENET_FORMATTING.md)
+- Ensure the document uses YAML front-matter format for metadata as described in [TENET_FORMATTING.md](TENET_FORMATTING.md)
 
 **For Bindings:**
 
@@ -246,8 +245,7 @@ Some bindings may be applicable across multiple categories. When deciding where 
 - Ensure changes maintain or improve natural language quality
 - Follow the [Natural Language Style Guide](docs/STYLE_GUIDE_NATURAL_LANGUAGE.md)
 - Verify that all required front-matter fields are present and formatted correctly
-- If the document uses the legacy horizontal rule format for metadata, convert it to
-  YAML front-matter
+- Ensure the document uses YAML front-matter format for metadata
 
 ## Writing Effective Natural Language Documentation
 
@@ -271,9 +269,7 @@ For detailed guidance with examples, see the
 - **MAJOR Releases** (new/changed tenets, breaking binding changes): More thorough
   review
 
-Each release must maintain consistent front-matter standards. Changes that convert
-documents from legacy formats to YAML front-matter are considered **Patch Releases**
-when no other content changes are made.
+Each release must maintain consistent front-matter standards in YAML format as described in [TENET_FORMATTING.md](TENET_FORMATTING.md).
 
 ## Code of Conduct
 

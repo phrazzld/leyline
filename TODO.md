@@ -202,7 +202,7 @@
     - **Depends‑on:** [T003]
 
 ## Documentation Updates
-- [ ] **T014 · Chore · P1: Update core documentation (TENET_FORMATTING, CONTRIBUTING)**
+- [x] **T014 · Chore · P1: Update core documentation (TENET_FORMATTING, CONTRIBUTING)**
     - **Context:** Ensure documentation reflects YAML-only standard
     - **Action:**
         1. Rewrite `docs/TENET_FORMATTING.md`:
