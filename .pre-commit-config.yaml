@@ -38,4 +38,4 @@ repos:
         exclude: ^docs/(tenets|bindings)/00-index\.md$
         pass_filenames: false
         types: [markdown]
-        stages: [commit]
+        stages: [pre-commit]
