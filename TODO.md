@@ -148,7 +148,7 @@
     - **Depends‑on:** [T008]
 
 ### Other Tooling
-- [ ] **T010 · Chore · P1: Search codebase for other legacy metadata parsing**
+- [x] **T010 · Chore · P1: Search codebase for other legacy metadata parsing**
     - **Context:** Ensure comprehensive elimination of legacy format
     - **Action:**
         1. Perform comprehensive search (e.g., `git grep`, `rg`) for keywords like `horizontal_rule`, `____`, or patterns used for legacy parsing
