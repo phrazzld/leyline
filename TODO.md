@@ -246,7 +246,7 @@
     - **Depends‑on:** [T004, T007, T009, T011]
 
 ## Communication
-- [ ] **T017 · Chore · P1: Communicate change to contributors**
+- [x] **T017 · Chore · P1: Communicate change to contributors**
     - **Context:** Ensure awareness of breaking change
     - **Action:**
         1. Draft announcement about YAML-only metadata standard
