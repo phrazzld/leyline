@@ -15,6 +15,16 @@ on:
         required: false
         type: string
         default: ""
+      target_path:
+        description: "Target directory to sync Leyline content into"
+        required: false
+        type: string
+        default: "docs/leyline"
+      create_pr:
+        description: "Whether to create a PR after syncing content"
+        required: false
+        type: boolean
+        default: true
       override_languages:
         description: "Override language detection (comma-separated list)"
         required: false
@@ -27,7 +37,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-    - name: Validate Required Inputs
+    - name: Validate Inputs
       run: |
         # Validate token (this will simply fail if the token is invalid when used)
         echo "Using GitHub token for authentication"
@@ -38,6 +48,10 @@ jobs:
           exit 1
         fi
         echo "Will sync Leyline content from: ${{ inputs.leyline_ref }}"
+
+        # Log optional inputs with their default values if not provided
+        echo "Target path: ${{ inputs.target_path }}"
+        echo "Create PR: ${{ inputs.create_pr }}"
 
     - uses: actions/checkout@v4   # consumer repo
       with:
@@ -104,14 +118,14 @@ jobs:
 
     - name: Clean Up Old Flat Structure
       run: |
-        echo "Cleaning up old flat binding structure in docs/bindings/"
+        echo "Cleaning up old flat binding structure in ${{ inputs.target_path }}"
 
         # First, make sure the target directories exist
-        mkdir -p docs/tenets docs/bindings/core docs/bindings/categories
+        mkdir -p "${{ inputs.target_path }}/tenets" "${{ inputs.target_path }}/bindings/core" "${{ inputs.target_path }}/bindings/categories"
 
-        # Find and list all .md files directly in docs/bindings/
+        # Find and list all .md files directly in target bindings directory
         # (excluding 00-index.md which gets regenerated anyway)
-        old_files=$(find docs/bindings -maxdepth 1 -type f -name "*.md" ! -name "00-index.md" 2>/dev/null || true)
+        old_files=$(find "${{ inputs.target_path }}/bindings" -maxdepth 1 -type f -name "*.md" ! -name "00-index.md" 2>/dev/null || true)
 
         # Count removed files for summary
         removed_count=0
@@ -125,7 +139,7 @@ jobs:
           done
           echo "✅ Removed $removed_count old flat structure files."
         else
-          echo "No old flat structure files found in docs/bindings/."
+          echo "No old flat structure files found in ${{ inputs.target_path }}/bindings."
         fi
 
         # Save count for use in summary
@@ -136,10 +150,10 @@ jobs:
         # Directories already created in the cleanup step
 
         # Always sync all tenets (they're language-agnostic)
-        rsync -a --delete _leyline/docs/tenets/ docs/tenets/
+        rsync -a --delete _leyline/docs/tenets/ "${{ inputs.target_path }}/tenets/"
 
         # Always sync core bindings (applicable to all)
-        rsync -a --delete _leyline/docs/bindings/core/ docs/bindings/core/
+        rsync -a --delete _leyline/docs/bindings/core/ "${{ inputs.target_path }}/bindings/core/"
 
         # Process requested categories
         if [ -n "${{ inputs.categories }}" ]; then
@@ -163,10 +177,10 @@ jobs:
               SYNCED_CATEGORIES+=("$category")
 
               # Create target directory
-              mkdir -p "docs/bindings/categories/$category"
+              mkdir -p "${{ inputs.target_path }}/bindings/categories/$category"
 
               # Sync category files
-              rsync -a --delete "_leyline/docs/bindings/categories/$category/" "docs/bindings/categories/$category/"
+              rsync -a --delete "_leyline/docs/bindings/categories/$category/" "${{ inputs.target_path }}/bindings/categories/$category/"
             else
               echo "⚠️ WARNING: Category directory for '$category' does not exist in Leyline"
               MISSING_CATEGORIES+=("$category")
@@ -194,12 +208,12 @@ jobs:
 
         # For backward compatibility, also sync filtered bindings (this will be removed in a future update)
         if [ -d "filtered_bindings" ]; then
-          rsync -a filtered_bindings/ docs/bindings/
+          rsync -a filtered_bindings/ "${{ inputs.target_path }}/bindings/"
         fi
 
     - name: Run reindex.rb to regenerate 00-index.md
       run: |
-        echo "Regenerating docs/bindings/00-index.md using reindex.rb"
+        echo "Regenerating ${{ inputs.target_path }}/bindings/00-index.md using reindex.rb"
 
         # Copy the reindex.rb script from Leyline to consumer repo if needed
         if [ ! -d "tools" ]; then
@@ -210,14 +224,14 @@ jobs:
         cp _leyline/tools/reindex.rb tools/
         chmod +x tools/reindex.rb
 
-        # Run reindex.rb to regenerate the index
-        cd tools && ruby reindex.rb
+        # Run reindex.rb to regenerate the index, with target path
+        cd tools && LEYLINE_DOCS_PATH="${{ inputs.target_path }}" ruby reindex.rb
 
         # Verify the index file was generated
-        if [ -f "../docs/bindings/00-index.md" ]; then
-          echo "✅ Successfully regenerated docs/bindings/00-index.md"
+        if [ -f "../${{ inputs.target_path }}/bindings/00-index.md" ]; then
+          echo "✅ Successfully regenerated ${{ inputs.target_path }}/bindings/00-index.md"
         else
-          echo "❌ ERROR: Failed to generate docs/bindings/00-index.md"
+          echo "❌ ERROR: Failed to generate ${{ inputs.target_path }}/bindings/00-index.md"
           exit 1
         fi
 
@@ -238,20 +252,20 @@ jobs:
         if [ -f "cleanup-count.txt" ] && [ "$(cat cleanup-count.txt)" -gt 0 ]; then
           echo "## Cleanup" >> sync-summary.md
           echo "" >> sync-summary.md
-          echo "🧹 Removed $(cat cleanup-count.txt) old flat structure files from docs/bindings/" >> sync-summary.md
+          echo "🧹 Removed $(cat cleanup-count.txt) old flat structure files from ${{ inputs.target_path }}/bindings/" >> sync-summary.md
           echo "" >> sync-summary.md
         fi
 
         # Add reindex information
         echo "## Index Regeneration" >> sync-summary.md
         echo "" >> sync-summary.md
-        echo "📋 Regenerated docs/bindings/00-index.md to include all synced bindings" >> sync-summary.md
+        echo "📋 Regenerated ${{ inputs.target_path }}/bindings/00-index.md to include all synced bindings" >> sync-summary.md
         echo "" >> sync-summary.md
 
         echo "## Synced Files" >> sync-summary.md
         echo "" >> sync-summary.md
-        echo "- Tenets: $(find docs/tenets -type f -name "*.md" | wc -l)" >> sync-summary.md
-        echo "- Core Bindings: $(find docs/bindings/core -type f -name "*.md" | wc -l)" >> sync-summary.md
+        echo "- Tenets: $(find "${{ inputs.target_path }}/tenets" -type f -name "*.md" | wc -l)" >> sync-summary.md
+        echo "- Core Bindings: $(find "${{ inputs.target_path }}/bindings/core" -type f -name "*.md" | wc -l)" >> sync-summary.md
 
         # Count category bindings if any were synced
         if [ -n "${{ inputs.categories }}" ]; then
@@ -266,8 +280,8 @@ jobs:
 
           for category in "${CATEGORIES[@]}"; do
             category=$(echo "$category" | xargs)
-            if [ -d "docs/bindings/categories/$category" ]; then
-              count=$(find "docs/bindings/categories/$category" -type f -name "*.md" | wc -l)
+            if [ -d "${{ inputs.target_path }}/bindings/categories/$category" ]; then
+              count=$(find "${{ inputs.target_path }}/bindings/categories/$category" -type f -name "*.md" | wc -l)
               echo "  - $category: $count" >> sync-summary.md
               synced_count=$((synced_count + 1))
             else
@@ -301,7 +315,7 @@ jobs:
       run: |
         git config user.name  "Leyline Bot"
         git config user.email "leyline-bot@users.noreply.github.com"
-        git add docs/tenets docs/bindings || true
+        git add "${{ inputs.target_path }}/tenets" "${{ inputs.target_path }}/bindings" || true
 
         # Create commit message with category info if specified
         commit_msg="docs: sync Leyline ${{ inputs.leyline_ref }}"
@@ -379,8 +393,9 @@ jobs:
         # Save PR title to file
         echo "$pr_title" > pr-title.txt
 
-      # Create the PR
+      # Create the PR if create_pr is true
     - name: Create Pull Request
+      if: inputs.create_pr == true
       uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ inputs.token }}

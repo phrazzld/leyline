@@ -34,7 +34,7 @@
         2. Workflow fails if these required inputs are not provided by the caller.
     - **Depends‑on:** [T002]
 
-- [ ] **T004 · Feature · P1: implement optional general inputs (`categories`, `target_path`, `create_pr`) for `sync-leyline-content.yml`**
+- [x] **T004 · Feature · P1: implement optional general inputs (`categories`, `target_path`, `create_pr`) for `sync-leyline-content.yml`**
     - **Context:** Public Interfaces / Contracts - `sync-leyline-content.yml` Inputs
     - **Action:**
         1. Define `categories: { required: false, type: string, default: '' }`, `target_path: { required: false, type: string, default: 'docs/leyline' }`, and `create_pr: { required: false, type: boolean, default: true }` in workflow inputs.
