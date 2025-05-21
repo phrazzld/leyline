@@ -23,4 +23,5 @@ jobs:
       - name: Sync Leyline Content
         uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1.0.0  # Update version as needed
         with:
-          ref: v1.0.0  # Specify the version of Leyline to use
+          token: ${{ secrets.GITHUB_TOKEN }}  # Token with repo access permissions
+          leyline_ref: v1.0.0  # Specify the version of Leyline to use

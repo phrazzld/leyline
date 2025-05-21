@@ -24,7 +24,7 @@
         2. Old workflow (if any) is renamed or its contents considered for migration.
     - **Depends‑on:** none
 
-- [ ] **T003 · Feature · P1: implement required inputs (`token`, `leyline_ref`) for `sync-leyline-content.yml`**
+- [x] **T003 · Feature · P1: implement required inputs (`token`, `leyline_ref`) for `sync-leyline-content.yml`**
     - **Context:** Public Interfaces / Contracts - `sync-leyline-content.yml` Inputs
     - **Action:**
         1. Define `token: { required: true, type: string }` and `leyline_ref: { required: true, type: string }` in the workflow's `inputs` section.

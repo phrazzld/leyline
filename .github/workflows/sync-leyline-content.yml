@@ -2,8 +2,12 @@ name: sync-leyline-content
 on:
   workflow_call:
     inputs:
-      ref:
-        description: "Leyline tag"
+      token:
+        description: "GitHub token with repository access permissions"
+        required: true
+        type: string
+      leyline_ref:
+        description: "Leyline reference (tag, branch, or commit SHA)"
         required: true
         type: string
       categories:
@@ -23,12 +27,27 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+    - name: Validate Required Inputs
+      run: |
+        # Validate token (this will simply fail if the token is invalid when used)
+        echo "Using GitHub token for authentication"
+
+        # Validate leyline_ref
+        if [ -z "${{ inputs.leyline_ref }}" ]; then
+          echo "::error::Required input 'leyline_ref' must be provided."
+          exit 1
+        fi
+        echo "Will sync Leyline content from: ${{ inputs.leyline_ref }}"
+
     - uses: actions/checkout@v4   # consumer repo
+      with:
+        token: ${{ inputs.token }}
     - name: Clone Leyline
       uses: actions/checkout@v4
       with:
         repository: phrazzld/leyline
-        ref: ${{ inputs.ref }}
+        ref: ${{ inputs.leyline_ref }}
+        token: ${{ inputs.token }}
         path: _leyline
 
     - name: Validate Categories Input
@@ -285,7 +304,7 @@ jobs:
         git add docs/tenets docs/bindings || true
 
         # Create commit message with category info if specified
-        commit_msg="docs: sync Leyline ${{ inputs.ref }}"
+        commit_msg="docs: sync Leyline ${{ inputs.leyline_ref }}"
         if [ -n "${{ inputs.categories }}" ]; then
           commit_msg="$commit_msg with categories: ${{ inputs.categories }}"
         fi
@@ -346,7 +365,7 @@ jobs:
     - name: Push PR
       run: |
         # Create PR title with synced categories info
-        pr_title="docs: sync Leyline ${{ inputs.ref }}"
+        pr_title="docs: sync Leyline ${{ inputs.leyline_ref }}"
 
         # Add synced categories to PR title if available
         if [ -f "synced-categories.txt" ]; then
@@ -364,5 +383,6 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
       with:
+        token: ${{ inputs.token }}
         title-path: pr-title.txt
         body-path: pr-body.md
