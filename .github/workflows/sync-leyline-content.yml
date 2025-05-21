@@ -216,17 +216,25 @@ jobs:
 
     - name: Sync Files
       run: |
+        echo "Starting file synchronization from Leyline to consumer repository..."
+
         # Directories already created in the cleanup step
 
-        # Always sync all tenets (they're language-agnostic)
+        # Always sync all tenets (they're language-agnostic and apply to all projects)
+        echo "📚 Syncing tenets from _leyline/docs/tenets/ to ${{ inputs.target_path }}/tenets/"
         rsync -a --delete _leyline/docs/tenets/ "${{ inputs.target_path }}/tenets/"
+        tenet_count=$(find "${{ inputs.target_path }}/tenets" -name "*.md" 2>/dev/null | wc -l || echo "0")
+        echo "✅ Synced $tenet_count tenet files"
 
-        # Always sync core bindings (applicable to all)
+        # Always sync core bindings (applicable to all projects regardless of language/context)
+        echo "🔗 Syncing core bindings from _leyline/docs/bindings/core/ to ${{ inputs.target_path }}/bindings/core/"
         rsync -a --delete _leyline/docs/bindings/core/ "${{ inputs.target_path }}/bindings/core/"
+        core_count=$(find "${{ inputs.target_path }}/bindings/core" -name "*.md" 2>/dev/null | wc -l || echo "0")
+        echo "✅ Synced $core_count core binding files"
 
-        # Process requested categories
+        # Process requested categories (if any specified)
         if [ -n "${{ inputs.categories }}" ]; then
-          echo "Syncing requested categories: ${{ inputs.categories }}"
+          echo "🏷️ Processing requested categories: ${{ inputs.categories }}"
 
           # Create array from comma-separated list
           IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
@@ -240,16 +248,20 @@ jobs:
             # Trim whitespace
             category=$(echo "$category" | xargs)
 
-            # Check if category directory exists
+            # Check if category directory exists in the Leyline repository
             if [ -d "_leyline/docs/bindings/categories/$category" ]; then
-              echo "Syncing category: $category"
+              echo "📂 Syncing category '$category' from _leyline/docs/bindings/categories/$category/ to ${{ inputs.target_path }}/bindings/categories/$category/"
               SYNCED_CATEGORIES+=("$category")
 
               # Create target directory
               mkdir -p "${{ inputs.target_path }}/bindings/categories/$category"
 
-              # Sync category files
+              # Sync category files using rsync with --delete to remove stale files
               rsync -a --delete "_leyline/docs/bindings/categories/$category/" "${{ inputs.target_path }}/bindings/categories/$category/"
+
+              # Count synced files for this category
+              category_count=$(find "${{ inputs.target_path }}/bindings/categories/$category" -name "*.md" 2>/dev/null | wc -l || echo "0")
+              echo "✅ Synced $category_count files for category '$category'"
             else
               echo "⚠️ WARNING: Category directory for '$category' does not exist in Leyline"
               MISSING_CATEGORIES+=("$category")
@@ -272,8 +284,10 @@ jobs:
             printf "%s\n" "${MISSING_CATEGORIES[@]}" > missing-categories.txt
           fi
         else
-          echo "No specific categories requested, syncing only core bindings"
+          echo "ℹ️ No specific categories requested - syncing only tenets and core bindings"
         fi
+
+        echo "📁 File synchronization completed successfully"
 
         # For backward compatibility, also sync filtered bindings (this will be removed in a future update)
         if [ -d "filtered_bindings" ]; then

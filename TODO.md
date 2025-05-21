@@ -61,7 +61,7 @@
         1. The specified Leyline version's content is checked out successfully.
     - **Depends‑on:** [T003]
 
-- [ ] **T007 · Feature · P1: implement file copying for `tenets`, `core` bindings, and specified `categories` in `sync-leyline-content.yml`**
+- [x] **T007 · Feature · P1: implement file copying for `tenets`, `core` bindings, and specified `categories` in `sync-leyline-content.yml`**
     - **Context:** Detailed Build Steps #2, Architecture Blueprint - `sync-leyline-content.yml`
     - **Action:**
         1. Copy all content from the checked-out Leyline `tenets/` directory to `inputs.target_path`.
