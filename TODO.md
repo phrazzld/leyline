@@ -230,7 +230,7 @@
     - **Depends‑on:** [T014]
 
 ## Repository Cleanup
-- [ ] **T016 · Chore · P2: Repository cleanup (remove legacy fixtures/scripts)**
+- [x] **T016 · Chore · P2: Repository cleanup (remove legacy fixtures/scripts)**
     - **Context:** Remove obsolete artifacts
     - **Action:**
         1. Identify and remove test fixtures, sample files, or utility scripts specific to legacy format
