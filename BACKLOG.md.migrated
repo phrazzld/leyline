@@ -6,16 +6,6 @@
 
 ### System Architecture Simplification & Core Tooling
 
--   **[Refactor]**: **Eliminate Dual Metadata Formats in Tenets and Bindings**
-    *   **Complexity**: Medium
-    *   **Rationale**: Supporting both YAML front-matter and legacy horizontal rule formats increases tooling complexity, introduces contributor confusion, and creates parsing brittleness. Standardization is key to Simplicity and Automation.
-    *   **Expected Outcome**: All tenet and binding Markdown files use exclusively YAML front-matter. All validation, indexing, and generation tools are simplified, containing no logic for the legacy format. Documentation is updated to reflect the YAML-only approach.
-    *   **Dependencies**: "Create One-Time Migration Script for Legacy Metadata".
--   [x] **[Chore]**: **Create One-Time Migration Script for Legacy Metadata to YAML**
-    *   **Complexity**: Simple
-    *   **Rationale**: To support the "Eliminate Dual Metadata Formats" initiative by programmatically converting all existing files, ensuring no data loss and minimizing manual effort.
-    *   **Expected Outcome**: A robust script that reliably converts all legacy horizontal rule metadata blocks to YAML front-matter. All existing documents in the repository are successfully migrated.
-    *   **Dependencies**: None.
 -   **[Refactor]**: **Use Directory Structure as Single Source of Truth for Binding Categorization**
     *   **Complexity**: Medium
     *   **Rationale**: The deprecated `applies_to` metadata field creates redundancy and potential conflict with directory-based categorization. Simplifying to a single source of truth (directory location) streamlines logic, improves clarity, and aligns with the Simplicity tenet.
