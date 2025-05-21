@@ -43,7 +43,7 @@
         1. Workflow correctly parses optional inputs and applies defaults.
     - **Depends‑on:** [T002]
 
-- [ ] **T005 · Feature · P1: implement optional PR-specific inputs (`commit_message`, `pr_title`, `pr_branch_name`) for `sync-leyline-content.yml`**
+- [x] **T005 · Feature · P1: implement optional PR-specific inputs (`commit_message`, `pr_title`, `pr_branch_name`) for `sync-leyline-content.yml`**
     - **Context:** Public Interfaces / Contracts - `sync-leyline-content.yml` Inputs
     - **Action:**
         1. Define `commit_message` (default: `docs: Sync Leyline content from @${{ inputs.leyline_ref }}`), `pr_title` (default: `Sync Leyline Content @${{ inputs.leyline_ref }}`), and `pr_branch_name` (default: `leyline-sync/${{ inputs.leyline_ref }}`) as optional string inputs.

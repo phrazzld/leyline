@@ -26,7 +26,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}  # Token with repo access permissions
           leyline_ref: v1.0.0  # Specify the version of Leyline to use
 
-          # Optional parameters with their default values (uncomment to customize)
+          # Optional general parameters (uncomment to customize)
           # target_path: "docs/leyline"  # Target directory to sync content into
           # categories: "typescript,frontend"  # Specific categories to sync (comma-separated)
           # create_pr: true  # Whether to create a PR (set to false for direct commits)
+
+          # Optional PR-specific parameters (uncomment to customize)
+          # commit_message: "docs: Update Leyline content to @${{ inputs.leyline_ref }}"  # Custom commit message
+          # pr_title: "Update Leyline Content to @${{ inputs.leyline_ref }}"  # Custom PR title
+          # pr_branch_name: "update-leyline/${{ inputs.leyline_ref }}"  # Custom branch name for the PR

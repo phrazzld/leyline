@@ -25,6 +25,21 @@ on:
         required: false
         type: boolean
         default: true
+      commit_message:
+        description: "Custom commit message for synced content"
+        required: false
+        type: string
+        default: "docs: Sync Leyline content from @${{ inputs.leyline_ref }}"
+      pr_title:
+        description: "Custom PR title for synced content"
+        required: false
+        type: string
+        default: "Sync Leyline Content @${{ inputs.leyline_ref }}"
+      pr_branch_name:
+        description: "Custom branch name for the PR"
+        required: false
+        type: string
+        default: "leyline-sync/${{ inputs.leyline_ref }}"
       override_languages:
         description: "Override language detection (comma-separated list)"
         required: false
@@ -317,9 +332,12 @@ jobs:
         git config user.email "leyline-bot@users.noreply.github.com"
         git add "${{ inputs.target_path }}/tenets" "${{ inputs.target_path }}/bindings" || true
 
-        # Create commit message with category info if specified
-        commit_msg="docs: sync Leyline ${{ inputs.leyline_ref }}"
-        if [ -n "${{ inputs.categories }}" ]; then
+        # Use the custom commit message if provided, otherwise build one with category info
+        commit_msg="${{ inputs.commit_message }}"
+
+        # If categories are specified and we're using the default commit message,
+        # append the categories info
+        if [ -n "${{ inputs.categories }}" ] && [ "$commit_msg" == "docs: Sync Leyline content from @${{ inputs.leyline_ref }}" ]; then
           commit_msg="$commit_msg with categories: ${{ inputs.categories }}"
         fi
 
@@ -378,11 +396,12 @@ jobs:
 
     - name: Push PR
       run: |
-        # Create PR title with synced categories info
-        pr_title="docs: sync Leyline ${{ inputs.leyline_ref }}"
+        # Use the custom PR title if provided, otherwise generate one with synced categories info
+        pr_title="${{ inputs.pr_title }}"
 
-        # Add synced categories to PR title if available
-        if [ -f "synced-categories.txt" ]; then
+        # If synced categories are available and we're using the default PR title,
+        # append the categories info
+        if [ -f "synced-categories.txt" ] && [ "$pr_title" == "Sync Leyline Content @${{ inputs.leyline_ref }}" ]; then
           # Create a comma-separated list of synced categories
           synced_list=$(cat synced-categories.txt | tr '\n' ',' | sed 's/,$//')
           if [ -n "$synced_list" ]; then
@@ -401,3 +420,4 @@ jobs:
         token: ${{ inputs.token }}
         title-path: pr-title.txt
         body-path: pr-body.md
+        branch: ${{ inputs.pr_branch_name }}
