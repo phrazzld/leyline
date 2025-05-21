@@ -4,8 +4,13 @@ test-repo/
 site/
 CODE_REVIEW.md
 T*-plan.md
+T*-summary.md
+*-verification.md
+*_analysis.md
+*_search_results.md
 node_modules/
 **/node_modules/
 dist/
 **/dist/
 thinktank_*/
+coverage/

@@ -19,18 +19,23 @@ derived from that tenet.
 ## Repository Structure
 
 ```
-docs/tenets/                     # Foundational principles (immutable truths)
-docs/bindings/                   # Enforceable rules (derived from tenets)
-  ├── core/                      # Core bindings applicable to all projects
-  └── categories/                # Category-specific bindings
-      ├── go/                    # Go language bindings
-      ├── rust/                  # Rust language bindings
-      ├── typescript/            # TypeScript language bindings
-      ├── cli/                   # CLI application bindings
-      ├── frontend/              # Frontend application bindings
-      └── backend/               # Backend application bindings
-tools/                           # Validation and maintenance scripts
-.github/                         # Automation workflows
+docs/
+  ├── tenets/                     # Foundational principles (immutable truths)
+  ├── bindings/                   # Enforceable rules (derived from tenets)
+  │   ├── core/                   # Core bindings applicable to all projects
+  │   └── categories/             # Category-specific bindings
+  │       ├── go/                 # Go language bindings
+  │       ├── rust/               # Rust language bindings
+  │       ├── typescript/         # TypeScript language bindings
+  │       ├── cli/                # CLI application bindings
+  │       ├── frontend/           # Frontend application bindings
+  │       └── backend/            # Backend application bindings
+  ├── announcements/              # Important announcements for contributors
+  ├── data/                       # Data files for the project
+  └── templates/                  # Templates for creating new tenets and bindings
+tools/                            # Validation and maintenance scripts
+archive/                          # Archived tools and documentation
+.github/                          # Automation workflows
 ```
 
 ## How It Works
