@@ -218,7 +218,7 @@
         2. All references to legacy format are removed
     - **Depends‑on:** [T003, T006]
 
-- [ ] **T015 · Chore · P2: Update ancillary documentation (READMEs, CLAUDE.md, etc.)**
+- [x] **T015 · Chore · P2: Update ancillary documentation (READMEs, CLAUDE.md, etc.)**
     - **Context:** Ensure consistent documentation across repository
     - **Action:**
         1. Review `README.md`, `CLAUDE.md`, any tool READMEs, and other relevant documentation
