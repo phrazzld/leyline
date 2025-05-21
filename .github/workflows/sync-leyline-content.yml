@@ -48,9 +48,19 @@ on:
         description: "Override context detection (comma-separated list)"
         required: false
         type: string
+    outputs:
+      pr_url:
+        description: "URL of the created pull request (if any)"
+        value: ${{ jobs.sync.outputs.pr_url }}
+      commit_sha:
+        description: "Commit SHA of the synchronized changes"
+        value: ${{ jobs.sync.outputs.commit_sha }}
 jobs:
   sync:
     runs-on: ubuntu-latest
+    outputs:
+      pr_url: ${{ steps.set-outputs.outputs.pr_url }}
+      commit_sha: ${{ steps.set-outputs.outputs.commit_sha }}
     steps:
     - name: Validate Inputs
       run: |
@@ -519,3 +529,27 @@ jobs:
       run: |
         echo "ℹ️ Pull Request creation disabled (create_pr = false)"
         echo "Changes have been committed directly to the current branch"
+
+    # Set workflow outputs for consumption by calling workflows
+    - name: Set Workflow Outputs
+      id: set-outputs
+      run: |
+        # Set PR URL output (empty if no PR created)
+        if [ "${{ steps.create-pr.outputs.pull-request-url }}" != "" ]; then
+          echo "pr_url=${{ steps.create-pr.outputs.pull-request-url }}" >> $GITHUB_OUTPUT
+          echo "📤 Output: pr_url=${{ steps.create-pr.outputs.pull-request-url }}"
+        else
+          echo "pr_url=" >> $GITHUB_OUTPUT
+          echo "📤 Output: pr_url=(empty - no PR created)"
+        fi
+
+        # Set commit SHA output (from PR head or current commit)
+        if [ "${{ steps.create-pr.outputs.pull-request-head-sha }}" != "" ]; then
+          echo "commit_sha=${{ steps.create-pr.outputs.pull-request-head-sha }}" >> $GITHUB_OUTPUT
+          echo "📤 Output: commit_sha=${{ steps.create-pr.outputs.pull-request-head-sha }}"
+        else
+          # If no PR was created, get the current commit SHA
+          current_sha=$(git rev-parse HEAD)
+          echo "commit_sha=$current_sha" >> $GITHUB_OUTPUT
+          echo "📤 Output: commit_sha=$current_sha"
+        fi

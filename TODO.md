@@ -93,7 +93,7 @@
         2. No PR is created if `inputs.create_pr` is false.
     - **Depends‑on:** [T003, T005, T008]
 
-- [ ] **T010 · Feature · P1: implement outputs (`pr_url`, `commit_sha`) for `sync-leyline-content.yml`**
+- [x] **T010 · Feature · P1: implement outputs (`pr_url`, `commit_sha`) for `sync-leyline-content.yml`**
     - **Context:** Public Interfaces / Contracts - `sync-leyline-content.yml` Outputs
     - **Action:**
         1. Define `pr_url: { type: string }` and `commit_sha: { type: string }` in the workflow's `outputs` section.
