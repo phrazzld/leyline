@@ -1,7 +1,33 @@
 #!/usr/bin/env ruby
 # tools/validate_front_matter.rb - Validates metadata in Markdown files
-# Accepts both horizontal rule and YAML front-matter formats
-# See TENET_FORMATTING.md for documentation on the acceptable formats
+# Enforces YAML front-matter format only
+# See TENET_FORMATTING.md for documentation on the required format
+#
+# This script performs strict validation on the YAML front-matter in tenet and binding
+# markdown files. It checks:
+#
+# 1. All files must have YAML front-matter delimited by triple dashes (---)
+# 2. Required fields are present:
+#    - Tenets: id, last_modified
+#    - Bindings: id, last_modified, derived_from, enforced_by
+# 3. Field formats are valid:
+#    - id: lowercase alphanumeric with hyphens
+#    - last_modified: ISO date format (YYYY-MM-DD)
+#    - derived_from: lowercase alphanumeric with hyphens, must reference existing tenet
+#    - enforced_by: non-empty string
+# 4. IDs are unique across all documents
+# 5. All referenced tenets exist
+#
+# The script will report errors and warnings:
+# - Errors will cause validation to fail (exit code 1)
+# - Warnings are reported but will not fail validation
+#
+# Warnings include:
+# - Use of deprecated fields (applies_to)
+#
+# Usage examples:
+# - Validate all files: ruby tools/validate_front_matter.rb
+# - Validate a specific file: ruby tools/validate_front_matter.rb -f docs/tenets/example.md
 
 require 'yaml'
 require 'date'
@@ -12,11 +38,29 @@ REQUIRED_KEYS = {
   'bindings' => %w[id last_modified derived_from enforced_by]
 }
 
+# Validation functions for field types
+VALIDATORS = {
+  'id' => ->(value) { value.is_a?(String) && value =~ /^[a-z0-9-]+$/ },
+  'last_modified' => lambda { |value|
+    value.is_a?(Date) ||
+    (value.is_a?(String) && value =~ /^\d{4}-\d{2}-\d{2}$/ && begin
+      Date.parse(value)
+      true
+    rescue
+      false
+    end)
+  },
+  'derived_from' => ->(value) { value.is_a?(String) && value =~ /^[a-z0-9-]+$/ },
+  'enforced_by' => ->(value) { value.is_a?(String) && !value.empty? }
+}
+
 # Optional keys that have validation rules when present
 OPTIONAL_KEYS = {
   'bindings' => {
-    # Note: 'applies_to' field has been removed as part of directory restructuring
-    # The binding category is now determined by its location in the directory structure
+    'applies_to' => lambda { |value|
+      # Verify it's an array of strings
+      value.is_a?(Array) && value.all? { |v| v.is_a?(String) }
+    }
   }
 }
 
@@ -25,40 +69,65 @@ OPTIONAL_KEYS = {
 # - docs/bindings/core/ for core bindings
 # - docs/bindings/categories/<category>/ for category-specific bindings
 
-# Setup command line options for strict mode
+# Setup command line options
 require 'optparse'
 
-options = { strict: false }
+options = { file: nil }
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: validate_front_matter.rb [options]"
-  opts.on("--strict", "Enforce YAML front-matter format strictly, exit on any non-YAML format") do
-    options[:strict] = true
+  opts.separator ""
+  opts.separator "This script validates the YAML front-matter in tenet and binding markdown files."
+  opts.separator "It ensures all required fields are present and correctly formatted."
+  opts.separator ""
+  opts.separator "Options:"
+
+  opts.on("-f FILE", "--file FILE", "Validate a specific file only") do |file|
+    options[:file] = file
   end
+
+  opts.on("-v", "--verbose", "Show additional validation details") do
+    options[:verbose] = true
+  end
+
   opts.on("-h", "--help", "Show this help message") do
     puts opts
     exit
   end
+
+  opts.separator ""
+  opts.separator "Examples:"
+  opts.separator "  ruby tools/validate_front_matter.rb             # Validate all files"
+  opts.separator "  ruby tools/validate_front_matter.rb -f path.md  # Validate single file"
 end
 
 parser.parse!
 
-# Track all ids to ensure uniqueness
-$all_ids = {}
-$files_with_issues = []
-$strict_mode = options[:strict]
+# Track validation state
+$all_ids = {}            # Track all ids to ensure uniqueness
+$files_with_issues = []  # Track files with issues
+$warnings_found = []     # Track warnings (non-fatal issues)
+$single_file = options[:file]
+$verbose = options[:verbose]
 
-# Helper method to check if a file uses the old horizontal rule format
-def using_horizontal_rule_format?(content)
-  content =~ /^____+\s*$/ || # Continuous underscores
-  content =~ /^# .*?\n_+\n\*\*ID:\*\* [\w-]+/m # Title, underscores, ID format
+# Helper to print styled error messages
+def print_error(file, message, details = nil, exit_code = 1)
+  puts "  [ERROR] #{file}: #{message}"
+  puts "  #{details}" if details
+  $files_with_issues << file
+  exit exit_code unless $single_file.nil?
+end
+
+# Helper to print styled warning messages
+def print_warning(file, message, details = nil)
+  puts "  [WARNING] #{file}: #{message}"
+  puts "  #{details}" if details
+  $warnings_found << "#{file}: #{message}"
 end
 
 # Helper method to detect front matter format
 def detect_front_matter_format(content)
   if content =~ /^---\n(.*?)\n---/m
     :yaml
-  elsif using_horizontal_rule_format?(content)
-    :horizontal_rule
   else
     :unknown
   end
@@ -112,78 +181,81 @@ def process_single_file(file, dir_base)
   content = File.read(file)
   format = detect_front_matter_format(content)
 
-  # Check for horizontal rule format (now deprecated)
-  # Horizontal rule format is fully supported, but we'll extract metadata
-  if format == :horizontal_rule
-    # For now, just validate that we have a horizontal rule and some metadata
-    # In the future, we could add more sophisticated parsing of horizontal rule metadata
-    puts "  [OK] #{file} (using horizontal rule format)"
-    return
-  end
-
   # Extract front-matter - must use YAML format with triple dashes
   if format == :yaml
     yaml_content = content.match(/^---\n(.*?)\n---/m)[1]
     begin
-      front_matter = YAML.safe_load(yaml_content)
+      # Use safe_load with permitted classes for security
+      front_matter = YAML.safe_load(yaml_content, permitted_classes: [Date, Time])
     rescue => e
-      message = "  [ERROR] #{file}: Invalid YAML in front-matter: #{e.message}"
-      puts message
-      puts "  YAML content: #{yaml_content.inspect}"
-      puts "  Front-matter must use valid YAML syntax. See TENET_FORMATTING.md for the standard format."
-      exit 1
+      print_error(file, "Invalid YAML in front-matter: #{e.message}",
+        "Front-matter must use valid YAML syntax. See TENET_FORMATTING.md for the standard format.\n  YAML content: #{yaml_content.inspect}")
     end
 
     if front_matter.nil?
-      puts "  [ERROR] #{file}: Empty YAML in front-matter"
-      puts "  Front-matter must include required fields. See TENET_FORMATTING.md for details."
-      exit 1
+      print_error(file, "Empty YAML in front-matter",
+        "Front-matter must include required fields. See TENET_FORMATTING.md for details.")
     end
 
     # Check required keys
     missing_keys = REQUIRED_KEYS[dir_base] - front_matter.keys
     unless missing_keys.empty?
-      puts "  [ERROR] #{file}: Missing required keys in YAML front-matter: #{missing_keys.join(', ')}"
-      puts "  #{dir_base.capitalize} must include: #{REQUIRED_KEYS[dir_base].join(', ')}"
-      puts "  See TENET_FORMATTING.md for the standard format."
-      exit 1
+      print_error(file, "Missing required keys in YAML front-matter: #{missing_keys.join(', ')}",
+        "#{dir_base.capitalize} must include: #{REQUIRED_KEYS[dir_base].join(', ')}\n  See TENET_FORMATTING.md for the standard format.")
     end
 
     # Check for unique ID
     id = front_matter['id']
     if $all_ids[id]
-      puts "  [ERROR] #{file}: Duplicate ID '#{id}' in YAML front-matter (already used in #{$all_ids[id]})"
-      puts "  Each document must have a unique ID."
-      exit 1
+      print_error(file, "Duplicate ID '#{id}' in YAML front-matter (already used in #{$all_ids[id]})",
+        "Each document must have a unique ID.")
+    end
+
+    # Validate ID format
+    unless VALIDATORS['id'].call(id)
+      print_error(file, "Invalid ID format '#{id}' in YAML front-matter",
+        "ID must contain only lowercase letters, numbers, and hyphens (e.g., 'example-id').")
     end
     $all_ids[id] = file
 
-    # Validate date format
+    # Validate date format and value
     date = front_matter['last_modified']
-    unless date.is_a?(Date) || date.is_a?(String) && date =~ /^\d{4}-\d{2}-\d{2}$/
-      puts "  [ERROR] #{file}: Invalid date format in 'last_modified' field"
-      puts "  Date must be in ISO format (YYYY-MM-DD) and enclosed in quotes."
-      puts "  Example: last_modified: '2025-05-09'"
-      exit 1
+    unless VALIDATORS['last_modified'].call(date)
+      print_error(file, "Invalid date format in 'last_modified' field",
+        "Date must be in ISO format (YYYY-MM-DD) and enclosed in quotes.\n  Example: last_modified: '2025-05-09'")
     end
 
-    # For bindings, validate that derived_from exists
-    if dir_base == 'bindings' && front_matter['derived_from']
-      tenet_file = Dir.glob("docs/tenets/#{front_matter['derived_from']}.md").first
+    # For bindings, validate derived_from and enforced_by fields
+    if dir_base == 'bindings'
+      # Validate derived_from exists and has correct format
+      derived_from = front_matter['derived_from']
+      unless VALIDATORS['derived_from'].call(derived_from)
+        print_error(file, "Invalid format for 'derived_from' in YAML front-matter",
+          "The 'derived_from' field must be a string containing only lowercase letters, numbers, and hyphens.")
+      end
+
+      # Check that derived_from references an existing tenet
+      tenet_file = Dir.glob("docs/tenets/#{derived_from}.md").first
       unless tenet_file
-        puts "  [ERROR] #{file}: References non-existent tenet '#{front_matter['derived_from']}'"
-        puts "  The 'derived_from' field must reference an existing tenet ID."
-        exit 1
+        print_error(file, "References non-existent tenet '#{derived_from}'",
+          "The 'derived_from' field must reference an existing tenet ID.")
+      end
+
+      # Validate enforced_by field
+      enforced_by = front_matter['enforced_by']
+      unless VALIDATORS['enforced_by'].call(enforced_by)
+        print_error(file, "Invalid format for 'enforced_by' in YAML front-matter",
+          "The 'enforced_by' field must be a non-empty string.")
       end
     end
 
-    # Validate optional keys if present (if any are defined)
+    # Validate optional keys if present
     if dir_base == 'bindings' && OPTIONAL_KEYS['bindings'] && !OPTIONAL_KEYS['bindings'].empty?
       OPTIONAL_KEYS['bindings'].each do |key, validator|
         if front_matter.key?(key)
           unless validator.call(front_matter[key])
-            puts "  [ERROR] #{file}: Invalid format for '#{key}' in YAML front-matter"
-            exit 1
+            details = key == 'applies_to' ? "The 'applies_to' field must be an array of strings." : "Invalid value format."
+            print_error(file, "Invalid format for '#{key}' in YAML front-matter", details)
           end
         end
       end
@@ -191,41 +263,61 @@ def process_single_file(file, dir_base)
 
     # Check for legacy applies_to field and warn to remove it
     if dir_base == 'bindings' && front_matter.key?('applies_to')
-      puts "  [WARNING] #{file}: Contains deprecated 'applies_to' field"
-      puts "  The 'applies_to' field is no longer used as categories are now determined by directory structure."
-      puts "  Please remove this field from the front matter."
+      print_warning(file, "Contains deprecated 'applies_to' field",
+        "The 'applies_to' field is no longer used as categories are now determined by directory structure.\n  Please remove this field from the front matter.")
     end
 
     puts "  [OK] #{file}"
   else
-    message = "  [ERROR] #{file}: No front-matter found"
-
-    if $strict_mode
-      puts message
-      puts "  All #{dir_base} files must begin with YAML front-matter between triple dashes."
-      puts "  See TENET_FORMATTING.md for the standard format."
-      puts "  Example:\n  ---\n  id: example-id\n  last_modified: '2025-05-09'\n  ---"
-      exit 1
-    else
-      puts message.gsub("[ERROR]", "[WARNING]")
-      puts "  Please add YAML front-matter as described in TENET_FORMATTING.md."
-      $files_with_issues << file
-    end
+    print_error(file, "No front-matter found",
+      "All #{dir_base} files must begin with YAML front-matter between triple dashes.\n  See TENET_FORMATTING.md for the standard format.\n  Example:\n  ---\n  id: example-id\n  last_modified: '2025-05-09'\n  ---")
   end
 end
 
 # Run the validation process
-process_tenets_files
+if $single_file
+  # If a specific file is specified, just validate that one
+  puts "Validating single file: #{$single_file}"
 
-# Get binding files from the new directory structure
-binding_files = get_binding_files
+  # Determine if it's a tenet or binding based on path
+  if $single_file.include?('/tenets/')
+    dir_base = 'tenets'
+  elsif $single_file.include?('/bindings/')
+    dir_base = 'bindings'
+  else
+    print_error($single_file, "Unable to determine file type from path",
+      "Path must include /tenets/ or /bindings/ to identify the file type.")
+  end
 
-# Process the binding files
-process_bindings_files(binding_files)
+  process_single_file($single_file, dir_base)
+else
+  # Process all files
+  process_tenets_files
+
+  # Get binding files from the new directory structure
+  binding_files = get_binding_files
+
+  # Process the binding files
+  process_bindings_files(binding_files)
+
+  # Report warnings that were found (but didn't cause failures)
+  if $warnings_found.any?
+    puts "\n#{$warnings_found.size} warning(s) found:"
+    $warnings_found.each do |warning|
+      puts "  - #{warning}"
+    end
+  end
+end
 
 # Summarize results
 if $files_with_issues.empty?
   puts "All files validated successfully!"
+
+  # Display warnings summary if we have warnings but no errors
+  if !$single_file && $warnings_found.any?
+    puts "\nNote: #{$warnings_found.size} warning(s) were found, but all files passed validation."
+    puts "See warnings above for details on recommended changes."
+  end
 else
   issues_count = $files_with_issues.length
 
@@ -234,17 +326,6 @@ else
     puts "  - #{file}"
   end
 
-  if $strict_mode
-    puts "\nMetadata validation failed!"
-    puts "Run reindex.rb to ensure indexes are still generated correctly."
-    exit 1
-  else
-    puts "\nValidation completed with warnings."
-
-    # Ensure reindex.rb can still run to generate indexes correctly
-    if File.exist?('tools/reindex.rb')
-      puts "\nRunning reindex.rb to ensure indexes are still generated correctly..."
-      system('ruby tools/reindex.rb')
-    end
-  end
+  puts "\nMetadata validation failed!"
+  exit 1
 end

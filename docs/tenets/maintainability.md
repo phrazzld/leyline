@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## id: maintainability last_modified: '2025-05-08'
+---
+id: maintainability
+last_modified: '2025-05-08'
+---
 
 # Tenet: Maintainability Over Premature Optimization
 

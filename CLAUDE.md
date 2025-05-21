@@ -8,36 +8,30 @@ Leyline provides a centralized system for defining and enforcing development pri
 - **Tenets**: Immutable truths and principles that guide development philosophy
 - **Bindings**: Enforceable rules derived from tenets, with specific implementation guidance
 
-The repository includes a metadata migration tool in `tools/metadata-migration/` that converts legacy horizontal rule metadata to standardized YAML front-matter in all tenet and binding Markdown files.
+The repository uses standardized YAML front-matter in all tenet and binding Markdown files.
 
 ## Common Commands
 
-### Metadata Migration Tool (TypeScript)
-Location: `tools/metadata-migration/`
+### Ruby Documentation Tools
+Location: `tools/`
 
 ```bash
-# Build the TypeScript project
-pnpm run build
+# Validate YAML front-matter in all files
+ruby tools/validate_front_matter.rb
 
-# Run tests
-pnpm test               # Run all tests once
-pnpm test:watch        # Run tests in watch mode
-pnpm test:coverage     # Run tests with coverage report
+# Validate a specific file
+ruby tools/validate_front_matter.rb -f path/to/file.md
 
-# Run a single test file
-pnpm test src/legacyParser.test.ts
+# Generate index files based on document metadata
+ruby tools/reindex.rb
 
-# Development
-pnpm run dev           # Run TypeScript files directly with ts-node
-pnpm run lint          # Type-check without emitting files
-pnpm run format        # Format code with Prettier
+# Run reindex in strict mode (fails on YAML errors)
+ruby tools/reindex.rb --strict
+
+# Fix cross-references in documentation
+ruby tools/fix_cross_references.rb
 ```
 
-### Legacy Ruby Tools
-Location: `tools/`
-- `validate_front_matter.rb` - Validates YAML front matter in markdown files
-- `reindex.rb` - Rebuilds document indexes
-- `fix_cross_references.rb` - Fixes internal cross-references in documentation
 
 ## Architecture & Structure
 
@@ -54,26 +48,28 @@ docs/
 │       ├── frontend/
 │       └── backend/
 tools/
-├── metadata-migration/    # TypeScript metadata conversion tool
-│   ├── src/              # TypeScript source files
-│   ├── test/fixtures/    # Test fixture files
-│   └── dist/            # Compiled JavaScript (gitignored)
-└── *.rb                  # Legacy Ruby maintenance scripts
+├── *.rb                  # Ruby maintenance scripts
+│   ├── validate_front_matter.rb  # Validates YAML front-matter
+│   ├── reindex.rb                # Rebuilds document indexes
+│   └── fix_cross_references.rb   # Fixes internal cross-references
 ```
 
-### Metadata Migration Architecture
+### Repository Architecture
 
-The TypeScript migration tool follows a modular pipeline architecture:
+All tenet and binding files use YAML front-matter for metadata, which provides a standardized, machine-readable way to define document properties.
 
-1. **FileWalker**: Recursively finds Markdown files
-2. **MetadataInspector**: Detects metadata format (yaml, legacy-hr, none, unknown)
-3. **LegacyParser**: Parses raw legacy metadata into structured objects
-4. **MetadataConverter**: Transforms LegacyMetadata to StandardYamlMetadata
-5. **YamlSerializer**: Generates valid YAML front-matter
-6. **BackupManager**: Creates backups before file modification
-7. **MigrationEngine**: Orchestrates the complete migration process
+The repository follows a structured architecture with:
 
-All modules use structured logging via the Logger module and follow strict TypeScript typing (no `any` types).
+1. **Tenets**: Located in `docs/tenets/` - represent core principles
+2. **Bindings**: Located in `docs/bindings/` with categories:
+   - Core bindings in `docs/bindings/core/` - apply to all projects
+   - Category-specific bindings in `docs/bindings/categories/<category>/`
+3. **Tools**: Ruby scripts to validate and maintain documents:
+   - `validate_front_matter.rb` - Ensures metadata follows YAML standards
+   - `reindex.rb` - Creates index files based on document metadata
+   - `fix_cross_references.rb` - Maintains link integrity
+
+All tools strictly enforce YAML front-matter standards and follow proper error handling.
 
 ### Task Management System
 

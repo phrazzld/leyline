@@ -1,269 +1,272 @@
-# Todo: Metadata Migration Script
+# Todo: Metadata Format Elimination
 
-## Project Setup
-- [x] **T001 · Chore · P1: Create migration script directory**
-    - **Context:** Implementation Steps - 1. Project Setup
+## Prerequisite Verification & Backup
+- [x] **T001 · Chore · P0: Verify migration completion and create backup**
+    - **Context:** Prerequisite validation before removing legacy format support
     - **Action:**
-        1. Create a new directory named `metadata-migration` under the `tools/` directory
-        2. Add an initial README.md placeholder
+        1. Confirm that `tools/metadata-migration/` has been successfully executed across all files
+        2. Create a full backup of `docs/tenets/` and `docs/bindings/` directories
+        3. Run `grep -rL '^---' docs/tenets/ docs/bindings/` to identify any files without YAML front-matter
+        4. Manually spot-check ~12 diverse files to verify YAML format compliance
     - **Done‑when:**
-        1. The directory exists with README.md
+        1. Backup is successfully created and verified
+        2. No files without YAML front-matter are detected
+    - **Verification:**
+        1. Backup integrity checked by restoring a sample file
+        2. `grep` command returns no file paths (no legacy files)
+    - **Depends‑on:** none
+    - **Notes:**
+        - ⚠️ **MIGRATION INCOMPLETE** - All tenet files (9 files) still use legacy format
+        - See detailed findings in `metadata-format-elimination-verification.md`
+        - Additional migration step required before proceeding with T002
+
+## Additional Task (Required)
+- [x] **T001a · Chore · P0: Complete metadata migration for tenet files**
+    - **Context:** Address incomplete migration discovered in T001
+    - **Action:**
+        1. Create a script or manually convert all tenet files from legacy horizontal rule format to YAML front-matter
+        2. Preserve all existing metadata values during conversion
+        3. Verify conversion success for all tenet files
+    - **Done‑when:**
+        1. All tenet files use YAML front-matter
+        2. `grep -rL '^---' docs/tenets/ docs/bindings/` only returns index files
+    - **Verification:**
+        1. Manual inspection of converted files
+        2. Running validation tool confirms success
     - **Depends‑on:** none
 
-- [x] **T002 · Chore · P1: Initialize Node.js project with TypeScript**
-    - **Context:** Implementation Steps - 1. Project Setup
-    - **Action:**
-        1. Initialize a Node.js project (npm init -y)
-        2. Install TypeScript and @types/node as development dependencies
-    - **Done‑when:**
-        1. package.json exists with TypeScript as a dev dependency
-    - **Depends‑on:** [T001]
+## Ruby Tool Refactoring
 
-- [x] **T003 · Chore · P1: Configure necessary project dependencies**
-    - **Context:** Implementation Steps - 1. Project Setup
+### Validate Front Matter Tool
+- [x] **T002 · Refactor · P0: Remove legacy format logic from validate_front_matter.rb**
+    - **Context:** Core tool refactoring for YAML-only validation
     - **Action:**
-        1. Install production dependencies: glob, js-yaml (or yaml)
-        2. Install development dependencies: ts-node, test runner (jest or vitest), CLI argument parser (yargs or commander)
+        1. Delete all code handling detection, parsing, or validation of legacy horizontal rule format
+        2. Enforce that only YAML front-matter delimited by `---` is accepted
+        3. Remove or repurpose the `--strict` flag if its primary purpose was YAML-only enforcement
     - **Done‑when:**
-        1. All dependencies are installed and listed in package.json
+        1. All legacy format parsing code is completely removed
+        2. Script enforces YAML-only validation
+        3. `--strict` flag is removed or repurposed
+    - **Verification:**
+        1. Code review confirms removal of legacy parsing logic
+        2. Running script against legacy format file produces explicit failure
+    - **Depends‑on:** [T001, T001a]
+
+- [x] **T003 · Refactor · P1: Implement strict YAML validation in validate_front_matter.rb**
+    - **Context:** Ensure robust validation for YAML-only format
+    - **Action:**
+        1. Implement validation for required YAML keys (e.g., `id`, `last_modified`, `derived_from` for bindings)
+        2. Validate correct data types/formats for known keys
+        3. Use `YAML.safe_load` for secure YAML parsing
+        4. Update error messages to be clear about YAML errors (malformed, missing keys, invalid values)
+    - **Done‑when:**
+        1. Script correctly validates compliant YAML structure and required fields
+        2. Script fails appropriately for malformed YAML, missing front-matter, or missing required keys
+        3. Safe YAML loading is implemented
+    - **Verification:**
+        1. Test with files: valid YAML, malformed YAML, missing front-matter, missing required keys
     - **Depends‑on:** [T002]
 
-- [x] **T004 · Chore · P1: Setup tsconfig and npm scripts**
-    - **Context:** Implementation Steps - 1. Project Setup
+- [x] **T004 · Test · P1: Update tests for validate_front_matter.rb**
+    - **Context:** Ensure test coverage for YAML-only functionality
     - **Action:**
-        1. Create tsconfig.json with strict settings
-        2. Define npm scripts for build, start, test, lint, format
+        1. Remove unit tests specifically designed for legacy format validation
+        2. Write unit tests for YAML parsing, required key validation, and error reporting
+        3. Add tests explicitly verifying that detection of legacy format remnants causes failure
     - **Done‑when:**
-        1. tsconfig.json exists and allows TypeScript compilation
-        2. Basic npm scripts are functional
+        1. No unit tests for legacy format handling remain
+        2. Test suite covers YAML validation and error paths
+        3. Test coverage for refactored code meets target (>90%)
     - **Verification:**
-        1. Run npm run build (compiles an empty index.ts)
-        2. Run npm run test (runs an empty test suite)
+        1. All tests pass and coverage targets are met
     - **Depends‑on:** [T003]
 
-## Core Data Structures
-- [x] **T005 · Feature · P1: Define core data structure interfaces**
-    - **Context:** Core Data Structures
+### Reindex Tool
+- [x] **T005 · Refactor · P0: Remove legacy format parsing from reindex.rb**
+    - **Context:** Core tool refactoring for YAML-only indexing
     - **Action:**
-        1. Create a types.ts file
-        2. Define FileContext, InspectedContent, LegacyMetadata, StandardYamlMetadata interfaces
+        1. Remove all code paths related to parsing metadata from the legacy horizontal rule format
+        2. Modify script to exclusively use YAML parser (`YAML.safe_load`) for metadata extraction
+        3. Simplify metadata extraction logic now that only one format is supported
     - **Done‑when:**
-        1. All interfaces are defined with TSDoc comments
-    - **Depends‑on:** [T002]
+        1. Legacy metadata parsing logic is completely removed
+        2. Script exclusively uses YAML parsing
+        3. Metadata extraction logic is simplified
+    - **Verification:**
+        1. Code review confirms removal of legacy parsing logic
+    - **Depends‑on:** [T001, T001a]
 
-## Core Modules
-- [x] **T006 · Feature · P1: Implement Logger module**
-    - **Context:** Key Components - Logger
+- [x] **T006 · Refactor · P1: Implement error handling in reindex.rb**
+    - **Context:** Ensure robust handling of invalid files
     - **Action:**
-        1. Create src/logger.ts
-        2. Implement structured JSON logging with levels (DEBUG, INFO, WARN, ERROR)
+        1. Implement behavior to fail loudly if a file cannot be parsed as valid YAML or lacks expected metadata
+        2. Use `YAML.safe_load` for secure YAML parsing
+        3. Add clear error messages indicating problematic files and issues
     - **Done‑when:**
-        1. Logger provides functions for each log level and outputs structured logs
-    - **Depends‑on:** [T004, T005]
+        1. Script fails loudly on YAML parsing errors or missing required metadata
+        2. Error messages clearly indicate the problematic file and nature of error
+    - **Verification:**
+        1. Test with valid YAML files, malformed YAML files, and files missing required metadata
+    - **Depends‑on:** [T005]
 
-- [x] **T007 · Feature · P1: Implement FileWalker module**
-    - **Context:** Key Components - FileWalker
+- [x] **T007 · Test · P1: Update tests for reindex.rb**
+    - **Context:** Ensure test coverage for YAML-only functionality
     - **Action:**
-        1. Create src/fileWalker.ts
-        2. Implement function to recursively find Markdown files within specified directories
+        1. Remove unit tests specifically designed for legacy format parsing
+        2. Write unit tests for correct data extraction from YAML front-matter
+        3. Add tests for handling of files with missing/malformed YAML
     - **Done‑when:**
-        1. Module can identify and return markdown file paths
-    - **Depends‑on:** [T004, T005]
+        1. No unit tests for legacy format handling remain
+        2. Test suite covers YAML parsing and error paths
+        3. Test coverage for refactored code meets target (>90%)
+    - **Verification:**
+        1. All tests pass and coverage targets are met
+    - **Depends‑on:** [T006]
 
-- [x] **T008 · Feature · P1: Implement MetadataInspector module**
-    - **Context:** Key Components - MetadataInspector
+### Cross-References Tool
+- [x] **T008 · Chore · P2: Analyze fix_cross_references.rb for metadata parsing**
+    - **Context:** Determine if additional refactoring is needed
     - **Action:**
-        1. Create src/metadataInspector.ts
-        2. Implement detection of metadata format (yaml, legacy-hr, none, unknown)
-        3. Extract content sections appropriately
+        1. Investigate if `tools/fix_cross_references.rb` parses or relies on tenet/binding metadata structure
+        2. Document findings regarding its metadata usage
     - **Done‑when:**
-        1. Module correctly detects formats and separates metadata from content
-    - **Depends‑on:** [T004, T005]
-
-- [x] **T009 · Feature · P1: Implement LegacyParser module**
-    - **Context:** Key Components - LegacyParser
-    - **Action:**
-        1. Create src/legacyParser.ts
-        2. Analyze existing legacy formats to understand variations
-        3. Implement parsing of raw metadata into LegacyMetadata object
-    - **Done‑when:**
-        1. Module correctly parses legacy metadata and handles malformed data
-    - **Depends‑on:** [T004, T005, T006, T008]
-
-- [x] **T010 · Feature · P1: Implement MetadataConverter module**
-    - **Context:** Key Components - MetadataConverter
-    - **Action:**
-        1. Create src/metadataConverter.ts
-        2. Implement transformation of LegacyMetadata to StandardYamlMetadata
-        3. Validate required fields and normalize formats
-    - **Done‑when:**
-        1. Module correctly transforms metadata and handles special cases
-    - **Depends‑on:** [T004, T005, T006, T009]
-
-- [x] **T011 · Feature · P1: Implement YamlSerializer module**
-    - **Context:** Key Components - YamlSerializer
-    - **Action:**
-        1. Create src/yamlSerializer.ts
-        2. Implement conversion of StandardYamlMetadata to YAML string
-    - **Done‑when:**
-        1. Module produces valid YAML front-matter strings
-    - **Depends‑on:** [T003, T004, T005]
-
-- [x] **T012 · Feature · P1: Implement FileRewriter module**
-    - **Context:** Key Components - FileRewriter
-    - **Action:**
-        1. Create src/fileRewriter.ts
-        2. Implement construction of new file content
-        3. Implement atomic file writes and backup functionality
-    - **Done‑when:**
-        1. Module can write files atomically and create backups
-    - **Depends‑on:** [T004, T005, T008, T011]
-
-- [x] **T013 · Feature · P1: Implement MigrationOrchestrator module**
-    - **Context:** Key Components - MigrationOrchestrator
-    - **Action:**
-        1. Create src/migrationOrchestrator.ts
-        2. Implement main workflow coordination
-        3. Handle dry-run mode and error handling
-    - **Done‑when:**
-        1. Module correctly processes files through the full workflow
-    - **Depends‑on:** [T006, T007, T008, T009, T010, T011, T012]
-
-- [x] **T014 · Feature · P1: Implement CliHandler module**
-    - **Context:** Key Components - CliHandler
-    - **Action:**
-        1. Create src/cliHandler.ts
-        2. Implement CLI argument parsing for target paths, --dry-run, --backup-dir
-    - **Done‑when:**
-        1. Module correctly parses arguments and provides help messages
-    - **Depends‑on:** [T003, T004, T013]
-
-## Testing
-- [x] **T015 · Chore · P1: Create test fixtures**
-    - **Context:** Testing Strategy
-    - **Action:**
-        1. Create test/fixtures/ directory
-        2. Create various test files covering all scenarios:
-            - Valid legacy formats
-            - Files with YAML front-matter
-            - Files with no metadata
-            - Files with malformed metadata
-            - Files with deprecated fields
-            - Files with edge case formatting
-    - **Done‑when:**
-        1. Complete set of test fixtures exists
-    - **Depends‑on:** [T001]
-
-- [x] **T016 · Test · P1: Implement unit tests for all modules**
-    - **Context:** Testing Strategy - Unit Tests
-    - **Action:**
-        1. Create test files for each module
-        2. Test normal operation and edge cases
-    - **Done‑when:**
-        1. All modules have comprehensive unit tests with >90% coverage
-    - **Depends‑on:** [T006, T007, T008, T009, T010, T011, T012, T013, T014, T015]
-
-- [x] **T017 · Test · P1: Implement integration tests**
-    - **Context:** Testing Strategy - Integration Tests
-    - **Action:**
-        1. Create tests for end-to-end workflow
-        2. Test with various fixture combinations
-    - **Done‑when:**
-        1. Integration tests verify the complete workflow
-    - **Depends‑on:** [T013, T015, T016]
-
-## Documentation
-- [x] **T018 · Docs · P2: Write comprehensive README**
-    - **Context:** Implementation Steps - CLI & Documentation
-    - **Action:**
-        1. Document purpose, installation, usage examples
-        2. Document CLI options and flags
-        3. Include warnings about backup importance
-    - **Done‑when:**
-        1. README provides complete usage guidance
-    - **Depends‑on:** [T014]
-
-- [x] **T019 · Docs · P2: Add TSDoc comments**
-    - **Context:** Documentation
-    - **Action:**
-        1. Add detailed TSDoc comments to all exported functions, classes, and interfaces
-    - **Done‑when:**
-        1. All public exports have comprehensive documentation
-    - **Depends‑on:** [T006, T007, T008, T009, T010, T011, T012, T013, T014]
-
-## Validation & Execution
-- [x] **T020 · Test · P1: Validate script on actual repository (dry-run)**
-    - **Context:** Implementation Steps - Validation & Execution
-    - **Action:**
-        1. Run migration with --dry-run flag on actual repository files
-        2. Analyze logs and verify expected behavior
-    - **Done‑when:**
-        1. Dry run completes successfully and logs expected changes
-    - **Depends‑on:** [T013, T014, T017]
-
-- [x] **T021 · Chore · P0: Create backup of docs directory**
-    - **Context:** Implementation Steps - Validation & Execution
-    - **Action:**
-        1. Create a full backup of the docs directory before execution
-    - **Done‑when:**
-        1. Backup exists and integrity verified
+        1. Analysis is complete with clear determination if script uses metadata and how
     - **Depends‑on:** none
 
-- [x] **T022 · Chore · P0: Fix missing lastModified dates in repository**
-    - **Context:** Dry-run validation revealed 27 binding files are missing required lastModified field
+- [x] **T009 · Refactor · P2: Refactor fix_cross_references.rb for YAML-only (if applicable)**
+    - **Context:** Conditional refactoring based on analysis
     - **Action:**
-        1. Review all 27 binding files identified in T020 validation
-        2. Add appropriate lastModified dates based on git history or default date
-        3. Files requiring fix (from validation report):
-            - `/docs/bindings/core/use-structured-logging.md`
-            - `/docs/bindings/core/semantic-versioning.md`
-            - `/docs/bindings/core/require-conventional-commits.md`
-            - All other binding files with legacy metadata (27 total)
+        1. If T008 found metadata usage, remove any legacy format parsing logic
+        2. Update to rely exclusively on YAML front-matter
+        3. Use `YAML.safe_load` for secure YAML parsing
     - **Done‑when:**
-        1. All binding files have valid lastModified dates in metadata
-        2. Re-run dry-run validates all files successfully
-    - **Depends‑on:** [T020]
-
-- [x] **T023 · Feature · P1: Execute migration on repository**
-    - **Context:** Implementation Steps - Validation & Execution
-    - **Action:**
-        1. Run the migration script on the actual repository
-        2. Verify files are properly converted
-    - **Done‑when:**
-        1. All legacy metadata files are converted to YAML front-matter
+        1. If applicable, script is refactored to use YAML-only
+        2. Legacy parsing logic is removed
     - **Verification:**
-        1. Manually inspect a sample of converted files
-        2. No errors or warnings in the logs that indicate data loss
-    - **Depends‑on:** [T022, T021]
+        1. If refactored, test with YAML-only files and verify correct operation
+    - **Depends‑on:** [T008]
 
-## Final Verification
-- [x] **T024 · Test · P1: Verify success criteria**
-    - **Context:** Success Criteria
+### Other Tooling
+- [x] **T010 · Chore · P1: Search codebase for other legacy metadata parsing**
+    - **Context:** Ensure comprehensive elimination of legacy format
     - **Action:**
-        1. Check that all files with legacy HR metadata were converted
-        2. Verify no data loss or corruption occurred
-        3. Confirm document content and formatting preserved
-        4. Check all required fields were correctly mapped
-        5. Verify script is idempotent (run again and confirm it skips already converted files)
+        1. Perform comprehensive search (e.g., `git grep`, `rg`) for keywords like `horizontal_rule`, `____`, or patterns used for legacy parsing
+        2. Document any identified scripts or code sections that handle tenet/binding metadata outside already refactored tools
     - **Done‑when:**
-        1. All success criteria confirmed
-    - **Depends‑on:** [T023]
+        1. Codebase search is completed
+        2. Findings are documented with list of any other identified tooling
+    - **Depends‑on:** [T001]
 
-## CI Fix
-- [x] **T025 · Fix · P0: Add missing derived_from field to all binding files**
-    - **Context:** CI lint-docs check is failing because binding files are missing required `derived_from` field
+- [x] **T011 · Refactor · P2: Refactor identified tooling for YAML-only**
+    - **Context:** Conditional refactoring based on search
     - **Action:**
-        1. Analyze each binding file to determine which tenet it implements
-        2. Create mapping of binding ID → tenet ID relationships
-        3. Add `derived_from` field to YAML front-matter in all 27 binding files
-        4. Run Ruby validation script locally to verify fix
-        5. Push changes to fix CI
+        1. For each tool identified in T010 that uses metadata:
+           - Remove legacy format parsing logic
+           - Update to support YAML-only metadata access
+           - Use `YAML.safe_load` for secure YAML parsing
     - **Done‑when:**
-        1. All binding files have valid `derived_from` fields
-        2. Ruby validation script passes locally
-        3. CI lint-docs check passes on GitHub
-    - **Depends‑on:** none (urgent CI fix)
-    - **Example mapping:**
-        - `api-design` → `explicit-over-implicit`
-        - `no-internal-mocking` → `testability`
-        - `immutable-by-default` → `simplicity`
+        1. All identified tooling is refactored to use YAML-only
+        2. Legacy parsing is removed from these tools
+    - **Verification:**
+        1. Test each refactored tool with YAML-only files and verify correct operation
+    - **Depends‑on:** [T010]
+
+## CI/CD and Pre-commit Integration
+- [x] **T012 · Chore · P0: Update CI workflows for YAML-only validation**
+    - **Context:** Ensure automated builds enforce new standard
+    - **Action:**
+        1. Update relevant CI workflow files (`.github/workflows/`)
+        2. Ensure CI jobs execute the refactored `validate_front_matter.rb` and `reindex.rb`
+        3. Configure CI steps to fail the build if `validate_front_matter.rb` reports any errors
+        4. Remove any CI steps or configurations related to legacy format
+    - **Done‑when:**
+        1. CI workflows are updated to run refactored tools
+        2. CI builds fail on validation errors (including legacy format detection)
+        3. Legacy-related CI configuration is removed
+    - **Verification:**
+        1. Test commit/PR with valid, invalid, and legacy format files to verify expected CI behavior
+    - **Depends‑on:** [T003, T006]
+
+- [x] **T013 · Chore · P0: Update pre-commit hooks for YAML-only validation**
+    - **Context:** Ensure local validation enforces new standard
+    - **Action:**
+        1. Update the `.pre-commit-config.yaml` file
+        2. Ensure the pre-commit hook executes the refactored `validate_front_matter.rb`
+        3. Verify hooks block commits with invalid YAML or legacy format
+    - **Done‑when:**
+        1. Pre-commit hook configuration is updated
+        2. Hook blocks commits on validation errors
+    - **Verification:**
+        1. Attempt to commit files with legacy metadata, malformed YAML, and valid YAML
+    - **Depends‑on:** [T003]
+
+## Documentation Updates
+- [x] **T014 · Chore · P1: Update core documentation (TENET_FORMATTING, CONTRIBUTING)**
+    - **Context:** Ensure documentation reflects YAML-only standard
+    - **Action:**
+        1. Rewrite `docs/TENET_FORMATTING.md`:
+           - Remove all references to the horizontal rule format
+           - State clearly that YAML front-matter is the sole and mandatory format
+           - Provide clear examples of the required YAML structure and fields
+           - Update or remove "Converting" sections
+        2. Update `docs/CONTRIBUTING.md`:
+           - Update front-matter standards to reflect YAML-only
+           - Ensure validation instructions reflect updated tool behavior
+    - **Done‑when:**
+        1. Both documents are updated to reflect YAML-only standard
+        2. All references to legacy format are removed
+    - **Depends‑on:** [T003, T006]
+
+- [x] **T015 · Chore · P2: Update ancillary documentation (READMEs, CLAUDE.md, etc.)**
+    - **Context:** Ensure consistent documentation across repository
+    - **Action:**
+        1. Review `README.md`, `CLAUDE.md`, any tool READMEs, and other relevant documentation
+        2. Remove all references to dual formats or legacy format
+        3. Ensure consistency regarding the YAML-only standard
+    - **Done‑when:**
+        1. All documentation is consistent with YAML-only standard
+        2. No references to legacy format remain
+    - **Depends‑on:** [T014]
+
+## Repository Cleanup
+- [x] **T016 · Chore · P2: Repository cleanup (remove legacy fixtures/scripts)**
+    - **Context:** Remove obsolete artifacts
+    - **Action:**
+        1. Identify and remove test fixtures, sample files, or utility scripts specific to legacy format
+        2. Determine appropriate handling for `tools/metadata-migration/`:
+           - Archive it (move to a separate branch or archive directory)
+           - Delete it if no longer needed
+           - Mark as deprecated/historical with clear documentation
+    - **Done‑when:**
+        1. Legacy test fixtures and utility scripts are removed
+        2. Migration script is appropriately handled
+    - **Verification:**
+        1. Confirm no references to legacy format remain in repository
+    - **Depends‑on:** [T004, T007, T009, T011]
+
+## Communication
+- [x] **T017 · Chore · P1: Communicate change to contributors**
+    - **Context:** Ensure awareness of breaking change
+    - **Action:**
+        1. Draft announcement about YAML-only metadata standard
+        2. Highlight breaking nature for any manual processes or custom tooling
+        3. Post announcement in relevant contributor channels
+        4. Update `CHANGELOG.md`
+    - **Done‑when:**
+        1. Announcement is drafted and sent
+        2. `CHANGELOG.md` is updated
+    - **Depends‑on:** [T014, T015, T016]
+
+## Issues Requiring Clarification
+- [ ] **Issue:** Are there any external or undocumented consumers of tenet/binding files that might break?
+    - **Context:** Risk assessment for breaking change
+    - **Blocking?:** Yes - Potential significant impact if unknown consumers exist
+
+- [ ] **Issue:** What are the precise required fields for YAML front-matter in tenets vs. bindings?
+    - **Context:** Required for validation implementation
+    - **Blocking?:** Yes - Required for T003 implementation
+
+- [ ] **Issue:** Should reindex.rb halt entirely on a YAML parse error or continue after reporting?
+    - **Context:** Error handling behavior
+    - **Blocking?:** No - Can proceed with conservative approach (halt) and refine later

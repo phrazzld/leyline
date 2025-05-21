@@ -1,6 +1,7 @@
-______________________________________________________________________
-
-## id: no-secret-suppression last_modified: '2025-05-08'
+---
+id: no-secret-suppression
+last_modified: '2025-05-08'
+---
 
 # Tenet: Confront Issues, Don't Suppress Warnings
 

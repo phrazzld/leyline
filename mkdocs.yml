@@ -57,6 +57,13 @@ nav:
   - Integration:
     - Migration Guide: migration-guide.md
     - Implementation Guide: implementation-guide.md
+  - Documentation:
+    - Formatting Standards: TENET_FORMATTING.md
+    - Storybook Standards: STORYBOOK_TENETS_SLASH_BINDINGS.md
+    - Style Guide: STYLE_GUIDE_NATURAL_LANGUAGE.md
+    - LLM Integration: LLM_INTEGRATION.md
+  - Announcements:
+    - YAML-only Format (May 2025): announcements/yaml-only-format-2025-05.md
   - Contributing: CONTRIBUTING.md
 
 # Theme
