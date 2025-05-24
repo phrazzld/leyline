@@ -88,6 +88,7 @@ jobs:
     - name: Checkout Leyline Content
       id: checkout-leyline
       uses: actions/checkout@v4
+      continue-on-error: true
       with:
         # Use the phrazzld/leyline repository as the source
         repository: phrazzld/leyline
@@ -99,6 +100,15 @@ jobs:
         path: _leyline
         # Only fetch what's needed to minimize checkout time
         fetch-depth: 1
+
+    # Check if the checkout was successful
+    - name: Check Checkout Success
+      if: steps.checkout-leyline.outcome == 'failure'
+      run: |
+        echo "::error::Error: Invalid \`leyline_ref\` provided: ${{ inputs.leyline_ref }}"
+        echo "The specified reference '${{ inputs.leyline_ref }}' could not be found in the Leyline repository."
+        echo "Please verify that the tag, branch, or commit SHA exists."
+        exit 1
 
     # Verify that the Leyline content was checked out successfully
     - name: Verify Leyline Checkout

@@ -102,7 +102,7 @@
         1. Workflow outputs `pr_url` and `commit_sha` are correctly populated when a PR is created.
     - **Depends‑on:** [T009]
 
-- [ ] **T011 · Feature · P1: implement error handling for invalid `leyline_ref` in `sync-leyline-content.yml`**
+- [x] **T011 · Feature · P1: implement error handling for invalid `leyline_ref` in `sync-leyline-content.yml`**
     - **Context:** Error & Edge‑Case Strategy - Invalid `leyline_ref`
     - **Action:**
         1. After the Leyline content checkout step (T006), check if it was successful.
