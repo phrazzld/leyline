@@ -210,7 +210,7 @@
         1. Review guide against workflow features (T003-T016) and error strategies.
     - **Depends‑on:** [T001, T017, T019]
 
-- [ ] **T021 · Feature · P1: create `versioning-guide.md` for Leyline versioning**
+- [x] **T021 · Feature · P1: create `versioning-guide.md` for Leyline versioning**
     - **Context:** Detailed Build Steps #4, Architecture Blueprint - `versioning-guide.md`
     - **Action:**
         1. Create `docs/integration/versioning-guide.md`.
