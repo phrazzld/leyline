@@ -146,7 +146,7 @@
         1. Run sync twice with the same `leyline_ref`. The second run should report no changes.
     - **Depends‑on:** [T008, T009]
 
-- [ ] **T015 · Feature · P2: implement error handling for `token` permission issues in `sync-leyline-content.yml`**
+- [x] **T015 · Feature · P2: implement error handling for `token` permission issues in `sync-leyline-content.yml`**
     - **Context:** Error & Edge‑Case Strategy - Permission errors
     - **Action:**
         1. Ensure that failures in steps requiring special permissions (checkout, PR creation) provide clear error messages suggesting a token permission issue.

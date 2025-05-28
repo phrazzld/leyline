@@ -80,9 +80,27 @@ jobs:
 
     # Checkout the consumer repository (where the workflow is being called from)
     - name: Checkout Consumer Repository
+      id: checkout-consumer
       uses: actions/checkout@v4
+      continue-on-error: true
       with:
         token: ${{ inputs.token }}
+
+    # Check if consumer repository checkout was successful
+    - name: Check Consumer Repository Access
+      if: steps.checkout-consumer.outcome == 'failure'
+      run: |
+        echo "::error::Failed to checkout consumer repository"
+        echo "This is likely a token permission issue. Please ensure:"
+        echo "  1. The provided token has 'repo' or 'contents:write' scope"
+        echo "  2. The token has access to this repository"
+        echo "  3. The token is not expired or revoked"
+        echo ""
+        echo "For organization repositories, you may need:"
+        echo "  - 'repo' scope for private repositories"
+        echo "  - 'public_repo' scope for public repositories"
+        echo "  - Organization SSO authorization if enabled"
+        exit 1
 
     # Checkout the Leyline repository at the specified reference
     - name: Checkout Leyline Content
@@ -541,6 +559,7 @@ jobs:
     - name: Create Pull Request
       if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
       id: create-pr
+      continue-on-error: true
       uses: peter-evans/create-pull-request@v6
       with:
         # Use the provided GitHub token for authentication
@@ -554,9 +573,31 @@ jobs:
         # Only create PR if there are actual changes to commit
         commit-message: ${{ inputs.commit_message }}
 
+    # Check if PR creation was successful
+    - name: Check PR Creation Success
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true' && steps.create-pr.outcome == 'failure'
+      run: |
+        echo "::error::Failed to create Pull Request"
+        echo "This is likely a token permission issue. Please ensure:"
+        echo "  1. The provided token has 'repo' or 'pull_requests:write' scope"
+        echo "  2. The token has permission to create pull requests in this repository"
+        echo "  3. The token has permission to create and push to branches"
+        echo "  4. The repository allows pull requests (not disabled in settings)"
+        echo ""
+        echo "Required token permissions for PR creation:"
+        echo "  - 'repo' scope (full repository access)"
+        echo "  - OR 'public_repo' + 'pull_requests:write' for public repositories"
+        echo ""
+        echo "Common issues:"
+        echo "  - Token lacks 'repo' scope (most common)"
+        echo "  - Branch protection rules preventing PR creation"
+        echo "  - Organization SSO not authorized"
+        echo "  - Repository is archived or access is restricted"
+        exit 1
+
     # Log PR creation results for transparency
     - name: Log PR Creation Results
-      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true' && steps.create-pr.outcome == 'success'
       run: |
         if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
           echo "✅ Pull Request created successfully"
