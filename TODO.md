@@ -190,7 +190,7 @@
     - **Depends‑on:** [T001]
 
 ## New Integration Guides (`docs/integration/`)
-- [ ] **T019 · Chore · P1: create `docs/integration/` directory**
+- [x] **T019 · Chore · P1: create `docs/integration/` directory**
     - **Context:** Architecture Blueprint - `leyline/docs/integration/`
     - **Action:**
         1. Create the new directory `leyline/docs/integration/`.
