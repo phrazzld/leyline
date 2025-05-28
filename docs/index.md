@@ -35,45 +35,84 @@ tools/                         # Validation and maintenance scripts
 
 ## How It Works
 
-### The Warden System
+### The Warden System: Philosophy vs Implementation
 
-The Leyline Warden is an automated system that synchronizes tenets and bindings across
-repositories:
+The Warden System represents Leyline's core philosophy of maintaining standardized development
+principles across projects. It's important to understand that this is not an automated push
+system, but rather a conceptual framework:
 
-1. When a new version of Leyline is tagged (e.g., `v0.1.0`)
-1. Warden creates pull requests in all target repositories
-1. Each PR updates the local copies of tenets and bindings
-1. This ensures consistent standards across all codebases
+- **Philosophy**: The Warden System embodies the idea that development standards should be
+  consistent, versioned, and enforceable across all projects in an organization
+- **Implementation**: Consumer repositories pull Leyline content on their own schedule using
+  the `sync-leyline-content.yml` reusable workflow
+- **Control**: Teams maintain full control over when and how they adopt updates
+- **Flexibility**: Selective synchronization allows teams to adopt only relevant standards
 
-### Integration
+### Integration: Pull-Based Content Synchronization
 
-To integrate a repository with Leyline:
+Leyline uses a consumer-initiated pull model for content distribution. This approach provides
+maximum flexibility and control over when and how your projects adopt Leyline standards.
 
-1. Add this repository as a GitHub Actions workflow caller:
+#### Quick Start
+
+Create a workflow in your repository that calls Leyline's reusable sync workflow:
 
 ```yaml
-# .github/workflows/vendor-docs.yml
-name: Leyline Sync
+# .github/workflows/sync-leyline.yml
+name: Sync Leyline Content
 on:
-  pull_request:
-  push:
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly check for updates
+  workflow_dispatch:      # Manual trigger option
+
 jobs:
-  docs:
-    uses: phrazzld/leyline/.github/workflows/vendor.yml@v0.1.0
+  sync:
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
     with:
-      ref: v0.1.0
-      categories: go,typescript,frontend # Optional: Specify the categories you want to sync
+      token: ${{ secrets.GITHUB_TOKEN }}
+      leyline_ref: v1.0.0  # Pin to specific version
+      categories: go,typescript,frontend  # Optional: sync only what you need
 ```
 
-The workflow accepts the following inputs:
+#### Workflow Inputs
 
-- `ref`: The Leyline tag to sync from (required)
-- `categories`: A comma-separated list of categories to sync (optional)
-  - If not specified, only core bindings and tenets will be synced
-  - Valid categories: `go`, `rust`, `typescript`, `cli`, `frontend`, `backend`
+The `sync-leyline-content.yml` workflow accepts these inputs:
 
-2. The first time the workflow runs, it will create `/docs/tenets` and `/docs/bindings`
-   directories in your repository.
+**Required:**
+- `token`: GitHub token with repo write permissions
+- `leyline_ref`: Version/tag/branch of Leyline to sync from
+
+**Optional:**
+- `categories`: Comma-separated list of category bindings to sync
+  - Available: `go`, `rust`, `typescript`, `frontend`, `backend`
+  - Default: none (only core bindings synced)
+- `target_path`: Where to place synced content (default: `docs/leyline`)
+- `create_pr`: Create PR instead of direct commit (default: `true`)
+- `commit_message`: Custom commit message
+- `pr_title`: Custom PR title
+- `pr_branch_name`: Custom branch name for PR
+
+#### Workflow Outputs
+
+- `pr_url`: URL of created pull request (if applicable)
+- `commit_sha`: SHA of the commit with synced content
+
+#### Integration Guides
+
+- **[Pull Model Integration Guide](integration/pull-model-guide.md)**: Step-by-step setup instructions,
+  troubleshooting, and best practices for consumer repositories
+- **[Versioning Guide](integration/versioning-guide.md)**: How to manage Leyline versions,
+  set up automated updates with Dependabot/Renovate, and version pinning strategies
+- **[Migration Guide](migration-guide.md)**: For teams moving from symlinks or other
+  legacy integration methods
+
+#### Benefits of Pull-Based Sync
+
+1. **Version Control**: Pin to specific Leyline versions for stability
+2. **Selective Adoption**: Sync only the categories relevant to your project
+3. **Review Process**: Changes arrive as PRs for team review
+4. **Automation Ready**: Integrate with existing CI/CD pipelines
+5. **No Surprises**: Updates only when you explicitly request them
 
 ## Contributing
 

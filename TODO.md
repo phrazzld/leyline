@@ -177,7 +177,7 @@
     - **Depends‑on:** [T002, T003, T004, T005, T006, T007, T008, T009, T010, T011, T012, T013, T014, T015, T016]
 
 ## Core Documentation (`README.md`, `docs/index.md`)
-- [ ] **T018 · Chore · P1: update `README.md` and `docs/index.md` with pull-based model information**
+- [x] **T018 · Chore · P1: update `README.md` and `docs/index.md` with pull-based model information**
     - **Context:** Detailed Build Steps #3
     - **Action:**
         1. Clearly explain the pull-based model as the sole standard integration pattern in `README.md` and `docs/index.md`.
