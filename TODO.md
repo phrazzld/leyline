@@ -124,7 +124,7 @@
         1. Test with a mix of valid and invalid category names.
     - **Depends‑on:** [T007]
 
-- [ ] **T013 · Feature · P2: implement `target_path` creation if non-existent in `sync-leyline-content.yml`**
+- [x] **T013 · Feature · P2: implement `target_path` creation if non-existent in `sync-leyline-content.yml`**
     - **Context:** Error & Edge‑Case Strategy - `target_path` non-existent
     - **Action:**
         1. Before copying files, check if `inputs.target_path` exists in the consumer repository's workspace.

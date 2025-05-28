@@ -238,6 +238,16 @@ jobs:
       run: |
         echo "Starting file synchronization from Leyline to consumer repository..."
 
+        # Ensure the target path exists, create if it doesn't
+        if [ ! -d "${{ inputs.target_path }}" ]; then
+          echo "📁 Target path '${{ inputs.target_path }}' does not exist."
+          echo "Creating directory..."
+          mkdir -p "${{ inputs.target_path }}"
+          echo "✅ Created target directory: ${{ inputs.target_path }}"
+        else
+          echo "✅ Target path '${{ inputs.target_path }}' already exists"
+        fi
+
         # Directories already created in the cleanup step
 
         # Always sync all tenets (they're language-agnostic and apply to all projects)
