@@ -351,7 +351,28 @@ jobs:
           exit 1
         fi
 
+    - name: Check for Changes
+      id: check-changes
+      run: |
+        echo "Checking for changes in the repository..."
+
+        # Check if there are any uncommitted changes
+        if git diff --quiet && git diff --cached --quiet; then
+          # No changes detected
+          echo "ℹ️ No changes to sync."
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          # Changes detected
+          echo "✅ Changes detected, proceeding with sync."
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+
+          # Show what changed for transparency
+          echo "Changed files:"
+          git status --porcelain | head -20
+        fi
+
     - name: Create Summary
+      if: steps.check-changes.outputs.has_changes == 'true'
       run: |
         echo "# Leyline Sync Summary" > sync-summary.md
         echo "" >> sync-summary.md
@@ -428,6 +449,7 @@ jobs:
         cat sync-summary.md
 
     - name: Commit
+      if: steps.check-changes.outputs.has_changes == 'true'
       run: |
         git config user.name  "Leyline Bot"
         git config user.email "leyline-bot@users.noreply.github.com"
@@ -447,6 +469,7 @@ jobs:
         fi
 
     - name: Generate PR Body
+      if: steps.check-changes.outputs.has_changes == 'true'
       run: |
         echo "Automated content sync from Leyline." > pr-body.md
         echo "" >> pr-body.md
@@ -496,6 +519,7 @@ jobs:
         cat sync-summary.md >> pr-body.md
 
     - name: Push PR
+      if: steps.check-changes.outputs.has_changes == 'true'
       run: |
         # Use the custom PR title if provided, otherwise generate one with synced categories info
         pr_title="${{ inputs.pr_title }}"
@@ -515,7 +539,7 @@ jobs:
 
       # Create the PR if create_pr is true and changes exist
     - name: Create Pull Request
-      if: inputs.create_pr == true
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
       id: create-pr
       uses: peter-evans/create-pull-request@v6
       with:
@@ -532,7 +556,7 @@ jobs:
 
     # Log PR creation results for transparency
     - name: Log PR Creation Results
-      if: inputs.create_pr == true
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
       run: |
         if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
           echo "✅ Pull Request created successfully"
@@ -549,6 +573,13 @@ jobs:
       run: |
         echo "ℹ️ Pull Request creation disabled (create_pr = false)"
         echo "Changes have been committed directly to the current branch"
+
+    # Log when no changes detected
+    - name: Log No Changes
+      if: steps.check-changes.outputs.has_changes == 'false'
+      run: |
+        echo "ℹ️ No changes detected after syncing Leyline content"
+        echo "All files are already up to date with Leyline ref: ${{ inputs.leyline_ref }}"
 
     # Set workflow outputs for consumption by calling workflows
     - name: Set Workflow Outputs

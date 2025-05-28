@@ -135,7 +135,7 @@
         1. Test by syncing to a `target_path` that does not initially exist.
     - **Depends‑on:** [T007]
 
-- [ ] **T014 · Feature · P1: implement "no changes detected" handling in `sync-leyline-content.yml`**
+- [x] **T014 · Feature · P1: implement "no changes detected" handling in `sync-leyline-content.yml`**
     - **Context:** Error & Edge‑Case Strategy - No changes detected
     - **Action:**
         1. After file copying (T008) and before attempting to commit, check if any actual file changes occurred in `inputs.target_path`.
