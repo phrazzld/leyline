@@ -198,7 +198,7 @@
         1. The `leyline/docs/integration/` directory exists in the repository structure.
     - **Depends‑on:** none
 
-- [ ] **T020 · Feature · P1: create `pull-model-guide.md` for consumer integration**
+- [x] **T020 · Feature · P1: create `pull-model-guide.md` for consumer integration**
     - **Context:** Detailed Build Steps #4, Architecture Blueprint - `pull-model-guide.md`
     - **Action:**
         1. Create `docs/integration/pull-model-guide.md`.
