@@ -62,21 +62,45 @@ jobs:
       pr_url: ${{ steps.set-outputs.outputs.pr_url }}
       commit_sha: ${{ steps.set-outputs.outputs.commit_sha }}
     steps:
+    - name: Start Sync Process
+      run: |
+        echo "::notice::🚀 Starting Leyline content synchronization workflow"
+        echo "::debug::Workflow triggered from repository: ${{ github.repository }}"
+        echo "::debug::Workflow run ID: ${{ github.run_id }}"
+        echo "::debug::Triggered by: ${{ github.actor }}"
+
     - name: Validate Inputs
       run: |
+        echo "::notice::📋 Validating workflow inputs"
+
         # Validate token (this will simply fail if the token is invalid when used)
-        echo "Using GitHub token for authentication"
+        echo "✅ GitHub token provided for authentication"
 
         # Validate leyline_ref
         if [ -z "${{ inputs.leyline_ref }}" ]; then
           echo "::error::Required input 'leyline_ref' must be provided."
           exit 1
         fi
-        echo "Will sync Leyline content from: ${{ inputs.leyline_ref }}"
+        echo "✅ Leyline reference: ${{ inputs.leyline_ref }}"
 
-        # Log optional inputs with their default values if not provided
-        echo "Target path: ${{ inputs.target_path }}"
-        echo "Create PR: ${{ inputs.create_pr }}"
+        # Log all inputs with their values
+        echo "📊 Input configuration:"
+        echo "  - leyline_ref: ${{ inputs.leyline_ref }}"
+        echo "  - target_path: ${{ inputs.target_path }}"
+        echo "  - create_pr: ${{ inputs.create_pr }}"
+        echo "  - categories: ${{ inputs.categories != '' && inputs.categories || '(none specified)' }}"
+        echo "  - commit_message: ${{ inputs.commit_message }}"
+        echo "  - pr_title: ${{ inputs.pr_title }}"
+        echo "  - pr_branch_name: ${{ inputs.pr_branch_name }}"
+
+        echo "::debug::All required inputs validated successfully"
+
+    # Log consumer repository checkout
+    - name: Log Consumer Repository Checkout
+      run: |
+        echo "::notice::📥 Checking out consumer repository"
+        echo "::debug::Repository: ${{ github.repository }}"
+        echo "::debug::Branch/Ref: ${{ github.ref }}"
 
     # Checkout the consumer repository (where the workflow is being called from)
     - name: Checkout Consumer Repository
@@ -88,19 +112,32 @@ jobs:
 
     # Check if consumer repository checkout was successful
     - name: Check Consumer Repository Access
-      if: steps.checkout-consumer.outcome == 'failure'
       run: |
-        echo "::error::Failed to checkout consumer repository"
-        echo "This is likely a token permission issue. Please ensure:"
-        echo "  1. The provided token has 'repo' or 'contents:write' scope"
-        echo "  2. The token has access to this repository"
-        echo "  3. The token is not expired or revoked"
-        echo ""
-        echo "For organization repositories, you may need:"
-        echo "  - 'repo' scope for private repositories"
-        echo "  - 'public_repo' scope for public repositories"
-        echo "  - Organization SSO authorization if enabled"
-        exit 1
+        if [ "${{ steps.checkout-consumer.outcome }}" == "failure" ]; then
+          echo "::error::❌ Failed to checkout consumer repository"
+          echo "This is likely a token permission issue. Please ensure:"
+          echo "  1. The provided token has 'repo' or 'contents:write' scope"
+          echo "  2. The token has access to this repository"
+          echo "  3. The token is not expired or revoked"
+          echo ""
+          echo "For organization repositories, you may need:"
+          echo "  - 'repo' scope for private repositories"
+          echo "  - 'public_repo' scope for public repositories"
+          echo "  - Organization SSO authorization if enabled"
+          exit 1
+        else
+          echo "✅ Consumer repository checkout successful"
+          echo "::debug::Working directory: $(pwd)"
+          echo "::debug::Repository size: $(du -sh . | cut -f1)"
+        fi
+
+    # Log Leyline repository checkout
+    - name: Log Leyline Repository Checkout
+      run: |
+        echo "::notice::📦 Checking out Leyline repository"
+        echo "::debug::Repository: phrazzld/leyline"
+        echo "::debug::Reference: ${{ inputs.leyline_ref }}"
+        echo "::debug::Target path: _leyline"
 
     # Checkout the Leyline repository at the specified reference
     - name: Checkout Leyline Content
@@ -123,7 +160,7 @@ jobs:
     - name: Check Checkout Success
       if: steps.checkout-leyline.outcome == 'failure'
       run: |
-        echo "::error::Error: Invalid \`leyline_ref\` provided: ${{ inputs.leyline_ref }}"
+        echo "::error::❌ Invalid \`leyline_ref\` provided: ${{ inputs.leyline_ref }}"
         echo "The specified reference '${{ inputs.leyline_ref }}' could not be found in the Leyline repository."
         echo "Please verify that the tag, branch, or commit SHA exists."
         exit 1
@@ -131,40 +168,44 @@ jobs:
     # Verify that the Leyline content was checked out successfully
     - name: Verify Leyline Checkout
       run: |
-        echo "Verifying Leyline content checkout..."
+        echo "::notice::✅ Verifying Leyline content checkout"
 
         # Check if the _leyline directory exists
         if [ ! -d "_leyline" ]; then
-          echo "::error::Failed to checkout Leyline repository - _leyline directory not found"
+          echo "::error::❌ Failed to checkout Leyline repository - _leyline directory not found"
           echo "This could indicate an issue with the repository access or the specified reference: ${{ inputs.leyline_ref }}"
           exit 1
         fi
+        echo "::debug::✅ _leyline directory exists"
 
         # Check if essential directories exist
         if [ ! -d "_leyline/docs" ]; then
-          echo "::error::Leyline checkout appears invalid - docs directory not found"
+          echo "::error::❌ Leyline checkout appears invalid - docs directory not found"
           echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version"
           exit 1
         fi
+        echo "::debug::✅ docs directory exists"
 
         if [ ! -d "_leyline/docs/tenets" ]; then
-          echo "::error::Leyline checkout appears invalid - tenets directory not found"
+          echo "::error::❌ Leyline checkout appears invalid - tenets directory not found"
           echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version with the expected structure"
           exit 1
         fi
+        echo "::debug::✅ tenets directory exists"
 
         if [ ! -d "_leyline/docs/bindings" ]; then
-          echo "::error::Leyline checkout appears invalid - bindings directory not found"
+          echo "::error::❌ Leyline checkout appears invalid - bindings directory not found"
           echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version with the expected structure"
           exit 1
         fi
+        echo "::debug::✅ bindings directory exists"
 
         # Get and display the actual commit that was checked out
         cd _leyline
         actual_commit=$(git rev-parse HEAD)
         echo "✅ Successfully checked out Leyline content"
-        echo "Reference requested: ${{ inputs.leyline_ref }}"
-        echo "Actual commit: $actual_commit"
+        echo "📍 Reference requested: ${{ inputs.leyline_ref }}"
+        echo "📍 Actual commit: $actual_commit"
 
         # Count available content for logging
         tenet_count=$(find docs/tenets -name "*.md" 2>/dev/null | wc -l || echo "0")
@@ -254,7 +295,9 @@ jobs:
 
     - name: Sync Files
       run: |
-        echo "Starting file synchronization from Leyline to consumer repository..."
+        echo "::notice::🔄 Starting file synchronization from Leyline to consumer repository"
+        echo "::debug::Source: _leyline/docs/"
+        echo "::debug::Target: ${{ inputs.target_path }}"
 
         # Ensure the target path exists, create if it doesn't
         if [ ! -d "${{ inputs.target_path }}" ]; then
@@ -270,24 +313,27 @@ jobs:
 
         # Always sync all tenets (they're language-agnostic and apply to all projects)
         # The --delete flag ensures stale files are removed for efficient sync
-        echo "📚 Syncing tenets from _leyline/docs/tenets/ to ${{ inputs.target_path }}/tenets/"
+        echo "::notice::📚 Syncing tenets"
+        echo "::debug::Source: _leyline/docs/tenets/ → Target: ${{ inputs.target_path }}/tenets/"
         rsync -a --delete _leyline/docs/tenets/ "${{ inputs.target_path }}/tenets/"
         tenet_count=$(find "${{ inputs.target_path }}/tenets" -name "*.md" 2>/dev/null | wc -l || echo "0")
         echo "✅ Synced $tenet_count tenet files (stale files automatically removed)"
 
         # Always sync core bindings (applicable to all projects regardless of language/context)
         # The --delete flag ensures stale files are removed for efficient sync
-        echo "🔗 Syncing core bindings from _leyline/docs/bindings/core/ to ${{ inputs.target_path }}/bindings/core/"
+        echo "::notice::🔗 Syncing core bindings"
+        echo "::debug::Source: _leyline/docs/bindings/core/ → Target: ${{ inputs.target_path }}/bindings/core/"
         rsync -a --delete _leyline/docs/bindings/core/ "${{ inputs.target_path }}/bindings/core/"
         core_count=$(find "${{ inputs.target_path }}/bindings/core" -name "*.md" 2>/dev/null | wc -l || echo "0")
         echo "✅ Synced $core_count core binding files (stale files automatically removed)"
 
         # Process requested categories (if any specified)
         if [ -n "${{ inputs.categories }}" ]; then
-          echo "🏷️ Processing requested categories: ${{ inputs.categories }}"
+          echo "::notice::🏷️ Processing requested categories: ${{ inputs.categories }}"
 
           # Create array from comma-separated list
           IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
+          echo "::debug::Categories to process: ${#CATEGORIES[@]} items"
 
           # Initialize arrays to track synced and missing categories
           SYNCED_CATEGORIES=()
@@ -297,10 +343,12 @@ jobs:
           for category in "${CATEGORIES[@]}"; do
             # Trim whitespace
             category=$(echo "$category" | xargs)
+            echo "::debug::Processing category: '$category'"
 
             # Check if category directory exists in the Leyline repository
             if [ -d "_leyline/docs/bindings/categories/$category" ]; then
-              echo "📂 Syncing category '$category' from _leyline/docs/bindings/categories/$category/ to ${{ inputs.target_path }}/bindings/categories/$category/"
+              echo "📂 Syncing category '$category'"
+              echo "::debug::Source: _leyline/docs/bindings/categories/$category/ → Target: ${{ inputs.target_path }}/bindings/categories/$category/"
               SYNCED_CATEGORIES+=("$category")
 
               # Create target directory
@@ -314,6 +362,7 @@ jobs:
               echo "✅ Synced $category_count files for category '$category' (stale files automatically removed)"
             else
               echo "⚠️ WARNING: Category directory for '$category' does not exist in Leyline"
+              echo "::debug::Missing directory: _leyline/docs/bindings/categories/$category"
               MISSING_CATEGORIES+=("$category")
             fi
           done
@@ -372,21 +421,27 @@ jobs:
     - name: Check for Changes
       id: check-changes
       run: |
-        echo "Checking for changes in the repository..."
+        echo "::notice::🔍 Checking for changes in the repository"
 
         # Check if there are any uncommitted changes
         if git diff --quiet && git diff --cached --quiet; then
           # No changes detected
           echo "ℹ️ No changes to sync."
+          echo "::debug::Repository is already up to date with Leyline content"
           echo "has_changes=false" >> $GITHUB_OUTPUT
         else
           # Changes detected
           echo "✅ Changes detected, proceeding with sync."
+          echo "::debug::Repository has uncommitted changes from Leyline sync"
           echo "has_changes=true" >> $GITHUB_OUTPUT
 
           # Show what changed for transparency
-          echo "Changed files:"
+          echo "📝 Changed files:"
           git status --porcelain | head -20
+
+          # Count changes for logging
+          total_changes=$(git status --porcelain | wc -l)
+          echo "::debug::Total changed files: $total_changes"
         fi
 
     - name: Create Summary
@@ -555,6 +610,15 @@ jobs:
         # Save PR title to file
         echo "$pr_title" > pr-title.txt
 
+    # Log PR creation attempt
+    - name: Log PR Creation Attempt
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        echo "::notice::📮 Attempting to create Pull Request"
+        echo "::debug::PR title: $(cat pr-title.txt)"
+        echo "::debug::PR branch: ${{ inputs.pr_branch_name }}"
+        echo "::debug::Base branch: ${{ github.ref_name }}"
+
       # Create the PR if create_pr is true and changes exist
     - name: Create Pull Request
       if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
@@ -615,16 +679,18 @@ jobs:
       run: |
         if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
           if [ "${{ steps.create-pr.outputs.pull-request-operation }}" == "created" ]; then
-            echo "✅ New Pull Request created successfully"
+            echo "::notice::✅ New Pull Request created successfully"
           elif [ "${{ steps.create-pr.outputs.pull-request-operation }}" == "updated" ]; then
-            echo "✅ Existing Pull Request updated successfully"
+            echo "::notice::✅ Existing Pull Request updated successfully"
           else
-            echo "✅ Pull Request processed successfully"
+            echo "::notice::✅ Pull Request processed successfully"
           fi
-          echo "PR Number: ${{ steps.create-pr.outputs.pull-request-number }}"
-          echo "PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
-          echo "Branch: ${{ inputs.pr_branch_name }}"
-          echo "Operation: ${{ steps.create-pr.outputs.pull-request-operation }}"
+          echo "📋 PR Details:"
+          echo "  - Number: ${{ steps.create-pr.outputs.pull-request-number }}"
+          echo "  - URL: ${{ steps.create-pr.outputs.pull-request-url }}"
+          echo "  - Branch: ${{ inputs.pr_branch_name }}"
+          echo "  - Operation: ${{ steps.create-pr.outputs.pull-request-operation }}"
+          echo "::debug::PR creation completed successfully"
         else
           echo "ℹ️ No Pull Request created (no changes detected)"
         fi
@@ -633,15 +699,17 @@ jobs:
     - name: Log PR Creation Skipped
       if: inputs.create_pr == false
       run: |
-        echo "ℹ️ Pull Request creation disabled (create_pr = false)"
+        echo "::notice::ℹ️ Pull Request creation disabled (create_pr = false)"
         echo "Changes have been committed directly to the current branch"
+        echo "::debug::Skipping PR creation as requested by input configuration"
 
     # Log when no changes detected
     - name: Log No Changes
       if: steps.check-changes.outputs.has_changes == 'false'
       run: |
-        echo "ℹ️ No changes detected after syncing Leyline content"
+        echo "::notice::ℹ️ No changes detected after syncing Leyline content"
         echo "All files are already up to date with Leyline ref: ${{ inputs.leyline_ref }}"
+        echo "::debug::Repository content matches Leyline source exactly"
 
     # Set workflow outputs for consumption by calling workflows
     - name: Set Workflow Outputs
@@ -666,3 +734,25 @@ jobs:
           echo "commit_sha=$current_sha" >> $GITHUB_OUTPUT
           echo "📤 Output: commit_sha=$current_sha"
         fi
+
+    # Workflow completion summary
+    - name: Workflow Completion Summary
+      run: |
+        echo "::notice::🎉 Leyline content synchronization workflow completed"
+        echo ""
+        echo "📊 Summary:"
+        echo "  - Leyline reference: ${{ inputs.leyline_ref }}"
+        echo "  - Target path: ${{ inputs.target_path }}"
+        echo "  - Categories: ${{ inputs.categories != '' && inputs.categories || '(none)' }}"
+        echo "  - Changes detected: ${{ steps.check-changes.outputs.has_changes }}"
+        echo "  - PR creation enabled: ${{ inputs.create_pr }}"
+
+        if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
+          echo "  - PR created/updated: #${{ steps.create-pr.outputs.pull-request-number }}"
+        else
+          echo "  - PR created/updated: No"
+        fi
+
+        echo ""
+        echo "::debug::Workflow run completed successfully"
+        echo "::debug::Total execution time: ${{ job.duration || 'N/A' }}"

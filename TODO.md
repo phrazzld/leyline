@@ -168,7 +168,7 @@
         1. Manually create a branch with the default `pr_branch_name`, add a conflicting commit, then run the sync.
     - **Depends‑on:** [T009]
 
-- [ ] **T017 · Chore · P2: add comprehensive logging throughout `sync-leyline-content.yml`**
+- [x] **T017 · Chore · P2: add comprehensive logging throughout `sync-leyline-content.yml`**
     - **Context:** Detailed Build Steps #2
     - **Action:**
         1. Add `echo` statements or use workflow logging commands (e.g., `::debug::`, `::info::`) at key stages: start, inputs received, Leyline checkout, files being copied, categories processed, changes detected/not detected, PR creation attempt.
