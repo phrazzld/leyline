@@ -113,7 +113,7 @@
         1. Test with a non-existent tag/branch for `leyline_ref`.
     - **Depends‑on:** [T006]
 
-- [ ] **T012 · Feature · P2: implement handling for non-existent `categories` in `sync-leyline-content.yml`**
+- [x] **T012 · Feature · P2: implement handling for non-existent `categories` in `sync-leyline-content.yml`**
     - **Context:** Error & Edge‑Case Strategy - Non-existent `categories`
     - **Action:**
         1. When processing `inputs.categories`, if a specified category directory does not exist in the checked-out Leyline content, issue a warning (e.g., `::warning::Category '<category_name>' not found in Leyline ref '${{ inputs.leyline_ref }}'. Skipping.`).
