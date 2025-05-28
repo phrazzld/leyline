@@ -157,7 +157,7 @@
         1. Test with a token that has insufficient permissions (e.g., read-only).
     - **Depends‑on:** [T009]
 
-- [ ] **T016 · Feature · P2: implement error handling for PR branch conflicts in `sync-leyline-content.yml`**
+- [x] **T016 · Feature · P2: implement error handling for PR branch conflicts in `sync-leyline-content.yml`**
     - **Context:** Error & Edge‑Case Strategy - Merge conflicts if `pr_branch_name` already exists
     - **Action:**
         1. Configure `peter-evans/create-pull-request` to handle existing branches.

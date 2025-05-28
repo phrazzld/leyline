@@ -572,27 +572,41 @@ jobs:
         branch: ${{ inputs.pr_branch_name }}
         # Only create PR if there are actual changes to commit
         commit-message: ${{ inputs.commit_message }}
+        # Delete branch on close if no longer differs from base
+        delete-branch: true
+        # Base branch for the pull request
+        base: ${{ github.ref_name }}
 
     # Check if PR creation was successful
     - name: Check PR Creation Success
       if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true' && steps.create-pr.outcome == 'failure'
       run: |
-        echo "::error::Failed to create Pull Request"
-        echo "This is likely a token permission issue. Please ensure:"
-        echo "  1. The provided token has 'repo' or 'pull_requests:write' scope"
-        echo "  2. The token has permission to create pull requests in this repository"
-        echo "  3. The token has permission to create and push to branches"
-        echo "  4. The repository allows pull requests (not disabled in settings)"
+        echo "::error::Failed to create or update Pull Request"
         echo ""
-        echo "Required token permissions for PR creation:"
-        echo "  - 'repo' scope (full repository access)"
-        echo "  - OR 'public_repo' + 'pull_requests:write' for public repositories"
+        echo "This could be due to several reasons:"
         echo ""
-        echo "Common issues:"
-        echo "  - Token lacks 'repo' scope (most common)"
-        echo "  - Branch protection rules preventing PR creation"
-        echo "  - Organization SSO not authorized"
-        echo "  - Repository is archived or access is restricted"
+        echo "1. **Branch Conflicts:**"
+        echo "   - The branch '${{ inputs.pr_branch_name }}' may have diverged from the base branch"
+        echo "   - There may be an existing closed PR that prevents creating a new one"
+        echo "   - Solution: Try using a different branch name or manually delete the existing branch"
+        echo ""
+        echo "2. **Token Permission Issues:**"
+        echo "   - The provided token has insufficient permissions"
+        echo "   - Required: 'repo' scope or 'contents:write' + 'pull_requests:write'"
+        echo "   - For organizations: Ensure SSO is authorized if enabled"
+        echo ""
+        echo "3. **Branch Protection Rules:**"
+        echo "   - The base branch may have protection rules preventing PR creation"
+        echo "   - Check repository settings for branch protection policies"
+        echo ""
+        echo "4. **Repository Restrictions:**"
+        echo "   - Repository may be archived or have restricted access"
+        echo "   - Pull requests may be disabled in repository settings"
+        echo ""
+        echo "To resolve branch conflicts specifically:"
+        echo "  1. Delete the existing branch: git push origin --delete ${{ inputs.pr_branch_name }}"
+        echo "  2. Use a different branch name in your workflow"
+        echo "  3. Or manually merge/close any existing PRs from this branch"
         exit 1
 
     # Log PR creation results for transparency
@@ -600,10 +614,17 @@ jobs:
       if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true' && steps.create-pr.outcome == 'success'
       run: |
         if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
-          echo "✅ Pull Request created successfully"
+          if [ "${{ steps.create-pr.outputs.pull-request-operation }}" == "created" ]; then
+            echo "✅ New Pull Request created successfully"
+          elif [ "${{ steps.create-pr.outputs.pull-request-operation }}" == "updated" ]; then
+            echo "✅ Existing Pull Request updated successfully"
+          else
+            echo "✅ Pull Request processed successfully"
+          fi
           echo "PR Number: ${{ steps.create-pr.outputs.pull-request-number }}"
           echo "PR URL: ${{ steps.create-pr.outputs.pull-request-url }}"
           echo "Branch: ${{ inputs.pr_branch_name }}"
+          echo "Operation: ${{ steps.create-pr.outputs.pull-request-operation }}"
         else
           echo "ℹ️ No Pull Request created (no changes detected)"
         fi
