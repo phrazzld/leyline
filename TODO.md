@@ -223,7 +223,7 @@
     - **Depends‑on:** [T019]
 
 ## Consumer Workflow Examples (`examples/consumer-workflows/`)
-- [ ] **T022 · Chore · P1: create `examples/consumer-workflows/` directory**
+- [x] **T022 · Chore · P1: create `examples/consumer-workflows/` directory**
     - **Context:** Architecture Blueprint - `leyline/examples/consumer-workflows/`
     - **Action:**
         1. Create the new directory `leyline/examples/consumer-workflows/`.
