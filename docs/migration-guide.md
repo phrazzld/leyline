@@ -1,227 +1,400 @@
 # Migration Guide
 
-This guide covers two migration scenarios:
+This guide covers migration scenarios for adopting or upgrading your Leyline integration:
+
 1. **[Migrating from Symlinks to Leyline](#migrating-from-symlinks-to-leyline)** - For repositories using symlinked philosophy documents
-2. **[Migrating to Directory-Based Structure](#migrating-to-directory-based-structure)** - For existing Leyline users updating to the new directory-based structure
+2. **[Migrating from Legacy Workflows](#migrating-from-legacy-workflows)** - For repositories using the old vendor.yml workflow
+3. **[Migrating to Directory-Based Structure](#migrating-to-directory-based-structure)** - For existing Leyline users updating to the new directory-based structure
+
+For comprehensive integration instructions, see the [Pull-Based Integration Guide](integration/pull-model-guide.md).
 
 ---
 
 # Migrating from Symlinks to Leyline
 
+If your repository currently uses symlinked philosophy documents, follow this guide to migrate to Leyline's pull-based content synchronization.
+
 ## Step-by-Step Migration Process
 
-1. **Delete the old symlinks**
+### 1. Remove Old Symlinks
 
-   ```bash
-   git rm docs/DEVELOPMENT_PHILOSOPHY*.md
-   ```
+```bash
+# Remove the old symlinked files
+git rm docs/DEVELOPMENT_PHILOSOPHY*.md
 
-1. **Create a GitHub workflow file** Create `.github/workflows/vendor-docs.yml` with:
+# Commit the removal
+git commit -m "chore: remove symlinked philosophy documents"
+```
 
-   ```yaml
-   name: Leyline Sync
-   on:
-     pull_request:
-     push:
-       branches:
-         - master  # Change this if your default branch has a different name
-   permissions:
-     contents: write
-     pull-requests: write
-   jobs:
-     docs:
-       uses: phrazzld/leyline/.github/workflows/vendor.yml@v1.0.0
-       with:
-         ref: v1.0.0
-         categories: go,typescript,frontend  # Specify your required categories
-   ```
+### 2. Create Leyline Sync Workflow
 
-1. **Push these changes**
+Create `.github/workflows/sync-leyline.yml`:
 
-   ```bash
-   git add .github/workflows/vendor-docs.yml
-   git commit -m "chore: migrate from symlinks to Leyline"
-   git push
-   ```
+```yaml
+name: Sync Leyline Content
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Weekly on Mondays
+  workflow_dispatch:     # Allow manual triggers
 
-1. **Wait for the workflow to run**
+jobs:
+  sync:
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+    with:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      leyline_ref: v1.0.0  # Pin to specific version
+      categories: go,typescript,frontend  # Customize for your tech stack
+      target_path: docs/leyline
+      create_pr: true
+```
 
-   - GitHub Actions will clone the Leyline repo
-   - The workflow will create `/docs/tenets` and `/docs/bindings` directories with appropriate structure
-   - A PR will be created automatically with these directories
+### 3. Configure Workflow
 
-1. **Merge the PR**
+**Required Configuration:**
+- `token`: GitHub token with repo write permissions
+- `leyline_ref`: Specific Leyline version (never use `main`)
 
-   - The PR contains the vendored Leyline files
-   - Merging it completes the migration
+**Optional Configuration:**
+- `categories`: Comma-separated list of relevant categories
+- `target_path`: Where to place Leyline content (default: `docs/leyline`)
+- `create_pr`: Whether to create PR (recommended: `true`)
 
-## That's it!
+**Available Categories:**
+- **Languages**: `go`, `rust`, `typescript`
+- **Contexts**: `frontend`, `backend`
 
-Your repository will now use the vendored tenets and bindings from Leyline instead of
-the old symlinks. When Leyline is updated, you'll automatically receive a PR with the
-updates.
+### 4. Activate the Workflow
+
+```bash
+# Add and commit the workflow
+git add .github/workflows/sync-leyline.yml
+git commit -m "feat: add Leyline content synchronization"
+git push
+```
+
+### 5. Review and Merge Initial Sync
+
+1. **Automatic Sync**: The workflow runs and creates a PR with Leyline content
+2. **Review PR**: Check the synced tenets and bindings
+3. **Merge PR**: Complete the migration by merging the PR
+
+## What Happens Next
+
+- **Scheduled Updates**: Workflow runs weekly to check for updates
+- **Manual Updates**: Trigger via GitHub Actions UI when needed
+- **Version Control**: Team reviews all changes via pull requests
+- **Selective Sync**: Only categories relevant to your project are included
+
+For detailed configuration options, see the [comprehensive workflow example](../examples/consumer-workflows/sync-leyline-example.yml).
+
+---
+
+# Migrating from Legacy Workflows
+
+If your repository uses the old `vendor.yml` workflow, follow this guide to migrate to the new `sync-leyline-content.yml` workflow.
+
+## Why Migrate?
+
+The new workflow provides:
+- **Enhanced Security**: Explicit token management
+- **Better Control**: More configuration options and outputs
+- **Improved Reliability**: Better error handling and logging
+- **Future Support**: Active development and maintenance
+
+## Before and After Comparison
+
+### Old Workflow (vendor.yml)
+```yaml
+jobs:
+  docs:
+    uses: phrazzld/leyline/.github/workflows/vendor.yml@v1.0.0
+    with:
+      ref: v1.0.0
+      categories: go,typescript
+```
+
+### New Workflow (sync-leyline-content.yml)
+```yaml
+jobs:
+  sync:
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+    with:
+      token: ${{ secrets.GITHUB_TOKEN }}  # Now required
+      leyline_ref: v1.0.0                # Renamed from 'ref'
+      categories: go,typescript           # Same format
+      target_path: docs/leyline          # New: customizable path
+      create_pr: true                    # New: PR control
+```
+
+## Migration Steps
+
+### Step 1: Update Workflow Reference
+
+In your `.github/workflows/*.yml` file:
+
+**Change:**
+```yaml
+uses: phrazzld/leyline/.github/workflows/vendor.yml@v1.0.0
+```
+
+**To:**
+```yaml
+uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+```
+
+### Step 2: Update Input Parameters
+
+| Old Parameter | New Parameter | Notes |
+|---------------|---------------|-------|
+| `ref` | `leyline_ref` | Renamed for clarity |
+| N/A | `token` | **Required**: `${{ secrets.GITHUB_TOKEN }}` |
+| `categories` | `categories` | Same format |
+| N/A | `target_path` | Optional: customize destination |
+| N/A | `create_pr` | Optional: control PR creation |
+
+### Step 3: Add Required Token
+
+Add the token parameter to your workflow:
+
+```yaml
+with:
+  token: ${{ secrets.GITHUB_TOKEN }}
+  # ... other parameters
+```
+
+### Step 4: Test the Migration
+
+1. **Create Feature Branch**: Test changes before applying to main
+2. **Manual Trigger**: Use `workflow_dispatch` to test manually
+3. **Verify Output**: Check that sync works as expected
+4. **Review PR**: Ensure content is synced correctly
+
+### Step 5: Update Additional Configurations
+
+**Optional Enhancements:**
+```yaml
+with:
+  token: ${{ secrets.GITHUB_TOKEN }}
+  leyline_ref: v1.0.0
+  categories: go,typescript,frontend
+  target_path: docs/leyline                    # Customize location
+  create_pr: true                             # Enable PR workflow
+  commit_message: "docs: update standards"    # Custom commit message
+  pr_title: "Update Development Standards"    # Custom PR title
+```
+
+## Migration Troubleshooting
+
+### Common Issues
+
+**"Resource not accessible by integration"**
+- **Cause**: Missing or insufficient token permissions
+- **Solution**: Ensure `token: ${{ secrets.GITHUB_TOKEN }}` is included
+
+**"Invalid leyline_ref provided"**
+- **Cause**: Using old parameter name or invalid version
+- **Solution**: Use `leyline_ref` (not `ref`) with valid version
+
+**"Workflow file seems to have an issue"**
+- **Cause**: Syntax error in updated workflow
+- **Solution**: Validate YAML syntax and parameter format
+
+**No PR created after migration**
+- **Cause**: `create_pr` disabled or permission issues
+- **Solution**: Set `create_pr: true` and check repo permissions
+
+### Validation Checklist
+
+After migration, verify:
+- [ ] Workflow runs without errors
+- [ ] Content syncs to expected location
+- [ ] PR is created with appropriate title
+- [ ] All requested categories are included
+- [ ] No old-format files remain
 
 ---
 
 # Migrating to Directory-Based Structure
 
+For existing Leyline users updating to the new hierarchical directory structure.
+
 ## What's Changing?
 
-Leyline has undergone an architectural change in how bindings are organized:
-
-**Old Structure:**
-- Flat organization in `docs/bindings/`
-- Language/context identification via filename prefixes (e.g., `ts-no-any.md`, `go-error-wrapping.md`)
-- Filtering via detection-based approach using `applies_to` front matter
-
-**New Structure:**
-- Hierarchical organization with `core/` and `categories/` directories
-- Language/context identification via directory placement
-- Explicit category selection via the new `categories` input
-- Core bindings always synced to all consumers
-
-This change provides better organization, more explicit control, and cleaner integration for all consumers.
-
-## Migration Steps
-
-### Step 1: Update Your Workflow YAML
-
-Update your GitHub Actions workflow file to include the new `categories` input:
-
-```yaml
-# .github/workflows/vendor-docs.yml
-name: Leyline Sync
-on:
-  pull_request:
-  push:
-jobs:
-  docs:
-    uses: phrazzld/leyline/.github/workflows/vendor.yml@v1.0.0  # Use appropriate version
-    with:
-      ref: v1.0.0  # Use appropriate version
-      categories: go,typescript,frontend  # Specify your required categories
+### Old Structure (Flat)
+```
+docs/bindings/
+├── 00-index.md
+├── pure-functions.md           # Core binding
+├── ts-no-any.md               # TypeScript binding
+└── go-error-wrapping.md       # Go binding
 ```
 
-The `categories` parameter accepts a comma-separated list with no spaces.
+### New Structure (Hierarchical)
+```
+docs/bindings/
+├── core/
+│   ├── 00-index.md
+│   └── pure-functions.md      # Core bindings
+├── categories/
+│   ├── typescript/
+│   │   └── no-any.md          # TypeScript-specific
+│   └── go/
+│       └── error-wrapping.md  # Go-specific
+└── 00-index.md               # Combined index
+```
 
-> **Note:** The `override_languages` and `override_contexts` parameters are deprecated and will be removed in a future version. Use `categories` instead.
+## Migration Process
 
-### Step 2: Select Appropriate Categories
+### Step 1: Update Workflow Configuration
 
-Choose which categories are relevant for your project from:
+Add explicit `categories` parameter to your workflow:
 
-| Category | Description | Contains Bindings For |
-|----------|-------------|------------------------|
-| `go` | Go language | Go-specific patterns and practices |
-| `rust` | Rust language | Rust-specific patterns and practices |
-| `typescript` | TypeScript language | TypeScript and JavaScript patterns |
-| `cli` | Command-line interfaces | CLI application design patterns |
-| `frontend` | Frontend applications | Web/UI application patterns |
-| `backend` | Backend applications | Server-side application patterns |
+```yaml
+jobs:
+  sync:
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+    with:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      leyline_ref: v1.0.0
+      categories: go,typescript,frontend  # Specify your categories
+```
 
-Guidelines for selection:
-- Select categories matching your project technologies
-- Specify only the categories you need (reduces noise)
-- Core bindings are always synced regardless of selection
+### Step 2: Run Updated Workflow
 
-### Step 3: Run the Updated Workflow
+The workflow automatically:
+1. **Cleans up** old flat-structure files
+2. **Syncs core** bindings to `docs/bindings/core/`
+3. **Syncs categories** to `docs/bindings/categories/<category>/`
+4. **Regenerates index** to reflect new structure
+5. **Creates PR** with migration details
 
-When you run the updated workflow:
+### Step 3: Review Migration PR
 
-1. The workflow will automatically clean up any old-format binding files
-2. Core bindings will be synced to `docs/bindings/core/`
-3. Requested categories will be synced to `docs/bindings/categories/<category>/`
-4. The bindings index will be regenerated to reflect the new structure
-5. A pull request will be created with:
-   - Details of which categories were synced
-   - Warnings for any requested categories that don't exist
-   - Information about cleanup operations performed
+The PR will show:
+- Files removed from old structure
+- New hierarchical organization
+- Updated index with proper sections
+- Any warnings for missing categories
+
+### Step 4: Update Internal References
+
+If your project references binding files directly:
+
+**Update paths:**
+```markdown
+<!-- Old -->
+[Pure Functions](docs/bindings/pure-functions.md)
+
+<!-- New -->
+[Pure Functions](docs/bindings/core/pure-functions.md)
+```
 
 ## Understanding the New Structure
 
-### Directory Structure
-
-```
-docs/bindings/
-  ├── core/                # Core bindings (always synced)
-  ├── categories/
-  │   ├── go/              # Go-specific bindings
-  │   ├── rust/            # Rust-specific bindings
-  │   ├── typescript/      # TypeScript-specific bindings
-  │   ├── cli/             # CLI-specific bindings
-  │   ├── frontend/        # Frontend-specific bindings
-  │   └── backend/         # Backend-specific bindings
-  └── 00-index.md          # Auto-generated index of all bindings
-```
-
 ### Core vs. Category Bindings
 
-- **Core Bindings**: Apply to all projects regardless of language or environment. These bindings represent fundamental principles that transcend specific technologies.
+**Core Bindings** (`docs/bindings/core/`):
+- Apply universally across all projects
+- Technology-agnostic principles
+- Always synced regardless of categories
 
-- **Category Bindings**: Apply specifically to certain languages or contexts. These bindings often use language-specific syntax or address concerns unique to particular development environments.
+**Category Bindings** (`docs/bindings/categories/<category>/`):
+- Apply to specific languages or contexts
+- Technology-specific implementations
+- Synced only when category is requested
 
-### Cleanup Process
+### Benefits of New Structure
 
-When the workflow runs:
-- It identifies any `.md` files directly in `docs/bindings/` (old structure)
-- These files are removed to prevent conflicts and confusion
-- A count of removed files is included in the PR description
-
-### Reindexing Process
-
-The workflow automatically runs `reindex.rb` to:
-- Generate a new `docs/bindings/00-index.md` file
-- Include proper sections for core and each category
-- Create correct relative links to all binding files
-- Ensure the index reflects the current state of all bindings
-
-## Troubleshooting
-
-### Common Issues
-
-**Missing categories warning**
-- **Symptom**: PR shows warnings about requested categories not found
-- **Solution**: Check spelling of categories; verify they exist in the current Leyline version
-
-**No category-specific bindings synced**
-- **Symptom**: PR shows only core bindings were synced, but no category-specific bindings
-- **Solution**: Verify you specified categories in the input parameter; check if you need to update to a newer Leyline version
-
-**Binding links are broken in documentation**
-- **Symptom**: Internal documentation links to binding files return 404
-- **Solution**: Update internal references to use new paths (`docs/bindings/core/` or `docs/bindings/categories/<category>/`)
-
-**Workflow fails with "This run likely failed because of a workflow file issue"**
-- Check that you're using `uses` correctly. It should be at the job level, not the step level.
-- Make sure to add the `permissions` section as shown above.
-
-**No PR is created after the workflow runs**
-- Check if your repository allows GitHub Actions to create pull requests. Go to Settings > Actions > General and ensure "Workflow permissions" is set to "Read and write permissions".
-- Verify that the permissions are correctly set in the workflow file.
-
-**Error about "not finding ref" or similar reference errors**
-- The Leyline repository must have the tag (e.g., `v1.0.0`) you're referencing published on GitHub.
-- Check available tags at https://github.com/phrazzld/leyline/tags
-
-**Invalid format for categories input**
-- **Symptom**: Workflow fails with error about invalid format for categories input
-- **Solution**: Ensure the categories input contains only alphanumeric characters, commas, and hyphens (no spaces)
-
-### Verifying Successful Migration
-
-A successful migration should result in:
-1. No `.md` files directly in `docs/bindings/` (except `00-index.md`)
-2. Core bindings in `docs/bindings/core/`
-3. Category-specific bindings in `docs/bindings/categories/<category>/`
-4. An up-to-date `docs/bindings/00-index.md` file with proper sections and links
-
-## Need Help?
-
-If you encounter any issues during migration, please:
-1. Check this guide's troubleshooting section
-2. Review the [Leyline documentation](https://github.com/phrazzld/leyline)
-3. Open an issue with the "migration" label if you need additional assistance
+1. **Explicit Control**: Choose exactly which categories to sync
+2. **Cleaner Organization**: Clear separation of concerns
+3. **Reduced Noise**: Only relevant bindings in your project
+4. **Better Scaling**: Easy to add new categories without conflicts
 
 ---
 
-**Note**: This migration is a one-time process. Once completed, all future syncs will use the new directory structure automatically.
+# Troubleshooting
+
+## Common Issues
+
+### Workflow Errors
+
+**"Token permission issues"**
+- **Symptoms**: "Resource not accessible by integration"
+- **Solutions**:
+  - Ensure `token: ${{ secrets.GITHUB_TOKEN }}` is included
+  - Check repository Actions permissions
+  - Verify organization SSO settings
+
+**"Invalid workflow reference"**
+- **Symptoms**: "Could not resolve to a Repository"
+- **Solutions**:
+  - Use `sync-leyline-content.yml@v1` (not `vendor.yml`)
+  - Verify workflow file syntax
+  - Check for typos in repository reference
+
+### Content Issues
+
+**"Missing requested categories"**
+- **Symptoms**: Warnings in PR about non-existent categories
+- **Solutions**:
+  - Check category spelling: `go`, `rust`, `typescript`, `frontend`, `backend`
+  - Verify categories exist in the Leyline version you're using
+  - Update to newer Leyline version if category was added later
+
+**"No changes detected"**
+- **Symptoms**: Workflow runs but no PR is created
+- **Solutions**:
+  - Content is already up-to-date (normal behavior)
+  - Check if workflow is configured correctly
+  - Verify `leyline_ref` points to different version
+
+### Repository Setup Issues
+
+**"Workflow doesn't trigger"**
+- **Symptoms**: Scheduled workflow never runs
+- **Solutions**:
+  - Ensure workflow is on main/default branch
+  - Check Actions are enabled for repository
+  - Verify cron syntax in schedule trigger
+
+**"PRs aren't created"**
+- **Symptoms**: Workflow runs but no PR appears
+- **Solutions**:
+  - Verify `create_pr: true` in workflow
+  - Check repository allows Actions to create PRs
+  - Ensure no branch protection conflicts
+
+## Getting Help
+
+### Self-Service Resources
+
+1. **Check workflow logs** in GitHub Actions tab
+2. **Review this migration guide** for common scenarios
+3. **Consult the comprehensive guide**: [Pull-Based Integration Guide](integration/pull-model-guide.md)
+4. **See working examples**: [Consumer Workflow Examples](../examples/consumer-workflows/)
+
+### Community Support
+
+- **Questions**: [GitHub Discussions](https://github.com/phrazzld/leyline/discussions)
+- **Bug Reports**: [GitHub Issues](https://github.com/phrazzld/leyline/issues)
+- **Feature Requests**: [GitHub Issues](https://github.com/phrazzld/leyline/issues) with "enhancement" label
+
+### When Reporting Issues
+
+Include:
+- Complete workflow configuration
+- Error messages from workflow logs
+- Leyline version being used (`leyline_ref`)
+- Repository settings (if relevant)
+
+---
+
+## Related Documentation
+
+- **[Pull-Based Integration Guide](integration/pull-model-guide.md)**: Comprehensive setup instructions
+- **[Versioning Guide](integration/versioning-guide.md)**: Version management best practices
+- **[Consumer Workflow Examples](../examples/consumer-workflows/)**: Working configuration examples
+
+---
+
+**Note**: All migrations are one-time processes. Once completed, future syncs will use the current workflow and structure automatically.

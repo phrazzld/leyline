@@ -253,7 +253,7 @@
     - **Depends‑on:** [T023]
 
 ## Existing Supporting Documentation Updates
-- [ ] **T025 · Chore · P2: update `docs/migration-guide.md`**
+- [x] **T025 · Chore · P2: update `docs/migration-guide.md`**
     - **Context:** Detailed Build Steps #6
     - **Action:**
         1. Update `docs/migration-guide.md` with instructions for migrating from any legacy sync methods to `sync-leyline-content.yml`.
