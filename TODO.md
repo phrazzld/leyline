@@ -261,7 +261,7 @@
         1. Migration guide provides clear steps for users of old methods.
     - **Depends‑on:** [T017, T020]
 
-- [ ] **T026 · Chore · P2: update `docs/implementation-guide.md` for Leyline authors**
+- [x] **T026 · Chore · P2: update `docs/implementation-guide.md` for Leyline authors**
     - **Context:** Detailed Build Steps #6
     - **Action:**
         1. Ensure `docs/implementation-guide.md` is clearly focused on *authors contributing new tenets/bindings to Leyline itself*.
