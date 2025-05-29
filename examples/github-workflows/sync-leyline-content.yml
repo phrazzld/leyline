@@ -1,4 +1,9 @@
-# GitHub Actions workflow for syncing Leyline tenets and bindings
+# Minimal Example: GitHub Actions workflow for syncing Leyline content
+#
+# This is a basic example showing the minimal configuration needed.
+# For a comprehensive example with all options and best practices, see:
+# 📖 examples/consumer-workflows/sync-leyline-example.yml
+#
 # Place this file in your repository at .github/workflows/sync-leyline.yml
 
 name: Leyline Sync

@@ -1,131 +1,127 @@
-# Language-specific Leyline sync workflow
-# Place this file in your repository at .github/workflows/leyline-sync.yml
+# Language-Specific Leyline Sync Example
+#
+# This example demonstrates automatic language detection to sync only relevant categories.
+# It detects your project's languages and syncs the appropriate Leyline bindings.
+#
+# For a comprehensive example with all options, see:
+# 📖 examples/consumer-workflows/sync-leyline-example.yml
 
-name: Leyline Sync (Language-Specific)
+name: Leyline Sync (Auto-Detect Languages)
+
 on:
+  # Weekly check for updates
+  schedule:
+    - cron: '0 9 * * 1'
+  # Manual trigger for testing
+  workflow_dispatch:
+  # Or trigger on workflow file changes
   pull_request:
-  push:
-    branches:
-      - master
+    paths:
+      - '.github/workflows/leyline-sync.yml'
 
 jobs:
-  detect-language:
+  detect-languages:
     name: Detect Project Languages
     runs-on: ubuntu-latest
     outputs:
       categories: ${{ steps.detect.outputs.categories }}
+
     steps:
-      - name: Checkout
+      # First, detect what languages/frameworks are in use
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Detect Languages and Set Categories
+      - name: Detect Languages
         id: detect
         run: |
+          echo "🔍 Detecting project languages and frameworks..."
+
           CATEGORIES=""
 
-          # Check for TypeScript/JavaScript
-          if find . -type f -name "*.ts" -o -name "*.tsx" -o -name "package.json" | grep -q .; then
-            CATEGORIES="${CATEGORIES}typescript,"
-          fi
-
-          # Check for Go
-          if find . -type f -name "*.go" -o -name "go.mod" | grep -q .; then
+          # Detect Go
+          if [[ -f "go.mod" ]] || find . -name "*.go" -type f | head -1 > /dev/null; then
+            echo "✓ Go detected"
             CATEGORIES="${CATEGORIES}go,"
           fi
 
-          # Check for Rust
-          if find . -type f -name "*.rs" -o -name "Cargo.toml" | grep -q .; then
+          # Detect Rust
+          if [[ -f "Cargo.toml" ]] || find . -name "*.rs" -type f | head -1 > /dev/null; then
+            echo "✓ Rust detected"
             CATEGORIES="${CATEGORIES}rust,"
           fi
 
-          # Check for Frontend code
-          if find . -type f -name "*.html" -o -name "*.css" -o -name "*.jsx" -o -name "*.tsx" | grep -q .; then
+          # Detect TypeScript/JavaScript
+          if [[ -f "package.json" ]] || [[ -f "tsconfig.json" ]] || find . -name "*.ts" -o -name "*.tsx" -type f | head -1 > /dev/null; then
+            echo "✓ TypeScript detected"
+            CATEGORIES="${CATEGORIES}typescript,"
+          fi
+
+          # Detect Frontend code
+          if [[ -d "frontend/" ]] || [[ -d "src/components/" ]] || find . -name "*.jsx" -o -name "*.tsx" -o -name "*.vue" -type f | head -1 > /dev/null; then
+            echo "✓ Frontend code detected"
             CATEGORIES="${CATEGORIES}frontend,"
           fi
 
-          # Remove trailing comma if it exists
-          CATEGORIES=$(echo $CATEGORIES | sed 's/,$//')
+          # Detect Backend indicators
+          if [[ -d "backend/" ]] || [[ -d "api/" ]] || [[ -d "server/" ]] || [[ -f "Dockerfile" ]]; then
+            echo "✓ Backend code detected"
+            CATEGORIES="${CATEGORIES}backend,"
+          fi
+
+          # Remove trailing comma
+          CATEGORIES=${CATEGORIES%,}
+
+          if [[ -z "$CATEGORIES" ]]; then
+            echo "ℹ️ No specific language categories detected, will sync core bindings only"
+          else
+            echo "📦 Categories to sync: $CATEGORIES"
+          fi
 
           echo "categories=$CATEGORIES" >> $GITHUB_OUTPUT
-          echo "Detected categories: $CATEGORIES"
 
-  sync-docs:
-    name: Sync Relevant Leyline Docs
-    needs: detect-language
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # Now sync Leyline content based on detected languages
+  sync-leyline:
+    name: Sync Leyline Content
+    needs: detect-languages
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+    with:
+      # Required inputs
+      token: ${{ secrets.GITHUB_TOKEN }}
+      leyline_ref: v1.0.0  # Pin to specific version
 
-      - name: Clone Leyline
-        uses: actions/checkout@v4
-        with:
-          repository: phrazzld/leyline
-          ref: v0.1.0
-          path: _leyline
+      # Use detected categories (empty string means core only)
+      categories: ${{ needs.detect-languages.outputs.categories }}
 
-      # Always sync all tenets (language-agnostic)
-      - name: Sync Tenets
-        run: |
-          mkdir -p docs/tenets
-          rsync -a --delete _leyline/docs/tenets/ docs/tenets/
+      # Optional: Customize other parameters
+      target_path: docs/leyline
+      create_pr: true
+      pr_title: "Update Leyline Standards (Auto-Detected: ${{ needs.detect-languages.outputs.categories || 'core only' }})"
 
-      # Setup the bindings directory structure
-      - name: Setup Bindings Directory Structure
-        run: |
-          mkdir -p docs/bindings/core
-          mkdir -p docs/bindings/categories
+# Alternative: Inline language detection (if you prefer a single job)
+# ============================================================================
+#
+# jobs:
+#   sync-with-detection:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#
+#       - name: Detect and Sync
+#         uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           leyline_ref: v1.0.0
+#           # Use bash substitution to detect categories inline
+#           categories: |
+#             ${{
+#               (hashFiles('go.mod') != '' && 'go,') ||
+#               (hashFiles('Cargo.toml') != '' && 'rust,') ||
+#               (hashFiles('package.json') != '' && 'typescript,') ||
+#               ''
+#             }}
 
-      # Always sync core bindings
-      - name: Sync Core Bindings
-        run: |
-          rsync -a --delete _leyline/docs/bindings/core/ docs/bindings/core/
-
-      # Sync category-specific bindings based on detected categories
-      - name: Sync Category-Specific Bindings
-        if: ${{ needs.detect-language.outputs.categories != '' }}
-        run: |
-          # Split the categories string into an array
-          IFS=',' read -ra CATEGORY_ARRAY <<< "${{ needs.detect-language.outputs.categories }}"
-
-          # Sync each detected category
-          for category in "${CATEGORY_ARRAY[@]}"; do
-            if [ -d "_leyline/docs/bindings/categories/$category" ]; then
-              echo "Syncing $category bindings"
-              mkdir -p "docs/bindings/categories/$category"
-              rsync -a --delete "_leyline/docs/bindings/categories/$category/" "docs/bindings/categories/$category/"
-            else
-              echo "Warning: Category directory not found for $category"
-            fi
-          done
-
-      # Clean up any old binding structure if it exists
-      - name: Clean Up Old Binding Structure
-        run: |
-          # Remove any old-style bindings in the flat structure
-          find docs/bindings/ -maxdepth 1 -name "*.md" ! -name "00-index.md" -type f -delete || true
-
-      # Regenerate the index file
-      - name: Generate Bindings Index
-        run: |
-          cd _leyline
-          ruby tools/reindex.rb
-          cp docs/bindings/00-index.md ../docs/bindings/
-
-      # Create PR with changes
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          title: "docs: sync language-specific Leyline docs"
-          body: |
-            # Leyline Documentation Sync
-
-            This PR automatically syncs Leyline tenets and bindings based on repository language detection.
-
-            ## Synced Categories:
-            - Core (always synced)
-            ${{ needs.detect-language.outputs.categories != '' && format('- {0}', replace(needs.detect-language.outputs.categories, ',', '\n- ')) || '' }}
-
-            Please review the synced documentation to ensure it's appropriate for your project.
-          branch: leyline-sync
-          commit-message: "docs: sync language-specific Leyline docs"
+# Notes:
+# - Language detection runs before each sync to ensure accuracy
+# - You can customize the detection logic for your specific needs
+# - Consider caching detection results if running frequently
+# - The workflow will create PRs with clear indication of what was synced

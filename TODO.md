@@ -243,7 +243,7 @@
         1. Manually inspect the example for clarity and correctness.
     - **Depends‑on:** [T017, T022]
 
-- [ ] **T024 · Chore · P2: update or deprecate existing consumer workflow examples**
+- [x] **T024 · Chore · P2: update or deprecate existing consumer workflow examples**
     - **Context:** Detailed Build Steps #5
     - **Action:**
         1. Review any existing consumer workflow examples.
