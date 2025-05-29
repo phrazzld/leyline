@@ -231,7 +231,7 @@
         1. The `leyline/examples/consumer-workflows/` directory exists.
     - **Depends‑on:** none
 
-- [ ] **T023 · Feature · P1: create `sync-leyline-example.yml` consumer workflow example**
+- [x] **T023 · Feature · P1: create `sync-leyline-example.yml` consumer workflow example**
     - **Context:** Detailed Build Steps #5, Architecture Blueprint - `sync-leyline-example.yml`
     - **Action:**
         1. Create `examples/consumer-workflows/sync-leyline-example.yml`.

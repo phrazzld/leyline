@@ -1,0 +1,236 @@
+# =============================================================================
+# Leyline Content Sync - Example Consumer Workflow
+# =============================================================================
+#
+# This is a comprehensive example showing how to integrate Leyline's pull-based
+# content synchronization into your repository. Copy and customize this workflow
+# to automatically sync tenets, core bindings, and category-specific bindings.
+#
+# 📖 For detailed integration instructions, see:
+#    docs/integration/pull-model-guide.md
+#
+# 🏷️  For version management best practices, see:
+#    docs/integration/versioning-guide.md
+#
+# =============================================================================
+
+name: Sync Leyline Content
+
+# =============================================================================
+# TRIGGERS: When should this workflow run?
+# =============================================================================
+
+on:
+  # 🕐 Scheduled Updates (Recommended)
+  # Run weekly on Mondays at 9 AM UTC to check for new Leyline versions
+  schedule:
+    - cron: '0 9 * * 1'
+
+  # 🔧 Manual Trigger (Recommended)
+  # Allow manual execution with optional version override
+  workflow_dispatch:
+    inputs:
+      leyline_version:
+        description: 'Leyline version to sync (e.g., v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+        type: string
+      create_pr:
+        description: 'Create pull request instead of direct commit'
+        required: false
+        default: true
+        type: boolean
+
+  # 🎯 Event-Driven (Optional)
+  # Uncomment to trigger on specific events
+  # pull_request:
+  #   paths:
+  #     - '.github/workflows/sync-leyline.yml'  # Test workflow changes
+
+# =============================================================================
+# WORKFLOW JOBS
+# =============================================================================
+
+jobs:
+  sync-leyline-content:
+    name: Sync Leyline Content
+    runs-on: ubuntu-latest
+
+    # 🔒 Security: Only run on main branch for scheduled/dispatch triggers
+    # Remove this condition if you want to test on feature branches
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      # =========================================================================
+      # CORE SYNC STEP: Call Leyline's reusable workflow
+      # =========================================================================
+
+      - name: Sync Leyline Content
+        id: sync
+        uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+        with:
+          # 🔑 REQUIRED: GitHub token with repo write permissions
+          # For organization repositories, ensure token has SSO enabled
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+          # 🏷️ REQUIRED: Leyline version to sync from
+          # 🚨 IMPORTANT: Always pin to specific version tags (never 'main'!)
+          # Use manual input if provided, otherwise use default pinned version
+          leyline_ref: ${{ inputs.leyline_version || 'v1.0.0' }}
+
+          # 📁 OPTIONAL: Categories to sync (comma-separated)
+          # Available categories: go, rust, typescript, frontend, backend
+          # Uncomment and customize based on your tech stack:
+          categories: 'go,typescript,frontend'
+
+          # Alternative examples:
+          # categories: 'rust,backend'           # Rust backend project
+          # categories: 'typescript,frontend'   # Frontend TypeScript project
+          # categories: 'go'                    # Go-only project
+          # categories: ''                      # Core bindings only (default)
+
+          # 📂 OPTIONAL: Custom destination directory
+          # Default: 'docs/leyline'
+          target_path: 'docs/leyline'
+
+          # 🔀 OPTIONAL: PR creation control
+          # true (default): Create pull request for team review
+          # false: Commit directly to current branch
+          create_pr: ${{ inputs.create_pr != false }}
+
+          # 📝 OPTIONAL: Custom commit/PR messages
+          # Uncomment to customize:
+          # commit_message: 'docs: sync Leyline standards to ${{ inputs.leyline_version || "v1.0.0" }}'
+          # pr_title: 'Update Development Standards (${{ inputs.leyline_version || "v1.0.0" }})'
+          # pr_branch_name: 'leyline-sync-${{ inputs.leyline_version || "v1.0.0" }}'
+
+      # =========================================================================
+      # POST-SYNC ACTIONS (Optional)
+      # =========================================================================
+
+      # 📢 Example: Comment on PR with sync details
+      - name: Comment on PR
+        if: steps.sync.outputs.pr_url != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prUrl = '${{ steps.sync.outputs.pr_url }}';
+            const prNumber = prUrl.split('/').pop();
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `🤖 **Leyline Sync Complete**
+
+              - **Version**: ${{ inputs.leyline_version || 'v1.0.0' }}
+              - **Categories**: ${{ inputs.categories || 'core only' }}
+              - **Commit**: ${{ steps.sync.outputs.commit_sha }}
+
+              Please review the changes and merge when ready.`
+            });
+
+      # 🔔 Example: Send Slack notification (requires SLACK_WEBHOOK secret)
+      # - name: Notify Slack
+      #   if: always()
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ job.status }}
+      #     text: |
+      #       Leyline sync ${{ job.status }} for ${{ github.repository }}
+      #       PR: ${{ steps.sync.outputs.pr_url || 'No PR created' }}
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      # 🧪 Example: Run tests after sync (if you have validation scripts)
+      # - name: Validate Synced Content
+      #   run: |
+      #     # Example validation scripts
+      #     ./scripts/validate-leyline-content.sh
+      #     # or
+      #     npm run lint:docs
+      #     # or
+      #     make validate-standards
+
+# =============================================================================
+# CONFIGURATION VARIATIONS
+# =============================================================================
+
+# 🏢 ORGANIZATION-WIDE SETUP
+# For consistent configuration across multiple repositories:
+#
+# 1. Set organization-level variables:
+#    - LEYLINE_VERSION: v1.0.0
+#    - LEYLINE_CATEGORIES: (varies per repo)
+#
+# 2. Use in workflow:
+#    leyline_ref: ${{ vars.LEYLINE_VERSION }}
+#    categories: ${{ vars.LEYLINE_CATEGORIES }}
+
+# 🎯 ENVIRONMENT-SPECIFIC SYNC
+# For different versions per environment:
+#
+# strategy:
+#   matrix:
+#     environment: [development, staging, production]
+#     include:
+#       - environment: development
+#         leyline_version: main
+#       - environment: staging
+#         leyline_version: v1.1.0-rc.1
+#       - environment: production
+#         leyline_version: v1.0.0
+
+# 🔍 LANGUAGE DETECTION
+# Automatically detect and sync relevant categories:
+#
+# - name: Detect Languages
+#   id: detect
+#   run: |
+#     categories=""
+#     [[ -f "go.mod" ]] && categories="${categories},go"
+#     [[ -f "package.json" ]] && categories="${categories},typescript"
+#     [[ -d "frontend/" ]] && categories="${categories},frontend"
+#     echo "categories=${categories#,}" >> $GITHUB_OUTPUT
+#
+# - uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+#   with:
+#     categories: ${{ steps.detect.outputs.categories }}
+
+# =============================================================================
+# TROUBLESHOOTING TIPS
+# =============================================================================
+
+# 🚨 Common Issues and Solutions:
+#
+# ❌ "Resource not accessible by integration"
+#    → Check token permissions (contents:write, pull-requests:write)
+#    → Enable SSO for organization repositories
+#
+# ❌ "Invalid leyline_ref provided"
+#    → Verify version exists: https://github.com/phrazzld/leyline/releases
+#    → Use 'v1.0.0' format, not '1.0.0'
+#
+# ❌ "Category 'xyz' not found"
+#    → Check available categories in Leyline version
+#    → Valid: go, rust, typescript, frontend, backend
+#
+# ❌ Workflow creates empty PRs
+#    → Content already up-to-date, no changes needed
+#    → This is normal behavior
+#
+# 📖 For comprehensive troubleshooting:
+#    docs/integration/pull-model-guide.md#troubleshooting
+
+# =============================================================================
+# BEST PRACTICES CHECKLIST
+# =============================================================================
+
+# ✅ Pin to specific Leyline version tags (never 'main')
+# ✅ Use pull requests for team review (create_pr: true)
+# ✅ Set up automated dependency updates (Dependabot/Renovate)
+# ✅ Test workflow changes in feature branches first
+# ✅ Monitor workflow runs and investigate failures
+# ✅ Include relevant categories for your tech stack
+# ✅ Coordinate team updates through PRs
+# ✅ Keep local customizations in separate directories
