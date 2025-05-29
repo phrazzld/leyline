@@ -278,7 +278,7 @@
         1. `CONTRIBUTING.md` is consistent with the new standard.
     - **Depends‑on:** [T001]
 
-- [ ] **T028 · Chore · P3: review and update all other documentation (e.g., `CLAUDE.md`)**
+- [x] **T028 · Chore · P3: review and update all other documentation (e.g., `CLAUDE.md`)**
     - **Context:** Detailed Build Steps #6
     - **Action:**
         1. Review all other miscellaneous documentation files for outdated references to push mechanisms or the "Warden System" as an active agent.

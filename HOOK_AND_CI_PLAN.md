@@ -155,7 +155,7 @@ CI for dev‑infra executes all reusable workflows against miniature sample proj
 | Phase                   | Action                                                                                 |
 | ----------------------- | -------------------------------------------------------------------------------------- |
 |  0 — Pilot              | Pick three canary repos (one per language), integrate dev‑infra v1.0, gather feedback. |
-|  1 — Adopt              | Auto‑PR generator opens dispatcher PRs in remaining repos.                             |
+|  1 — Adopt              | Teams create dispatcher PRs in their repos following the integration guide.                             |
 |  2 — Deprecate old YAML | Archive legacy `.github/workflows` after two green builds.                             |
 |  3 — Deprecate husky    | Replace with pre‑commit; add Husky shim hook that warns contributors.                  |
 
