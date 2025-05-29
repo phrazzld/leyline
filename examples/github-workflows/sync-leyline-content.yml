@@ -1,0 +1,42 @@
+# Minimal Example: GitHub Actions workflow for syncing Leyline content
+#
+# This is a basic example showing the minimal configuration needed.
+# For a comprehensive example with all options and best practices, see:
+# 📖 examples/consumer-workflows/sync-leyline-example.yml
+#
+# Place this file in your repository at .github/workflows/sync-leyline.yml
+
+name: Leyline Sync
+on:
+  # Run on pull requests to ensure docs are up to date
+  pull_request:
+  # Run on pushes to the default branch
+  push:
+    branches:
+      - master  # Change this if your default branch has a different name
+
+jobs:
+  docs:
+    name: Sync Leyline Content
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Call the reusable workflow from the Leyline repository
+      # This will sync tenets and bindings into your docs directory
+      - name: Sync Leyline Content
+        uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1.0.0  # Update version as needed
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Token with repo access permissions
+          leyline_ref: v1.0.0  # Specify the version of Leyline to use
+
+          # Optional general parameters (uncomment to customize)
+          # target_path: "docs/leyline"  # Target directory to sync content into
+          # categories: "typescript,frontend"  # Specific categories to sync (comma-separated)
+          # create_pr: true  # Whether to create a PR (set to false for direct commits)
+
+          # Optional PR-specific parameters (uncomment to customize)
+          # commit_message: "docs: Update Leyline content to @${{ inputs.leyline_ref }}"  # Custom commit message
+          # pr_title: "Update Leyline Content to @${{ inputs.leyline_ref }}"  # Custom PR title
+          # pr_branch_name: "update-leyline/${{ inputs.leyline_ref }}"  # Custom branch name for the PR

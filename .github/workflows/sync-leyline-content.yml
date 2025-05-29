@@ -1,0 +1,758 @@
+name: sync-leyline-content
+on:
+  workflow_call:
+    inputs:
+      token:
+        description: "GitHub token with repository access permissions"
+        required: true
+        type: string
+      leyline_ref:
+        description: "Leyline reference (tag, branch, or commit SHA)"
+        required: true
+        type: string
+      categories:
+        description: "Comma-separated list of categories to sync (e.g., go,typescript,frontend)"
+        required: false
+        type: string
+        default: ""
+      target_path:
+        description: "Target directory to sync Leyline content into"
+        required: false
+        type: string
+        default: "docs/leyline"
+      create_pr:
+        description: "Whether to create a PR after syncing content"
+        required: false
+        type: boolean
+        default: true
+      commit_message:
+        description: "Custom commit message for synced content"
+        required: false
+        type: string
+        default: "docs: Sync Leyline content from @${{ inputs.leyline_ref }}"
+      pr_title:
+        description: "Custom PR title for synced content"
+        required: false
+        type: string
+        default: "Sync Leyline Content @${{ inputs.leyline_ref }}"
+      pr_branch_name:
+        description: "Custom branch name for the PR"
+        required: false
+        type: string
+        default: "leyline-sync/${{ inputs.leyline_ref }}"
+      override_languages:
+        description: "Override language detection (comma-separated list)"
+        required: false
+        type: string
+      override_contexts:
+        description: "Override context detection (comma-separated list)"
+        required: false
+        type: string
+    outputs:
+      pr_url:
+        description: "URL of the created pull request (if any)"
+        value: ${{ jobs.sync.outputs.pr_url }}
+      commit_sha:
+        description: "Commit SHA of the synchronized changes"
+        value: ${{ jobs.sync.outputs.commit_sha }}
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      pr_url: ${{ steps.set-outputs.outputs.pr_url }}
+      commit_sha: ${{ steps.set-outputs.outputs.commit_sha }}
+    steps:
+    - name: Start Sync Process
+      run: |
+        echo "::notice::🚀 Starting Leyline content synchronization workflow"
+        echo "::debug::Workflow triggered from repository: ${{ github.repository }}"
+        echo "::debug::Workflow run ID: ${{ github.run_id }}"
+        echo "::debug::Triggered by: ${{ github.actor }}"
+
+    - name: Validate Inputs
+      run: |
+        echo "::notice::📋 Validating workflow inputs"
+
+        # Validate token (this will simply fail if the token is invalid when used)
+        echo "✅ GitHub token provided for authentication"
+
+        # Validate leyline_ref
+        if [ -z "${{ inputs.leyline_ref }}" ]; then
+          echo "::error::Required input 'leyline_ref' must be provided."
+          exit 1
+        fi
+        echo "✅ Leyline reference: ${{ inputs.leyline_ref }}"
+
+        # Log all inputs with their values
+        echo "📊 Input configuration:"
+        echo "  - leyline_ref: ${{ inputs.leyline_ref }}"
+        echo "  - target_path: ${{ inputs.target_path }}"
+        echo "  - create_pr: ${{ inputs.create_pr }}"
+        echo "  - categories: ${{ inputs.categories != '' && inputs.categories || '(none specified)' }}"
+        echo "  - commit_message: ${{ inputs.commit_message }}"
+        echo "  - pr_title: ${{ inputs.pr_title }}"
+        echo "  - pr_branch_name: ${{ inputs.pr_branch_name }}"
+
+        echo "::debug::All required inputs validated successfully"
+
+    # Log consumer repository checkout
+    - name: Log Consumer Repository Checkout
+      run: |
+        echo "::notice::📥 Checking out consumer repository"
+        echo "::debug::Repository: ${{ github.repository }}"
+        echo "::debug::Branch/Ref: ${{ github.ref }}"
+
+    # Checkout the consumer repository (where the workflow is being called from)
+    - name: Checkout Consumer Repository
+      id: checkout-consumer
+      uses: actions/checkout@v4
+      continue-on-error: true
+      with:
+        token: ${{ inputs.token }}
+
+    # Check if consumer repository checkout was successful
+    - name: Check Consumer Repository Access
+      run: |
+        if [ "${{ steps.checkout-consumer.outcome }}" == "failure" ]; then
+          echo "::error::❌ Failed to checkout consumer repository"
+          echo "This is likely a token permission issue. Please ensure:"
+          echo "  1. The provided token has 'repo' or 'contents:write' scope"
+          echo "  2. The token has access to this repository"
+          echo "  3. The token is not expired or revoked"
+          echo ""
+          echo "For organization repositories, you may need:"
+          echo "  - 'repo' scope for private repositories"
+          echo "  - 'public_repo' scope for public repositories"
+          echo "  - Organization SSO authorization if enabled"
+          exit 1
+        else
+          echo "✅ Consumer repository checkout successful"
+          echo "::debug::Working directory: $(pwd)"
+          echo "::debug::Repository size: $(du -sh . | cut -f1)"
+        fi
+
+    # Log Leyline repository checkout
+    - name: Log Leyline Repository Checkout
+      run: |
+        echo "::notice::📦 Checking out Leyline repository"
+        echo "::debug::Repository: phrazzld/leyline"
+        echo "::debug::Reference: ${{ inputs.leyline_ref }}"
+        echo "::debug::Target path: _leyline"
+
+    # Checkout the Leyline repository at the specified reference
+    - name: Checkout Leyline Content
+      id: checkout-leyline
+      uses: actions/checkout@v4
+      continue-on-error: true
+      with:
+        # Use the phrazzld/leyline repository as the source
+        repository: phrazzld/leyline
+        # Use the specified leyline_ref (tag, branch, or commit SHA)
+        ref: ${{ inputs.leyline_ref }}
+        # Use the provided token for authentication
+        token: ${{ inputs.token }}
+        # Checkout to a temporary directory named _leyline
+        path: _leyline
+        # Only fetch what's needed to minimize checkout time
+        fetch-depth: 1
+
+    # Check if the checkout was successful
+    - name: Check Checkout Success
+      if: steps.checkout-leyline.outcome == 'failure'
+      run: |
+        echo "::error::❌ Invalid \`leyline_ref\` provided: ${{ inputs.leyline_ref }}"
+        echo "The specified reference '${{ inputs.leyline_ref }}' could not be found in the Leyline repository."
+        echo "Please verify that the tag, branch, or commit SHA exists."
+        exit 1
+
+    # Verify that the Leyline content was checked out successfully
+    - name: Verify Leyline Checkout
+      run: |
+        echo "::notice::✅ Verifying Leyline content checkout"
+
+        # Check if the _leyline directory exists
+        if [ ! -d "_leyline" ]; then
+          echo "::error::❌ Failed to checkout Leyline repository - _leyline directory not found"
+          echo "This could indicate an issue with the repository access or the specified reference: ${{ inputs.leyline_ref }}"
+          exit 1
+        fi
+        echo "::debug::✅ _leyline directory exists"
+
+        # Check if essential directories exist
+        if [ ! -d "_leyline/docs" ]; then
+          echo "::error::❌ Leyline checkout appears invalid - docs directory not found"
+          echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version"
+          exit 1
+        fi
+        echo "::debug::✅ docs directory exists"
+
+        if [ ! -d "_leyline/docs/tenets" ]; then
+          echo "::error::❌ Leyline checkout appears invalid - tenets directory not found"
+          echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version with the expected structure"
+          exit 1
+        fi
+        echo "::debug::✅ tenets directory exists"
+
+        if [ ! -d "_leyline/docs/bindings" ]; then
+          echo "::error::❌ Leyline checkout appears invalid - bindings directory not found"
+          echo "The reference '${{ inputs.leyline_ref }}' may not point to a valid Leyline version with the expected structure"
+          exit 1
+        fi
+        echo "::debug::✅ bindings directory exists"
+
+        # Get and display the actual commit that was checked out
+        cd _leyline
+        actual_commit=$(git rev-parse HEAD)
+        echo "✅ Successfully checked out Leyline content"
+        echo "📍 Reference requested: ${{ inputs.leyline_ref }}"
+        echo "📍 Actual commit: $actual_commit"
+
+        # Count available content for logging
+        tenet_count=$(find docs/tenets -name "*.md" 2>/dev/null | wc -l || echo "0")
+        binding_count=$(find docs/bindings -name "*.md" 2>/dev/null | wc -l || echo "0")
+        echo "Available content: $tenet_count tenets, $binding_count bindings"
+
+    - name: Validate Categories Input
+      if: inputs.categories != ''
+      run: |
+        # Check if categories input contains only valid characters (alphanumeric, comma, hyphen)
+        if ! [[ "${{ inputs.categories }}" =~ ^[a-zA-Z0-9,\-]+$ ]]; then
+          echo "::error::Invalid format for categories input: '${{ inputs.categories }}'. Only alphanumeric characters, commas, and hyphens are allowed."
+          exit 1
+        fi
+        echo "Categories input validation passed: '${{ inputs.categories }}'"
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq ruby
+
+    - name: Detect Languages and Contexts
+      run: |
+        # Copy detection script to workspace
+        cp _leyline/.github/scripts/detect-languages.sh .
+        chmod +x detect-languages.sh
+
+        # Run detection
+        ./detect-languages.sh
+
+        # Handle overrides if provided
+        if [ -n "${{ inputs.override_languages }}" ]; then
+          echo "Overriding detected languages with: ${{ inputs.override_languages }}"
+          languages=$(echo "${{ inputs.override_languages }}" | tr ',' '\n' | jq -R . | jq -s .)
+          jq --argjson langs "$languages" '.languages = $langs' repo-context.json > repo-context.json.tmp
+          mv repo-context.json.tmp repo-context.json
+        fi
+
+        if [ -n "${{ inputs.override_contexts }}" ]; then
+          echo "Overriding detected contexts with: ${{ inputs.override_contexts }}"
+          contexts=$(echo "${{ inputs.override_contexts }}" | tr ',' '\n' | jq -R . | jq -s .)
+          jq --argjson ctxs "$contexts" '.contexts = $ctxs' repo-context.json > repo-context.json.tmp
+          mv repo-context.json.tmp repo-context.json
+        fi
+
+        # Show final configuration
+        echo "Final repository context configuration:"
+        cat repo-context.json
+
+    - name: Filter Bindings
+      run: |
+        # Copy filter script to workspace
+        cp _leyline/.github/scripts/filter-bindings.rb .
+        chmod +x filter-bindings.rb
+
+        # Run filtering
+        ./filter-bindings.rb
+
+    - name: Clean Up Old Flat Structure
+      run: |
+        echo "Cleaning up old flat binding structure in ${{ inputs.target_path }}"
+
+        # First, make sure the target directories exist
+        mkdir -p "${{ inputs.target_path }}/tenets" "${{ inputs.target_path }}/bindings/core" "${{ inputs.target_path }}/bindings/categories"
+
+        # Find and list all .md files directly in target bindings directory
+        # (excluding 00-index.md which gets regenerated anyway)
+        old_files=$(find "${{ inputs.target_path }}/bindings" -maxdepth 1 -type f -name "*.md" ! -name "00-index.md" 2>/dev/null || true)
+
+        # Count removed files for summary
+        removed_count=0
+
+        if [ -n "$old_files" ]; then
+          echo "Found old flat structure files to remove:"
+          echo "$old_files" | while read -r file; do
+            echo "  - $file"
+            rm -f "$file"
+            removed_count=$((removed_count + 1))
+          done
+          echo "✅ Removed $removed_count old flat structure files."
+        else
+          echo "No old flat structure files found in ${{ inputs.target_path }}/bindings."
+        fi
+
+        # Save count for use in summary
+        echo "$removed_count" > cleanup-count.txt
+
+    - name: Sync Files
+      run: |
+        echo "::notice::🔄 Starting file synchronization from Leyline to consumer repository"
+        echo "::debug::Source: _leyline/docs/"
+        echo "::debug::Target: ${{ inputs.target_path }}"
+
+        # Ensure the target path exists, create if it doesn't
+        if [ ! -d "${{ inputs.target_path }}" ]; then
+          echo "📁 Target path '${{ inputs.target_path }}' does not exist."
+          echo "Creating directory..."
+          mkdir -p "${{ inputs.target_path }}"
+          echo "✅ Created target directory: ${{ inputs.target_path }}"
+        else
+          echo "✅ Target path '${{ inputs.target_path }}' already exists"
+        fi
+
+        # Directories already created in the cleanup step
+
+        # Always sync all tenets (they're language-agnostic and apply to all projects)
+        # The --delete flag ensures stale files are removed for efficient sync
+        echo "::notice::📚 Syncing tenets"
+        echo "::debug::Source: _leyline/docs/tenets/ → Target: ${{ inputs.target_path }}/tenets/"
+        rsync -a --delete _leyline/docs/tenets/ "${{ inputs.target_path }}/tenets/"
+        tenet_count=$(find "${{ inputs.target_path }}/tenets" -name "*.md" 2>/dev/null | wc -l || echo "0")
+        echo "✅ Synced $tenet_count tenet files (stale files automatically removed)"
+
+        # Always sync core bindings (applicable to all projects regardless of language/context)
+        # The --delete flag ensures stale files are removed for efficient sync
+        echo "::notice::🔗 Syncing core bindings"
+        echo "::debug::Source: _leyline/docs/bindings/core/ → Target: ${{ inputs.target_path }}/bindings/core/"
+        rsync -a --delete _leyline/docs/bindings/core/ "${{ inputs.target_path }}/bindings/core/"
+        core_count=$(find "${{ inputs.target_path }}/bindings/core" -name "*.md" 2>/dev/null | wc -l || echo "0")
+        echo "✅ Synced $core_count core binding files (stale files automatically removed)"
+
+        # Process requested categories (if any specified)
+        if [ -n "${{ inputs.categories }}" ]; then
+          echo "::notice::🏷️ Processing requested categories: ${{ inputs.categories }}"
+
+          # Create array from comma-separated list
+          IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
+          echo "::debug::Categories to process: ${#CATEGORIES[@]} items"
+
+          # Initialize arrays to track synced and missing categories
+          SYNCED_CATEGORIES=()
+          MISSING_CATEGORIES=()
+
+          # Process each category
+          for category in "${CATEGORIES[@]}"; do
+            # Trim whitespace
+            category=$(echo "$category" | xargs)
+            echo "::debug::Processing category: '$category'"
+
+            # Check if category directory exists in the Leyline repository
+            if [ -d "_leyline/docs/bindings/categories/$category" ]; then
+              echo "📂 Syncing category '$category'"
+              echo "::debug::Source: _leyline/docs/bindings/categories/$category/ → Target: ${{ inputs.target_path }}/bindings/categories/$category/"
+              SYNCED_CATEGORIES+=("$category")
+
+              # Create target directory
+              mkdir -p "${{ inputs.target_path }}/bindings/categories/$category"
+
+              # Sync category files using rsync with --delete to efficiently remove stale files
+              rsync -a --delete "_leyline/docs/bindings/categories/$category/" "${{ inputs.target_path }}/bindings/categories/$category/"
+
+              # Count synced files for this category
+              category_count=$(find "${{ inputs.target_path }}/bindings/categories/$category" -name "*.md" 2>/dev/null | wc -l || echo "0")
+              echo "✅ Synced $category_count files for category '$category' (stale files automatically removed)"
+            else
+              echo "⚠️ WARNING: Category directory for '$category' does not exist in Leyline"
+              echo "::debug::Missing directory: _leyline/docs/bindings/categories/$category"
+              MISSING_CATEGORIES+=("$category")
+            fi
+          done
+
+          # Summarize results
+          if [ ${#SYNCED_CATEGORIES[@]} -gt 0 ]; then
+            echo "✅ Successfully synced ${#SYNCED_CATEGORIES[@]} categories: ${SYNCED_CATEGORIES[*]}"
+            # Save to file for later use in PR body
+            printf "%s\n" "${SYNCED_CATEGORIES[@]}" > synced-categories.txt
+          else
+            echo "ℹ️ No categories were synced"
+          fi
+
+          if [ ${#MISSING_CATEGORIES[@]} -gt 0 ]; then
+            echo "⚠️ WARNING: ${#MISSING_CATEGORIES[@]} requested categories were not found: ${MISSING_CATEGORIES[*]}"
+            echo "::warning::The following requested categories do not exist in Leyline: ${MISSING_CATEGORIES[*]}"
+            # Save to file for later use in PR body
+            printf "%s\n" "${MISSING_CATEGORIES[@]}" > missing-categories.txt
+          fi
+        else
+          echo "ℹ️ No specific categories requested - syncing only tenets and core bindings"
+        fi
+
+        echo "📁 File synchronization completed successfully"
+        echo "🗑️ Stale file removal: All rsync operations use --delete flag for efficient cleanup"
+
+        # For backward compatibility, also sync filtered bindings (this will be removed in a future update)
+        if [ -d "filtered_bindings" ]; then
+          rsync -a filtered_bindings/ "${{ inputs.target_path }}/bindings/"
+        fi
+
+    - name: Run reindex.rb to regenerate 00-index.md
+      run: |
+        echo "Regenerating ${{ inputs.target_path }}/bindings/00-index.md using reindex.rb"
+
+        # Copy the reindex.rb script from Leyline to consumer repo if needed
+        if [ ! -d "tools" ]; then
+          mkdir -p tools
+        fi
+
+        # Copy the script
+        cp _leyline/tools/reindex.rb tools/
+        chmod +x tools/reindex.rb
+
+        # Run reindex.rb to regenerate the index, with target path
+        cd tools && LEYLINE_DOCS_PATH="${{ inputs.target_path }}" ruby reindex.rb
+
+        # Verify the index file was generated
+        if [ -f "../${{ inputs.target_path }}/bindings/00-index.md" ]; then
+          echo "✅ Successfully regenerated ${{ inputs.target_path }}/bindings/00-index.md"
+        else
+          echo "❌ ERROR: Failed to generate ${{ inputs.target_path }}/bindings/00-index.md"
+          exit 1
+        fi
+
+    - name: Check for Changes
+      id: check-changes
+      run: |
+        echo "::notice::🔍 Checking for changes in the repository"
+
+        # Check if there are any uncommitted changes
+        if git diff --quiet && git diff --cached --quiet; then
+          # No changes detected
+          echo "ℹ️ No changes to sync."
+          echo "::debug::Repository is already up to date with Leyline content"
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          # Changes detected
+          echo "✅ Changes detected, proceeding with sync."
+          echo "::debug::Repository has uncommitted changes from Leyline sync"
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+
+          # Show what changed for transparency
+          echo "📝 Changed files:"
+          git status --porcelain | head -20
+
+          # Count changes for logging
+          total_changes=$(git status --porcelain | wc -l)
+          echo "::debug::Total changed files: $total_changes"
+        fi
+
+    - name: Create Summary
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        echo "# Leyline Sync Summary" > sync-summary.md
+        echo "" >> sync-summary.md
+        echo "## Repository Context" >> sync-summary.md
+        echo "" >> sync-summary.md
+        echo "Detected languages: $(jq -r '.languages | join(", ")' repo-context.json)" >> sync-summary.md
+        echo "Detected contexts: $(jq -r '.contexts | join(", ")' repo-context.json)" >> sync-summary.md
+        if [ -n "${{ inputs.categories }}" ]; then
+          echo "Requested categories: ${{ inputs.categories }}" >> sync-summary.md
+        fi
+        echo "" >> sync-summary.md
+
+        # Add cleanup information if any files were removed
+        if [ -f "cleanup-count.txt" ] && [ "$(cat cleanup-count.txt)" -gt 0 ]; then
+          echo "## Cleanup" >> sync-summary.md
+          echo "" >> sync-summary.md
+          echo "🧹 Removed $(cat cleanup-count.txt) old flat structure files from ${{ inputs.target_path }}/bindings/" >> sync-summary.md
+          echo "" >> sync-summary.md
+        fi
+
+        # Add reindex information
+        echo "## Index Regeneration" >> sync-summary.md
+        echo "" >> sync-summary.md
+        echo "📋 Regenerated ${{ inputs.target_path }}/bindings/00-index.md to include all synced bindings" >> sync-summary.md
+        echo "" >> sync-summary.md
+
+        echo "## Synced Files" >> sync-summary.md
+        echo "" >> sync-summary.md
+        echo "- Tenets: $(find "${{ inputs.target_path }}/tenets" -type f -name "*.md" | wc -l)" >> sync-summary.md
+        echo "- Core Bindings: $(find "${{ inputs.target_path }}/bindings/core" -type f -name "*.md" | wc -l)" >> sync-summary.md
+
+        # Count category bindings if any were synced
+        if [ -n "${{ inputs.categories }}" ]; then
+          echo "- Category Bindings:" >> sync-summary.md
+
+          # Check each requested category
+          IFS=',' read -ra CATEGORIES <<< "${{ inputs.categories }}"
+
+          # Track counts for summary
+          synced_count=0
+          missing_count=0
+
+          for category in "${CATEGORIES[@]}"; do
+            category=$(echo "$category" | xargs)
+            if [ -d "${{ inputs.target_path }}/bindings/categories/$category" ]; then
+              count=$(find "${{ inputs.target_path }}/bindings/categories/$category" -type f -name "*.md" | wc -l)
+              echo "  - $category: $count" >> sync-summary.md
+              synced_count=$((synced_count + 1))
+            else
+              echo "  - $category: ⚠️ Not found" >> sync-summary.md
+              missing_count=$((missing_count + 1))
+            fi
+          done
+
+          # Add summary of category sync status
+          echo "" >> sync-summary.md
+          echo "**Category Summary:**" >> sync-summary.md
+          echo "- Categories requested: ${#CATEGORIES[@]}" >> sync-summary.md
+          echo "- Categories found and synced: $synced_count" >> sync-summary.md
+
+          if [ $missing_count -gt 0 ]; then
+            echo "- Categories not found: $missing_count" >> sync-summary.md
+            echo "" >> sync-summary.md
+            echo "⚠️ Some requested categories were not found. Please check the spelling or verify they are available in the Leyline repository." >> sync-summary.md
+          fi
+        else
+          echo "- Category Bindings: None requested" >> sync-summary.md
+        fi
+
+        # Total bindings count
+        total_bindings=$(find docs/bindings -type f -name "*.md" | wc -l)
+        echo "- Total Bindings: $total_bindings" >> sync-summary.md
+
+        cat sync-summary.md
+
+    - name: Commit
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        git config user.name  "Leyline Bot"
+        git config user.email "leyline-bot@users.noreply.github.com"
+        git add "${{ inputs.target_path }}/tenets" "${{ inputs.target_path }}/bindings" || true
+
+        # Use the custom commit message if provided, otherwise build one with category info
+        commit_msg="${{ inputs.commit_message }}"
+
+        # If categories are specified and we're using the default commit message,
+        # append the categories info
+        if [ -n "${{ inputs.categories }}" ] && [ "$commit_msg" == "docs: Sync Leyline content from @${{ inputs.leyline_ref }}" ]; then
+          commit_msg="$commit_msg with categories: ${{ inputs.categories }}"
+        fi
+
+        if ! git diff --cached --quiet; then
+          git commit -m "$commit_msg"
+        fi
+
+    - name: Generate PR Body
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        echo "Automated content sync from Leyline." > pr-body.md
+        echo "" >> pr-body.md
+        echo "This update syncs:" >> pr-body.md
+        echo "- All tenets" >> pr-body.md
+        echo "- Core bindings (applicable to all projects)" >> pr-body.md
+
+        # Add categories information
+        if [ -n "${{ inputs.categories }}" ]; then
+          echo "- Requested categories: ${{ inputs.categories }}" >> pr-body.md
+
+          # Add synced categories info if any were synced
+          if [ -f "synced-categories.txt" ]; then
+            echo "" >> pr-body.md
+            echo "✅ **Successfully synced categories:**" >> pr-body.md
+            echo "```" >> pr-body.md
+            while read -r category; do
+              echo "- $category" >> pr-body.md
+            done < synced-categories.txt
+            echo "```" >> pr-body.md
+          fi
+
+          # Add warning about missing categories if any
+          if [ -f "missing-categories.txt" ]; then
+            echo "" >> pr-body.md
+            echo "⚠️ **WARNING:** The following requested categories were not found:" >> pr-body.md
+            echo "```" >> pr-body.md
+            cat missing-categories.txt >> pr-body.md
+            echo "```" >> pr-body.md
+            echo "Please verify the spelling of these categories or check if they are available in the Leyline repository." >> pr-body.md
+          fi
+        fi
+
+        # Add information about cleanup if any files were removed
+        if [ -f "cleanup-count.txt" ] && [ "$(cat cleanup-count.txt)" -gt 0 ]; then
+          echo "" >> pr-body.md
+          echo "🧹 **Cleanup:** Removed $(cat cleanup-count.txt) old flat structure binding files from docs/bindings/" >> pr-body.md
+          echo "" >> pr-body.md
+          echo "**Note:** This updates your binding files to use the new directory-based structure. See [Migration Guide](https://github.com/phrazzld/leyline/blob/main/docs/migration-guide.md) for details." >> pr-body.md
+        fi
+
+        # Add information about index regeneration
+        echo "" >> pr-body.md
+        echo "📋 **Index:** Regenerated the bindings index file to reflect the new directory structure" >> pr-body.md
+
+        echo "" >> pr-body.md
+        cat sync-summary.md >> pr-body.md
+
+    - name: Push PR
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        # Use the custom PR title if provided, otherwise generate one with synced categories info
+        pr_title="${{ inputs.pr_title }}"
+
+        # If synced categories are available and we're using the default PR title,
+        # append the categories info
+        if [ -f "synced-categories.txt" ] && [ "$pr_title" == "Sync Leyline Content @${{ inputs.leyline_ref }}" ]; then
+          # Create a comma-separated list of synced categories
+          synced_list=$(cat synced-categories.txt | tr '\n' ',' | sed 's/,$//')
+          if [ -n "$synced_list" ]; then
+            pr_title="$pr_title with categories: $synced_list"
+          fi
+        fi
+
+        # Save PR title to file
+        echo "$pr_title" > pr-title.txt
+
+    # Log PR creation attempt
+    - name: Log PR Creation Attempt
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        echo "::notice::📮 Attempting to create Pull Request"
+        echo "::debug::PR title: $(cat pr-title.txt)"
+        echo "::debug::PR branch: ${{ inputs.pr_branch_name }}"
+        echo "::debug::Base branch: ${{ github.ref_name }}"
+
+      # Create the PR if create_pr is true and changes exist
+    - name: Create Pull Request
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
+      id: create-pr
+      continue-on-error: true
+      uses: peter-evans/create-pull-request@v6
+      with:
+        # Use the provided GitHub token for authentication
+        token: ${{ inputs.token }}
+        # Use the generated PR title (supports custom input via inputs.pr_title)
+        title-path: pr-title.txt
+        # Use the generated PR body with sync summary and details
+        body-path: pr-body.md
+        # Use the custom branch name (supports custom input via inputs.pr_branch_name)
+        branch: ${{ inputs.pr_branch_name }}
+        # Only create PR if there are actual changes to commit
+        commit-message: ${{ inputs.commit_message }}
+        # Delete branch on close if no longer differs from base
+        delete-branch: true
+        # Base branch for the pull request
+        base: ${{ github.ref_name }}
+
+    # Check if PR creation was successful
+    - name: Check PR Creation Success
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true' && steps.create-pr.outcome == 'failure'
+      run: |
+        echo "::error::Failed to create or update Pull Request"
+        echo ""
+        echo "This could be due to several reasons:"
+        echo ""
+        echo "1. **Branch Conflicts:**"
+        echo "   - The branch '${{ inputs.pr_branch_name }}' may have diverged from the base branch"
+        echo "   - There may be an existing closed PR that prevents creating a new one"
+        echo "   - Solution: Try using a different branch name or manually delete the existing branch"
+        echo ""
+        echo "2. **Token Permission Issues:**"
+        echo "   - The provided token has insufficient permissions"
+        echo "   - Required: 'repo' scope or 'contents:write' + 'pull_requests:write'"
+        echo "   - For organizations: Ensure SSO is authorized if enabled"
+        echo ""
+        echo "3. **Branch Protection Rules:**"
+        echo "   - The base branch may have protection rules preventing PR creation"
+        echo "   - Check repository settings for branch protection policies"
+        echo ""
+        echo "4. **Repository Restrictions:**"
+        echo "   - Repository may be archived or have restricted access"
+        echo "   - Pull requests may be disabled in repository settings"
+        echo ""
+        echo "To resolve branch conflicts specifically:"
+        echo "  1. Delete the existing branch: git push origin --delete ${{ inputs.pr_branch_name }}"
+        echo "  2. Use a different branch name in your workflow"
+        echo "  3. Or manually merge/close any existing PRs from this branch"
+        exit 1
+
+    # Log PR creation results for transparency
+    - name: Log PR Creation Results
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true' && steps.create-pr.outcome == 'success'
+      run: |
+        if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
+          if [ "${{ steps.create-pr.outputs.pull-request-operation }}" == "created" ]; then
+            echo "::notice::✅ New Pull Request created successfully"
+          elif [ "${{ steps.create-pr.outputs.pull-request-operation }}" == "updated" ]; then
+            echo "::notice::✅ Existing Pull Request updated successfully"
+          else
+            echo "::notice::✅ Pull Request processed successfully"
+          fi
+          echo "📋 PR Details:"
+          echo "  - Number: ${{ steps.create-pr.outputs.pull-request-number }}"
+          echo "  - URL: ${{ steps.create-pr.outputs.pull-request-url }}"
+          echo "  - Branch: ${{ inputs.pr_branch_name }}"
+          echo "  - Operation: ${{ steps.create-pr.outputs.pull-request-operation }}"
+          echo "::debug::PR creation completed successfully"
+        else
+          echo "ℹ️ No Pull Request created (no changes detected)"
+        fi
+
+    # Log when PR creation is disabled
+    - name: Log PR Creation Skipped
+      if: inputs.create_pr == false
+      run: |
+        echo "::notice::ℹ️ Pull Request creation disabled (create_pr = false)"
+        echo "Changes have been committed directly to the current branch"
+        echo "::debug::Skipping PR creation as requested by input configuration"
+
+    # Log when no changes detected
+    - name: Log No Changes
+      if: steps.check-changes.outputs.has_changes == 'false'
+      run: |
+        echo "::notice::ℹ️ No changes detected after syncing Leyline content"
+        echo "All files are already up to date with Leyline ref: ${{ inputs.leyline_ref }}"
+        echo "::debug::Repository content matches Leyline source exactly"
+
+    # Set workflow outputs for consumption by calling workflows
+    - name: Set Workflow Outputs
+      id: set-outputs
+      run: |
+        # Set PR URL output (empty if no PR created)
+        if [ "${{ steps.create-pr.outputs.pull-request-url }}" != "" ]; then
+          echo "pr_url=${{ steps.create-pr.outputs.pull-request-url }}" >> $GITHUB_OUTPUT
+          echo "📤 Output: pr_url=${{ steps.create-pr.outputs.pull-request-url }}"
+        else
+          echo "pr_url=" >> $GITHUB_OUTPUT
+          echo "📤 Output: pr_url=(empty - no PR created)"
+        fi
+
+        # Set commit SHA output (from PR head or current commit)
+        if [ "${{ steps.create-pr.outputs.pull-request-head-sha }}" != "" ]; then
+          echo "commit_sha=${{ steps.create-pr.outputs.pull-request-head-sha }}" >> $GITHUB_OUTPUT
+          echo "📤 Output: commit_sha=${{ steps.create-pr.outputs.pull-request-head-sha }}"
+        else
+          # If no PR was created, get the current commit SHA
+          current_sha=$(git rev-parse HEAD)
+          echo "commit_sha=$current_sha" >> $GITHUB_OUTPUT
+          echo "📤 Output: commit_sha=$current_sha"
+        fi
+
+    # Workflow completion summary
+    - name: Workflow Completion Summary
+      run: |
+        echo "::notice::🎉 Leyline content synchronization workflow completed"
+        echo ""
+        echo "📊 Summary:"
+        echo "  - Leyline reference: ${{ inputs.leyline_ref }}"
+        echo "  - Target path: ${{ inputs.target_path }}"
+        echo "  - Categories: ${{ inputs.categories != '' && inputs.categories || '(none)' }}"
+        echo "  - Changes detected: ${{ steps.check-changes.outputs.has_changes }}"
+        echo "  - PR creation enabled: ${{ inputs.create_pr }}"
+
+        if [ "${{ steps.create-pr.outputs.pull-request-number }}" != "" ]; then
+          echo "  - PR created/updated: #${{ steps.create-pr.outputs.pull-request-number }}"
+        else
+          echo "  - PR created/updated: No"
+        fi
+
+        echo ""
+        echo "::debug::Workflow run completed successfully"
+        echo "::debug::Total execution time: ${{ job.duration || 'N/A' }}"

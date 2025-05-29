@@ -40,17 +40,17 @@ archive/                          # Archived tools and documentation
 
 ## How It Works
 
-### The Warden System
+### Leyline Philosophy: The Warden System
 
-The Leyline Warden is an automated system that synchronizes tenets and bindings across
-repositories:
+The Warden System represents Leyline's philosophy of standardized development principles.
+It's not an automated push mechanism, but rather a structured approach to maintaining
+consistent tenets (foundational principles) and bindings (enforceable rules) that teams
+can adopt on their own schedule through consumer-initiated synchronization.
 
-1. Whenever changes are pushed to the master branch of Leyline
-1. Warden automatically updates all target repositories
-1. Each update refreshes the local copies of tenets and bindings
-1. This ensures consistent standards across all codebases
+### Integration: Pull-Based Content Sync
 
-### Integration
+Leyline uses a consumer-initiated pull model. You control when and what to sync from Leyline
+into your repository using our reusable GitHub Actions workflow.
 
 ### Migrating from Symlinks
 
@@ -60,28 +60,39 @@ Leyline.
 
 ### New Repository Integration
 
-To integrate a new repository with Leyline:
+To integrate Leyline into your repository:
 
-1. Add this repository as a GitHub Actions workflow caller:
+1. Create a workflow that calls our reusable sync workflow:
 
 ```yaml
-# .github/workflows/vendor-docs.yml
-name: Leyline Sync
+# .github/workflows/sync-leyline.yml
+name: Sync Leyline Content
 on:
-  pull_request:
-  push:
+  schedule:
+    - cron: '0 0 * * 1'  # Weekly on Mondays
+  workflow_dispatch:  # Allow manual triggers
+
 jobs:
-  docs:
-    uses: phrazzld/leyline/.github/workflows/vendor.yml@master
+  sync:
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
     with:
-      ref: master
-      categories: go,typescript # Optional: Specify the categories you want to sync
+      token: ${{ secrets.GITHUB_TOKEN }}
+      leyline_ref: v1.0.0  # Pin to a specific Leyline version
+      categories: go,typescript  # Optional: only sync specific categories
+      target_path: docs/leyline  # Optional: customize target directory
+      create_pr: true  # Optional: create a PR instead of direct commit
 ```
 
-> **Note**: Using `master` instead of a version tag (e.g., `v0.1.0`) means your repository will automatically receive all updates to Leyline, including potential breaking changes. If you prefer a more controlled update process, use a specific version tag and update it manually when ready to upgrade.
+2. The workflow will:
+   - Pull the specified version of Leyline content
+   - Copy tenets, core bindings, and requested category bindings
+   - Create a pull request with the changes (or commit directly)
 
-2. The first time the workflow runs, it will create `/docs/tenets` and `/docs/bindings`
-   directories in your repository.
+3. Review and merge the PR to adopt the standards
+
+**For detailed integration instructions**, see the [Integration Guide](./docs/integration/pull-model-guide.md).
+
+**For versioning best practices**, see the [Versioning Guide](./docs/integration/versioning-guide.md).
 
 For complete integration examples, including pre-commit hooks and Renovate
 configurations, see the [examples directory](./examples/). These examples provide

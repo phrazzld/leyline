@@ -3,6 +3,8 @@
 Thank you for your interest in contributing to Leyline! This document provides
 guidelines for proposing changes to our tenets and bindings.
 
+> **Note**: This guide is for contributors to Leyline itself. If you're looking to integrate Leyline into your project, see the [Pull-Based Integration Guide](docs/integration/pull-model-guide.md).
+
 ## Core Principles
 
 Leyline maintains two types of documents:
@@ -52,6 +54,8 @@ properly.
 **Note**: The `applies_to` field has been deprecated. Binding applicability is now determined by its location in the directory structure:
 - `/docs/bindings/core/` - Core bindings that apply to all projects
 - `/docs/bindings/categories/<category>/` - Category-specific bindings
+
+This directory-based organization supports Leyline's pull-based distribution model, allowing consumers to selectively sync only the categories relevant to their projects.
 
 For detailed guidance on front-matter requirements, including examples, format
 conversion, and troubleshooting, refer to [TENET_FORMATTING.md](TENET_FORMATTING.md).
@@ -207,7 +211,7 @@ The pre-commit hooks will handle basic formatting like trailing whitespace and l
 
 ### Cross-Cutting Bindings Strategy
 
-Some bindings may be applicable across multiple categories. When deciding where to place such bindings, follow these guidelines:
+Some bindings may be applicable across multiple categories. When deciding where to place such bindings, follow these guidelines (see the [Implementation Guide](docs/implementation-guide.md) for detailed placement guidance):
 
 1. **Core Bindings**:
    - Place a binding in `docs/bindings/core/` if:
@@ -270,6 +274,8 @@ For detailed guidance with examples, see the
   review
 
 Each release must maintain consistent front-matter standards in YAML format as described in [TENET_FORMATTING.md](TENET_FORMATTING.md).
+
+When new content is released, consumers using the pull-based model can update at their own pace by adjusting the `leyline_ref` in their sync workflow. See the [Versioning Guide](docs/integration/versioning-guide.md) for consumer versioning best practices.
 
 ## Code of Conduct
 
