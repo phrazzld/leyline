@@ -270,7 +270,7 @@
         1. `docs/implementation-guide.md` has a clear audience and explains directory structure relevance.
     - **Depends‑on:** [T001]
 
-- [ ] **T027 · Chore · P2: update `CONTRIBUTING.md` for consistency**
+- [x] **T027 · Chore · P2: update `CONTRIBUTING.md` for consistency**
     - **Context:** Detailed Build Steps #6
     - **Action:**
         1. Review `CONTRIBUTING.md` and verify its consistency with the pull-based model and updated terminology.
