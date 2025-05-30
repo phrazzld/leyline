@@ -19,7 +19,7 @@
     - **Depends‑on:** none
 
 ### Infrastructure File Removal
-- [ ] **T002 · Chore · P2: remove mkdocs.yml configuration file**
+- [x] **T002 · Chore · P2: remove mkdocs.yml configuration file**
     - **Context:** Implementation Steps > Phase 1: File Removal
     - **Action:**
         1. Delete `/mkdocs.yml` from repository root
