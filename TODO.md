@@ -98,7 +98,7 @@
     - **Depends‑on:** [T006]
 
 ### Comprehensive Validation
-- [ ] **T008 · Test · P1: verify complete MkDocs removal**
+- [x] **T008 · Test · P1: verify complete MkDocs removal**
     - **Context:** Implementation Steps > Phase 3: Validation - critical completeness check
     - **Action:**
         1. Execute `rg -i "mkdocs|github.pages"` across entire repository
@@ -112,7 +112,7 @@
         2. Confirm no content files contain unintended references
     - **Depends‑on:** [T007]
 
-- [ ] **T009 · Test · P1: validate system integrity post-removal**
+- [x] **T009 · Test · P1: validate system integrity post-removal**
     - **Context:** Implementation Steps > Phase 3: Validation - ensure core functionality intact
     - **Action:**
         1. Execute `ruby tools/validate_front_matter.rb`
@@ -128,7 +128,7 @@
     - **Depends‑on:** [T008]
 
 ### Final Integration
-- [ ] **T010 · Chore · P1: create conventional commit**
+- [~] **T010 · Chore · P1: create conventional commit**
     - **Context:** Implementation Checklist - proper version control integration
     - **Action:**
         1. Stage all changes related to MkDocs infrastructure removal
