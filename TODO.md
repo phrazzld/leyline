@@ -42,7 +42,7 @@
         2. Check GitHub Actions UI shows workflow removed
     - **Depends‑on:** [T001]
 
-- [ ] **T004 · Chore · P2: remove MkDocs setup documentation**
+- [x] **T004 · Chore · P2: remove MkDocs setup documentation**
     - **Context:** Implementation Steps > Phase 1: File Removal
     - **Action:**
         1. Delete `/docs/gh-pages-setup.md`
