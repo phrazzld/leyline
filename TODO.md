@@ -30,7 +30,7 @@
         2. Verify file absence with `ls mkdocs.yml`
     - **Depends‑on:** [T001]
 
-- [ ] **T003 · Chore · P2: remove GitHub Pages deployment workflow**
+- [x] **T003 · Chore · P2: remove GitHub Pages deployment workflow**
     - **Context:** Implementation Steps > Phase 1: File Removal
     - **Action:**
         1. Delete `/.github/workflows/gh-pages.yml`
