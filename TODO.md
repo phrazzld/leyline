@@ -83,7 +83,7 @@
         2. Verify Jekyll references are preserved
     - **Depends‑on:** [T005]
 
-- [ ] **T007 · Refactor · P2: update automate-changelog.md binding**
+- [x] **T007 · Refactor · P2: update automate-changelog.md binding**
     - **Context:** Implementation Steps > Phase 2: Content Updates
     - **Action:**
         1. Remove MkDocs-specific example from GitHub workflow section

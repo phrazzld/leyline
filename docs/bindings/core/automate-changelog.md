@@ -196,23 +196,29 @@ Here are concrete strategies for implementing automated changelog generation:
        steps:
          - uses: actions/checkout@v2
 
-         - name: Set up Python
-           uses: actions/setup-python@v2
+         - name: Set up build environment
+           uses: actions/setup-node@v2
            with:
-             python-version: 3.8
+             node-version: '16'
 
          - name: Install dependencies
            run: |
-             python -m pip install --upgrade pip
-             pip install mkdocs mkdocs-material
+             # Install your documentation generator
+             # Examples: npm install -g @11ty/eleventy
+             #           npm install -g hexo-cli
+             #           npm install -g vuepress
+             npm ci
 
          - name: Extract changelog for docs
            run: |
              # Extract the most recent complete release entry
              awk '/^## [[0-9]+\.[0-9]+\.[0-9]+]/{p++;if(p==2)exit} {if(p==1)print}' CHANGELOG.md > docs/recent-changes.md
 
-         - name: Build docs
-           run: mkdocs build
+         - name: Build documentation
+           run: |
+             # Build your documentation site
+             # Examples: eleventy, hexo generate, vuepress build
+             npm run build-docs
    ```
 
 ## Examples
