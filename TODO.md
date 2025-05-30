@@ -54,7 +54,7 @@
     - **Depends‑on:** [T001]
 
 ### Content Updates for LLM-First Approach
-- [ ] **T005 · Refactor · P1: update README.md for LLM-first approach**
+- [x] **T005 · Refactor · P1: update README.md for LLM-first approach**
     - **Context:** Implementation Steps > Phase 2: Content Updates - critical messaging update
     - **Action:**
         1. Remove all references to GitHub Pages site
@@ -69,7 +69,7 @@
         2. Review for clear LLM-first messaging
     - **Depends‑on:** [T002, T003, T004]
 
-- [ ] **T006 · Refactor · P2: update TENET_FORMATTING.md references**
+- [x] **T006 · Refactor · P2: update TENET_FORMATTING.md references**
     - **Context:** Implementation Steps > Phase 2: Content Updates
     - **Action:**
         1. Remove MkDocs Meta-Data references from `/TENET_FORMATTING.md`

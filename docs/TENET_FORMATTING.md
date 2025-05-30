@@ -262,5 +262,3 @@ Our toolchain is fully configured to work with YAML front-matter:
 - [YAML Specification](https://yaml.org/)
 - [Jekyll Front Matter](https://jekyllrb.com/docs/front-matter/) - A popular
   implementation of front-matter
-- [MkDocs Meta-Data](https://www.mkdocs.org/user-guide/writing-your-docs/#meta-data) -
-  How MkDocs uses front-matter
