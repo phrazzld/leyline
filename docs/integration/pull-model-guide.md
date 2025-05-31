@@ -359,8 +359,7 @@ When reporting issues, include:
 - Repository and organization settings (if relevant)
 
 #### Resources
-- **Discussions**: [GitHub Discussions](https://github.com/phrazzld/leyline/discussions)
-- **Issues**: [Report bugs or feature requests](https://github.com/phrazzld/leyline/issues)
+- **Issues**: [Report bugs, questions, or feature requests](https://github.com/phrazzld/leyline/issues)
 - **Examples**: See `examples/consumer-workflows/` for working configurations
 
 ## Advanced Configuration
@@ -491,6 +490,5 @@ If currently using symlinks, see the [Migration Guide](../migration-guide.md) fo
 
 ## Need Help?
 
-- **Questions?** Check [GitHub Discussions](https://github.com/phrazzld/leyline/discussions)
-- **Issues?** Report them in [GitHub Issues](https://github.com/phrazzld/leyline/issues)
+- **Questions or Issues?** Report them in [GitHub Issues](https://github.com/phrazzld/leyline/issues)
 - **Examples?** See [consumer workflow examples](../../examples/consumer-workflows/)

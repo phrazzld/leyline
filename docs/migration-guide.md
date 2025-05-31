@@ -375,8 +375,7 @@ If your project references binding files directly:
 
 ### Community Support
 
-- **Questions**: [GitHub Discussions](https://github.com/phrazzld/leyline/discussions)
-- **Bug Reports**: [GitHub Issues](https://github.com/phrazzld/leyline/issues)
+- **Questions & Bug Reports**: [GitHub Issues](https://github.com/phrazzld/leyline/issues)
 - **Feature Requests**: [GitHub Issues](https://github.com/phrazzld/leyline/issues) with "enhancement" label
 
 ### When Reporting Issues

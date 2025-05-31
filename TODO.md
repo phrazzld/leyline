@@ -50,7 +50,7 @@
         3. Test binding-to-tenet and tenet-to-binding links
     - **Depends‑on:** [T002]
 
-- [ ] **T004 · Fix · P3: update dead external links**
+- [x] **T004 · Fix · P3: update dead external links**
     - **Context:** CI Failure Resolution > Phase 2: Link Resolution - external reference cleanup
     - **Action:**
         1. Address GitHub discussions link returning 404: `https://github.com/phrazzld/leyline/discussions`
