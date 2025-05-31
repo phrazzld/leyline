@@ -297,19 +297,19 @@ fn add_tag_clone(tags: &[String], tag: String) -> Vec<String> {
 
 ## Related Bindings
 
-- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Immutability and dependency inversion
+- [dependency-inversion](dependency-inversion.md): Immutability and dependency inversion
   work together to make code more testable and maintainable. Immutability ensures your
   data doesn't change unexpectedly, while dependency inversion ensures your components
   are loosely coupled. Together, they dramatically reduce the complexity of
   understanding how data flows through your system.
 
-- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Domain purity and immutability are
+- [hex-domain-purity](hex-domain-purity.md): Domain purity and immutability are
   complementary approaches to simplifying your codebase. Domain purity keeps your
   business logic free from infrastructure concerns, while immutability ensures your data
   structures remain stable and predictable. Both reduce the cognitive load of
   understanding how your system evolves over time.
 
-- [no-internal-mocking](../../docs/bindings/core/no-internal-mocking.md): Immutable data structures make testing
+- [no-internal-mocking](no-internal-mocking.md): Immutable data structures make testing
   significantly easier, supporting our no-internal-mocking binding. When components use
   immutable data, they're naturally more testable because inputs and outputs are clear
   and predictable. You can verify that functions produce the expected outputs without

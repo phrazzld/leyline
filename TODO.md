@@ -33,7 +33,7 @@
     - **Depends‑on:** [T001]
 
 ### Cross-Reference Resolution
-- [ ] **T003 · Fix · P2: resolve internal cross-reference links**
+- [x] **T003 · Fix · P2: resolve internal cross-reference links**
     - **Context:** CI Failure Resolution > Phase 2: Link Resolution - documentation quality
     - **Action:**
         1. Run cross-reference fixing tool: `ruby tools/fix_cross_references.rb`

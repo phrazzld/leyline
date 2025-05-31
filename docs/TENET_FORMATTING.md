@@ -74,7 +74,7 @@ fields for each type.
   - Binding applicability is now determined by directory location
   - Core bindings (applicable to all) go in `docs/bindings/core/`
   - Category-specific bindings go in `docs/bindings/categories/<category>/`
-  - See [binding-metadata.md](docs/binding-metadata.md) for more details
+  - See [binding-metadata.md](binding-metadata.md) for more details
 
 ## Examples with Comments
 

@@ -446,20 +446,20 @@ class UserMapper {
 
 ## Related Bindings
 
-- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): While hex-domain-purity focuses on
+- [dependency-inversion](dependency-inversion.md): While hex-domain-purity focuses on
   keeping business logic free from infrastructure concerns, dependency inversion
   establishes the directional flow of dependencies. Together, they form the foundation
   of clean architecture—domain purity keeps your business logic clean, and dependency
   inversion ensures that dependencies flow toward the domain rather than away from it.
 
-- [external-configuration](../../docs/bindings/core/external-configuration.md): Externalizing configuration
+- [external-configuration](external-configuration.md): Externalizing configuration
   complements domain purity by removing environment-specific details from your codebase
   entirely. Where domain purity focuses on keeping infrastructure dependencies out of
   your business logic, external configuration takes this a step further by ensuring that
   even adapter implementations don't contain hardcoded connection strings, credentials,
   or environment-specific settings.
 
-- [immutable-by-default](../../docs/bindings/core/immutable-by-default.md): Immutability strengthens domain
+- [immutable-by-default](immutable-by-default.md): Immutability strengthens domain
   purity by making your business objects more predictable and side-effect free. Pure
   domain models with immutable properties are easier to reason about and less
   susceptible to bugs. Together, these bindings create a domain layer that's both free
