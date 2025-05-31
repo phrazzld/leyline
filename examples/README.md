@@ -133,5 +133,4 @@ For common issues and solutions, see the comprehensive example's troubleshooting
 
 - 📚 **Full Documentation**: [docs/integration/pull-model-guide.md](../docs/integration/pull-model-guide.md)
 - 🏷️ **Versioning Guide**: [docs/integration/versioning-guide.md](../docs/integration/versioning-guide.md)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/phrazzld/leyline/discussions)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/phrazzld/leyline/issues)
+- 🐛 **Questions & Issues**: [GitHub Issues](https://github.com/phrazzld/leyline/issues)

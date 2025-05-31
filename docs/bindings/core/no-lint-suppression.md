@@ -276,20 +276,20 @@ namespace Company.Project.Testing.Utilities
 
 ## Related Bindings
 
-- [require-conventional-commits](../../docs/bindings/core/require-conventional-commits.md): Both bindings
+- [require-conventional-commits](require-conventional-commits.md): Both bindings
   emphasize the importance of clear, informative communication about code changes. While
   conventional commits document why changes were made at the repository level,
   documented suppressions explain exceptions at the code level. Together, they create a
   comprehensive history of decisions that future developers can understand and evaluate.
 
-- [use-structured-logging](../../docs/bindings/core/use-structured-logging.md): This binding complements the
+- [use-structured-logging](use-structured-logging.md): This binding complements the
   no-lint-suppression rule by ensuring that runtime information is as carefully tracked
   as compile-time exceptions. Both bindings recognize that future developers and
   operators need contextual information to make good decisions, whether they're
   investigating a production issue or evaluating a code pattern that triggered a
   warning.
 
-- [external-configuration](../../docs/bindings/core/external-configuration.md): External configuration and
+- [external-configuration](external-configuration.md): External configuration and
   documented suppressions both address how to handle necessary deviations from ideal
   patterns. Configuration values shouldn't be hardcoded, and quality warnings shouldn't
   be silenced—but when exceptions are unavoidable, both bindings require that these

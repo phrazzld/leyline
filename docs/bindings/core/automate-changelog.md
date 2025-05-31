@@ -47,7 +47,7 @@ generation:
 
 - **Commit Message Structure**: All commits must follow the Conventional Commits
   specification as defined in the
-  [require-conventional-commits](../../docs/bindings/core/require-conventional-commits.md) binding:
+  [require-conventional-commits](require-conventional-commits.md) binding:
 
   - Use standardized type prefixes (`feat`, `fix`, `docs`, etc.)
   - Mark breaking changes with `!` and `BREAKING CHANGE:` footer
@@ -196,23 +196,29 @@ Here are concrete strategies for implementing automated changelog generation:
        steps:
          - uses: actions/checkout@v2
 
-         - name: Set up Python
-           uses: actions/setup-python@v2
+         - name: Set up build environment
+           uses: actions/setup-node@v2
            with:
-             python-version: 3.8
+             node-version: '16'
 
          - name: Install dependencies
            run: |
-             python -m pip install --upgrade pip
-             pip install mkdocs mkdocs-material
+             # Install your documentation generator
+             # Examples: npm install -g @11ty/eleventy
+             #           npm install -g hexo-cli
+             #           npm install -g vuepress
+             npm ci
 
          - name: Extract changelog for docs
            run: |
              # Extract the most recent complete release entry
              awk '/^## [[0-9]+\.[0-9]+\.[0-9]+]/{p++;if(p==2)exit} {if(p==1)print}' CHANGELOG.md > docs/recent-changes.md
 
-         - name: Build docs
-           run: mkdocs build
+         - name: Build documentation
+           run: |
+             # Build your documentation site
+             # Examples: eleventy, hexo generate, vuepress build
+             npm run build-docs
    ```
 
 ## Examples
@@ -307,7 +313,7 @@ This will:
 
 ## Related Bindings
 
-- [require-conventional-commits](../../docs/bindings/core/require-conventional-commits.md): Conventional commits provide the structured data that enables automated changelog generation. These bindings work together to create a seamless workflow—conventional commit messages act as the data source, and changelog automation transforms that data into valuable documentation without additional effort.
+- [require-conventional-commits](require-conventional-commits.md): Conventional commits provide the structured data that enables automated changelog generation. These bindings work together to create a seamless workflow—conventional commit messages act as the data source, and changelog automation transforms that data into valuable documentation without additional effort.
 
-- [semantic-versioning](../../docs/bindings/core/semantic-versioning.md): Automated changelogs and semantic versioning are complementary practices. Conventional commits signal what kind of version change is needed (patch, minor, major), while changelog automation ensures that all relevant changes are documented for each version increment.
+- [semantic-versioning](semantic-versioning.md): Automated changelogs and semantic versioning are complementary practices. Conventional commits signal what kind of version change is needed (patch, minor, major), while changelog automation ensures that all relevant changes are documented for each version increment.
 ```

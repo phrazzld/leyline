@@ -139,5 +139,15 @@ Here are some example tenets and their derived bindings:
 
 ## Documentation
 
-Browse through the tenets and bindings directories in this repository for the complete
-documentation. Note that the site URL will change when the project is fully deployed.
+Leyline documentation is designed primarily for LLM consumption, with all tenets and bindings
+available as structured Markdown files with YAML front-matter. Human readers can browse the
+complete documentation directly in this GitHub repository.
+
+**Navigate the documentation:**
+- **[Tenets](./docs/tenets/)** - Foundational principles and philosophy
+- **[Bindings](./docs/bindings/)** - Enforceable rules organized by category
+- **[Integration guides](./docs/integration/)** - Implementation instructions
+- **[Examples](./examples/)** - Practical integration templates
+
+The repository structure is optimized for both programmatic access and GitHub's native
+Markdown rendering, ensuring excellent readability without requiring additional tooling.

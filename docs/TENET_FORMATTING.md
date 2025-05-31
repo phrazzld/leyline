@@ -74,7 +74,7 @@ fields for each type.
   - Binding applicability is now determined by directory location
   - Core bindings (applicable to all) go in `docs/bindings/core/`
   - Category-specific bindings go in `docs/bindings/categories/<category>/`
-  - See [binding-metadata.md](docs/binding-metadata.md) for more details
+  - See [binding-metadata.md](binding-metadata.md) for more details
 
 ## Examples with Comments
 
@@ -262,5 +262,3 @@ Our toolchain is fully configured to work with YAML front-matter:
 - [YAML Specification](https://yaml.org/)
 - [Jekyll Front Matter](https://jekyllrb.com/docs/front-matter/) - A popular
   implementation of front-matter
-- [MkDocs Meta-Data](https://www.mkdocs.org/user-guide/writing-your-docs/#meta-data) -
-  How MkDocs uses front-matter

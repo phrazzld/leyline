@@ -50,10 +50,3 @@ jobs:
         else
           echo "✅ Index file is up-to-date and all documents use valid YAML front-matter"
         fi
-  build-site:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - run: |
-        pip install mkdocs mkdocs-material
-        mkdocs build
