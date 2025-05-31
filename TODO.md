@@ -17,7 +17,7 @@
         2. Cross-reference with CI failure logs to confirm match
     - **Depends‑on:** none
 
-- [ ] **T002 · Chore · P1: remove or update orphaned MkDocs workflow**
+- [x] **T002 · Chore · P1: remove or update orphaned MkDocs workflow**
     - **Context:** CI Failure Resolution > Phase 1: Workflow Cleanup - eliminate CI blocker
     - **Action:**
         1. Evaluate if entire workflow should be removed or just MkDocs steps updated
