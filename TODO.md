@@ -14,7 +14,7 @@
         1. Ensure coverage of all 4 proposed new tenets and 4 enhanced existing tenets
     - **Depends-on:** none
 
-- [ ] **T002 · Feature · P1: Map pragmatic principles to existing tenets and identify gaps**
+- [x] **T002 · Feature · P1: Map pragmatic principles to existing tenets and identify gaps**
     - **Context:** PLAN.md Section 1.2 - Gap Analysis
     - **Action:**
         1. Create matrix showing overlap between pragmatic principles and existing 8 tenets
