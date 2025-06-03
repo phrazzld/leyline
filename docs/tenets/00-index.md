@@ -10,5 +10,6 @@ This file contains an automatically generated list of all tenets with their one-
 | [maintainability](./maintainability.md) | Most of a software project's lifetime is spent in maintenance mode. The code you write |
 | [modularity](./modularity.md) | Modularity is the fundamental approach for taming complexity in software systems. When |
 | [no-secret-suppression](./no-secret-suppression.md) | Software quality tools—linters, type checkers, test suites, security scanners—represent |
+| [orthogonality](./orthogonality.md) | Orthogonality is about isolation and independence—ensuring that unrelated components in |
 | [simplicity](./simplicity.md) | Simplicity is a fundamental requirement for building high-quality, maintainable |
 | [testability](./testability.md) | Testable code is inherently better code. When you design your systems with testability |
