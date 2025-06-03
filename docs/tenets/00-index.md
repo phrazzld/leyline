@@ -4,6 +4,7 @@ This file contains an automatically generated list of all tenets with their one-
 
 | ID | Summary |
 |---|---|
+| [adaptability-and-reversibility](./adaptability-and-reversibility.md) | The only constant in software development is change. Requirements evolve as users |
 | [automation](./automation.md) | Automation is fundamentally about respecting the scarcity of human attention and |
 | [document-decisions](./document-decisions.md) | Software development is fundamentally a decision-making process. Each line of code |
 | [dry-dont-repeat-yourself](./dry-dont-repeat-yourself.md) | The DRY principle is fundamentally about knowledge management and maintaining |

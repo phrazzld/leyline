@@ -80,7 +80,7 @@
         1. Verify DRY content avoids overlap with existing tenets
     - **Depends-on:** [T002]
 
-- [ ] **T007 · Feature · P2: Create adaptability-and-reversibility.md tenet with YAML front-matter**
+- [x] **T007 · Feature · P2: Create adaptability-and-reversibility.md tenet with YAML front-matter**
     - **Context:** PLAN.md Section 3.1 - New Tenet 3
     - **Action:**
         1. Write adaptability-and-reversibility.md with change management guidance
