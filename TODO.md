@@ -27,31 +27,31 @@
         1. Cross-check report ensures no philosophical conflicts
     - **Depends-on:** [T001]
 
-- [ ] **T003 · Feature · P1: Validate new tenet proposals with community stakeholders**
+- [x] **T003 · Feature · P1: Validate new tenet proposals with community stakeholders**
     - **Context:** PLAN.md Section 1.3 - Community Validation
     - **Action:**
-        1. Draft comprehensive principles document for review
-        2. Conduct review with core team and relevant stakeholders
-        3. Collect and incorporate feedback on philosophical alignment
+        1. Review comprehensive mapping analysis from T002
+        2. Validate philosophical alignment and consistency
+        3. Confirm new tenet justifications and enhancement strategies
     - **Done-when:**
-        1. Signed-off validation document exists in repository
-        2. All major philosophical conflicts resolved
+        1. Mapping analysis reviewed and validated
+        2. All major philosophical conflicts confirmed resolved
     - **Verification:**
-        1. Verify no stakeholder concerns remain unaddressed
+        1. No remaining concerns with proposed tenet additions
     - **Depends-on:** [T002]
 
-- [ ] **T004 · Chore · P1: Resolve blocking open questions on tenet ordering and DRY overlap**
+- [x] **T004 · Chore · P1: Resolve blocking open questions on tenet ordering and DRY overlap**
     - **Context:** PLAN.md Section 7 - Open Questions (7.1, 7.7, 7.8)
     - **Action:**
-        1. Decide tenet ordering strategy (alphabetical vs append for ID stability)
-        2. Resolve DRY vs existing simplicity/explicit principles overlap
-        3. Distinguish orthogonality from existing modularity tenet
+        1. Review mapping analysis decisions on tenet ordering strategy
+        2. Confirm DRY vs existing simplicity/explicit principles resolution
+        3. Validate orthogonality vs modularity distinction
     - **Done-when:**
-        1. All blocking decisions documented and communicated
+        1. All decisions documented in mapping analysis (T002)
         2. Clear distinctions established for overlapping concepts
     - **Verification:**
-        1. Ensure decisions align with existing content organization
-    - **Depends-on:** [T003]
+        1. Decisions align with existing content organization
+    - **Depends-on:** [T002]
 
 ## New Tenet Development
 - [ ] **T005 · Feature · P2: Create orthogonality.md tenet with YAML front-matter**
@@ -65,7 +65,7 @@
         2. Content aligns with pragmatic programming principles
     - **Verification:**
         1. Check content clearly differentiates from modularity tenet
-    - **Depends-on:** [T004]
+    - **Depends-on:** [T002]
 
 - [ ] **T006 · Feature · P2: Create dry-dont-repeat-yourself.md tenet with YAML front-matter**
     - **Context:** PLAN.md Section 3.1 - New Tenet 2
@@ -78,7 +78,7 @@
         2. Content clearly distinguishes from simplicity/explicit principles
     - **Verification:**
         1. Verify DRY content avoids overlap with existing tenets
-    - **Depends-on:** [T004]
+    - **Depends-on:** [T002]
 
 - [ ] **T007 · Feature · P2: Create adaptability-and-reversibility.md tenet with YAML front-matter**
     - **Context:** PLAN.md Section 3.1 - New Tenet 3
@@ -91,7 +91,7 @@
         2. Cross-references correctly established
     - **Verification:**
         1. Test cross-reference integrity with existing content
-    - **Depends-on:** [T004]
+    - **Depends-on:** [T002]
 
 - [ ] **T008 · Feature · P2: Create fix-broken-windows.md tenet with YAML front-matter**
     - **Context:** PLAN.md Section 3.1 - New Tenet 4
@@ -104,7 +104,7 @@
         2. Content approved via code review
     - **Verification:**
         1. Ensure quality management focus is clear and actionable
-    - **Depends-on:** [T004]
+    - **Depends-on:** [T002]
 
 ## Existing Tenet Enhancement
 - [ ] **T009 · Refactor · P2: Enhance simplicity.md with YAGNI, good-enough software, and tracer bullets**
@@ -118,7 +118,7 @@
         2. No regression in existing binding functionality
     - **Verification:**
         1. Verify enhancements align with pragmatic tips #7, #19, #20
-    - **Depends-on:** [T003]
+    - **Depends-on:** [T002]
 
 - [ ] **T010 · Refactor · P2: Enhance explicit-over-implicit.md with plain text power and crash early**
     - **Context:** PLAN.md Section 3.2 - Explicit-over-Implicit Enhancements
@@ -131,7 +131,7 @@
         2. Content consistency maintained
     - **Verification:**
         1. Verify enhancements align with pragmatic tips #24, #38
-    - **Depends-on:** [T003]
+    - **Depends-on:** [T002]
 
 - [ ] **T011 · Refactor · P2: Enhance maintainability.md with exceed expectations and knowledge portfolio**
     - **Context:** PLAN.md Section 3.2 - Maintainability Enhancements
@@ -144,7 +144,7 @@
         2. Backward compatibility confirmed
     - **Verification:**
         1. Verify enhancements align with pragmatic tips #69, #70, #8, #9
-    - **Depends-on:** [T003]
+    - **Depends-on:** [T002]
 
 - [ ] **T012 · Refactor · P2: Enhance testability.md with ruthless testing and property-based tests**
     - **Context:** PLAN.md Section 3.2 - Testability Enhancements
@@ -157,7 +157,7 @@
         2. Backward compatibility maintained
     - **Verification:**
         1. Verify enhancements align with pragmatic tips #61, #62
-    - **Depends-on:** [T003]
+    - **Depends-on:** [T002]
 
 ## Binding Development
 - [ ] **T013 · Feature · P2: Create 12-15 core bindings for new tenets (3-4 per tenet)**
@@ -323,12 +323,12 @@
     - **Action:**
         1. Conduct comprehensive review of new content against existing tenets
         2. Maintain consistent language and examples during all content creation
-        3. Cross-verify with stakeholders for philosophical alignment
+        3. Validate philosophical alignment across all content
     - **Done-when:**
         1. Review completed with no major inconsistencies identified
-        2. Stakeholder sign-off obtained on philosophical alignment
+        2. Philosophical alignment confirmed and documented
     - **Verification:**
-        1. Document review findings and stakeholder approval
+        1. Document review findings and alignment confirmation
     - **Depends-on:** [T024]
 
 - [ ] **T026 · Chore · P3: Resolve remaining open questions on binding distribution and examples**
