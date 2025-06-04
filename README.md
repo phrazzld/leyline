@@ -79,21 +79,41 @@ on:
 
 jobs:
   sync:
-    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v0.1.2
     with:
-      token: ${{ secrets.GITHUB_TOKEN }}
-      leyline_ref: v1.0.0  # Pin to a specific Leyline version
+      leyline_ref: v0.1.2  # Pin to a specific Leyline version
       categories: go,typescript  # Optional: only sync specific categories
       target_path: docs/leyline  # Optional: customize target directory
       create_pr: true  # Optional: create a PR instead of direct commit
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}  # Required: GitHub token for repo access
 ```
 
-2. The workflow will:
+2. **First-time setup**: After adding the workflow file, manually trigger it:
+   - Go to your repository's **Actions** tab
+   - Find **"Sync Leyline Content"** workflow
+   - Click **"Run workflow"** → **"Run workflow"**
+
+3. The workflow will:
    - Pull the specified version of Leyline content
    - Copy tenets, core bindings, and requested category bindings
    - Create a pull request with the changes (or commit directly)
 
-3. Review and merge the PR to adopt the standards
+4. Review and merge the PR to adopt the standards
+
+### Common Setup Issues
+
+If you encounter errors when setting up the workflow:
+
+**"reference to workflow should be either a valid branch, tag, or commit"**
+- Use `@v0.1.2` instead of `@v1` (check [releases](https://github.com/phrazzld/leyline/releases) for latest version)
+
+**"Unrecognized named-value: 'secrets'. Located at position 1 within expression: secrets.GITHUB_TOKEN"**
+- Move `token` from `with:` to `secrets:` section (see corrected template above)
+
+**"Workflow doesn't run after pushing"**
+- The workflow only runs on schedule or manual trigger, not on push
+- Manually trigger it the first time via GitHub Actions UI
 
 **For detailed integration instructions**, see the [Integration Guide](./docs/integration/pull-model-guide.md).
 
@@ -112,7 +132,7 @@ pull Go bindings), Leyline provides category-specific integration options:
 - Use the `categories` input parameter to specify which categories to sync:
   ```yaml
   with:
-    ref: master
+    leyline_ref: v0.1.2
     categories: go,typescript,frontend
   ```
 - The workflow will always sync core bindings (applicable to all projects) and tenets, along with the categories you specify
