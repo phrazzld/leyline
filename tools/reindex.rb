@@ -41,9 +41,16 @@ def report_warning(file, message)
   $warnings << { file: file, message: message }
 end
 
+# Get the base docs path from environment variable or default
+def get_docs_base_path
+  base_path = ENV['LEYLINE_DOCS_PATH'] || 'docs'
+  puts "Using docs base path: #{base_path}" if $options[:verbose]
+  base_path
+end
+
 # Process tenets directory with enhanced error handling
 def process_tenets_dir
-  dir = 'docs/tenets'
+  dir = "#{get_docs_base_path}/tenets"
   dir_base = dir.split('/').last
   entries = []
 
@@ -146,7 +153,7 @@ end
 
 # Process bindings with new directory structure
 def process_bindings_dir
-  dir = 'docs/bindings'
+  dir = "#{get_docs_base_path}/bindings"
 
   # Check for misplaced files in the root directory
   misplaced_files = Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }
