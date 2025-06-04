@@ -644,17 +644,16 @@ jobs:
         echo "" >> pr-body.md
         cat sync-summary.md >> pr-body.md
 
-    - name: Push PR
+    - name: Resolve PR Configuration
       if: steps.check-changes.outputs.has_changes == 'true'
       run: |
-        # Resolve PR branch name (use custom or default)
+        # Resolve PR branch name (use custom or default) for logging
         if [ -n "${{ inputs.pr_branch_name }}" ]; then
           pr_branch_name="${{ inputs.pr_branch_name }}"
         else
           pr_branch_name="leyline-sync/${{ inputs.leyline_ref }}"
         fi
         echo "$pr_branch_name" > pr-branch.txt
-        echo "PR_BRANCH_NAME=$pr_branch_name" >> $GITHUB_ENV
 
         # Use the custom PR title if provided, otherwise generate one with synced categories info
         pr_title="${{ inputs.pr_title }}"
@@ -678,7 +677,8 @@ jobs:
       run: |
         echo "::notice::📮 Attempting to create Pull Request"
         echo "::debug::PR title: $(cat pr-title.txt)"
-        echo "::debug::PR branch: $(cat pr-branch.txt)"
+        pr_branch=$(cat pr-branch.txt 2>/dev/null || echo "${{ inputs.pr_branch_name != '' && inputs.pr_branch_name || format('leyline-sync/{0}', inputs.leyline_ref) }}")
+        echo "::debug::PR branch: $pr_branch"
         echo "::debug::Base branch: ${{ github.ref_name }}"
 
       # Create the PR if create_pr is true and changes exist
@@ -694,8 +694,8 @@ jobs:
         title-path: pr-title.txt
         # Use the generated PR body with sync summary and details
         body-path: pr-body.md
-        # Use the dynamically resolved branch name
-        branch: ${{ env.PR_BRANCH_NAME }}
+        # Use the resolved branch name or fallback to default
+        branch: ${{ inputs.pr_branch_name != '' && inputs.pr_branch_name || format('leyline-sync/{0}', inputs.leyline_ref) }}
         # Only create PR if there are actual changes to commit
         commit-message: ${{ inputs.commit_message }}
         # Delete branch on close if no longer differs from base
@@ -712,7 +712,8 @@ jobs:
         echo "This could be due to several reasons:"
         echo ""
         echo "1. **Branch Conflicts:**"
-        echo "   - The branch '$(cat pr-branch.txt)' may have diverged from the base branch"
+        pr_branch=$(cat pr-branch.txt 2>/dev/null || echo "${{ inputs.pr_branch_name != '' && inputs.pr_branch_name || format('leyline-sync/{0}', inputs.leyline_ref) }}")
+        echo "   - The branch '$pr_branch' may have diverged from the base branch"
         echo "   - There may be an existing closed PR that prevents creating a new one"
         echo "   - Solution: Try using a different branch name or manually delete the existing branch"
         echo ""
@@ -730,7 +731,8 @@ jobs:
         echo "   - Pull requests may be disabled in repository settings"
         echo ""
         echo "To resolve branch conflicts specifically:"
-        echo "  1. Delete the existing branch: git push origin --delete $(cat pr-branch.txt)"
+        pr_branch=$(cat pr-branch.txt 2>/dev/null || echo "${{ inputs.pr_branch_name != '' && inputs.pr_branch_name || format('leyline-sync/{0}', inputs.leyline_ref) }}")
+        echo "  1. Delete the existing branch: git push origin --delete $pr_branch"
         echo "  2. Use a different branch name in your workflow"
         echo "  3. Or manually merge/close any existing PRs from this branch"
         exit 1
@@ -750,7 +752,8 @@ jobs:
           echo "📋 PR Details:"
           echo "  - Number: ${{ steps.create-pr.outputs.pull-request-number }}"
           echo "  - URL: ${{ steps.create-pr.outputs.pull-request-url }}"
-          echo "  - Branch: $(cat pr-branch.txt)"
+          pr_branch=$(cat pr-branch.txt 2>/dev/null || echo "${{ inputs.pr_branch_name != '' && inputs.pr_branch_name || format('leyline-sync/{0}', inputs.leyline_ref) }}")
+          echo "  - Branch: $pr_branch"
           echo "  - Operation: ${{ steps.create-pr.outputs.pull-request-operation }}"
           echo "::debug::PR creation completed successfully"
         else
