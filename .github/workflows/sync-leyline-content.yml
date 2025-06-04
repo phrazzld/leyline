@@ -408,7 +408,7 @@ jobs:
         chmod +x tools/reindex.rb
 
         # Run reindex.rb to regenerate the index, with target path
-        cd tools && LEYLINE_DOCS_PATH="${{ inputs.target_path }}" ruby reindex.rb
+        cd tools && LEYLINE_DOCS_PATH="../${{ inputs.target_path }}" ruby reindex.rb
 
         # Verify the index file was generated
         if [ -f "../${{ inputs.target_path }}/bindings/00-index.md" ]; then

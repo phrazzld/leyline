@@ -3,6 +3,7 @@
 
 require 'yaml'
 require 'optparse'
+require 'fileutils'
 
 # Global error tracking
 $errors = []
@@ -146,7 +147,8 @@ def process_tenets_dir
     report_warning(dir, "No valid tenet entries found for index generation")
   end
 
-  # Write index file
+  # Ensure directory exists and write index file
+  FileUtils.mkdir_p(dir)
   File.write("#{dir}/00-index.md", index_content)
   puts "Updated #{dir}/00-index.md with #{entries.size} entries"
 end
@@ -275,7 +277,8 @@ def process_bindings_dir
     end
   end
 
-  # Write index file
+  # Ensure directory exists and write index file
+  FileUtils.mkdir_p(dir)
   File.write("#{dir}/00-index.md", index_content)
   puts "Updated #{dir}/00-index.md with #{core_entries.size} core entries and #{category_entries.values.flatten.size} category entries"
 end
