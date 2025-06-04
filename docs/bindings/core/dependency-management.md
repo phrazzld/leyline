@@ -472,7 +472,7 @@ def generate_report(data, include_charts=False):
   deliberately limiting dependencies, you reduce the cognitive load required to work
   with your codebase and minimize potential points of failure.
 
-- [external-configuration](external-configuration.md): External configuration and
+- [external-configuration](../../docs/bindings/core/external-configuration.md): External configuration and
   careful dependency management are complementary practices that improve system
   maintainability. Both focus on isolating aspects of your system that are likely to
   change—configuration values and third-party code—behind clear boundaries. This
@@ -486,7 +486,7 @@ def generate_report(data, include_charts=False):
   dependencies and automating security scanning, you can detect and address
   vulnerabilities before they impact your users.
 
-- [hex-domain-purity](hex-domain-purity.md): Hexagonal architecture and careful
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Hexagonal architecture and careful
   dependency management work together to create more maintainable systems. By isolating
   third-party dependencies at the boundaries of your application, you keep your domain
   logic pure and focused on business rules rather than implementation details. This

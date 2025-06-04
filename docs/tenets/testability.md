@@ -1,6 +1,6 @@
 ---
 id: testability
-last_modified: '2025-05-08'
+last_modified: '2025-06-02'
 ---
 
 # Tenet: Design for Testability
@@ -79,6 +79,33 @@ documentation of the system's intended behavior.
    control, not convenient substitutes for internal components. If you feel compelled to
    mock an internal component, consider instead refactoring to better encapsulate that
    functionality.
+
+1. **Apply Ruthless Testing Standards**: Be uncompromising about test quality and
+   coverage for critical business logic. Ask yourself: "What happens if this code fails
+   in production?" Test every edge case, error condition, and boundary you can think of.
+   Don't settle for "it probably works" or "we'll catch issues later." For core
+   functionality that users depend on, aim for comprehensive coverage that gives you
+   absolute confidence in correctness. This doesn't mean testing every trivial getter,
+   but it does mean exhaustively validating the components that matter most. When in
+   doubt, err on the side of more testing rather than less.
+
+1. **Test All Meaningful States**: Systematically verify behavior across all significant
+   states your system can be in. Ask yourself: "What are all the possible states this
+   component can be in, and have I tested transitions between them?" Many bugs occur
+   during state transitions or in unusual but valid system states. Create test cases
+   that exercise initialization, steady-state operation, error recovery, shutdown, and
+   edge conditions. For stateful components, test both successful and failed state
+   transitions. Don't just test the happy path—test the entire state space that your
+   users might encounter.
+
+1. **Leverage Property-Based Testing**: Complement example-based tests with
+   property-based tests that verify invariants hold across many inputs. Ask yourself:
+   "What properties should always be true regardless of the specific input?" Rather than
+   testing individual examples, define rules that must hold for entire classes of
+   inputs, then let the testing framework generate hundreds of test cases automatically.
+   This approach often uncovers edge cases you wouldn't think to test manually. Use
+   property-based testing for algorithms, data transformations, and any logic where you
+   can express invariants or relationships that should always hold true.
 
 ## Warning Signs
 

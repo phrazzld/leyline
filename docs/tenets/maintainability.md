@@ -1,6 +1,6 @@
 ---
 id: maintainability
-last_modified: '2025-05-08'
+last_modified: '2025-06-02'
 ---
 
 # Tenet: Maintainability Over Premature Optimization
@@ -82,6 +82,35 @@ remains clean and comprehensible.
    the majority of execution time. Finding and optimizing these critical sections while
    keeping the rest of your code maintainable yields the best balance between
    performance and maintainability.
+
+1. **Gently Exceed User Expectations**: Look for small opportunities to delight users
+   and teammates beyond the minimum requirements. Ask yourself: "What small extra touch
+   would make this more pleasant to use?" This might mean providing helpful error
+   messages instead of cryptic codes, adding thoughtful logging for debugging, or
+   creating clear documentation for the next developer. The key is "gently"—avoid
+   over-engineering or gold-plating, but do add those small refinements that demonstrate
+   care and professionalism. Users remember software that feels thoughtfully crafted,
+   and future maintainers appreciate code that shows someone cared about quality.
+
+1. **Sign Your Work with Pride**: Take ownership and responsibility for the quality of
+   your code as if your name will be permanently associated with it. Ask yourself:
+   "Would I be proud to have my name on this implementation?" This doesn't mean
+   perfection, but it does mean doing your best work within the given constraints.
+   Clean up temporary debugging code, ensure consistent formatting, write clear commit
+   messages, and test edge cases. When you encounter someone else's poorly written
+   code, improve it rather than working around it. Code quality is a reflection of
+   professional standards, and signing your work means maintaining those standards
+   consistently.
+
+1. **Invest Regularly in Your Knowledge Portfolio**: Treat learning as an ongoing
+   professional responsibility, not a luxury for spare time. Ask yourself: "What
+   technologies, patterns, or skills am I learning this quarter?" Dedicate time to
+   understanding new tools, exploring different programming paradigms, reading code from
+   excellent projects, and learning from domain experts. Stay curious about alternative
+   approaches to common problems. This investment pays dividends in maintainability as
+   you develop better judgment about when to apply different techniques and how to
+   architect systems that will age well. Keep your skills sharp and your perspective
+   broad to write code that stands the test of time.
 
 ## Warning Signs
 

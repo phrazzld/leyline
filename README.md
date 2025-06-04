@@ -11,6 +11,11 @@ development principles through two core concepts:
 - **Bindings**: Enforceable rules derived from tenets, with specific implementation
   guidance
 
+Our philosophy is built on twelve foundational tenets, enhanced with insights from
+"The Pragmatic Programmer" and modern software engineering best practices. These tenets
+cover essential areas including simplicity, testability, maintainability, modularity,
+automation, and adaptability.
+
 For example, the [simplicity](./docs/tenets/simplicity.md) tenet establishes the
 principle that we should "prefer the simplest design that works," while the
 [no-any](./docs/bindings/categories/typescript/no-any.md) binding is a specific, enforceable rule
@@ -130,12 +135,20 @@ Here are some example tenets and their derived bindings:
 
 - **[Simplicity](./docs/tenets/simplicity.md)** →
   [hex-domain-purity](./docs/bindings/core/hex-domain-purity.md),
+  [yagni-pattern-enforcement](./docs/bindings/core/yagni-pattern-enforcement.md),
   [no-any](./docs/bindings/categories/typescript/no-any.md)
-- **[Automation](./docs/tenets/automation.md)** →
-  [error-wrapping](./docs/bindings/categories/go/error-wrapping.md),
-  [require-conventional-commits](./docs/bindings/core/require-conventional-commits.md)
+- **[Orthogonality](./docs/tenets/orthogonality.md)** →
+  [system-boundaries](./docs/bindings/core/system-boundaries.md),
+  [component-isolation](./docs/bindings/core/component-isolation.md)
+- **[DRY (Don't Repeat Yourself)](./docs/tenets/dry-dont-repeat-yourself.md)** →
+  [extract-common-logic](./docs/bindings/core/extract-common-logic.md),
+  [normalized-data-design](./docs/bindings/core/normalized-data-design.md)
+- **[Fix Broken Windows](./docs/tenets/fix-broken-windows.md)** →
+  [automated-quality-gates](./docs/bindings/core/automated-quality-gates.md),
+  [technical-debt-tracking](./docs/bindings/core/technical-debt-tracking.md)
 - **[Testability](./docs/tenets/testability.md)** →
-  [no-internal-mocking](./docs/bindings/core/no-internal-mocking.md)
+  [no-internal-mocking](./docs/bindings/core/no-internal-mocking.md),
+  [property-based-testing](./docs/bindings/core/property-based-testing.md)
 
 ## Documentation
 

@@ -1,6 +1,6 @@
 ---
 id: simplicity
-last_modified: '2025-05-08'
+last_modified: '2025-06-02'
 ---
 
 # Tenet: Simplicity Above All
@@ -71,6 +71,22 @@ choices).
    simplified?" When you understand a piece of complex code, take the time to refactor
    it toward simplicity while its workings are fresh in your mind. This ongoing
    investment prevents complexity debt from accumulating.
+
+1. **Ship Good-Enough Software**: Perfect software is the enemy of useful software.
+   Focus on meeting actual user needs rather than pursuing theoretical perfection.
+   Deliver value early and iterate based on real feedback rather than speculation.
+   Ask yourself: "Is this good enough for our users, future maintainers, and business
+   needs?" Quality has a cost, and over-engineering wastes resources that could be
+   better spent on features users actually need. Know when to stop polishing and
+   start delivering.
+
+1. **Use Tracer Bullets for Early Validation**: When building new functionality,
+   create a minimal end-to-end implementation first—a "tracer bullet" that touches
+   all architectural layers but implements only core functionality. This simple
+   approach validates assumptions about integration points, data flow, and user
+   interaction early, when changes are cheap. Like actual tracer rounds that help
+   gunners adjust their aim, tracer code helps you adjust your architecture before
+   investing heavily in detailed implementation.
 
 ## Warning Signs
 

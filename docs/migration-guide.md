@@ -5,6 +5,7 @@ This guide covers migration scenarios for adopting or upgrading your Leyline int
 1. **[Migrating from Symlinks to Leyline](#migrating-from-symlinks-to-leyline)** - For repositories using symlinked philosophy documents
 2. **[Migrating from Legacy Workflows](#migrating-from-legacy-workflows)** - For repositories using the old vendor.yml workflow
 3. **[Migrating to Directory-Based Structure](#migrating-to-directory-based-structure)** - For existing Leyline users updating to the new directory-based structure
+4. **[Migrating to Enhanced Pragmatic Programming Tenets](#migrating-to-enhanced-pragmatic-programming-tenets)** - For existing Leyline users adopting the expanded 12-tenet system
 
 For comprehensive integration instructions, see the [Pull-Based Integration Guide](integration/pull-model-guide.md).
 
@@ -309,6 +310,190 @@ If your project references binding files directly:
 2. **Cleaner Organization**: Clear separation of concerns
 3. **Reduced Noise**: Only relevant bindings in your project
 4. **Better Scaling**: Easy to add new categories without conflicts
+
+---
+
+# Migrating to Enhanced Pragmatic Programming Tenets
+
+For existing Leyline users upgrading from the original 8-tenet system to the enhanced 12-tenet system with pragmatic programming integration.
+
+## What's Changing?
+
+### Philosophy Expansion: 8 to 12 Tenets
+
+Leyline has evolved from 8 foundational tenets to 12, incorporating insights from "The Pragmatic Programmer" and modern software engineering practices.
+
+#### Original 8 Tenets (Enhanced)
+- [Simplicity](../tenets/simplicity.md) - Enhanced with YAGNI principles and tracer bullets
+- [Explicit over Implicit](../tenets/explicit-over-implicit.md) - Enhanced with crash early patterns
+- [Maintainability](../tenets/maintainability.md) - Enhanced with knowledge portfolio investment
+- [Testability](../tenets/testability.md) - Enhanced with property-based testing
+- [Modularity](../tenets/modularity.md) - Unchanged
+- [Automation](../tenets/automation.md) - Unchanged
+- [Document Decisions](../tenets/document-decisions.md) - Unchanged
+- [No Secret Suppression](../tenets/no-secret-suppression.md) - Unchanged
+
+#### New 4 Tenets (Pragmatic Programming)
+- [Orthogonality](../tenets/orthogonality.md) - Component independence and isolation
+- [DRY (Don't Repeat Yourself)](../tenets/dry-dont-repeat-yourself.md) - Knowledge representation management
+- [Adaptability and Reversibility](../tenets/adaptability-and-reversibility.md) - Change management and flexible architecture
+- [Fix Broken Windows](../tenets/fix-broken-windows.md) - Quality management and immediate action
+
+### New and Enhanced Bindings
+
+The enhanced philosophy includes new bindings that implement pragmatic programming concepts:
+
+#### New Core Bindings
+- [yagni-pattern-enforcement](../bindings/core/yagni-pattern-enforcement.md) - YAGNI implementation patterns
+- [fail-fast-validation](../bindings/core/fail-fast-validation.md) - Crash early patterns
+- [continuous-learning-investment](../bindings/core/continuous-learning-investment.md) - Knowledge portfolio management
+- [property-based-testing](../bindings/core/property-based-testing.md) - Property-based testing approaches
+- [system-boundaries](../bindings/core/system-boundaries.md) - Component isolation and orthogonality
+- [extract-common-logic](../bindings/core/extract-common-logic.md) - DRY implementation patterns
+- [feature-flag-management](../bindings/core/feature-flag-management.md) - Adaptability patterns
+- [automated-quality-gates](../bindings/core/automated-quality-gates.md) - Quality management automation
+
+#### Enhanced Category-Specific Bindings
+- [functional-composition-patterns](../bindings/categories/typescript/functional-composition-patterns.md) - TypeScript functional patterns
+- [dependency-injection-patterns](../bindings/categories/go/dependency-injection-patterns.md) - Go dependency management
+- [trait-composition-patterns](../bindings/categories/rust/trait-composition-patterns.md) - Rust trait composition
+
+## Breaking Changes and Considerations
+
+### No Breaking Changes to Existing Content
+- **Existing tenets remain valid**: The original 8 tenets are enhanced, not replaced
+- **Existing bindings continue to work**: No changes to established binding patterns
+- **Backward compatibility maintained**: Teams can adopt new concepts incrementally
+
+### Philosophical Considerations
+
+#### Enhanced Tenet Content
+Some existing tenets now include additional concepts that teams should be aware of:
+
+- **Simplicity**: Now emphasizes YAGNI principles more strongly
+- **Explicit over Implicit**: Includes crash early patterns that may require validation strategy changes
+- **Maintainability**: Emphasizes knowledge portfolio investment and continuous learning
+- **Testability**: Introduces property-based testing concepts alongside existing approaches
+
+#### New Tenet Integration
+The four new tenets introduce concepts that may overlap with existing practices:
+
+- **Orthogonality vs. Modularity**: Both focus on separation, but orthogonality emphasizes eliminating effects between unrelated components
+- **DRY vs. Simplicity**: DRY focuses on knowledge representation, while simplicity focuses on design clarity
+- **Adaptability vs. Maintainability**: Both support long-term sustainability, but adaptability emphasizes change management
+
+## Migration Process
+
+### Step 1: Update Leyline Version
+
+Update your workflow to use the latest Leyline version that includes the enhanced tenets:
+
+```yaml
+jobs:
+  sync:
+    uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v1
+    with:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      leyline_ref: v1.1.0  # Update to version with enhanced tenets
+      categories: go,typescript,frontend
+```
+
+### Step 2: Review Enhanced Content
+
+The sync will automatically pull:
+- Enhanced versions of existing tenets with new pragmatic concepts
+- Four new tenets with foundational content
+- New and enhanced bindings implementing pragmatic patterns
+
+### Step 3: Assess Team Readiness
+
+Consider your team's readiness for the expanded philosophy:
+
+#### Immediate Adoption (Low Risk)
+- Enhanced existing tenets - build on familiar concepts
+- Fix Broken Windows - immediately actionable quality management
+- Core bindings for crash early and YAGNI patterns
+
+#### Gradual Adoption (Medium Risk)
+- Orthogonality principles - may require architectural discussions
+- DRY implementation - may require refactoring analysis
+- Property-based testing - may require tooling and training
+
+#### Strategic Planning (Long-term)
+- Adaptability patterns - architectural planning and feature flag infrastructure
+- Knowledge portfolio investment - learning and development planning
+- Advanced composition patterns - requires language-specific expertise
+
+### Step 4: Create Adoption Plan
+
+**Phase 1: Enhanced Existing Tenets (Weeks 1-2)**
+1. Review enhanced simplicity guidance for YAGNI opportunities
+2. Implement crash early patterns from enhanced explicitness
+3. Apply immediate quality management from fix broken windows
+4. Assess property-based testing opportunities
+
+**Phase 2: New Core Concepts (Weeks 3-6)**
+1. Analyze system boundaries for orthogonality improvements
+2. Identify DRY opportunities in current codebase
+3. Plan adaptability infrastructure (feature flags, configuration)
+4. Implement automated quality gates
+
+**Phase 3: Advanced Integration (Months 2-3)**
+1. Apply language-specific composition patterns
+2. Establish knowledge portfolio practices
+3. Integrate adaptability patterns into architecture decisions
+4. Validate philosophical alignment across all practices
+
+### Step 5: Validate Adoption
+
+Use these criteria to assess successful migration:
+
+- [ ] Team understands distinctions between all 12 tenets
+- [ ] Enhanced existing tenets are integrated into current practices
+- [ ] New bindings are applied appropriately to relevant code
+- [ ] No conflicts between pragmatic concepts and existing standards
+- [ ] Team can articulate when to apply each tenet and binding
+
+## Common Migration Concerns
+
+### "Too Many Tenets - Overwhelming Complexity"
+**Concern**: 12 tenets seem like too many to manage effectively
+
+**Response**: The 8 original tenets remain unchanged in spirit, with pragmatic enhancements that make them more actionable. The 4 new tenets address gaps in architectural thinking and quality management that most teams already practice informally.
+
+**Solution**: Adopt incrementally, starting with enhanced existing tenets
+
+### "Philosophical Conflicts with Current Practices"
+**Concern**: New tenets might conflict with established team practices
+
+**Response**: Pragmatic programming tenets are designed to complement, not replace, existing good practices. They formalize patterns that effective teams already use.
+
+**Solution**: Map current practices to new tenets to identify alignment and gaps
+
+### "Implementation Overhead"
+**Concern**: New bindings require significant implementation effort
+
+**Response**: Bindings provide implementation guidance, not mandatory requirements. Teams can adopt patterns that provide value in their context.
+
+**Solution**: Prioritize bindings based on current pain points and improvement opportunities
+
+### "Learning Curve for New Concepts"
+**Concern**: Team needs training on pragmatic programming concepts
+
+**Response**: Most concepts align with existing industry best practices. The tenets provide structured guidance for familiar challenges.
+
+**Solution**: Use enhanced tenets as learning opportunities and gradual skill development
+
+## Validation Checklist
+
+After completing the migration:
+
+- [ ] All 12 tenets are accessible and understood by the team
+- [ ] Enhanced existing tenets are integrated into code review processes
+- [ ] New bindings are applied to appropriate areas of the codebase
+- [ ] Team can explain the relationship between tenets and practical implementation
+- [ ] No regression in existing quality practices or philosophical alignment
+- [ ] Team has a plan for ongoing adoption of advanced pragmatic concepts
 
 ---
 

@@ -47,7 +47,7 @@ generation:
 
 - **Commit Message Structure**: All commits must follow the Conventional Commits
   specification as defined in the
-  [require-conventional-commits](require-conventional-commits.md) binding:
+  [require-conventional-commits](../../docs/bindings/core/require-conventional-commits.md) binding:
 
   - Use standardized type prefixes (`feat`, `fix`, `docs`, etc.)
   - Mark breaking changes with `!` and `BREAKING CHANGE:` footer
@@ -313,7 +313,7 @@ This will:
 
 ## Related Bindings
 
-- [require-conventional-commits](require-conventional-commits.md): Conventional commits provide the structured data that enables automated changelog generation. These bindings work together to create a seamless workflow—conventional commit messages act as the data source, and changelog automation transforms that data into valuable documentation without additional effort.
+- [require-conventional-commits](../../docs/bindings/core/require-conventional-commits.md): Conventional commits provide the structured data that enables automated changelog generation. These bindings work together to create a seamless workflow—conventional commit messages act as the data source, and changelog automation transforms that data into valuable documentation without additional effort.
 
-- [semantic-versioning](semantic-versioning.md): Automated changelogs and semantic versioning are complementary practices. Conventional commits signal what kind of version change is needed (patch, minor, major), while changelog automation ensures that all relevant changes are documented for each version increment.
+- [semantic-versioning](../../docs/bindings/core/semantic-versioning.md): Automated changelogs and semantic versioning are complementary practices. Conventional commits signal what kind of version change is needed (patch, minor, major), while changelog automation ensures that all relevant changes are documented for each version increment.
 ```

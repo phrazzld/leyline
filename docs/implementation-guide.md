@@ -16,13 +16,20 @@ The directory organization directly maps to consumer filtering capabilities:
 
 ```
 docs/
-├── tenets/                 # Always synced to all consumers
+├── tenets/                 # Always synced to all consumers (12 total)
 │   ├── simplicity.md
-│   └── testability.md
+│   ├── testability.md
+│   ├── orthogonality.md
+│   ├── dry-dont-repeat-yourself.md
+│   ├── fix-broken-windows.md
+│   └── adaptability-and-reversibility.md
 └── bindings/
     ├── core/               # Always synced to all consumers
     │   ├── pure-functions.md
-    │   └── dependency-inversion.md
+    │   ├── dependency-inversion.md
+    │   ├── yagni-pattern-enforcement.md
+    │   ├── fail-fast-validation.md
+    │   └── property-based-testing.md
     └── categories/         # Selectively synced based on consumer choice
         ├── go/             # Only synced when consumers request 'go'
         ├── rust/           # Only synced when consumers request 'rust'
@@ -98,7 +105,9 @@ Core bindings should:
 **Examples**:
 - `pure-functions.md` - Functional programming principles
 - `dependency-inversion.md` - Architectural patterns
-- `no-global-state.md` - State management principles
+- `yagni-pattern-enforcement.md` - YAGNI implementation patterns
+- `fail-fast-validation.md` - Input validation and crash early patterns
+- `system-boundaries.md` - Component isolation and orthogonality
 
 ### Category-Specific Bindings
 
@@ -156,6 +165,74 @@ Code examples (if applicable)...
 ## Exceptions
 When this rule might not apply...
 ```
+
+## Pragmatic Programming Integration
+
+Leyline's philosophy has been enhanced with insights from "The Pragmatic Programmer" and modern software engineering best practices. This integration strengthens the existing tenets while adding new principles that reflect decades of accumulated wisdom in software development.
+
+### Enhanced Philosophy: From 8 to 12 Tenets
+
+The original eight tenets have been expanded to twelve, incorporating four new foundational principles derived from pragmatic programming wisdom:
+
+#### New Tenets from Pragmatic Programming
+
+1. **[Orthogonality](../tenets/orthogonality.md)** - "Eliminate Effects Between Unrelated Things"
+   - **Origin**: Pragmatic Programmer Tip #17
+   - **Focus**: Component independence and isolation
+   - **Key Bindings**: [system-boundaries](../bindings/core/system-boundaries.md), [component-isolation](../bindings/core/component-isolation.md)
+
+2. **[DRY (Don't Repeat Yourself)](../tenets/dry-dont-repeat-yourself.md)** - Knowledge Representation Management
+   - **Origin**: Pragmatic Programmer Tip #15
+   - **Focus**: Single source of truth for all knowledge
+   - **Key Bindings**: [extract-common-logic](../bindings/core/extract-common-logic.md), [normalized-data-design](../bindings/core/normalized-data-design.md)
+
+3. **[Adaptability and Reversibility](../tenets/adaptability-and-reversibility.md)** - "There Are No Final Decisions"
+   - **Origin**: Pragmatic Programmer Tip #18
+   - **Focus**: Change management and flexible architecture
+   - **Key Bindings**: [feature-flag-management](../bindings/core/feature-flag-management.md), [runtime-adaptability](../bindings/core/runtime-adaptability.md)
+
+4. **[Fix Broken Windows](../tenets/fix-broken-windows.md)** - Quality Management
+   - **Origin**: Pragmatic Programmer Tip #4
+   - **Focus**: Preventing quality decay through immediate action
+   - **Key Bindings**: [automated-quality-gates](../bindings/core/automated-quality-gates.md), [technical-debt-tracking](../bindings/core/technical-debt-tracking.md)
+
+#### Enhanced Existing Tenets
+
+Four existing tenets have been strengthened with additional pragmatic programming concepts:
+
+- **[Simplicity](../tenets/simplicity.md)**: Enhanced with YAGNI principles, good-enough software, and tracer bullet development
+- **[Explicit over Implicit](../tenets/explicit-over-implicit.md)**: Enhanced with plain text power and crash early patterns
+- **[Maintainability](../tenets/maintainability.md)**: Enhanced with "gently exceed expectations" and knowledge portfolio investment
+- **[Testability](../tenets/testability.md)**: Enhanced with ruthless testing and property-based testing approaches
+
+### Enhanced Bindings from Pragmatic Principles
+
+The pragmatic programming integration has produced new bindings that implement these enhanced concepts:
+
+- **[yagni-pattern-enforcement](../bindings/core/yagni-pattern-enforcement.md)**: Implements YAGNI principles from enhanced simplicity
+- **[fail-fast-validation](../bindings/core/fail-fast-validation.md)**: Implements crash early patterns from enhanced explicitness
+- **[continuous-learning-investment](../bindings/core/continuous-learning-investment.md)**: Implements knowledge portfolio from enhanced maintainability
+- **[property-based-testing](../bindings/core/property-based-testing.md)**: Implements property-based testing from enhanced testability
+
+### Adoption Guidance for Pragmatic Integration
+
+Teams adopting these enhanced principles should consider:
+
+#### Incremental Adoption Strategy
+1. **Start with Enhanced Existing Tenets**: Teams familiar with simplicity, explicitness, maintainability, and testability can immediately benefit from the pragmatic enhancements
+2. **Add New Tenets Gradually**: Introduce orthogonality, DRY, adaptability, and broken windows concepts as architectural decisions arise
+3. **Implement Supporting Bindings**: Use the new bindings to enforce the enhanced principles systematically
+
+#### Priority Framework
+- **High Priority**: Fix Broken Windows (immediate quality impact)
+- **Medium Priority**: YAGNI and Fail-Fast patterns (development velocity impact)
+- **Long-term**: Adaptability patterns and Learning Investment (strategic capability)
+
+#### Integration with Existing Practices
+- **Code Reviews**: Use enhanced bindings as review criteria
+- **Architecture Decisions**: Apply orthogonality and adaptability principles
+- **Technical Debt**: Use broken windows approach for quality management
+- **Knowledge Management**: Apply DRY principles to documentation and processes
 
 ## File Naming and Organization
 
