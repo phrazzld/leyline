@@ -423,12 +423,31 @@ jobs:
       run: |
         echo "::notice::🔍 Checking for changes in the repository"
 
+        # Debug: Show git status before checking
+        echo "🔍 Git status before change detection:"
+        git status --porcelain || echo "No output from git status --porcelain"
+
+        # Debug: Show if target directory exists
+        if [ -d "${{ inputs.target_path }}" ]; then
+          echo "📁 Target directory ${{ inputs.target_path }} exists"
+          echo "📊 Contents:"
+          ls -la "${{ inputs.target_path }}" || echo "Failed to list contents"
+        else
+          echo "📁 Target directory ${{ inputs.target_path }} does not exist"
+        fi
+
         # Check if there are any uncommitted changes
         if git diff --quiet && git diff --cached --quiet; then
           # No changes detected
           echo "ℹ️ No changes to sync."
           echo "::debug::Repository is already up to date with Leyline content"
           echo "has_changes=false" >> $GITHUB_OUTPUT
+
+          # Debug: Show what files exist in target path
+          if [ -d "${{ inputs.target_path }}" ]; then
+            echo "🔍 Files already in target path:"
+            find "${{ inputs.target_path }}" -type f | head -10 || echo "No files found"
+          fi
         else
           # Changes detected
           echo "✅ Changes detected, proceeding with sync."
