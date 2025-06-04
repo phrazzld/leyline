@@ -312,20 +312,54 @@ jobs:
         # Directories already created in the cleanup step
 
         # Always sync all tenets (they're language-agnostic and apply to all projects)
-        # The --delete flag ensures stale files are removed for efficient sync
         echo "::notice::📚 Syncing tenets"
         echo "::debug::Source: _leyline/docs/tenets/ → Target: ${{ inputs.target_path }}/tenets/"
-        rsync -a --delete _leyline/docs/tenets/ "${{ inputs.target_path }}/tenets/"
-        tenet_count=$(find "${{ inputs.target_path }}/tenets" -name "*.md" 2>/dev/null | wc -l || echo "0")
-        echo "✅ Synced $tenet_count tenet files (stale files automatically removed)"
+
+        # Debug: Check source directory
+        if [ -d "_leyline/docs/tenets" ]; then
+          echo "🔍 Source tenets directory exists, contains:"
+          ls -la _leyline/docs/tenets/ | head -5
+        else
+          echo "❌ ERROR: Source tenets directory _leyline/docs/tenets does not exist!"
+          exit 1
+        fi
+
+        # Ensure target directory exists before rsync
+        mkdir -p "${{ inputs.target_path }}/tenets"
+
+        # The --delete flag ensures stale files are removed for efficient sync
+        if rsync -a --delete _leyline/docs/tenets/ "${{ inputs.target_path }}/tenets/"; then
+          tenet_count=$(find "${{ inputs.target_path }}/tenets" -name "*.md" 2>/dev/null | wc -l || echo "0")
+          echo "✅ Synced $tenet_count tenet files (stale files automatically removed)"
+        else
+          echo "❌ ERROR: Failed to sync tenets"
+          exit 1
+        fi
 
         # Always sync core bindings (applicable to all projects regardless of language/context)
-        # The --delete flag ensures stale files are removed for efficient sync
         echo "::notice::🔗 Syncing core bindings"
         echo "::debug::Source: _leyline/docs/bindings/core/ → Target: ${{ inputs.target_path }}/bindings/core/"
-        rsync -a --delete _leyline/docs/bindings/core/ "${{ inputs.target_path }}/bindings/core/"
-        core_count=$(find "${{ inputs.target_path }}/bindings/core" -name "*.md" 2>/dev/null | wc -l || echo "0")
-        echo "✅ Synced $core_count core binding files (stale files automatically removed)"
+
+        # Debug: Check source directory
+        if [ -d "_leyline/docs/bindings/core" ]; then
+          echo "🔍 Source core bindings directory exists, contains:"
+          ls -la _leyline/docs/bindings/core/ | head -5
+        else
+          echo "❌ ERROR: Source core bindings directory _leyline/docs/bindings/core does not exist!"
+          exit 1
+        fi
+
+        # Ensure target directory exists before rsync
+        mkdir -p "${{ inputs.target_path }}/bindings/core"
+
+        # The --delete flag ensures stale files are removed for efficient sync
+        if rsync -a --delete _leyline/docs/bindings/core/ "${{ inputs.target_path }}/bindings/core/"; then
+          core_count=$(find "${{ inputs.target_path }}/bindings/core" -name "*.md" 2>/dev/null | wc -l || echo "0")
+          echo "✅ Synced $core_count core binding files (stale files automatically removed)"
+        else
+          echo "❌ ERROR: Failed to sync core bindings"
+          exit 1
+        fi
 
         # Process requested categories (if any specified)
         if [ -n "${{ inputs.categories }}" ]; then
