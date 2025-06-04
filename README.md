@@ -115,6 +115,10 @@ If you encounter errors when setting up the workflow:
 - The workflow only runs on schedule or manual trigger, not on push
 - Manually trigger it the first time via GitHub Actions UI
 
+**"No such file or directory @ rb_sysopen - docs/tenets/00-index.md"**
+- Update to `@v0.1.4` or later which includes the reindex.rb fix for custom target paths
+- This error occurred with older versions when using non-default `target_path`
+
 **For detailed integration instructions**, see the [Integration Guide](./docs/integration/pull-model-guide.md).
 
 **For versioning best practices**, see the [Versioning Guide](./docs/integration/versioning-guide.md).
