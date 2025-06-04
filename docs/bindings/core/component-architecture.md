@@ -490,11 +490,11 @@ function ContactForm() {
   Together, these bindings create a complete picture of component structure
   (architecture) and behavior (state).
 
-- [dependency-inversion.md](dependency-inversion.md): Reinforces component architecture
+- [dependency-inversion.md](../../docs/bindings/core/dependency-inversion.md): Reinforces component architecture
   by promoting loose coupling between components. Well-designed component interfaces
   follow dependency inversion principles by depending on abstractions rather than
   concrete implementations.
 
-- [code-size.md](code-size.md): Supports component architecture by encouraging small,
+- [code-size.md](../../docs/bindings/core/code-size.md): Supports component architecture by encouraging small,
   focused components. The atomic design approach naturally leads to smaller, more
   manageable components with clear boundaries and responsibilities.

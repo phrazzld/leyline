@@ -531,26 +531,26 @@ func ProcessPayment(userID string, amount float64, db Database, notifier Notific
 
 ## Related Bindings
 
-- [immutable-by-default](immutable-by-default.md): Pure functions and immutability are
+- [immutable-by-default](../../docs/bindings/core/immutable-by-default.md): Pure functions and immutability are
   two sides of the same coin. Immutability ensures data doesn't change after creation,
   while pure functions ensure behavior doesn't have hidden side effects. Together, they
   create a predictable system where data flows through transformations without
   unexpected mutations. When you follow both bindings, you gain compounding benefits in
   terms of code simplicity and testability.
 
-- [dependency-inversion](dependency-inversion.md): Pure functions support dependency
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Pure functions support dependency
   inversion by making dependencies explicit. When functions only rely on their inputs,
   they're naturally decoupled from implementation details. Both bindings push you toward
   code where components interact through clear interfaces rather than hidden shared
   state or direct knowledge of internals.
 
-- [hex-domain-purity](hex-domain-purity.md): Hexagonal architecture and pure functions
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Hexagonal architecture and pure functions
   complement each other perfectly. The domain layer in a hexagonal architecture should
   consist primarily of pure functions that implement business rules, while side effects
   are pushed to the adapters at the boundaries. This binding provides specific guidance
   on how to implement the "pure domain" aspect of hexagonal architecture.
 
-- [no-internal-mocking](no-internal-mocking.md): Pure functions dramatically reduce the
+- [no-internal-mocking](../../docs/bindings/core/no-internal-mocking.md): Pure functions dramatically reduce the
   need for mocking in tests. When functions have no side effects and depend only on
   their inputs, you can test them by providing inputs and asserting on outputs—no mocks
   required. This directly supports our no-internal-mocking binding by making code

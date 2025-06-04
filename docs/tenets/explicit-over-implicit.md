@@ -1,6 +1,6 @@
 ---
 id: explicit-over-implicit
-last_modified: '2025-05-08'
+last_modified: '2025-06-02'
 ---
 
 # Tenet: Explicit is Better than Implicit
@@ -78,6 +78,35 @@ understood by reading rather than debugging.
    saved by typing less code is quickly overwhelmed by the time spent understanding,
    debugging, and explaining unclear code. Remember that most code is read many more
    times than it is written.
+
+1. **Leverage Plain Text Power**: Prefer plain text formats for configuration, data
+   exchange, and documentation whenever possible. Ask yourself: "Can this data be
+   represented in a human-readable format?" Plain text is explicit about its contents,
+   can be version-controlled effectively, inspected without special tools, and remains
+   accessible across different systems and time periods. Use formats like JSON, YAML,
+   CSV, or Markdown rather than binary formats or proprietary schemas unless there's a
+   compelling technical reason. When you must use binary formats, provide plain text
+   alternatives for inspection and debugging.
+
+1. **Separate Commands from Queries**: Distinguish clearly between functions that
+   change state (commands) and functions that return information (queries). Ask
+   yourself: "Does this function both retrieve data and modify state?" Functions should
+   either perform an action and return no meaningful data, or return data without
+   causing side effects—avoid mixing both responsibilities. This separation makes code
+   behavior more predictable and easier to reason about. Name functions to reflect
+   their purpose: `getUser()` should only retrieve data, while `createUser()` should
+   only perform the creation. When you need both operations, make two explicit calls
+   rather than one ambiguous one.
+
+1. **Crash Early When Preconditions Fail**: Validate inputs and assumptions
+   immediately when they're violated, rather than allowing problems to propagate
+   through the system. Ask yourself: "What assumptions does this code make, and what
+   happens if they're false?" Check preconditions at function entry points and fail
+   fast with clear error messages when expectations aren't met. This approach makes
+   problems visible at their source rather than manifesting as mysterious failures
+   later in execution. Dead programs tell no lies—a program that crashes immediately
+   when something is wrong is more reliable than one that continues with invalid data
+   and produces corrupt results.
 
 ## Warning Signs
 

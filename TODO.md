@@ -93,7 +93,7 @@
         1. Test cross-reference integrity with existing content
     - **Depends-on:** [T002]
 
-- [ ] **T008 · Feature · P2: Create fix-broken-windows.md tenet with YAML front-matter**
+- [x] **T008 · Feature · P2: Create fix-broken-windows.md tenet with YAML front-matter**
     - **Context:** PLAN.md Section 3.1 - New Tenet 4
     - **Action:**
         1. Write fix-broken-windows.md with quality management principles
@@ -107,7 +107,7 @@
     - **Depends-on:** [T002]
 
 ## Existing Tenet Enhancement
-- [ ] **T009 · Refactor · P2: Enhance simplicity.md with YAGNI, good-enough software, and tracer bullets**
+- [x] **T009 · Refactor · P2: Enhance simplicity.md with YAGNI, good-enough software, and tracer bullets**
     - **Context:** PLAN.md Section 3.2 - Simplicity Enhancements
     - **Action:**
         1. Add YAGNI principle section to simplicity.md
@@ -120,7 +120,7 @@
         1. Verify enhancements align with pragmatic tips #7, #19, #20
     - **Depends-on:** [T002]
 
-- [ ] **T010 · Refactor · P2: Enhance explicit-over-implicit.md with plain text power and crash early**
+- [x] **T010 · Refactor · P2: Enhance explicit-over-implicit.md with plain text power and crash early**
     - **Context:** PLAN.md Section 3.2 - Explicit-over-Implicit Enhancements
     - **Action:**
         1. Add plain text power and command-query separation principles
@@ -133,7 +133,7 @@
         1. Verify enhancements align with pragmatic tips #24, #38
     - **Depends-on:** [T002]
 
-- [ ] **T011 · Refactor · P2: Enhance maintainability.md with exceed expectations and knowledge portfolio**
+- [x] **T011 · Refactor · P2: Enhance maintainability.md with exceed expectations and knowledge portfolio**
     - **Context:** PLAN.md Section 3.2 - Maintainability Enhancements
     - **Action:**
         1. Add "gently exceed expectations" and "sign your work" principles
@@ -146,7 +146,7 @@
         1. Verify enhancements align with pragmatic tips #69, #70, #8, #9
     - **Depends-on:** [T002]
 
-- [ ] **T012 · Refactor · P2: Enhance testability.md with ruthless testing and property-based tests**
+- [x] **T012 · Refactor · P2: Enhance testability.md with ruthless testing and property-based tests**
     - **Context:** PLAN.md Section 3.2 - Testability Enhancements
     - **Action:**
         1. Add ruthless testing principles and test state coverage guidance
@@ -160,7 +160,7 @@
     - **Depends-on:** [T002]
 
 ## Binding Development
-- [ ] **T013 · Feature · P2: Create 12-15 core bindings for new tenets (3-4 per tenet)**
+- [x] **T013 · Feature · P2: Create 12-15 core bindings for new tenets (3-4 per tenet)**
     - **Context:** PLAN.md Section 3.3 - Core Binding Creation
     - **Action:**
         1. Develop 3-4 core bindings for each new tenet
@@ -173,7 +173,7 @@
         1. Ensure bindings provide actionable guidance for their respective tenets
     - **Depends-on:** [T005, T006, T007, T008]
 
-- [ ] **T014 · Feature · P2: Create 5-7 category-specific bindings for language patterns**
+- [x] **T014 · Feature · P2: Create 5-7 category-specific bindings for language patterns**
     - **Context:** PLAN.md Section 3.3 - Category-Specific Binding Creation
     - **Action:**
         1. Develop category-specific bindings for Go, TypeScript, Rust patterns
@@ -186,7 +186,7 @@
         1. Verify bindings are relevant to specific language contexts
     - **Depends-on:** [T013]
 
-- [ ] **T015 · Feature · P2: Create 3-4 enhanced bindings for updated existing tenets**
+- [x] **T015 · Feature · P2: Create 3-4 enhanced bindings for updated existing tenets**
     - **Context:** PLAN.md Section 3.3 - Enhanced Binding Creation
     - **Action:**
         1. Develop enhanced bindings reflecting pragmatic enhancements
@@ -200,7 +200,7 @@
     - **Depends-on:** [T009, T010, T011, T012]
 
 ## Technical Integration
-- [ ] **T016 · Chore · P2: Update tools/validate_front_matter.rb for new tenet validation**
+- [x] **T016 · Chore · P2: Update tools/validate_front_matter.rb for new tenet validation**
     - **Context:** PLAN.md Section 4.1 - Tool Updates
     - **Action:**
         1. Modify validation script to support new tenets' YAML structure
@@ -213,7 +213,7 @@
         1. Run tool on all new content to confirm zero errors
     - **Depends-on:** [T005, T006, T007, T008]
 
-- [ ] **T017 · Chore · P2: Run tools/reindex.rb to regenerate indexes with new content**
+- [x] **T017 · Chore · P2: Run tools/reindex.rb to regenerate indexes with new content**
     - **Context:** PLAN.md Section 4.1 - Index Updates
     - **Action:**
         1. Execute reindex script to update all indexes
@@ -225,7 +225,7 @@
         1. Check index files for inclusion of new tenets and bindings
     - **Depends-on:** [T013, T014, T015, T016]
 
-- [ ] **T018 · Chore · P2: Update tools/fix_cross_references.rb and resolve all links**
+- [x] **T018 · Chore · P2: Update tools/fix_cross_references.rb and resolve all links**
     - **Context:** PLAN.md Section 4.1 - Cross-Reference Updates
     - **Action:**
         1. Update cross-reference script to handle new content
@@ -239,7 +239,7 @@
     - **Depends-on:** [T017]
 
 ## Documentation and Communication
-- [ ] **T019 · Chore · P2: Update README.md with new tenet count and philosophy overview**
+- [x] **T019 · Chore · P2: Update README.md with new tenet count and philosophy overview**
     - **Context:** PLAN.md Section 4.2 - Documentation Updates
     - **Action:**
         1. Revise README.md to reflect 12 total tenets
@@ -252,7 +252,7 @@
         1. Confirm new tenets listed and counts correct
     - **Depends-on:** [T005, T006, T007, T008]
 
-- [ ] **T020 · Chore · P2: Update docs/implementation-guide.md with pragmatic principles**
+- [x] **T020 · Chore · P2: Update docs/implementation-guide.md with pragmatic principles**
     - **Context:** PLAN.md Section 4.2 - Implementation Guide Updates
     - **Action:**
         1. Revise implementation guide to include new tenets and principles
@@ -265,7 +265,7 @@
         1. Check guide for detailed descriptions of all new tenets
     - **Depends-on:** [T019]
 
-- [ ] **T021 · Chore · P2: Create migration notes for existing users adopting new tenets**
+- [x] **T021 · Chore · P2: Create migration notes for existing users adopting new tenets**
     - **Context:** PLAN.md Section 4.2 - Migration Documentation
     - **Action:**
         1. Write migration notes detailing changes and impacts
@@ -279,7 +279,7 @@
     - **Depends-on:** [T020]
 
 ## Quality Assurance and Risk Mitigation
-- [ ] **T022 · Test · P2: Validate all YAML front-matter passes 100% validation**
+- [x] **T022 · Test · P2: Validate all YAML front-matter passes 100% validation**
     - **Context:** PLAN.md Section 4.3 - Quality Assurance
     - **Action:**
         1. Run comprehensive YAML validation on all files
@@ -292,7 +292,7 @@
         1. Review validation tool output for any remaining issues
     - **Depends-on:** [T016, T017, T018]
 
-- [ ] **T023 · Test · P2: Test cross-reference integrity across all content**
+- [x] **T023 · Test · P2: Test cross-reference integrity across all content**
     - **Context:** PLAN.md Section 4.3 - Link Validation
     - **Action:**
         1. Run comprehensive cross-reference checks
@@ -305,7 +305,7 @@
         1. Manually test subset of links for correctness
     - **Depends-on:** [T022]
 
-- [ ] **T024 · Test · P2: Review content consistency and philosophical alignment**
+- [x] **T024 · Test · P2: Review content consistency and philosophical alignment**
     - **Context:** PLAN.md Section 4.3 - Consistency Review
     - **Action:**
         1. Review all new and updated content for consistent language and metaphors
@@ -318,7 +318,7 @@
         1. Check sample content for style guide compliance
     - **Depends-on:** [T023]
 
-- [ ] **T025 · Chore · P1: Mitigate philosophical inconsistency risk through rigorous review**
+- [x] **T025 · Chore · P1: Mitigate philosophical inconsistency risk through rigorous review**
     - **Context:** PLAN.md Section 6 - Risk Analysis (High Severity)
     - **Action:**
         1. Conduct comprehensive review of new content against existing tenets
@@ -331,7 +331,7 @@
         1. Document review findings and alignment confirmation
     - **Depends-on:** [T024]
 
-- [ ] **T026 · Chore · P3: Resolve remaining open questions on binding distribution and examples**
+- [x] **T026 · Chore · P3: Resolve remaining open questions on binding distribution and examples**
     - **Context:** PLAN.md Section 7 - Remaining Open Questions
     - **Action:**
         1. Finalize binding distribution strategy between core and category-specific
