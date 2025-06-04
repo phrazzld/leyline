@@ -1,16 +1,32 @@
+# OS generated files
 .DS_STORE
+.DS_Store
+
+# Claude AI settings
 **/.claude/settings.local.json
+
+# Python virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Node.js
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Temporary/working directories
 test-repo/
 site/
+thinktank_*/
+coverage/
+
+# Working documents (should use planning/ and research/ instead)
 CODE_REVIEW.md
 T*-plan.md
 T*-summary.md
 *-verification.md
 *_analysis.md
 *_search_results.md
-node_modules/
-**/node_modules/
-dist/
-**/dist/
-thinktank_*/
-coverage/
