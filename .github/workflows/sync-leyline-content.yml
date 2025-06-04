@@ -470,8 +470,8 @@ jobs:
           echo "📁 Target directory ${{ inputs.target_path }} does not exist"
         fi
 
-        # Check if there are any uncommitted changes
-        if git diff --quiet && git diff --cached --quiet; then
+        # Check if there are any uncommitted changes (including untracked files)
+        if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
           # No changes detected
           echo "ℹ️ No changes to sync."
           echo "::debug::Repository is already up to date with Leyline content"
