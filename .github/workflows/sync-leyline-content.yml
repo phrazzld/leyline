@@ -2,10 +2,6 @@ name: sync-leyline-content
 on:
   workflow_call:
     inputs:
-      token:
-        description: "GitHub token with repository access permissions"
-        required: true
-        type: string
       leyline_ref:
         description: "Leyline reference (tag, branch, or commit SHA)"
         required: true
@@ -48,6 +44,10 @@ on:
         description: "Override context detection (comma-separated list)"
         required: false
         type: string
+    secrets:
+      token:
+        description: "GitHub token with repository access permissions"
+        required: true
     outputs:
       pr_url:
         description: "URL of the created pull request (if any)"
@@ -108,7 +108,7 @@ jobs:
       uses: actions/checkout@v4
       continue-on-error: true
       with:
-        token: ${{ inputs.token }}
+        token: ${{ secrets.token }}
 
     # Check if consumer repository checkout was successful
     - name: Check Consumer Repository Access
@@ -150,7 +150,7 @@ jobs:
         # Use the specified leyline_ref (tag, branch, or commit SHA)
         ref: ${{ inputs.leyline_ref }}
         # Use the provided token for authentication
-        token: ${{ inputs.token }}
+        token: ${{ secrets.token }}
         # Checkout to a temporary directory named _leyline
         path: _leyline
         # Only fetch what's needed to minimize checkout time
@@ -627,7 +627,7 @@ jobs:
       uses: peter-evans/create-pull-request@v6
       with:
         # Use the provided GitHub token for authentication
-        token: ${{ inputs.token }}
+        token: ${{ secrets.token }}
         # Use the generated PR title (supports custom input via inputs.pr_title)
         title-path: pr-title.txt
         # Use the generated PR body with sync summary and details
