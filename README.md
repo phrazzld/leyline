@@ -133,6 +133,15 @@ If you encounter errors when setting up the workflow:
   ```
 - **Solution 2**: Use a Personal Access Token with `repo` scope instead of `GITHUB_TOKEN`
 
+**"GitHub Actions is not permitted to create or approve pull requests"**
+- Your repository's workflow permissions are set to read-only by default
+- **Solution**: Update your repository's Actions permissions:
+  1. Go to your repository → Settings → Actions → General
+  2. Under "Workflow permissions", select "Read and write permissions"
+  3. Check "Allow GitHub Actions to create and approve pull requests"
+  4. Click "Save"
+- **CLI Solution**: `gh api repos/OWNER/REPO/actions/permissions/workflow -X PUT --input - <<< '{"default_workflow_permissions":"write","can_approve_pull_request_reviews":true}'`
+
 **For detailed integration instructions**, see the [Integration Guide](./docs/integration/pull-model-guide.md).
 
 **For versioning best practices**, see the [Versioning Guide](./docs/integration/versioning-guide.md).
