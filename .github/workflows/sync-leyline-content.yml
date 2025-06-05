@@ -681,6 +681,22 @@ jobs:
         echo "::debug::PR branch: $pr_branch"
         echo "::debug::Base branch: ${{ github.ref_name }}"
 
+    # Debug repository state before PR creation
+    - name: Debug Repository State
+      if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        echo "::debug::Repository state before PR creation:"
+        echo "::debug::Git status:"
+        git status
+        echo "::debug::Staged files:"
+        git diff --cached --name-only
+        echo "::debug::Unstaged files:"
+        git diff --name-only
+        echo "::debug::Untracked files:"
+        git ls-files --others --exclude-standard
+        echo "::debug::Current commit:"
+        git log --oneline -1
+
       # Create the PR if create_pr is true and changes exist
     - name: Create Pull Request
       if: inputs.create_pr == true && steps.check-changes.outputs.has_changes == 'true'
@@ -702,6 +718,10 @@ jobs:
         delete-branch: true
         # Base branch for the pull request
         base: ${{ github.ref_name }}
+        # Add debug information
+        add-paths: |
+          ${{ inputs.target_path }}/tenets
+          ${{ inputs.target_path }}/bindings
 
     # Check if PR creation was successful
     - name: Check PR Creation Success
