@@ -15,5 +15,4 @@ This file contains an automatically generated list of all tenets with their one-
 | [no-secret-suppression](./no-secret-suppression.md) | Software quality tools—linters, type checkers, test suites, security scanners—represent |
 | [orthogonality](./orthogonality.md) | Orthogonality is about isolation and independence—ensuring that unrelated components in |
 | [simplicity](./simplicity.md) | Simplicity is a fundamental requirement for building high-quality, maintainable |
-| [test-validation-accepts-valid](./test-validation-accepts-valid.md) | This is a test tenet to verify that the pre-commit hook validation accepts valid files in the correct location. |
 | [testability](./testability.md) | Testable code is inherently better code. When you design your systems with testability |
