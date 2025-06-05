@@ -176,6 +176,27 @@ We welcome contributions to both tenets and bindings:
 See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for detailed guidelines on proposing
 changes.
 
+## Development Setup
+
+For developers working on Leyline itself, we use automated validation to ensure content quality and consistency. The repository includes:
+
+- **Pre-commit hooks** for immediate validation feedback
+- **CI pipeline** that validates all changes before merging
+- **YAML front-matter validation** for all tenets and bindings
+- **Index consistency checking** to maintain up-to-date documentation
+
+**Quick setup for contributors:**
+```bash
+# Install pre-commit hooks (recommended)
+pip install pre-commit
+pre-commit install
+
+# Validate changes manually
+ruby tools/validate_front_matter.rb
+```
+
+For detailed setup instructions, troubleshooting guides, and validation requirements, see [CONTRIBUTING.md](./docs/CONTRIBUTING.md).
+
 ## Examples
 
 Here are some example tenets and their derived bindings:

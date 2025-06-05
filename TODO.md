@@ -48,7 +48,7 @@
         1. A new contributor can successfully set up the pre-commit hook and resolve a simulated error using only the guide.
     - **Depends‑on:** [T001]
 
-- [ ] **T005 · Docs · P2: update README.md with development validation info**
+- [x] **T005 · Docs · P2: update README.md with development validation info**
     - **Context:** PLAN.md § Phase 1.2 Update Repository Documentation
     - **Action:**
         1. Add or update a "Development Setup" section in `README.md`.
