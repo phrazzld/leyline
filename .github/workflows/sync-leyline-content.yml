@@ -668,8 +668,9 @@ jobs:
           fi
         fi
 
-        # Save PR title to file
+        # Save PR title to file and environment
         echo "$pr_title" > pr-title.txt
+        echo "PR_TITLE=$pr_title" >> $GITHUB_ENV
 
     # Log PR creation attempt
     - name: Log PR Creation Attempt
@@ -707,7 +708,7 @@ jobs:
         # Use the provided GitHub token for authentication
         token: ${{ secrets.token }}
         # Use the generated PR title (supports custom input via inputs.pr_title)
-        title-path: pr-title.txt
+        title: ${{ env.PR_TITLE }}
         # Use the generated PR body with sync summary and details
         body-path: pr-body.md
         # Use the resolved branch name or fallback to default
