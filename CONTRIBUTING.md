@@ -60,9 +60,32 @@ This directory-based organization supports Leyline's pull-based distribution mod
 For detailed guidance on front-matter requirements, including examples, format
 conversion, and troubleshooting, refer to [TENET_FORMATTING.md](TENET_FORMATTING.md).
 
-## Validation
+## Development Setup
 
-Before submitting your PR, please run the following validation tools locally:
+### Pre-commit Hooks (Recommended)
+
+To ensure quality and consistency, we recommend installing pre-commit hooks that automatically validate your changes:
+
+```bash
+# Install pre-commit (if not already installed)
+pip install pre-commit
+
+# Install hooks in your local repository
+pre-commit install
+
+# Test hooks manually (optional)
+pre-commit run --all-files
+```
+
+The pre-commit hooks will automatically:
+- Validate YAML front-matter format and required fields
+- Check index consistency with strict validation
+- Fix trailing whitespace and ensure proper file endings
+- Validate YAML syntax
+
+### Manual Validation
+
+You can also run validation tools manually before submitting your PR:
 
 ```bash
 # Validate front-matter format and required fields
