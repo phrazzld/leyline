@@ -57,7 +57,7 @@
         1. `README.md` clearly communicates the existence of the validation process to new developers.
     - **Depends‑on:** [T004]
 
-- [ ] **T006 · Test · P1: test pre-commit hook with all error scenarios**
+- [x] **T006 · Test · P1: test pre-commit hook with all error scenarios**
     - **Context:** PLAN.md § Phase 3.1 Layer 2 & 3.2 Error Scenario Testing
     - **Action:**
         1. Install the pre-commit hook locally.
@@ -70,6 +70,13 @@
         1. Create a file with invalid YAML (e.g., a missing `id` field).
         2. Run `git add .` and `git commit -m "test: invalid commit"`.
         3. Verify the commit is aborted and an error message is displayed.
+    - **Results:**
+        ✅ Invalid YAML syntax: Successfully blocked
+        ✅ Missing required fields: Successfully blocked
+        ✅ Invalid field formats: Successfully blocked
+        ⚠️  Duplicate IDs: Configuration gap discovered - Ruby script detects duplicates but pre-commit hook passes single files individually
+        ✅ Missing tenet references: Successfully blocked
+        ✅ Valid file acceptance: Successfully passes with automatic formatting fixes
     - **Depends‑on:** [T001]
 
 - [ ] **T007 · Test · P1: test CI workflow with all error scenarios**
