@@ -77,6 +77,10 @@ on:
     - cron: '0 0 * * 1'  # Weekly on Mondays
   workflow_dispatch:  # Allow manual triggers
 
+permissions:
+  contents: write      # Required: Create commits and branches
+  pull-requests: write # Required: Create pull requests
+
 jobs:
   sync:
     uses: phrazzld/leyline/.github/workflows/sync-leyline-content.yml@v0.1.5
@@ -118,6 +122,16 @@ If you encounter errors when setting up the workflow:
 **"No such file or directory @ rb_sysopen - docs/tenets/00-index.md"**
 - Update to `@v0.1.5` or later which includes the reindex.rb fix and change detection fix for initial syncs
 - This error occurred with older versions when using non-default `target_path`
+
+**"Permission to [repo] denied to github-actions[bot]" or "403 Forbidden"**
+- The `GITHUB_TOKEN` has insufficient permissions to create branches and pull requests
+- **Solution 1 (Recommended)**: Add permissions to your workflow:
+  ```yaml
+  permissions:
+    contents: write
+    pull-requests: write
+  ```
+- **Solution 2**: Use a Personal Access Token with `repo` scope instead of `GITHUB_TOKEN`
 
 **For detailed integration instructions**, see the [Integration Guide](./docs/integration/pull-model-guide.md).
 
