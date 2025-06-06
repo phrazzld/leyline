@@ -62,9 +62,9 @@ conversion, and troubleshooting, refer to [TENET_FORMATTING.md](TENET_FORMATTING
 
 ## Development Setup
 
-### Pre-commit Hooks (Recommended)
+### Pre-commit Hooks (Mandatory)
 
-To ensure quality and consistency, we recommend installing pre-commit hooks that automatically validate your changes:
+To ensure quality and consistency, you must install pre-commit hooks that automatically validate your changes:
 
 ```bash
 # Install pre-commit (if not already installed)

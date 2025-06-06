@@ -115,6 +115,75 @@
         ✅ Script validates 12 tenets + 35 bindings in under 0.4 seconds
     - **Depends‑on:** none
 
+### Code Review Remediation
+
+- [x] **T009 · Fix · P1: remove manual edits to auto-generated index files**
+    - **Context:** Code review identified critical functional issue
+    - **Action:**
+        1. Remove test artifacts that were manually added to auto-generated index files
+        2. Regenerate clean index files using `ruby tools/reindex.rb`
+        3. Commit only script-generated results
+    - **Done‑when:**
+        1. All test-related entries removed from `docs/bindings/00-index.md` and `docs/tenets/00-index.md`
+        2. Index files contain only legitimate content entries
+        3. Files maintain "automatically generated" integrity
+    - **Results:**
+        ✅ Test artifacts automatically removed by pre-commit automation
+        ✅ Index files now contain only legitimate content entries
+        ✅ "Automatically generated" integrity maintained
+    - **Depends‑on:** none
+
+- [x] **T010 · Fix · P1: correct pre-commit hook documentation**
+    - **Context:** Philosophy violation - hooks documented as "recommended" vs "mandatory"
+    - **Action:**
+        1. Change "(Recommended)" to "(Mandatory)" in CONTRIBUTING.md for pre-commit hooks
+        2. Align documentation with stated development philosophy
+    - **Done‑when:**
+        1. CONTRIBUTING.md reflects mandatory nature of pre-commit hooks
+        2. Documentation aligns with `DEVELOPMENT_PHILOSOPHY.md` requirements
+    - **Results:**
+        ✅ Changed "Pre-commit Hooks (Recommended)" to "(Mandatory)" in CONTRIBUTING.md
+        ✅ Updated language from "we recommend" to "you must" install hooks
+        ✅ Documentation now aligns with DEVELOPMENT_PHILOSOPHY.md requirements
+    - **Depends‑on:** none
+
+### Future Enhancements (Convert to GitHub Issues)
+
+- [x] **T011 · Enhancement · P2: harden CI dependency management**
+    - **Context:** CI workflows should explicitly manage Ruby dependencies
+    - **Action:** Create GitHub issue to investigate and implement explicit dependency management
+    - **Done‑when:** GitHub issue created with detailed specification
+    - **Results:** ✅ GitHub issue #33 created
+    - **Depends‑on:** none
+
+- [x] **T012 · Enhancement · P2: improve pre-commit duplicate ID detection**
+    - **Context:** Current pre-commit hook validates files individually, missing cross-file duplicates
+    - **Action:** Create GitHub issue to enhance pre-commit hook for comprehensive duplicate detection
+    - **Done‑when:** GitHub issue created with technical approach outlined
+    - **Results:** ✅ GitHub issue #34 created
+    - **Depends‑on:** none
+
+- [x] **T013 · Process · P3: define TODO.md lifecycle management**
+    - **Context:** Establish process for archiving/retiring TODO.md to prevent documentation drift
+    - **Action:** Create GitHub issue for TODO.md lifecycle planning
+    - **Done‑when:** GitHub issue created with lifecycle process proposal
+    - **Results:** ✅ GitHub issue #35 created
+    - **Depends‑on:** none
+
+- [x] **T014 · Enhancement · P3: enhance CI error reporting specificity**
+    - **Context:** Make validation failure messages more explicit and actionable
+    - **Action:** Create GitHub issue for improved error reporting in CI workflows
+    - **Done‑when:** GitHub issue created with specific improvements identified
+    - **Results:** ✅ GitHub issue #36 created
+    - **Depends‑on:** none
+
+- [x] **T015 · Docs · P3: standardize Ruby version documentation**
+    - **Context:** Document expected Ruby version range for contributors
+    - **Action:** Create GitHub issue for Ruby version standardization documentation
+    - **Done‑when:** GitHub issue created with version compatibility requirements
+    - **Results:** ✅ GitHub issue #37 created
+    - **Depends‑on:** none
+
 ### Clarifications & Assumptions
 - [x] **Issue:** Ruby Version Standardization
     - **Context:** Open Questions for Resolution #1
