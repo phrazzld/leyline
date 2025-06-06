@@ -23,7 +23,7 @@
 # - Warnings are reported but will not fail validation
 #
 # Warnings include:
-# - Use of deprecated fields (applies_to)
+# - (none currently defined)
 #
 # Usage examples:
 # - Validate all files: ruby tools/validate_front_matter.rb
@@ -57,15 +57,10 @@ VALIDATORS = {
 # Optional keys that have validation rules when present
 OPTIONAL_KEYS = {
   'bindings' => {
-    'applies_to' => lambda { |value|
-      # Verify it's an array of strings
-      value.is_a?(Array) && value.all? { |v| v.is_a?(String) }
-    }
   }
 }
 
-# Note: VALID_CONTEXTS constant has been removed as 'applies_to' is no longer used
-# Categories are now determined by the directory structure:
+# Categories are determined by the directory structure:
 # - docs/bindings/core/ for core bindings
 # - docs/bindings/categories/<category>/ for category-specific bindings
 
@@ -254,17 +249,23 @@ def process_single_file(file, dir_base)
       OPTIONAL_KEYS['bindings'].each do |key, validator|
         if front_matter.key?(key)
           unless validator.call(front_matter[key])
-            details = key == 'applies_to' ? "The 'applies_to' field must be an array of strings." : "Invalid value format."
+            details = "Invalid value format."
             print_error(file, "Invalid format for '#{key}' in YAML front-matter", details)
           end
         end
       end
     end
 
-    # Check for legacy applies_to field and warn to remove it
-    if dir_base == 'bindings' && front_matter.key?('applies_to')
-      print_warning(file, "Contains deprecated 'applies_to' field",
-        "The 'applies_to' field is no longer used as categories are now determined by directory structure.\n  Please remove this field from the front matter.")
+    # Check for unknown keys not in required or optional lists
+    allowed_keys = REQUIRED_KEYS[dir_base].dup
+    if OPTIONAL_KEYS[dir_base] && !OPTIONAL_KEYS[dir_base].empty?
+      allowed_keys.concat(OPTIONAL_KEYS[dir_base].keys)
+    end
+
+    unknown_keys = front_matter.keys - allowed_keys
+    unless unknown_keys.empty?
+      print_error(file, "Unknown key(s) in YAML front-matter: #{unknown_keys.join(', ')}",
+        "Only these keys are allowed: #{allowed_keys.join(', ')}\n  Remove unknown keys or check TENET_FORMATTING.md for valid fields.")
     end
 
     puts "  [OK] #{file}"

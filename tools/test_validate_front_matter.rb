@@ -66,21 +66,6 @@ This is a valid TypeScript binding.
 MARKDOWN
   File.write("#{TEST_DIR}/docs/bindings/categories/typescript/valid-ts-binding.md", valid_category_binding)
 
-  # Create a binding with deprecated applies_to field
-  applies_to_binding = <<~MARKDOWN
----
-id: binding-with-applies-to
-last_modified: '2025-05-10'
-derived_from: test-tenet
-enforced_by: 'manual review'
-applies_to: ['typescript']
----
-
-# Binding: With Applies To
-
-This binding has the deprecated applies_to field.
-MARKDOWN
-  File.write("#{TEST_DIR}/docs/bindings/core/binding-with-applies-to.md", applies_to_binding)
 
   # Create a misplaced binding
   misplaced_binding = <<~MARKDOWN
@@ -167,6 +152,22 @@ last_modified: '2025-05-10'
 MARKDOWN
   File.write("#{TEST_DIR}/docs/tenets/duplicate-id-tenet.md", duplicate_id_tenet)
 
+  # Create a file with deprecated applies_to field to test rejection
+  deprecated_applies_to = <<~MARKDOWN
+---
+id: deprecated-applies-to
+last_modified: '2025-05-10'
+derived_from: test-tenet
+enforced_by: 'manual review'
+applies_to: 'typescript'
+---
+
+# Binding: Deprecated Field Test
+
+This binding contains the deprecated applies_to field that should be rejected.
+MARKDOWN
+  File.write("#{TEST_DIR}/docs/bindings/core/deprecated-applies-to.md", deprecated_applies_to)
+
   puts "Test environment setup complete."
 end
 
@@ -230,14 +231,10 @@ def verify_validator_behavior
   # The regular validation will fail because of the no-front-matter file, so we'll test individual files
   valid_binding_output, _ = run_validator("-f #{TEST_DIR}/docs/bindings/core/valid-core-binding.md")
   category_binding_output, _ = run_validator("-f #{TEST_DIR}/docs/bindings/categories/typescript/valid-ts-binding.md")
-  applies_to_output, _ = run_validator("-f #{TEST_DIR}/docs/bindings/core/binding-with-applies-to.md")
-
   # Check for specific behaviors with valid files
   valid_file_checks = {
     "Validates core bindings" => valid_binding_output.include?("[OK] #{TEST_DIR}/docs/bindings/core/valid-core-binding.md"),
     "Validates category bindings" => category_binding_output.include?("[OK] #{TEST_DIR}/docs/bindings/categories/typescript/valid-ts-binding.md"),
-    "Warns about applies_to field" => applies_to_output.include?("Contains deprecated 'applies_to' field"),
-    "Explains applies_to deprecation" => applies_to_output.include?("The 'applies_to' field is no longer used"),
     "Detects misplaced files" => output.include?("Found 1 binding file(s) directly in docs/bindings/ directory"),
     "Suggests correct locations" => output.include?("These should be moved to either docs/bindings/core/ or docs/bindings/categories")
   }
@@ -251,13 +248,15 @@ def verify_validator_behavior
   invalid_id_output, invalid_id_exit_code = run_validator("-f #{TEST_DIR}/docs/bindings/core/invalid-id.md")
   invalid_date_output, invalid_date_exit_code = run_validator("-f #{TEST_DIR}/docs/bindings/core/invalid-date.md")
   missing_keys_output, missing_keys_exit_code = run_validator("-f #{TEST_DIR}/docs/bindings/core/missing-keys.md")
+  deprecated_applies_to_output, deprecated_applies_to_exit_code = run_validator("-f #{TEST_DIR}/docs/bindings/core/deprecated-applies-to.md")
 
   error_checks = {
     "Fails for files without front-matter" => no_front_matter_exit_code != 0 && no_front_matter_output.include?("No front-matter found"),
     "Fails for malformed YAML" => malformed_yaml_exit_code != 0 && malformed_yaml_output.include?("Invalid YAML in front-matter"),
     "Validates ID format" => invalid_id_exit_code != 0 && invalid_id_output.include?("Invalid ID format"),
     "Validates date format" => invalid_date_exit_code != 0 && invalid_date_output.include?("Invalid date format"),
-    "Validates required keys" => missing_keys_output.include?("Missing required keys")
+    "Validates required keys" => missing_keys_output.include?("Missing required keys"),
+    "Rejects deprecated applies_to field" => deprecated_applies_to_exit_code != 0 && (deprecated_applies_to_output.include?("Unknown key") || deprecated_applies_to_output.include?("applies_to"))
   }
 
   puts "\nError case checks:"
@@ -324,14 +323,13 @@ def verify_validator_behavior
   if total_passed == total
     puts "\nAll checks passed! The validate_front_matter.rb script correctly:"
     puts "1. Validates bindings in the new directory structure (core/ and categories/)"
-    puts "2. Warns about deprecated applies_to field"
-    puts "3. Detects misplaced files in the root bindings directory"
-    puts "4. Enforces YAML front-matter format only"
-    puts "5. Validates field formats (ID, date, etc.)"
-    puts "6. Validates required fields presence"
-    puts "7. Ensures ID uniqueness"
-    puts "8. Provides clear error messages"
-    puts "9. Reports warnings separately from errors"
+    puts "2. Detects misplaced files in the root bindings directory"
+    puts "3. Enforces YAML front-matter format only"
+    puts "4. Validates field formats (ID, date, etc.)"
+    puts "5. Validates required fields presence"
+    puts "6. Ensures ID uniqueness"
+    puts "7. Provides clear error messages"
+    puts "8. Reports warnings separately from errors"
   else
     puts "\nSome checks failed. Review the output for details."
     puts "Standard validation output:"
@@ -342,7 +340,7 @@ def verify_validator_behavior
     puts "Invalid ID: #{invalid_id_output.split("\n").first(3).join("\n")}"
     puts "Invalid date: #{invalid_date_output.split("\n").first(3).join("\n")}"
     puts "Missing keys: #{missing_keys_output.split("\n").first(3).join("\n")}"
-    puts "Duplicate ID: #{duplicate_id_output.split("\n").first(3).join("\n")}"
+    puts "Deprecated applies_to: #{deprecated_applies_to_output.split("\n").first(3).join("\n")}"
   end
 end
 
