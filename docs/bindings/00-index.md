@@ -38,8 +38,6 @@ This file contains an automatically generated list of all bindings with their on
 | [semantic-versioning](./core/semantic-versioning.md) | This binding directly implements our explicit-over-implicit tenet by bringing clarity to |
 | [system-boundaries](./core/system-boundaries.md) | This binding implements our orthogonality tenet by creating architectural separation that prevents components from becoming entangled across differ... |
 | [technical-debt-tracking](./core/technical-debt-tracking.md) | This binding implements our fix-broken-windows tenet by creating systematic approaches to identify and manage technical shortcuts, compromises, and... |
-| [test-unique-binding](./core/test-duplicate-id.md) | This file has the same ID as the tenet file to test duplicate ID detection. |
-| [test-complete-fields](./core/test-missing-fields.md) | This binding file is missing required fields (derived_from, enforced_by). |
 | [unified-documentation](./core/unified-documentation.md) | This binding implements our DRY tenet by ensuring that knowledge about system behavior, APIs, processes, and decisions exists in exactly one place.... |
 | [use-structured-logging](./core/use-structured-logging.md) | This binding directly implements our automation tenet by transforming system telemetry |
 | [yagni-pattern-enforcement](./core/yagni-pattern-enforcement.md) | This binding implements our simplicity tenet by attacking complexity at its source—the temptation to build more than what's actually required. YAGN... |
