@@ -1,0 +1,34 @@
+name: Validate Content
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0
+        bundler-cache: false
+
+    - name: Validate YAML front-matter
+      run: ruby tools/validate_front_matter.rb
+
+    - name: Validate index consistency
+      run: ruby tools/reindex.rb --strict
+
+    - name: Report validation results
+      if: failure()
+      run: |
+        echo "❌ Content validation failed"
+        echo "Please fix the errors above and commit again"
+        exit 1
