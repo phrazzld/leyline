@@ -79,7 +79,7 @@
         ✅ Valid file acceptance: Successfully passes with automatic formatting fixes
     - **Depends‑on:** [T001]
 
-- [ ] **T007 · Test · P1: test CI workflow with all error scenarios**
+- [x] **T007 · Test · P1: test CI workflow with all error scenarios**
     - **Context:** PLAN.md § Phase 3.1 Layer 3 & 3.2 Error Scenario Testing
     - **Action:**
         1. Create a pull request with one or more files containing validation errors (e.g., duplicate ID, invalid date format).
@@ -91,9 +91,15 @@
         3. The CI `validate` job passes on the PR with only valid changes.
     - **Verification:**
         1. Check the "Checks" tab on the test pull requests to confirm the pass/fail status of the `Validate Content` workflow.
+    - **Results:**
+        ✅ PR #31 created with validation errors (invalid YAML, duplicate IDs, missing fields)
+        ✅ CI validate job failed with clear error messages identifying specific issues
+        ✅ Fixed errors and pushed to same PR → CI validate job passed
+        ✅ Cleaned up test files → CI validate job continued to pass
+        ✅ Confirmed validation workflow correctly blocks invalid content and allows valid content
     - **Depends‑on:** [T002]
 
-- [ ] **T008 · Test · P2: benchmark validation script performance**
+- [x] **T008 · Test · P2: benchmark validation script performance**
     - **Context:** PLAN.md § Testing Strategy - Performance Testing
     - **Action:**
         1. Measure the execution time of the `ruby tools/validate_front_matter.rb` script on the entire repository.
@@ -102,6 +108,11 @@
         2. If over target, a new issue is created to investigate optimization.
     - **Verification:**
         1. Run `time ruby tools/validate_front_matter.rb` and record the `real` time output.
+    - **Results:**
+        ✅ Execution time: 0.397 seconds (real time)
+        ✅ Target: Under 5 seconds → **PASSED** (10x faster than target)
+        ✅ Performance is excellent - no optimization needed
+        ✅ Script validates 12 tenets + 35 bindings in under 0.4 seconds
     - **Depends‑on:** none
 
 ### Clarifications & Assumptions
