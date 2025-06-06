@@ -1,5 +1,5 @@
 ---
-id: test-invalid-yaml
+id: test-unique-binding
 last_modified: '2025-06-05'
 derived_from: simplicity
 enforced_by: "linter"

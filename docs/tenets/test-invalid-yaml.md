@@ -1,7 +1,6 @@
 ---
-id: test-invalid-yaml
+id: test-valid-yaml
 last_modified: '2025-06-05'
-invalid_yaml: [unclosed array
 ---
 
 # Test Invalid YAML
