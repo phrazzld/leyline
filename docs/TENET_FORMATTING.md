@@ -68,13 +68,6 @@ fields for each type.
 
   - Examples: "Linter rules", "Code review", "CI checks"
 
-### Deprecated Fields
-
-- **applies_to**: This field is now deprecated
-  - Binding applicability is now determined by directory location
-  - Core bindings (applicable to all) go in `docs/bindings/core/`
-  - Category-specific bindings go in `docs/bindings/categories/<category>/`
-  - See [binding-metadata.md](binding-metadata.md) for more details
 
 ## Examples with Comments
 
@@ -194,13 +187,6 @@ section)
 **Solution**: Ensure dates are in ISO format (YYYY-MM-DD) and enclosed in quotes (e.g.,
 `'2025-05-08'`)
 
-### Issue: "File in incorrect directory or missing applies_to field"
-
-**Solution**:
-- The `applies_to` field is deprecated
-- Move the binding file to the appropriate directory:
-  - Core bindings go in `docs/bindings/core/`
-  - Category-specific bindings go in `docs/bindings/categories/<category>/`
 
 ### Issue: "Invalid YAML in front-matter"
 

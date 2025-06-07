@@ -42,8 +42,6 @@ id: real-binding
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: testing
-applies_to:
-  - typescript
 ---
 
 # Binding: Real Binding
@@ -79,9 +77,6 @@ id: complex-yaml
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: "automated tests"
-applies_to:
-  - typescript
-  - javascript
 config:
   severity: error
   options:
@@ -190,23 +185,14 @@ MARKDOWN
   # Temporarily modify the script to use our test directories
   original_reindex = File.read('tools/reindex.rb')
   test_reindex = original_reindex.gsub(
-    'dir = \'docs/tenets\'',
-    'dir = \'tenets\''
+    'def get_docs_base_path',
+    'def get_docs_base_path_original'
   ).gsub(
-    'dir = \'docs/bindings\'',
-    'dir = \'bindings\''
+    'base_path = ENV[\'LEYLINE_DOCS_PATH\'] || \'docs\'',
+    'base_path = \'test_reindex\''
   ).gsub(
-    'Dir.glob("#{dir}/*.md")',
-    'Dir.glob("test_reindex/#{dir}/*.md")'
-  ).gsub(
-    'File.write("#{dir}/00-index.md"',
-    'File.write("test_reindex/#{dir}/00-index.md"'
-  ).gsub(
-    'Dir.glob("#{dir}/core/*.md")',
-    'Dir.glob("test_reindex/#{dir}/core/*.md")'
-  ).gsub(
-    'Dir.glob("#{dir}/categories/*")',
-    'Dir.glob("test_reindex/#{dir}/categories/*")'
+    'def get_docs_base_path_original',
+    "def get_docs_base_path\n  'test_reindex'\nend\n\ndef get_docs_base_path_original"
   )
   File.write('tools/reindex_test.rb', test_reindex)
 

@@ -90,8 +90,6 @@ id: placeholder-binding
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: testing
-applies_to:
-  - typescript
 ---
 
 # Binding: Placeholder Binding
@@ -117,8 +115,6 @@ id: real-binding
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: testing
-applies_to:
-  - typescript
 ---
 
 # Binding: Real Binding
@@ -145,8 +141,6 @@ id: mixed-binding
 last_modified: "2025-05-04"
 derived_from: simplicity
 enforced_by: testing
-applies_to:
-  - typescript
 ---
 
 # Binding: Mixed Binding

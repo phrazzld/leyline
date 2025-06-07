@@ -5,6 +5,17 @@ All notable changes to the Leyline project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Removed
+
+- **BREAKING**: Removed deprecated `applies_to` metadata field from bindings
+  - Directory structure is now the single source of truth for binding categorization
+  - Files in `docs/bindings/core/` apply to all projects
+  - Files in `docs/bindings/categories/<category>/` apply to specific categories
+  - Updated validation tools to reject `applies_to` field if present
+  - Updated documentation to reflect directory-based categorization approach
+
 ## [1.1.0] - 2025-05-21
 
 ### Changed

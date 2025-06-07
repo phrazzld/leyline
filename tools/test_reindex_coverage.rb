@@ -82,7 +82,6 @@ id: empty-categories
 last_modified: "2025-05-10"
 derived_from: simplicity
 enforced_by: "code review"
-applies_to: []
 ---
 
 # Binding: Empty Categories
