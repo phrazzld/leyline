@@ -217,7 +217,7 @@
         ```
     - **Depends-on:** [T006]
 
-- [ ] **T008 · Feature · P1: Add release gates and validation**
+- [x] **T008 · Feature · P1: Add release gates and validation**
     - **Context:** Prevent bad releases with comprehensive checks
     - **Action:**
         1. Add to release workflow:

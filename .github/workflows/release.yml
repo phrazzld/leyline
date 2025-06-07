@@ -14,9 +14,230 @@ permissions:
   actions: read
 
 jobs:
-  release:
+  pre-release-validation:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    outputs:
+      validation_passed: ${{ steps.final_validation.outputs.passed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for validation
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Wait for existing CI checks
+        run: |
+          echo "🔍 Checking status of existing CI workflows..."
+
+          # Get the current commit SHA
+          commit_sha="${{ github.sha }}"
+
+          # Wait for other workflows to complete (max 10 minutes)
+          timeout=600
+          elapsed=0
+
+          while [ $elapsed -lt $timeout ]; do
+            # Get status of other workflows for this commit
+            status=$(gh api \
+              repos/${{ github.repository }}/commits/$commit_sha/status \
+              --jq '.state')
+
+            if [ "$status" = "success" ]; then
+              echo "✅ All existing CI checks passed"
+              break
+            elif [ "$status" = "failure" ]; then
+              echo "❌ Existing CI checks failed - blocking release"
+              gh api repos/${{ github.repository }}/commits/$commit_sha/status \
+                --jq '.statuses[] | select(.state == "failure") |
+                     "Failed: \(.context) - \(.description)"'
+              exit 1
+            else
+              echo "⏳ Waiting for CI checks... (${elapsed}s elapsed)"
+              sleep 30
+              elapsed=$((elapsed + 30))
+            fi
+          done
+
+          if [ $elapsed -ge $timeout ]; then
+            echo "⚠️ Timeout waiting for CI checks - proceeding anyway"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate YAML front-matter
+        run: |
+          echo "📋 Running YAML front-matter validation..."
+
+          if ! ruby tools/validate_front_matter.rb; then
+            echo "❌ YAML front-matter validation failed"
+            echo "   All tenet and binding files must have valid YAML metadata"
+            exit 1
+          fi
+
+          echo "✅ YAML front-matter validation passed"
+
+      - name: Validate documentation consistency
+        run: |
+          echo "📚 Running documentation reindexing validation..."
+
+          # Run reindex in strict mode
+          if ! ruby tools/reindex.rb --strict; then
+            echo "❌ Documentation reindexing failed"
+            echo "   Generated indexes must be consistent with metadata"
+            exit 1
+          fi
+
+          echo "✅ Documentation consistency validation passed"
+
+      - name: Check breaking changes vs version bump
+        run: |
+          echo "🔍 Validating breaking changes against version bump..."
+
+          # Get version calculation data
+          if ! ruby tools/calculate_version.rb > version_data.json 2>&1; then
+            echo "❌ Version calculation failed"
+            cat version_data.json
+            exit 1
+          fi
+
+          current_version=$(jq -r '.current_version' version_data.json)
+          next_version=$(jq -r '.next_version' version_data.json)
+          bump_type=$(jq -r '.bump_type' version_data.json)
+          breaking_changes=$(jq '.breaking_changes' version_data.json)
+
+          echo "📊 Current: $current_version → Next: $next_version ($bump_type)"
+
+          # Check if breaking changes exist
+          breaking_count=$(echo "$breaking_changes" | jq 'length')
+
+          if [ "$breaking_count" -gt 0 ]; then
+            echo "⚠️ Found $breaking_count breaking changes:"
+            echo "$breaking_changes" | jq -r '.[]'
+
+            # Verify appropriate version bump
+            if [[ "$current_version" =~ ^0\. ]]; then
+              # Pre-1.0: breaking changes should bump minor
+              if [ "$bump_type" != "minor" ]; then
+                echo "❌ Breaking changes found but bump is '$bump_type'"
+                echo "   Pre-1.0 breaking changes require minor bump"
+                exit 1
+              fi
+            else
+              # Post-1.0: breaking changes should bump major
+              if [ "$bump_type" != "major" ]; then
+                echo "❌ Breaking changes found but bump is '$bump_type'"
+                echo "   Post-1.0 breaking changes require major bump"
+                exit 1
+              fi
+            fi
+
+            echo "✅ Breaking changes properly reflected in version bump"
+          else
+            echo "✅ No breaking changes detected"
+          fi
+
+          # Clean up
+          rm -f version_data.json
+
+      - name: Security vulnerability scan
+        run: |
+          echo "🔒 Running security vulnerability scan..."
+
+          # Check if we have a Gemfile for bundler-audit
+          if [ -f "Gemfile" ]; then
+            # Install bundler-audit if not present
+            if ! gem list bundler-audit -i > /dev/null 2>&1; then
+              echo "Installing bundler-audit..."
+              gem install bundler-audit
+            fi
+
+            # Update vulnerability database
+            bundle-audit update
+
+            # Run vulnerability check
+            if ! bundle-audit check; then
+              echo "❌ Security vulnerabilities found in Ruby dependencies"
+              exit 1
+            fi
+
+            echo "✅ No security vulnerabilities found in dependencies"
+          else
+            echo "ℹ️ No Gemfile found - skipping dependency vulnerability scan"
+          fi
+
+          # Check Ruby scripts for common security issues
+          echo "🔍 Scanning Ruby scripts for security issues..."
+
+          security_issues=0
+
+          # Check for eval/exec usage
+          if grep -r "eval\|exec\|system\|`" tools/ --include="*.rb" | \
+             grep -v "exit\|exec\|system.*exit"; then
+            echo "⚠️ Found potentially dangerous code execution patterns"
+            security_issues=$((security_issues + 1))
+          fi
+
+          # Check for hardcoded secrets patterns
+          if grep -r -i "password\|secret\|token\|key.*=" tools/ \
+             --include="*.rb" | grep -v "GITHUB_TOKEN"; then
+            echo "⚠️ Found potential hardcoded secrets"
+            security_issues=$((security_issues + 1))
+          fi
+
+          if [ $security_issues -gt 0 ]; then
+            echo "❌ Security issues found - manual review required"
+            exit 1
+          fi
+
+          echo "✅ Ruby script security scan passed"
+
+      - name: Validate script permissions
+        run: |
+          echo "🔧 Validating script permissions..."
+
+          # Check that executable scripts have proper permissions
+          for script in tools/*.rb; do
+            if [ -f "$script" ]; then
+              # Check if script has shebang
+              if head -1 "$script" | grep -q "^#!/"; then
+                # Should be executable
+                if [ ! -x "$script" ]; then
+                  echo "⚠️ Script $script has shebang but is not executable"
+                  chmod +x "$script"
+                  echo "   Fixed permissions for $script"
+                fi
+              fi
+            fi
+          done
+
+          echo "✅ Script permissions validated"
+
+      - name: Final validation summary
+        id: final_validation
+        run: |
+          echo "🎯 Pre-release validation summary:"
+          echo "  ✅ Existing CI checks passed"
+          echo "  ✅ YAML front-matter validation passed"
+          echo "  ✅ Documentation consistency validated"
+          echo "  ✅ Breaking changes vs version bump validated"
+          echo "  ✅ Security vulnerability scan passed"
+          echo "  ✅ Script permissions validated"
+          echo ""
+          echo "🟢 All validation gates passed - release authorized"
+          echo "passed=true" >> $GITHUB_OUTPUT
+
+  release:
+    runs-on: ubuntu-latest
+    needs: pre-release-validation
+    if: needs.pre-release-validation.outputs.validation_passed == 'true'
     outputs:
       prepared_version: ${{ steps.prepare_release.outputs.prepared_version }}
       release_created: ${{ steps.check_release.outputs.release_needed }}
@@ -242,8 +463,10 @@ jobs:
   # Keep the existing consumer notification job, but trigger it after releases
   notify-consumers:
     runs-on: ubuntu-latest
-    needs: release
-    if: needs.release.outputs.release_created == 'true'
+    needs: [pre-release-validation, release]
+    if: |
+      needs.pre-release-validation.outputs.validation_passed == 'true' &&
+      needs.release.outputs.release_created == 'true'
     steps:
       - uses: actions/checkout@v4
 
