@@ -39,7 +39,6 @@ docs/
   ├── data/                       # Data files for the project
   └── templates/                  # Templates for creating new tenets and bindings
 tools/                            # Validation and maintenance scripts
-archive/                          # Archived tools and documentation
 .github/                          # Automation workflows
 ```
 

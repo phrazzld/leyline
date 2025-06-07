@@ -300,6 +300,47 @@ Each release must maintain consistent front-matter standards in YAML format as d
 
 When new content is released, consumers using the pull-based model can update at their own pace by adjusting the `leyline_ref` in their sync workflow. See the [Versioning Guide](docs/integration/versioning-guide.md) for consumer versioning best practices.
 
+## Versioning Policy
+
+Leyline follows [Semantic Versioning](https://semver.org/) with special considerations for the pre-1.0 development phase.
+
+### Current Version Strategy (Pre-1.0)
+
+While Leyline is in active development (versions 0.x.x), we use a modified semantic versioning approach:
+
+- **Breaking Changes**: Increment the **minor** version (0.1.0 → 0.2.0)
+- **New Features**: Increment the **minor** version (0.1.0 → 0.2.0)
+- **Bug Fixes/Clarifications**: Increment the **patch** version (0.1.0 → 0.1.1)
+
+### Post-1.0 Strategy (Stable API)
+
+Once Leyline reaches 1.0.0 (marking our commitment to API stability), we will follow standard semantic versioning:
+
+- **Breaking Changes**: Increment the **major** version (1.0.0 → 2.0.0)
+- **New Features**: Increment the **minor** version (1.0.0 → 1.1.0)
+- **Bug Fixes/Clarifications**: Increment the **patch** version (1.0.0 → 1.0.1)
+
+### What Constitutes Breaking Changes
+
+Breaking changes in Leyline include:
+
+1. **Removed or renamed tenet files** (e.g., deleting `docs/tenets/simplicity.md`)
+2. **Removed or renamed binding files** (e.g., deleting `docs/bindings/core/pure-functions.md`)
+3. **Changes to YAML front-matter schema** (e.g., renaming required fields, changing date format)
+4. **Directory restructuring** (e.g., moving bindings between categories)
+5. **Changes to binding metadata structure** that affect consumer tooling
+
+### Path to 1.0.0
+
+Version 1.0.0 will be released when:
+
+- The core tenet and binding structure is stable
+- Consumer integration patterns are well-established and tested
+- The pull-based distribution model is fully mature
+- Breaking changes become infrequent and well-justified
+
+This represents our commitment to API stability and backward compatibility for consumers who depend on Leyline's structure and content.
+
 ## Code of Conduct
 
 All contributors are expected to adhere to our code of conduct, which emphasizes:
