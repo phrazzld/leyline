@@ -105,7 +105,7 @@
         ```
     - **Depends-on:** [T003]
 
-- [ ] **T005 · Refactor · P1: Extend existing Ruby tools for version validation**
+- [x] **T005 · Refactor · P1: Extend existing Ruby tools for version validation**
     - **Context:** Integrate version checking with current infrastructure
     - **Action:**
         1. Modify `tools/validate_front_matter.rb`:

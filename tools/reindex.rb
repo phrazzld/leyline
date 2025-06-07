@@ -81,7 +81,7 @@ def process_tenets_dir
         end
 
         # Validate required fields for tenets
-        required_fields = ['id', 'last_modified']
+        required_fields = ['id', 'last_modified', 'version']
         missing_fields = required_fields - front_matter.keys
 
         if !missing_fields.empty?
@@ -121,7 +121,8 @@ def process_tenets_dir
         # Add to entries
         entries << {
           id: front_matter['id'] || File.basename(file, '.md'),
-          summary: summary
+          summary: summary,
+          version: front_matter['version']
         }
       else
         report_error(file, "Could not parse file structure - expected YAML front-matter followed by title and content")
@@ -137,10 +138,10 @@ def process_tenets_dir
 
   # Add entries in a table
   if entries.any?
-    index_content += "| ID | Summary |\n"
-    index_content += "|---|---|\n"
+    index_content += "| ID | Version | Summary |\n"
+    index_content += "|---|---|---|\n"
     entries.each do |entry|
-      index_content += "| [#{entry[:id]}](./#{entry[:id]}.md) | #{entry[:summary]} |\n"
+      index_content += "| [#{entry[:id]}](./#{entry[:id]}.md) | #{entry[:version] || 'N/A'} | #{entry[:summary]} |\n"
     end
   else
     index_content += "_No #{dir_base} defined yet._\n"
@@ -238,10 +239,10 @@ def process_bindings_dir
   # Core bindings section
   index_content += "## Core Bindings\n\n"
   if core_entries.any?
-    index_content += "| ID | Summary |\n"
-    index_content += "|---|---|\n"
+    index_content += "| ID | Version | Summary |\n"
+    index_content += "|---|---|---|\n"
     core_entries.each do |entry|
-      index_content += "| [#{entry[:id]}](#{entry[:path]}) | #{entry[:summary]} |\n"
+      index_content += "| [#{entry[:id]}](#{entry[:path]}) | #{entry[:version] || 'N/A'} | #{entry[:summary]} |\n"
     end
   else
     index_content += "_No core bindings defined yet._\n\n"
@@ -264,10 +265,10 @@ def process_bindings_dir
     index_content += "\n## #{category_title} Bindings\n\n"
 
     if entries.any?
-      index_content += "| ID | Summary |\n"
-      index_content += "|---|---|\n"
+      index_content += "| ID | Version | Summary |\n"
+      index_content += "|---|---|---|\n"
       entries.each do |entry|
-        index_content += "| [#{entry[:id]}](#{entry[:path]}) | #{entry[:summary]} |\n"
+        index_content += "| [#{entry[:id]}](#{entry[:path]}) | #{entry[:version] || 'N/A'} | #{entry[:summary]} |\n"
       end
     else
       # Handle empty category gracefully with an informative message
@@ -306,7 +307,7 @@ def process_binding_file(file)
       end
 
       # Validate required fields for bindings
-      required_fields = ['id', 'last_modified', 'derived_from', 'enforced_by']
+      required_fields = ['id', 'last_modified', 'derived_from', 'enforced_by', 'version']
       missing_fields = required_fields - front_matter.keys
 
       if !missing_fields.empty?
@@ -342,7 +343,8 @@ def process_binding_file(file)
       # Return entry data
       return {
         id: front_matter['id'] || File.basename(file, '.md'),
-        summary: summary
+        summary: summary,
+        version: front_matter['version']
       }
     else
       report_error(file, "Could not parse file structure - expected YAML front-matter followed by title and content")

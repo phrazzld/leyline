@@ -8,13 +8,14 @@
 #
 # 1. All files must have YAML front-matter delimited by triple dashes (---)
 # 2. Required fields are present:
-#    - Tenets: id, last_modified
-#    - Bindings: id, last_modified, derived_from, enforced_by
+#    - Tenets: id, last_modified, version
+#    - Bindings: id, last_modified, derived_from, enforced_by, version
 # 3. Field formats are valid:
 #    - id: lowercase alphanumeric with hyphens
 #    - last_modified: ISO date format (YYYY-MM-DD)
 #    - derived_from: lowercase alphanumeric with hyphens, must reference existing tenet
 #    - enforced_by: non-empty string
+#    - version: semantic version matching VERSION file (e.g., "0.1.0")
 # 4. IDs are unique across all documents
 # 5. All referenced tenets exist
 #
@@ -34,9 +35,20 @@ require 'date'
 
 # Configuration
 REQUIRED_KEYS = {
-  'tenets' => %w[id last_modified],
-  'bindings' => %w[id last_modified derived_from enforced_by]
+  'tenets' => %w[id last_modified version],
+  'bindings' => %w[id last_modified derived_from enforced_by version]
 }
+
+# Get expected version from VERSION file
+def get_expected_version
+  version_file = 'VERSION'
+  if File.exist?(version_file)
+    File.read(version_file).strip
+  else
+    puts "ERROR: VERSION file not found"
+    exit 1
+  end
+end
 
 # Validation functions for field types
 VALIDATORS = {
@@ -51,7 +63,10 @@ VALIDATORS = {
     end)
   },
   'derived_from' => ->(value) { value.is_a?(String) && value =~ /^[a-z0-9-]+$/ },
-  'enforced_by' => ->(value) { value.is_a?(String) && !value.empty? }
+  'enforced_by' => ->(value) { value.is_a?(String) && !value.empty? },
+  'version' => lambda { |value|
+    value.is_a?(String) && value =~ /^\d+\.\d+\.\d+$/ && value == get_expected_version
+  }
 }
 
 # Optional keys that have validation rules when present
@@ -218,6 +233,22 @@ def process_single_file(file, dir_base)
     unless VALIDATORS['last_modified'].call(date)
       print_error(file, "Invalid date format in 'last_modified' field",
         "Date must be in ISO format (YYYY-MM-DD) and enclosed in quotes.\n  Example: last_modified: '2025-05-09'")
+    end
+
+    # Validate version field matches VERSION file
+    version = front_matter['version']
+    expected_version = get_expected_version
+    unless VALIDATORS['version'].call(version)
+      if version.nil? || version.empty?
+        print_error(file, "Missing 'version' field in YAML front-matter",
+          "The 'version' field is required and must match the VERSION file.\n  Expected: version: '#{expected_version}'")
+      elsif version != expected_version
+        print_error(file, "Version mismatch in YAML front-matter",
+          "Document version '#{version}' does not match VERSION file '#{expected_version}'.\n  Expected: version: '#{expected_version}'")
+      else
+        print_error(file, "Invalid version format in YAML front-matter",
+          "Version must be in semantic version format (e.g., '#{expected_version}').")
+      end
     end
 
     # For bindings, validate derived_from and enforced_by fields
