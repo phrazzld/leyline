@@ -219,6 +219,119 @@ def report_error(message)
   $errors << message
 end
 
+# Get GitHub repository URL for commit links
+def get_github_repo_url
+  # Try to get the GitHub URL from git remote
+  output, status = run_git_command("config --get remote.origin.url")
+
+  if status.success? && !output.empty?
+    url = output.strip
+
+    # Convert various formats to standard GitHub URL
+    if url =~ /github\.com[\/:](.+?)\/(.+?)(?:\.git)?$/
+      owner, repo = $1, $2
+      "https://github.com/#{owner}/#{repo}"
+    else
+      # Fallback if we can't parse the URL
+      puts "Could not parse GitHub URL: #{url}" if $options[:verbose]
+      nil
+    end
+  else
+    puts "Could not get remote origin URL" if $options[:verbose]
+    nil
+  end
+end
+
+# Clean commit message for display
+def clean_commit_message(message)
+  # Remove conventional commit prefix for display
+  cleaned = message.gsub(/^(\w+)(\(.+?\))?!?:\s*/, '')
+
+  # Capitalize first letter
+  cleaned = cleaned[0].upcase + cleaned[1..-1] if cleaned.length > 0
+
+  cleaned
+end
+
+# Generate changelog markdown from commits
+def generate_changelog_markdown(commits, next_version)
+  return "No changes since last release." if commits.empty?
+
+  repo_url = get_github_repo_url
+
+  # Categorize commits
+  breaking_commits = commits.select { |c| c[:breaking] }
+  feature_commits = commits.select { |c| c[:type] == 'feat' && !c[:breaking] }
+  fix_commits = commits.select { |c| c[:type] == 'fix' && !c[:breaking] }
+  other_commits = commits.select { |c| !['feat', 'fix'].include?(c[:type]) && !c[:breaking] }
+
+  markdown = []
+  markdown << "# Release #{next_version}"
+  markdown << ""
+
+  # Breaking Changes section
+  if breaking_commits.any?
+    markdown << "## ⚠️ BREAKING CHANGES"
+    markdown << ""
+    breaking_commits.each do |commit|
+      message = clean_commit_message(commit[:message])
+      if repo_url
+        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+      else
+        markdown << "- #{message} (#{commit[:hash][0..7]})"
+      end
+    end
+    markdown << ""
+  end
+
+  # Features section
+  if feature_commits.any?
+    markdown << "## ✨ Features"
+    markdown << ""
+    feature_commits.each do |commit|
+      message = clean_commit_message(commit[:message])
+      if repo_url
+        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+      else
+        markdown << "- #{message} (#{commit[:hash][0..7]})"
+      end
+    end
+    markdown << ""
+  end
+
+  # Bug Fixes section
+  if fix_commits.any?
+    markdown << "## 🐛 Bug Fixes"
+    markdown << ""
+    fix_commits.each do |commit|
+      message = clean_commit_message(commit[:message])
+      if repo_url
+        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+      else
+        markdown << "- #{message} (#{commit[:hash][0..7]})"
+      end
+    end
+    markdown << ""
+  end
+
+  # Other changes section (if any)
+  if other_commits.any?
+    markdown << "## 🔧 Other Changes"
+    markdown << ""
+    other_commits.each do |commit|
+      message = clean_commit_message(commit[:message])
+      if repo_url
+        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+      else
+        markdown << "- #{message} (#{commit[:hash][0..7]})"
+      end
+    end
+    markdown << ""
+  end
+
+  markdown.join("\n").strip
+end
+
 # Main calculation function
 def calculate_version
   rules = load_breaking_change_rules
@@ -227,13 +340,15 @@ def calculate_version
   breaking_changes = detect_file_based_breaking_changes(commits)
   bump_type = determine_bump_type(commits, current_version, breaking_changes)
   next_version = calculate_next_version(current_version, bump_type)
+  changelog_markdown = generate_changelog_markdown(commits, next_version)
 
   {
     current_version: current_version,
     next_version: next_version,
     bump_type: bump_type,
     commits: commits,
-    breaking_changes: breaking_changes
+    breaking_changes: breaking_changes,
+    changelog_markdown: changelog_markdown
   }
 end
 

@@ -39,6 +39,25 @@ class TestVersionCalculation < Test::Unit::TestCase
     assert current.start_with?('0.'), "Expected pre-1.0 version, got #{current}"
   end
 
+  def test_changelog_markdown_field_exists
+    # Should include changelog_markdown field in output
+    result = calculate_version_for_test
+    assert result.key?('changelog_markdown')
+    assert result['changelog_markdown'].is_a?(String)
+  end
+
+  def test_changelog_markdown_has_sections
+    # Should have proper markdown sections for different commit types
+    result = calculate_version_for_test
+    changelog = result['changelog_markdown']
+
+    # Should have sections for features and fixes (based on current commit history)
+    assert changelog.include?('## '), "Expected markdown headers in changelog"
+
+    # Should have commit links
+    assert changelog.include?('['), "Expected markdown links in changelog"
+  end
+
   private
 
   def calculate_version_for_test

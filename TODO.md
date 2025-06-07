@@ -82,7 +82,7 @@
         ```
     - **Depends-on:** [T001, T002]
 
-- [ ] **T004 · Feature · P1: Add changelog generation to version calculator**
+- [x] **T004 · Feature · P1: Add changelog generation to version calculator**
     - **Context:** Generate release notes from commit history
     - **Action:**
         1. Extend `tools/calculate_version.rb` to parse commit messages
