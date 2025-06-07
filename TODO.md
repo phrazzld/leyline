@@ -134,7 +134,7 @@
         ```
     - **Depends-on:** [T003]
 
-- [ ] **T006 · Feature · P1: Create release preparation script (`tools/prepare_release.rb`)**
+- [x] **T006 · Feature · P1: Create release preparation script (`tools/prepare_release.rb`)**
     - **Context:** Orchestrate all release preparation steps
     - **Action:**
         1. Create script that calls `calculate_version.rb` to get next version
