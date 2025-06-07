@@ -50,7 +50,7 @@
 
 ## Phase 1: Version Calculation Foundation
 
-- [ ] **T003 · Feature · P0: Build version calculation script (`tools/calculate_version.rb`)**
+- [x] **T003 · Feature · P0: Build version calculation script (`tools/calculate_version.rb`)**
     - **Context:** Core engine for semantic version determination
     - **Action:**
         1. Create Ruby script that parses `git log --oneline` since last tag
