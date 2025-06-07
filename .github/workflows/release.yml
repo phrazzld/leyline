@@ -1,18 +1,256 @@
-name: release
-on:
+---
+name: Automated Release
+
+'on':
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [main, master]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '**.md'
+
+permissions:
+  contents: write
+  actions: read
 
 jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    outputs:
+      prepared_version: ${{ steps.prepare_release.outputs.prepared_version }}
+      release_created: ${{ steps.check_release.outputs.release_needed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for version calculation
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Check if release needed
+        id: check_release
+        run: |
+          echo "Checking if release is needed..."
+
+          # Run version calculation to see if there are changes
+          if ! ruby tools/calculate_version.rb > version_output.json 2>&1; then
+            echo "❌ Version calculation failed"
+            cat version_output.json
+            exit 1
+          fi
+
+          # Parse the output to check if version bump is needed
+          current_version=$(jq -r '.current_version' version_output.json)
+          next_version=$(jq -r '.next_version' version_output.json)
+          bump_type=$(jq -r '.bump_type' version_output.json)
+          commit_count=$(jq '.commits | length' version_output.json)
+
+          echo "📊 Current version: $current_version"
+          echo "📊 Next version: $next_version"
+          echo "📊 Bump type: $bump_type"
+          echo "📊 Commits since last release: $commit_count"
+
+          if [ "$current_version" = "$next_version" ] || \
+             [ "$bump_type" = "none" ]; then
+            echo "✅ No release needed - no significant changes found"
+            echo "release_needed=false" >> $GITHUB_OUTPUT
+          else
+            echo "🚀 Release needed: $current_version → $next_version"
+            echo "release_needed=true" >> $GITHUB_OUTPUT
+            echo "next_version=$next_version" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate repository state
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          echo "🔍 Validating repository state before release..."
+
+          # Check that we're on the main branch
+          current_branch=$(git branch --show-current)
+          if [ "$current_branch" != "main" ] && \
+             [ "$current_branch" != "master" ]; then
+            echo "❌ Release can only be triggered from main/master branch"
+            echo "    Currently on: $current_branch"
+            exit 1
+          fi
+
+          # Verify all required tools exist
+          tools="tools/calculate_version.rb tools/prepare_release.rb"
+          tools="$tools tools/validate_front_matter.rb tools/reindex.rb"
+          for tool in $tools; do
+            if [ ! -f "$tool" ]; then
+              echo "❌ Required tool not found: $tool"
+              exit 1
+            fi
+          done
+
+          echo "✅ Repository state validation passed"
+
+      - name: Prepare release
+        if: steps.check_release.outputs.release_needed == 'true'
+        id: prepare_release
+        run: |
+          echo "🛠️ Preparing release with tools/prepare_release.rb..."
+
+          # Run the release preparation script
+          if ! ruby tools/prepare_release.rb --verbose; then
+            echo "❌ Release preparation failed"
+            exit 1
+          fi
+
+          # Get the updated version from VERSION file
+          new_version=$(cat VERSION | tr -d '\n\r')
+          echo "📦 Prepared release version: $new_version"
+          echo "prepared_version=$new_version" >> $GITHUB_OUTPUT
+
+          # Verify changelog was updated
+          if [ ! -f "CHANGELOG.md" ]; then
+            echo "❌ CHANGELOG.md was not created"
+            exit 1
+          fi
+
+          echo "✅ Release preparation completed successfully"
+
+      - name: Create Git tag
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          echo "🏷️ Creating Git tag: $tag_name"
+
+          # Create annotated tag with release info
+          git tag -a "$tag_name" -m "Release $version
+
+          Automated release created by GitHub Actions
+
+          See CHANGELOG.md for detailed release notes."
+
+          echo "✅ Created tag: $tag_name"
+
+      - name: Generate release notes
+        if: steps.check_release.outputs.release_needed == 'true'
+        id: release_notes
+        run: |
+          echo "📝 Generating release notes..."
+
+          # Extract changelog for this version
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+
+          # Get the changelog markdown from version calculator
+          changelog_markdown=$(ruby tools/calculate_version.rb | \
+                               jq -r '.changelog_markdown')
+
+          # Save to file for GitHub release
+          echo "$changelog_markdown" > release_notes.md
+
+          # Also extract just the summary for the release title
+          echo "🎯 Release notes generated"
+
+      - name: Create GitHub release
+        if: steps.check_release.outputs.release_needed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          echo "🚀 Creating GitHub release: $tag_name"
+
+          # Create the release using GitHub CLI
+          gh release create "$tag_name" \
+            --title "Release $version" \
+            --notes-file release_notes.md \
+            --draft=false \
+            --prerelease=false
+
+          echo "✅ GitHub release created: $tag_name"
+
+      - name: Commit updated files
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+
+          echo "💾 Committing updated files back to repository..."
+
+          # Add files that were updated during release preparation
+          git add VERSION CHANGELOG.md docs/
+
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            # Commit with [skip ci] to prevent triggering this workflow again
+            git commit -m "chore: release $version [skip ci]
+
+            - Update VERSION to $version
+            - Update CHANGELOG.md with release notes
+            - Update generated documentation indexes
+
+            This commit was created automatically by the release workflow."
+
+            # Push the changes
+            git push origin HEAD
+
+            echo "✅ Committed and pushed updated files"
+          fi
+
+      - name: Push tags
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          echo "🏷️ Pushing tags to repository..."
+          git push --tags
+          echo "✅ Tags pushed successfully"
+
+      - name: Release summary
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+          echo "🎉 Release $version completed successfully!"
+          echo ""
+          echo "📋 What was done:"
+          echo "  ✅ Calculated next version based on conventional commits"
+          echo "  ✅ Updated VERSION file to $version"
+          echo "  ✅ Generated and updated CHANGELOG.md"
+          echo "  ✅ Validated all documentation and metadata"
+          echo "  ✅ Created Git tag v$version"
+          echo "  ✅ Created GitHub release with changelog"
+          echo "  ✅ Committed updated files back to main branch"
+          echo ""
+          release_url="https://github.com/${{ github.repository }}"
+          echo "🔗 View the release: $release_url/releases/tag/v$version"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          # Clean up temporary files
+          rm -f version_output.json release_notes.md
+          echo "🧹 Cleanup completed"
+
+  # Keep the existing consumer notification job, but trigger it after releases
   notify-consumers:
     runs-on: ubuntu-latest
+    needs: release
+    if: needs.release.outputs.release_created == 'true'
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup environment
         run: |
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          version="${{ needs.release.outputs.prepared_version }}"
+          echo "TAG=v$version" >> $GITHUB_ENV
 
       - name: Dispatch vendor workflows
         run: |

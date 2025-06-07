@@ -168,7 +168,7 @@
 
 ## Phase 2: Release Automation Workflow
 
-- [ ] **T007 · Feature · P0: Create GitHub Actions release workflow**
+- [x] **T007 · Feature · P0: Create GitHub Actions release workflow**
     - **Context:** Fully automated release on merge to main
     - **Action:**
         1. Create `.github/workflows/release.yml`:
