@@ -20,7 +20,7 @@
         2. Versioning policy documented in `CONTRIBUTING.md`
     - **Depends-on:** none
 
-- [ ] **T002 · Setup · P0: Define breaking change detection rules**
+- [x] **T002 · Setup · P0: Define breaking change detection rules**
     - **Context:** Required for automated version bump logic
     - **Action:**
         1. Document breaking change policy:

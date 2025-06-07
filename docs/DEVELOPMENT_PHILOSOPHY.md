@@ -215,6 +215,51 @@ We use Semantic Versioning (SemVer) 2.0.0 for all versioned artifacts (libraries
 * **Process:** CI/CD pipelines use standard tooling (e.g., `semantic-release`, `standard-version`) to analyze Conventional Commits since the last release.
 * **Outcome:** Automatically determines the next SemVer version (patch, minor, major), tags the release in Git, and generates/updates a `CHANGELOG.md` file.
 
+## 3. Breaking Changes in Documentation Repositories
+
+For documentation-focused repositories like Leyline, breaking changes are defined differently than traditional code repositories. The following examples illustrate what constitutes breaking changes that require version bumps:
+
+### File Structure Changes (Major Breaking Changes)
+* **Deleting or renaming tenet files:** `docs/tenets/simplicity.md` → deleted
+* **Deleting or renaming binding files:** `docs/bindings/core/pure-functions.md` → deleted
+* **Moving category bindings:** `docs/bindings/categories/typescript/no-any.md` → `docs/bindings/categories/frontend/no-any.md`
+* **Restructuring template files:** `docs/templates/tenet_template.md` → `docs/templates/tenet-template.md`
+
+### Schema Changes (Major Breaking Changes)
+* **YAML front-matter field changes:** Renaming `last_modified` to `updated_at`
+* **Required field additions:** Adding new mandatory front-matter fields without defaults
+* **Date format changes:** Switching from `'2025-01-01'` to `2025-01-01` (removing quotes)
+* **Validation rule changes:** Modifying `tools/validate_front_matter.rb` to reject previously valid files
+
+### Content Changes (Minor/Patch Changes)
+* **Clarifying existing content:** Adding examples or improving explanations (patch)
+* **Adding new tenets or bindings:** New files that don't replace existing ones (minor)
+* **Fixing typos or formatting:** Grammar corrections, markdown fixes (patch)
+
+### Commit Message Examples
+
+```bash
+# Breaking change - file deletion
+git commit -m "feat!: remove deprecated simplicity tenet
+
+BREAKING CHANGE: The simplicity tenet has been superseded by the
+new complexity-management tenet. Consumers should update references."
+
+# Breaking change - schema modification
+git commit -m "refactor!: standardize date format in front-matter
+
+BREAKING CHANGE: All date fields now require ISO format without quotes.
+Update existing files: '2025-01-01' → 2025-01-01"
+
+# Non-breaking addition
+git commit -m "feat: add new error-handling binding for Rust category"
+
+# Non-breaking fix
+git commit -m "fix: correct typo in modularity tenet explanation"
+```
+
+These patterns enable automated tools to correctly identify when consumer-breaking changes occur and trigger appropriate version bumps for safe consumption.
+
 ---
 
 # Testing Strategy
