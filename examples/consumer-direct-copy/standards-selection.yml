@@ -1,0 +1,173 @@
+# Leyline Standards Selection Configuration
+# This file defines which Leyline standards to copy to your project
+
+# Leyline version to copy from (pin to specific version for reproducibility)
+leyline_version: "v0.1.5"
+
+# Output directory for copied standards (relative to project root)
+output_directory: "docs/standards"
+
+# Core tenets to copy
+# These are fundamental principles that guide development
+tenets:
+  - simplicity              # Prefer simple solutions over complex ones
+  - testability             # Design code for comprehensive testing
+  - explicit-over-implicit  # Make dependencies and behavior explicit
+  # - maintainability       # Uncomment if you want maintainability standards
+  # - modularity            # Uncomment if you want modularity standards
+  # - orthogonality         # Uncomment if you want orthogonality standards
+  # - dry-dont-repeat-yourself  # Uncomment if you want DRY standards
+
+# Binding categories to copy (copy entire categories)
+binding_categories:
+  - core                    # Universal bindings that apply to all projects
+
+  # Uncomment language/platform categories as needed:
+  # - typescript            # TypeScript-specific standards
+  # - go                    # Go-specific standards
+  # - rust                  # Rust-specific standards
+  # - frontend              # Frontend development standards
+  # - backend               # Backend development standards
+
+# Specific bindings to copy (individual binding selection)
+# Use this for fine-grained control over which bindings to include
+specific_bindings:
+  # Examples - uncomment and modify as needed:
+  # - typescript/no-any                    # Avoid TypeScript 'any' type
+  # - go/error-wrapping                    # Go error handling patterns
+  # - core/require-conventional-commits    # Enforce commit message format
+  # - core/use-structured-logging          # Standardize logging format
+
+# Bindings to exclude from categories (exceptions)
+# Use this to exclude specific bindings from copied categories
+excluded_bindings:
+  # Examples - uncomment if you want to exclude specific bindings:
+  # - core/use-structured-logging    # Skip if you're not ready for structured logging
+  # - core/no-lint-suppression       # Skip if you need lint suppressions temporarily
+
+# Customization options for copied content
+customization:
+  # Add a prefix to copied filenames (optional)
+  file_prefix: ""           # e.g., "company-" results in "company-simplicity.md"
+
+  # Add project-specific context to copied content
+  add_project_context: true
+
+  # Content transformation options
+  content_transforms:
+    # Replace generic examples with project-specific ones
+    replace_examples: true
+
+    # Add implementation notes specific to your project
+    add_implementation_notes: true
+
+    # Project-specific text replacements
+    replacements:
+      # "your-project": "MyProjectName"
+      # "example.com": "mycompany.com"
+
+    # Add project-specific sections to standards
+    additions:
+      # - section: "## Implementation in Our Project"
+      #   content: "See internal documentation for specific implementation guidelines."
+      #   position: "end"
+
+    # Remove sections not applicable to your project
+    removals:
+      # - pattern: "## For Enterprise Teams"
+
+# Version tracking and integrity options
+tracking:
+  # Track which Leyline version each standard was copied from
+  track_versions: true
+
+  # Create checksums to detect local modifications
+  track_checksums: true
+
+  # Store original source URLs for reference
+  track_sources: true
+
+  # Track copy timestamp
+  track_timestamps: true
+
+# Output format options
+output:
+  # Create an index file listing all copied standards
+  create_index: true
+
+  # Ensure consistent formatting across all copied files
+  unified_format: true
+
+  # Add navigation links between related standards
+  add_navigation: false
+
+  # Preserve original file structure or reorganize
+  preserve_structure: true    # true = keep tenets/, bindings/ structure
+
+  # Organization mode (if preserve_structure = false)
+  # organize_by: "category"   # "category", "alphabetical", "topic"
+
+# Integration options
+integration:
+  # Generate a validation script for copied standards
+  generate_validation: false
+
+  # Create GitHub Actions workflow for validation
+  generate_workflow: false
+
+  # Create pre-commit hooks for standards validation
+  generate_pre_commit: false
+
+# Documentation options
+documentation:
+  # File to document why these specific standards were chosen
+  rationale_file: "docs/standards-rationale.md"
+
+  # File with implementation guidance for your team
+  implementation_guide: "docs/implementing-standards.md"
+
+  # Include adoption timeline and migration plan
+  include_adoption_plan: true
+
+# Notification options (for automation)
+notifications:
+  # How to notify about available updates
+  update_check_method: "manual"     # "manual", "github_issue", "slack", "email"
+
+  # How often to check for updates (when automated)
+  update_frequency: "monthly"       # "weekly", "monthly", "quarterly"
+
+  # Slack webhook for notifications (if using slack method)
+  # slack_webhook: "https://hooks.slack.com/..."
+
+# Advanced options
+advanced:
+  # Backup original files before overwriting during updates
+  backup_on_update: true
+
+  # Merge strategy for handling local modifications during updates
+  merge_strategy: "preserve_local"  # "preserve_local", "prefer_upstream", "manual"
+
+  # Validate copied content integrity
+  validate_after_copy: true
+
+  # Maximum age before suggesting updates
+  max_age_days: 90
+
+# Example configurations for different project types:
+
+# Minimal configuration (just core principles):
+# tenets: [simplicity, testability]
+# binding_categories: [core]
+
+# TypeScript project:
+# tenets: [simplicity, testability, explicit-over-implicit]
+# binding_categories: [core, typescript, frontend]
+
+# Go microservice:
+# tenets: [simplicity, testability, modularity]
+# binding_categories: [core, go, backend]
+
+# Full-stack application:
+# tenets: [simplicity, testability, explicit-over-implicit, maintainability]
+# binding_categories: [core, typescript, go, frontend, backend]

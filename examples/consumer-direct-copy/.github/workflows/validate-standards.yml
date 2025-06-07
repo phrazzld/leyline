@@ -1,0 +1,390 @@
+---
+name: Standards Compliance Validation
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+  schedule:
+    # Check for Leyline updates weekly
+    - cron: '0 9 * * 1'
+
+permissions:
+  contents: read
+  pull-requests: write  # For commenting on PRs
+
+jobs:
+  validate-compliance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: false
+
+      - name: Verify standards directory
+        run: |
+          echo "🔍 Verifying copied standards directory..."
+
+          if [ ! -d "docs/standards" ]; then
+            echo "❌ Standards directory not found"
+            echo "Run: ruby scripts/copy-leyline-standards.rb --config .leyline-selection.yml"
+            exit 1
+          fi
+
+          echo "✅ Standards directory found"
+
+          # Count standards files
+          TENET_COUNT=$(find docs/standards/tenets -name "*.md" 2>/dev/null | wc -l || echo "0")
+          BINDING_COUNT=$(find docs/standards/bindings -name "*.md" 2>/dev/null | wc -l || echo "0")
+
+          echo "📚 Found $TENET_COUNT tenets and $BINDING_COUNT bindings"
+
+      - name: Load tracking information
+        id: tracking
+        run: |
+          echo "📋 Loading Leyline tracking information..."
+
+          if [ ! -f ".leyline-tracking.yml" ]; then
+            echo "⚠️ No tracking file found"
+            echo "tracking_exists=false" >> $GITHUB_OUTPUT
+            echo "leyline_version=unknown" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Found tracking file"
+            echo "tracking_exists=true" >> $GITHUB_OUTPUT
+
+            # Extract version (basic YAML parsing)
+            VERSION=$(grep "leyline_version:" .leyline-tracking.yml | cut -d'"' -f2 || echo "unknown")
+            echo "leyline_version=$VERSION" >> $GITHUB_OUTPUT
+            echo "🏷️ Tracking Leyline version: $VERSION"
+          fi
+
+      - name: Load selection configuration
+        id: config
+        run: |
+          echo "⚙️ Loading selection configuration..."
+
+          if [ ! -f ".leyline-selection.yml" ]; then
+            echo "⚠️ No selection config found"
+            echo "config_exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Found selection config"
+            echo "config_exists=true" >> $GITHUB_OUTPUT
+
+            # Extract primary language if specified
+            PRIMARY_LANG=$(grep "primary_language:" .leyline-selection.yml | cut -d'"' -f2 || echo "")
+            echo "primary_language=$PRIMARY_LANG" >> $GITHUB_OUTPUT
+            echo "🔧 Primary language: ${PRIMARY_LANG:-'Not specified'}"
+          fi
+
+      - name: Validate project structure
+        run: |
+          echo "🏗️ Validating project structure against copied standards..."
+
+          validation_errors=0
+
+          # Check for README
+          if [ ! -f "README.md" ] && [ ! -f "readme.md" ] && [ ! -f "README.rst" ]; then
+            echo "❌ No README file found"
+            validation_errors=$((validation_errors + 1))
+          else
+            echo "✅ README file found"
+          fi
+
+          # Check for CHANGELOG if required by standards
+          if [ -f "docs/standards/bindings/core/automate-changelog.md" ]; then
+            if [ ! -f "CHANGELOG.md" ]; then
+              echo "❌ CHANGELOG.md required by automate-changelog binding but not found"
+              validation_errors=$((validation_errors + 1))
+            else
+              echo "✅ CHANGELOG.md found"
+            fi
+          fi
+
+          # Check language-specific project files
+          PRIMARY_LANG="${{ steps.config.outputs.primary_language }}"
+
+          case "$PRIMARY_LANG" in
+            "typescript" | "javascript")
+              if [ ! -f "package.json" ]; then
+                echo "❌ No package.json found for TypeScript/JavaScript project"
+                validation_errors=$((validation_errors + 1))
+              else
+                echo "✅ package.json found"
+              fi
+              ;;
+            "go")
+              if [ ! -f "go.mod" ]; then
+                echo "❌ No go.mod found for Go project"
+                validation_errors=$((validation_errors + 1))
+              else
+                echo "✅ go.mod found"
+              fi
+              ;;
+            "rust")
+              if [ ! -f "Cargo.toml" ]; then
+                echo "❌ No Cargo.toml found for Rust project"
+                validation_errors=$((validation_errors + 1))
+              else
+                echo "✅ Cargo.toml found"
+              fi
+              ;;
+          esac
+
+          echo "validation_errors=$validation_errors" >> $GITHUB_ENV
+
+          if [ $validation_errors -gt 0 ]; then
+            echo "⚠️ Project structure validation found $validation_errors issue(s)"
+          else
+            echo "✅ Project structure validation passed"
+          fi
+
+      - name: Check conventional commits
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "📝 Checking conventional commit format..."
+
+          # Only check if conventional commits binding is copied
+          if [ ! -f "docs/standards/bindings/core/require-conventional-commits.md" ]; then
+            echo "ℹ️ Conventional commits binding not found, skipping validation"
+            exit 0
+          fi
+
+          # Get commits in this PR
+          COMMITS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.number }}/commits \
+            --jq '.[].commit.message' | head -n 20)
+
+          validation_errors=0
+
+          while IFS= read -r commit_msg; do
+            # Skip empty lines
+            [ -z "$commit_msg" ] && continue
+
+            # Get first line only
+            first_line=$(echo "$commit_msg" | head -n 1)
+
+            # Check conventional commit format
+            if ! echo "$first_line" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+'; then
+              echo "❌ Non-conventional commit: $first_line"
+              validation_errors=$((validation_errors + 1))
+            else
+              echo "✅ Conventional commit: $first_line"
+            fi
+          done <<< "$COMMITS"
+
+          if [ $validation_errors -gt 0 ]; then
+            echo "⚠️ Found $validation_errors non-conventional commit(s)"
+            echo "Please use conventional commit format: type(scope): description"
+          else
+            echo "✅ All commits follow conventional format"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate against copied standards
+        run: |
+          echo "📚 Validating against copied Leyline standards..."
+
+          validation_issues=0
+
+          # Check if any specific validations are defined for copied bindings
+          echo "🔍 Analyzing copied bindings for specific validations..."
+
+          # Core bindings validation
+          if [ -d "docs/standards/bindings/core" ]; then
+            echo "📋 Checking core bindings compliance:"
+
+            for binding_file in docs/standards/bindings/core/*.md; do
+              if [ -f "$binding_file" ]; then
+                binding_name=$(basename "$binding_file" .md)
+                echo "  📋 $binding_name"
+
+                # Add specific validation logic based on binding type
+                case "$binding_name" in
+                  "no-lint-suppression")
+                    # Check for lint suppression comments
+                    if grep -r "eslint-disable\|// @ts-ignore\|// @ts-nocheck" src/ 2>/dev/null; then
+                      echo "    ❌ Found lint suppressions"
+                      validation_issues=$((validation_issues + 1))
+                    else
+                      echo "    ✅ No lint suppressions found"
+                    fi
+                    ;;
+                  "require-conventional-commits")
+                    echo "    ℹ️ Conventional commits checked separately"
+                    ;;
+                  "use-structured-logging")
+                    # Check for console.log usage (basic check)
+                    if grep -r "console\.log\|print(" src/ 2>/dev/null; then
+                      echo "    ⚠️ Found basic logging statements (consider structured logging)"
+                    else
+                      echo "    ✅ No basic logging statements found"
+                    fi
+                    ;;
+                  *)
+                    echo "    ℹ️ No specific validation implemented"
+                    ;;
+                esac
+              fi
+            done
+          fi
+
+          # Language-specific bindings validation
+          for lang_dir in docs/standards/bindings/*/; do
+            if [ -d "$lang_dir" ] && [ "$(basename "$lang_dir")" != "core" ]; then
+              lang=$(basename "$lang_dir")
+              echo "📋 Checking $lang bindings compliance:"
+
+              for binding_file in "$lang_dir"*.md; do
+                if [ -f "$binding_file" ]; then
+                  binding_name=$(basename "$binding_file" .md)
+                  echo "  📋 $binding_name"
+
+                  # Language-specific validations
+                  case "$lang-$binding_name" in
+                    "typescript-no-any")
+                      # Check for TypeScript 'any' usage
+                      if grep -r ": any\|<any>" src/ --include="*.ts" --include="*.tsx" 2>/dev/null; then
+                        echo "    ❌ Found 'any' type usage"
+                        validation_issues=$((validation_issues + 1))
+                      else
+                        echo "    ✅ No 'any' type usage found"
+                      fi
+                      ;;
+                    *)
+                      echo "    ℹ️ No specific validation implemented"
+                      ;;
+                  esac
+                fi
+              done
+            fi
+          done
+
+          echo "validation_issues=$validation_issues" >> $GITHUB_ENV
+
+          if [ $validation_issues -gt 0 ]; then
+            echo "⚠️ Found $validation_issues binding compliance issue(s)"
+          else
+            echo "✅ All copied bindings compliance checks passed"
+          fi
+
+      - name: Check for standards updates
+        if: github.event_name == 'schedule'
+        run: |
+          echo "🔄 Checking for Leyline standards updates..."
+
+          if [ ! -f "scripts/copy-leyline-standards.rb" ]; then
+            echo "❌ Copy script not found"
+            exit 1
+          fi
+
+          # Check for updates (this would need the actual script to work)
+          echo "ℹ️ Manual update check required"
+          echo "Run: ruby scripts/copy-leyline-standards.rb --check-updates"
+
+      - name: Generate compliance report
+        if: always()
+        run: |
+          echo "📊 Generating compliance report..."
+
+          cat > compliance-report.md << 'EOF'
+          # Standards Compliance Report
+
+          ## Summary
+          - **Report Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Project**: ${{ github.repository }}
+          - **Branch**: ${{ github.ref_name }}
+          - **Leyline Version**: ${{ steps.tracking.outputs.leyline_version }}
+
+          ## Configuration
+          - **Tracking File**: ${{ steps.tracking.outputs.tracking_exists == 'true' && '✅ Present' || '❌ Missing' }}
+          - **Selection Config**: ${{ steps.config.outputs.config_exists == 'true' && '✅ Present' || '❌ Missing' }}
+          - **Primary Language**: ${{ steps.config.outputs.primary_language || 'Not specified' }}
+
+          ## Validation Results
+
+          ### Project Structure
+          ${{ env.validation_errors == '0' && '✅ **PASSED** - Project structure meets requirements' || format('❌ **FAILED** - {0} issue(s) found', env.validation_errors) }}
+
+          ### Standards Compliance
+          ${{ env.validation_issues == '0' && '✅ **PASSED** - All copied standards compliance checks passed' || format('⚠️ **ISSUES** - {0} compliance issue(s) found', env.validation_issues) }}
+
+          ## Copied Standards
+
+          ### Tenets
+          $(find docs/standards/tenets -name "*.md" 2>/dev/null | sed 's|docs/standards/tenets/||' | sed 's|\.md||' | sed 's|^|- |' || echo "None copied")
+
+          ### Core Bindings
+          $(find docs/standards/bindings/core -name "*.md" 2>/dev/null | sed 's|docs/standards/bindings/core/||' | sed 's|\.md||' | sed 's|^|- |' || echo "None copied")
+
+          ### Language-Specific Bindings
+          $(find docs/standards/bindings -mindepth 2 -name "*.md" 2>/dev/null | grep -v "/core/" | sed 's|docs/standards/bindings/||' | sed 's|\.md||' | sed 's|^|- |' || echo "None copied")
+
+          ## Next Steps
+
+          1. Review any failing checks in the workflow logs
+          2. Update standards if compliance issues are found
+          3. Consider adopting additional relevant standards
+          4. Update to newer Leyline versions when available
+
+          ## Resources
+
+          - [Leyline Documentation](https://github.com/phrazzld/leyline)
+          - [Direct Copy Integration Guide](https://github.com/phrazzld/leyline/tree/main/examples/consumer-direct-copy)
+          - [Standards Selection Guide](https://github.com/phrazzld/leyline/blob/main/examples/consumer-direct-copy/standards-selection.yml)
+          EOF
+
+          echo "✅ Compliance report generated"
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('compliance-report.md', 'utf8');
+
+            // Add summary info to the comment
+            const validationErrors = process.env.validation_errors || '0';
+            const validationIssues = process.env.validation_issues || '0';
+
+            let summary = '## 📊 Standards Compliance Summary\n\n';
+
+            if (validationErrors === '0' && validationIssues === '0') {
+              summary += '✅ **All checks passed!** Your project meets the copied Leyline standards.\n\n';
+            } else {
+              summary += `⚠️ **Found issues:** ${validationErrors} structural issues, ${validationIssues} compliance issues\n\n`;
+            }
+
+            const fullReport = summary + report;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: fullReport
+            });
+
+      - name: Upload compliance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: standards-compliance-report
+          path: |
+            compliance-report.md
+            .leyline-selection.yml
+            .leyline-tracking.yml
+          retention-days: 30
+
+      - name: Fail on validation errors
+        if: env.validation_errors != '0'
+        run: |
+          echo "❌ Validation failed with ${{ env.validation_errors }} structural errors"
+          exit 1

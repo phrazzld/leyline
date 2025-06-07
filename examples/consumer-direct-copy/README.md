@@ -1,0 +1,423 @@
+# Direct Copy Integration Example
+
+This example demonstrates how to selectively copy specific Leyline tenets and bindings into your project. This approach gives you fine-grained control over which standards to adopt.
+
+## When to Use Direct Copy
+
+✅ **Good for:**
+- Projects that only need specific Leyline standards
+- Teams that want to customize or adapt standards
+- Organizations that prefer to own their development standards
+- Projects with strict dependency management requirements
+
+❌ **Consider alternatives if:**
+- You want all of Leyline's standards
+- You prefer automatic updates to new Leyline versions
+- Your team wants the full Leyline validation toolchain
+- You need frequent updates to standards
+
+## Quick Start
+
+### 1. Install the Copy Script
+
+```bash
+# Download the copy script
+curl -L https://raw.githubusercontent.com/phrazzld/leyline/main/examples/consumer-direct-copy/scripts/copy-leyline-standards.rb -o scripts/copy-leyline-standards.rb
+chmod +x scripts/copy-leyline-standards.rb
+
+# Or clone this repository and copy the script
+git clone https://github.com/phrazzld/leyline.git /tmp/leyline
+cp /tmp/leyline/examples/consumer-direct-copy/scripts/copy-leyline-standards.rb scripts/
+rm -rf /tmp/leyline
+```
+
+### 2. Create Selection Configuration
+
+Create a configuration file specifying which standards to copy:
+
+```bash
+cp examples/consumer-direct-copy/standards-selection.yml .leyline-selection.yml
+```
+
+Edit `.leyline-selection.yml` to choose your standards.
+
+### 3. Copy Selected Standards
+
+```bash
+# Copy standards to your project
+ruby scripts/copy-leyline-standards.rb --config .leyline-selection.yml --output docs/standards/
+
+# Or copy interactively
+ruby scripts/copy-leyline-standards.rb --interactive
+```
+
+### 4. Set Up Validation (Optional)
+
+```bash
+# Copy the validation workflow
+mkdir -p .github/workflows
+cp examples/consumer-direct-copy/.github/workflows/validate-standards.yml .github/workflows/
+```
+
+## Project Structure
+
+```
+your-project/
+├── .github/workflows/
+│   └── validate-standards.yml      # Validation workflow (optional)
+├── docs/standards/                 # Your copied standards
+│   ├── tenets/
+│   │   ├── simplicity.md
+│   │   └── testability.md
+│   └── bindings/
+│       ├── core/
+│       │   └── api-design.md
+│       └── typescript/
+│           └── no-any.md
+├── scripts/
+│   └── copy-leyline-standards.rb   # Copy script
+├── .leyline-selection.yml          # Your selection config
+├── .leyline-tracking.yml           # Version tracking (auto-generated)
+└── [your project files]
+```
+
+## Configuration
+
+### Selection Configuration (`.leyline-selection.yml`)
+
+```yaml
+# Leyline version to copy from
+leyline_version: "v0.1.5"
+
+# Output directory for copied standards
+output_directory: "docs/standards"
+
+# Tenets to copy
+tenets:
+  - simplicity
+  - testability
+  - explicit-over-implicit
+
+# Binding categories to copy
+binding_categories:
+  - core                    # Copy all core bindings
+
+# Specific bindings to copy (optional)
+specific_bindings:
+  - typescript/no-any      # Copy specific binding
+  - go/error-wrapping      # Copy from different categories
+
+# Bindings to exclude (optional)
+excluded_bindings:
+  - core/use-structured-logging  # Skip if not applicable
+
+# Customization options
+customization:
+  # Add project-specific prefix to copied files
+  file_prefix: ""
+
+  # Add project context to copied content
+  add_project_context: true
+
+  # Modify content during copy
+  content_transforms:
+    # Replace generic examples with project-specific ones
+    replace_examples: true
+
+    # Add project-specific implementation notes
+    add_implementation_notes: true
+
+# Version tracking
+tracking:
+  # Track which Leyline version each standard was copied from
+  track_versions: true
+
+  # Create checksums to detect local modifications
+  track_checksums: true
+
+  # Store original URLs for reference
+  track_sources: true
+```
+
+## Usage Examples
+
+### Basic Copy
+
+```bash
+# Copy core tenets and TypeScript bindings
+ruby scripts/copy-leyline-standards.rb \
+  --tenets simplicity,testability \
+  --categories core,typescript \
+  --output docs/standards/ \
+  --version v0.1.5
+```
+
+### Interactive Selection
+
+```bash
+# Interactive mode - choose standards interactively
+ruby scripts/copy-leyline-standards.rb --interactive
+```
+
+### Update Existing Standards
+
+```bash
+# Update previously copied standards to newer version
+ruby scripts/copy-leyline-standards.rb \
+  --config .leyline-selection.yml \
+  --update \
+  --version v0.2.0
+```
+
+### Show Differences
+
+```bash
+# Compare your standards with latest Leyline version
+ruby scripts/copy-leyline-standards.rb \
+  --config .leyline-selection.yml \
+  --diff \
+  --version v0.2.0
+```
+
+## Version Management
+
+### Tracking Copied Standards
+
+The script automatically creates `.leyline-tracking.yml` to track:
+
+```yaml
+# Generated by copy-leyline-standards.rb
+tracking_version: "1.0"
+last_updated: "2024-12-07T10:30:00Z"
+leyline_version: "v0.1.5"
+
+standards:
+  tenets/simplicity.md:
+    source_version: "v0.1.5"
+    source_url: "https://github.com/phrazzld/leyline/blob/v0.1.5/docs/tenets/simplicity.md"
+    checksum: "sha256:abc123..."
+    copied_at: "2024-12-07T10:30:00Z"
+    modified_locally: false
+
+  bindings/core/api-design.md:
+    source_version: "v0.1.5"
+    source_url: "https://github.com/phrazzld/leyline/blob/v0.1.5/docs/bindings/core/api-design.md"
+    checksum: "sha256:def456..."
+    copied_at: "2024-12-07T10:30:00Z"
+    modified_locally: true   # Detected local modifications
+```
+
+### Updating Standards
+
+```bash
+# Check for updates
+ruby scripts/copy-leyline-standards.rb --check-updates
+
+# Preview what would change
+ruby scripts/copy-leyline-standards.rb --update --dry-run --version v0.2.0
+
+# Update to new version
+ruby scripts/copy-leyline-standards.rb --update --version v0.2.0
+```
+
+### Handling Local Modifications
+
+When you've modified copied standards locally:
+
+```bash
+# See what you've changed
+ruby scripts/copy-leyline-standards.rb --show-local-changes
+
+# Update while preserving local changes
+ruby scripts/copy-leyline-standards.rb --update --preserve-local
+
+# Reset to original Leyline version (loses local changes)
+ruby scripts/copy-leyline-standards.rb --reset-to-source
+```
+
+## Customization
+
+### Content Transformation
+
+The copy script supports transforming content during copy:
+
+```yaml
+# In .leyline-selection.yml
+customization:
+  content_transforms:
+    # Replace placeholder text with project-specific content
+    replacements:
+      "your-project": "MyAwesomeApp"
+      "example.com": "mycompany.com"
+
+    # Add project-specific sections
+    additions:
+      - section: "## Implementation in MyAwesomeApp"
+        content: "See internal wiki for specific implementation guidelines."
+        position: "end"
+
+    # Remove sections not applicable to your project
+    removals:
+      - pattern: "## For Enterprise Teams"
+      - pattern: "### Legacy System Considerations"
+```
+
+### File Organization
+
+```bash
+# Copy with custom organization
+ruby scripts/copy-leyline-standards.rb \
+  --config .leyline-selection.yml \
+  --output docs/development-standards/ \
+  --organize-by-category  # Group by categories instead of type
+```
+
+## Integration with Existing Standards
+
+### Merging with Existing Documentation
+
+```bash
+# Merge with existing standards directory
+ruby scripts/copy-leyline-standards.rb \
+  --config .leyline-selection.yml \
+  --output docs/standards/ \
+  --merge-mode  # Don't overwrite existing files
+```
+
+### Creating Unified Standards
+
+```yaml
+# In .leyline-selection.yml
+output:
+  create_index: true        # Generate index of all standards
+  unified_format: true      # Ensure consistent formatting
+  add_navigation: true      # Add navigation between standards
+```
+
+## Validation and Compliance
+
+### Optional Validation Workflow
+
+The included GitHub Actions workflow can validate your project against copied standards:
+
+```yaml
+# In .github/workflows/validate-standards.yml
+name: Standards Compliance
+
+on: [push, pull_request]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate against copied standards
+        run: |
+          ruby scripts/validate-compliance.rb docs/standards/
+```
+
+### Custom Validation Rules
+
+```bash
+# Create project-specific validation
+ruby scripts/copy-leyline-standards.rb \
+  --generate-validation \
+  --output-validation scripts/validate-our-standards.rb
+```
+
+## Best Practices
+
+### 1. Version Pinning
+Always specify exact Leyline versions:
+```bash
+ruby scripts/copy-leyline-standards.rb --version v0.1.5
+```
+
+### 2. Regular Updates
+Schedule quarterly reviews of your copied standards:
+```bash
+# Add to crontab or CI schedule
+ruby scripts/copy-leyline-standards.rb --check-updates --notify
+```
+
+### 3. Documentation
+Document why you chose specific standards:
+```yaml
+# In .leyline-selection.yml
+documentation:
+  rationale: "docs/why-these-standards.md"
+  implementation_guide: "docs/implementing-standards.md"
+```
+
+### 4. Team Alignment
+Include standards review in your team processes:
+```bash
+# Generate team review report
+ruby scripts/copy-leyline-standards.rb --team-report
+```
+
+## Migration Paths
+
+### From No Standards to Leyline Copy
+
+1. **Assessment**: Review existing practices against Leyline tenets
+2. **Selection**: Choose standards that align with current practices
+3. **Gradual Adoption**: Start with core tenets, add bindings over time
+4. **Team Training**: Educate team on adopted standards
+
+### From Full Leyline to Selective Copy
+
+1. **Audit Usage**: Identify which standards your team actually follows
+2. **Copy Active Standards**: Use the copy script for relevant standards only
+3. **Remove Submodule**: Remove the full Leyline submodule
+4. **Update Workflows**: Switch to the direct copy validation approach
+
+## Troubleshooting
+
+### Copy Script Issues
+
+```bash
+# Enable verbose logging
+ruby scripts/copy-leyline-standards.rb --verbose --debug
+
+# Validate configuration
+ruby scripts/copy-leyline-standards.rb --validate-config
+
+# Clean and retry
+rm -rf docs/standards/ .leyline-tracking.yml
+ruby scripts/copy-leyline-standards.rb --config .leyline-selection.yml
+```
+
+### Version Conflicts
+
+```bash
+# Force update to specific version
+ruby scripts/copy-leyline-standards.rb --force-version v0.2.0
+
+# Resolve merge conflicts manually
+ruby scripts/copy-leyline-standards.rb --interactive-merge
+```
+
+### Content Issues
+
+```bash
+# Restore original content
+ruby scripts/copy-leyline-standards.rb --restore-original tenets/simplicity.md
+
+# Re-copy specific standards
+ruby scripts/copy-leyline-standards.rb --recopy bindings/core/api-design.md
+```
+
+## Example Projects
+
+- **Startup MVP**: Copies only simplicity and testability tenets
+- **Enterprise Service**: Copies comprehensive core + language bindings
+- **Open Source Library**: Copies standards relevant to public API design
+
+## Next Steps
+
+1. **Configure Selection**: Edit `.leyline-selection.yml` for your needs
+2. **Copy Standards**: Run the copy script to get your selected standards
+3. **Team Review**: Have your team review and adapt the copied content
+4. **Integrate Validation**: Set up the optional validation workflow
+5. **Schedule Updates**: Plan regular reviews of Leyline updates
