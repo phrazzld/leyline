@@ -60,13 +60,13 @@ if tenet_content && tenet_includes_prototype
 end
 
 if binding_content && binding_includes_prototype
-  binding_summary = binding_content.match(/\| \[ts-no-any\]\(\.\/ts-no-any\.md\) \| (.*?) \|/)[1] rescue "Not found"
+  binding_summary = binding_content.match(/\| \[no-any\]\(\.\/categories\/typescript\/no-any\.md\) \| (.*?) \|/)[1] rescue "Not found"
   puts "\nBinding summary extracted: #{binding_summary}"
 end
 
 # Compare with actual first paragraphs
-tenet_first_para = File.read("tenets/simplicity.md").match(/# Tenet:.*?\n\n(.*?)(\n\n|\n#|$)/m)[1].strip.gsub(/\s+/, ' ') rescue "Not found"
-binding_first_para = File.read("bindings/ts-no-any.md").match(/# Binding:.*?\n\n(.*?)(\n\n|\n#|$)/m)[1].strip.gsub(/\s+/, ' ') rescue "Not found"
+tenet_first_para = File.read("docs/tenets/simplicity.md").match(/# Tenet:.*?\n\n(.*?)(\n\n|\n#|$)/m)[1].strip.gsub(/\s+/, ' ') rescue "Not found"
+binding_first_para = File.read("docs/bindings/categories/typescript/no-any.md").match(/# Binding:.*?\n\n(.*?)(\n\n|\n#|$)/m)[1].strip.gsub(/\s+/, ' ') rescue "Not found"
 
 puts "\nActual tenet first paragraph: #{tenet_first_para}"
 puts "Actual binding first paragraph: #{binding_first_para}"
