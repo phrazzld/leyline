@@ -22,7 +22,8 @@
 require 'json'
 require 'yaml'
 require 'optparse'
-require 'open3'
+require 'ostruct'
+require_relative 'security_utils'
 
 # Global configuration
 $options = {
@@ -52,16 +53,36 @@ end.parse!
 
 # Load breaking change rules from YAML configuration
 def load_breaking_change_rules
-  rules_file = File.join(File.dirname(__FILE__), 'breaking_change_rules.yml')
-  unless File.exist?(rules_file)
-    report_error("Breaking change rules file not found: #{rules_file}")
+  rules_file = 'breaking_change_rules.yml'  # Simplified path for security
+  rules_full_path = File.join(File.dirname(__FILE__), rules_file)
+
+  unless File.exist?(rules_full_path)
+    report_error("Breaking change rules file not found: #{rules_full_path}")
     return {}
   end
 
   begin
-    YAML.load_file(rules_file)
+    # Read file directly since it's in the same directory and safe
+    yaml_content = File.read(rules_full_path)
+
+    # Use safe YAML loading to prevent arbitrary object deserialization
+    rules = YAML.safe_load(yaml_content, permitted_classes: [], permitted_symbols: [], aliases: false)
+
+    # Validate the structure contains expected keys
+    unless rules.is_a?(Hash)
+      report_error("Invalid breaking change rules format: must be a hash")
+      SecurityUtils.log_security_event('invalid_rules_format', { type: rules.class })
+      return {}
+    end
+
+    rules
+  rescue SecurityUtils::SecurityError => e
+    report_error("Security error loading breaking change rules: #{e.message}")
+    SecurityUtils.log_security_event('rules_file_security_error', { error: e.message })
+    {}
   rescue => e
     report_error("Failed to load breaking change rules: #{e.message}")
+    SecurityUtils.log_security_event('rules_file_load_error', { error: e.message })
     {}
   end
 end
@@ -79,9 +100,20 @@ def get_current_version
     # No tags found, start with 0.1.0 as per VERSION file
     version_file = 'VERSION'
     if File.exist?(version_file)
-      version = File.read(version_file).strip
-      puts "Found current version from VERSION file: #{version}" if $options[:verbose]
-      version
+      begin
+        version = SecurityUtils.safe_file_read(version_file, max_size: 100).strip
+        unless SecurityUtils.validate_version(version)
+          report_error("Invalid version format in VERSION file: #{version}")
+          SecurityUtils.log_security_event('invalid_version_file', { version: version })
+          return "0.1.0"
+        end
+        puts "Found current version from VERSION file: #{version}" if $options[:verbose]
+        version
+      rescue SecurityUtils::SecurityError => e
+        report_error("Failed to read VERSION file: #{e.message}")
+        SecurityUtils.log_security_event('version_file_read_error', { error: e.message })
+        "0.1.0"
+      end
     else
       puts "No version found, defaulting to 0.1.0" if $options[:verbose]
       "0.1.0"
@@ -91,8 +123,22 @@ end
 
 # Get commits since last tag
 def get_commits_since_last_tag(current_version)
+  # Validate current version format
+  unless SecurityUtils.validate_version(current_version)
+    report_error("Invalid current version format: #{current_version}")
+    SecurityUtils.log_security_event('invalid_current_version', { version: current_version })
+    return []
+  end
+
   # Find the tag corresponding to current version
   tag_name = "v#{current_version}"
+
+  # Validate tag name format
+  unless SecurityUtils.validate_git_ref(tag_name)
+    report_error("Invalid tag name format: #{tag_name}")
+    SecurityUtils.log_security_event('invalid_tag_name', { tag: tag_name })
+    return []
+  end
 
   # Check if tag exists
   _, status = run_git_command("rev-parse --verify #{tag_name}")
@@ -109,11 +155,38 @@ def get_commits_since_last_tag(current_version)
     commits = output.strip.split("\n").map do |line|
       next if line.empty?
       hash, message = line.split('|', 2)
+
+      # Validate commit hash format (40 character hex string)
+      unless hash && hash.match?(/^[a-f0-9]{40}$/)
+        SecurityUtils.log_security_event('invalid_commit_hash', { hash: hash })
+        next
+      end
+
+      # Validate commit message
+      unless SecurityUtils.validate_commit_message(message || '')
+        SecurityUtils.log_security_event('invalid_commit_message', { hash: hash, message: message })
+        next
+      end
+
+      # Get full commit message to check for breaking changes in body
+      full_message, full_status = run_git_command("log -1 --format=%B #{hash}")
+      full_text = full_status.success? ? full_message : (message || '')
+
+      # Validate full commit message too
+      unless SecurityUtils.validate_commit_message(full_text)
+        SecurityUtils.log_security_event('invalid_full_commit_message', { hash: hash })
+        full_text = message || ''  # Fallback to short message
+      end
+
+      parsed = parse_conventional_commit(message || '')
       {
         hash: hash,
-        message: message || '',
-        type: extract_commit_type(message || ''),
-        breaking: commit_has_breaking_change?(message || '')
+        message: SecurityUtils.sanitize_output(message || ''),
+        full_message: SecurityUtils.sanitize_output(full_text),
+        type: parsed[:type],
+        scope: parsed[:scope],
+        subject: parsed[:subject],
+        breaking: commit_has_breaking_change?(full_text)
       }
     end.compact
 
@@ -125,28 +198,64 @@ def get_commits_since_last_tag(current_version)
   end
 end
 
-# Extract conventional commit type from message
-def extract_commit_type(message)
-  if message =~ /^(\w+)(\(.+?\))?(!)?:/
-    type = $1.downcase
-    breaking_marker = $3
-    return 'breaking' if breaking_marker == '!'
-    type
+# Parse conventional commit format
+def parse_conventional_commit(message)
+  if message =~ /^(\w+)(\(([^)]+)\))?(!)?:\s*(.+)/
+    {
+      type: $1.downcase,
+      scope: $3,
+      subject: $5,
+      breaking: $4 == '!'
+    }
   else
-    'other'
+    {
+      type: 'other',
+      scope: nil,
+      subject: message,
+      breaking: false
+    }
   end
+end
+
+# Extract conventional commit type from message (legacy method)
+def extract_commit_type(message)
+  parsed = parse_conventional_commit(message)
+  parsed[:breaking] ? 'breaking' : parsed[:type]
 end
 
 # Check if commit message indicates breaking change
 def commit_has_breaking_change?(message)
-  message.include?('BREAKING CHANGE:') || !!(message =~ /^(\w+)(\(.+?\))?!:/)
+  # Check the commit message itself first
+  return true if message.include?('BREAKING CHANGE:') || !!(message =~ /^(\w+)(\(.+?\))?!:/)
+
+  # For single-line messages that might be truncated, this is sufficient
+  # The full message check happens in extract_breaking_change_details
+  false
 end
 
-# Detect breaking changes from file changes (future enhancement)
-def detect_file_based_breaking_changes(commits)
-  # For now, return empty array
-  # This would analyze git diff for file deletions/moves based on breaking_change_rules.yml
-  []
+# Detect breaking changes from file changes
+def detect_file_based_breaking_changes(commits, rules)
+  return [] if commits.empty? || !rules['breaking_patterns']
+
+  breaking_changes = []
+
+  # Get all changed files for these commits
+  commits.each do |commit|
+    output, status = run_git_command("show --name-only --format= #{commit[:hash]}")
+    if status.success?
+      files = output.strip.split("\n").reject(&:empty?)
+
+      files.each do |file|
+        rules['breaking_patterns'].each do |pattern|
+          if file.match?(Regexp.new(pattern))
+            breaking_changes << "Breaking change detected in file: #{file}"
+          end
+        end
+      end
+    end
+  end
+
+  breaking_changes.uniq
 end
 
 # Determine version bump type based on commits
@@ -201,16 +310,26 @@ def calculate_next_version(current_version, bump_type)
   end
 end
 
-# Run git command safely
+# Run git command safely with security validation
 def run_git_command(command)
-  full_command = "git #{command}"
-  puts "Running: #{full_command}" if $options[:verbose]
+  puts "Running: git #{command}" if $options[:verbose]
 
-  output, status = Open3.capture2(full_command)
-  [output, status]
-rescue => e
-  report_error("Git command failed: #{e.message}")
-  ["", nil]
+  begin
+    # Use secure git command execution
+    result = SecurityUtils.safe_git_command(command)
+    # Create a mock status object that responds to success?
+    mock_status = OpenStruct.new(success?: result[:success], exitstatus: result[:exit_code])
+    [result[:stdout], mock_status]
+  rescue SecurityUtils::SecurityError => e
+    report_error("Git command security error: #{e.message}")
+    SecurityUtils.log_security_event('git_command_blocked', { command: command, error: e.message })
+    mock_status = OpenStruct.new(success?: false, exitstatus: 1)
+    ["", mock_status]
+  rescue => e
+    report_error("Git command failed: #{e.message}")
+    mock_status = OpenStruct.new(success?: false, exitstatus: 1)
+    ["", mock_status]
+  end
 end
 
 # Error reporting
@@ -332,12 +451,41 @@ def generate_changelog_markdown(commits, next_version)
   markdown.join("\n").strip
 end
 
+# Extract breaking change details from commits
+def extract_breaking_change_details(commits)
+  breaking_details = []
+
+  commits.each do |commit|
+    # Use the already-fetched full message
+    message_to_check = commit[:full_message] || commit[:message]
+
+    # Check for BREAKING CHANGE: in the full message
+    if message_to_check.include?('BREAKING CHANGE:')
+      # Extract the breaking change description
+      breaking_text = message_to_check.split('BREAKING CHANGE:')[1]&.strip
+      if breaking_text && !breaking_text.empty?
+        # Take the first line or sentence of the breaking change description
+        first_line = breaking_text.split("\n").first&.strip
+        breaking_details << first_line if first_line && !first_line.empty?
+      end
+    elsif commit[:message] =~ /^(\w+)(\(.+?\))?!:/
+      # For ! syntax, use the commit subject as breaking change
+      parsed = parse_conventional_commit(commit[:message])
+      breaking_details << parsed[:subject] if parsed[:subject]
+    end
+  end
+
+  breaking_details
+end
+
 # Main calculation function
 def calculate_version
   rules = load_breaking_change_rules
   current_version = get_current_version
   commits = get_commits_since_last_tag(current_version)
-  breaking_changes = detect_file_based_breaking_changes(commits)
+  file_breaking_changes = detect_file_based_breaking_changes(commits, rules)
+  commit_breaking_changes = extract_breaking_change_details(commits)
+  breaking_changes = file_breaking_changes + commit_breaking_changes
   bump_type = determine_bump_type(commits, current_version, breaking_changes)
   next_version = calculate_next_version(current_version, bump_type)
   changelog_markdown = generate_changelog_markdown(commits, next_version)

@@ -169,15 +169,15 @@
 ## Phase 2: Release Automation Workflow
 
 - [x] **T007 · Feature · P0: Create GitHub Actions release workflow**
-    - **Context:** Fully automated release on merge to main
+    - **Context:** Fully automated release on merge to master
     - **Action:**
         1. Create `.github/workflows/release.yml`:
-           - Trigger: push to main branch
+           - Trigger: push to master branch
            - Jobs: validate → prepare → tag → release → update-docs
            - Use `ruby tools/prepare_release.rb` for preparation
            - Create Git tag with calculated version
            - Create GitHub release with changelog
-           - Commit updated docs back to main with `[skip ci]`
+           - Commit updated docs back to master with `[skip ci]`
         2. Configure GitHub token permissions: `contents: write`, `actions: read`
     - **Commands:**
         ```bash
@@ -186,7 +186,7 @@
         name: Release
         on:
           push:
-            branches: [main]
+            branches: [master]
         permissions:
           contents: write
           actions: read
@@ -206,14 +206,14 @@
         ```
     - **Done-when:**
         1. Workflow file exists and is valid YAML
-        2. Triggers on push to main
+        2. Triggers on push to master
         3. Complete release cycle: prep → tag → release → commit
         4. Generated releases appear in GitHub with changelog
     - **Verification:**
         ```bash
         # Validate workflow YAML
         yamllint .github/workflows/release.yml
-        # Test with a dummy commit to main
+        # Test with a dummy commit to master
         ```
     - **Depends-on:** [T006]
 
@@ -340,7 +340,7 @@
 
 ## Phase 5: Testing and Hardening
 
-- [ ] **T012 · Test · P1: Create comprehensive test suite**
+- [x] **T012 · Test · P1: Create comprehensive test suite**
     - **Context:** Ensure system reliability and regression prevention
     - **Action:**
         1. Create `tools/test_calculate_version.rb`:
@@ -374,11 +374,11 @@
         ```
     - **Depends-on:** [T003, T006, T007]
 
-- [ ] **T013 · Security · P1: Harden security and access controls**
+- [x] **T013 · Security · P1: Harden security and access controls**
     - **Context:** Protect release process from compromise
     - **Action:**
         1. Configure GitHub repository settings:
-           - Branch protection rules for main
+           - Branch protection rules for master
            - Require reviews for workflow changes
            - Restrict GitHub token permissions to minimum needed
         2. Add input validation to all Ruby scripts:
@@ -389,12 +389,12 @@
     - **Commands:**
         ```bash
         # Configure branch protection
-        gh api repos/:owner/:repo/branches/main/protection --method PUT --input protection.json
+        gh api repos/:owner/:repo/branches/master/protection --method PUT --input protection.json
         # Add security scanning
         bundle audit
         ```
     - **Done-when:**
-        1. Branch protection prevents direct pushes to main
+        1. Branch protection prevents direct pushes to master
         2. Workflow changes require review and approval
         3. All shell commands use proper escaping
         4. Security scanning passes in CI
@@ -402,7 +402,7 @@
         ```bash
         # Test malicious commit messages
         # Verify they don't break changelog generation
-        # Attempt direct push to main (should fail)
+        # Attempt direct push to master (should fail)
         ```
     - **Depends-on:** [T007]
 
@@ -421,7 +421,7 @@ ruby tools/prepare_release.rb --dry-run
 
 # 4. Test release workflow
 git add . && git commit -m "feat: add semantic versioning system"
-git push origin main
+git push origin master
 ```
 
 ### Testing Commands
@@ -460,7 +460,7 @@ ruby tools/manual_recovery.rb --guide
 
 ## Success Criteria
 
-- [ ] **Automated releases work:** Push to main → release appears in < 5 minutes
+- [ ] **Automated releases work:** Push to master → release appears in < 5 minutes
 - [ ] **Version calculation accurate:** Handles all commit patterns correctly
 - [ ] **Consumer examples functional:** All examples in `examples/` work independently
 - [ ] **Rollback tested:** Can safely revert any release
@@ -471,7 +471,7 @@ ruby tools/manual_recovery.rb --guide
 
 ✅ **Initial Version:** 0.1.0 (pre-stability, allows rapid iteration)
 ✅ **Breaking Changes:** File removal/rename, YAML schema changes, directory restructuring
-✅ **Release Trigger:** Every merge to main (rapid feedback)
+✅ **Release Trigger:** Every merge to master (rapid feedback)
 ✅ **Consumer Notification:** GitHub releases + migration guides + working examples
 ✅ **Pre-1.0 Versioning:** Breaking changes increment minor version (0.1.0 → 0.2.0)
 ✅ **Post-1.0 Versioning:** Standard semver (breaking = major, features = minor, fixes = patch)
