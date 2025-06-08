@@ -245,7 +245,7 @@
 
 ## Phase 3: Consumer Support
 
-- [ ] **T009 · Feature · P2: Create consumer integration examples**
+- [x] **T009 · Feature · P2: Create consumer integration examples**
     - **Context:** Help consumers adopt and integrate effectively
     - **Action:**
         1. Create `examples/consumer-git-submodule/` with:
@@ -274,7 +274,7 @@
         ```
     - **Depends-on:** [T007]
 
-- [ ] **T010 · Feature · P2: Create migration guide system**
+- [x] **T010 · Feature · P2: Create migration guide system**
     - **Context:** Support consumers through version upgrades
     - **Action:**
         1. Create `tools/generate_migration_guide.rb`:
@@ -306,7 +306,7 @@
 
 ## Phase 4: Rollback and Safety
 
-- [ ] **T011 · Feature · P1: Create rollback automation**
+- [x] **T011 · Feature · P1: Create rollback automation**
     - **Context:** Safety net for failed releases
     - **Action:**
         1. Create `tools/rollback_release.rb`:

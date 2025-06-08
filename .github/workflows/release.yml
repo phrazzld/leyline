@@ -460,13 +460,279 @@ jobs:
           rm -f version_output.json release_notes.md
           echo "🧹 Cleanup completed"
 
-  # Keep the existing consumer notification job, but trigger it after releases
-  notify-consumers:
+  # Post-release validation to ensure release integrity
+  post-release-validation:
     runs-on: ubuntu-latest
     needs: [pre-release-validation, release]
     if: |
       needs.pre-release-validation.outputs.validation_passed == 'true' &&
       needs.release.outputs.release_created == 'true'
+    outputs:
+      validation_passed: ${{ steps.final_check.outputs.passed }}
+      rollback_needed: ${{ steps.final_check.outputs.rollback_needed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: "v${{ needs.release.outputs.prepared_version }}"
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Validate release tag
+        run: |
+          echo "🏷️ Validating release tag..."
+
+          version="${{ needs.release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          # Check tag exists
+          if ! git tag | grep -q "^${tag_name}$"; then
+            echo "❌ Tag $tag_name not found"
+            exit 1
+          fi
+
+          # Check VERSION file matches
+          file_version=$(cat VERSION | tr -d '\n\r')
+          if [ "$file_version" != "$version" ]; then
+            echo "❌ VERSION file ($file_version) doesn't match tag ($version)"
+            exit 1
+          fi
+
+          echo "✅ Release tag validation passed"
+
+      - name: Test consumer examples - Git Submodule
+        id: test_submodule
+        continue-on-error: true
+        run: |
+          echo "🧪 Testing Git submodule consumer example..."
+
+          if [ -d "examples/consumer-git-submodule" ]; then
+            cd examples/consumer-git-submodule
+
+            # Simulate consumer integration test
+            if [ -f "leyline-config.yml" ]; then
+              echo "✅ Git submodule example configuration found"
+            else
+              echo "❌ Git submodule example missing configuration"
+              exit 1
+            fi
+
+            # Verify workflow file exists
+            if [ -f ".github/workflows/leyline-validation.yml" ]; then
+              echo "✅ Git submodule validation workflow found"
+            else
+              echo "❌ Git submodule validation workflow missing"
+              exit 1
+            fi
+          else
+            echo "⚠️ Git submodule example directory not found"
+          fi
+
+      - name: Test consumer examples - Direct Copy
+        id: test_direct_copy
+        continue-on-error: true
+        run: |
+          echo "🧪 Testing direct copy consumer example..."
+
+          if [ -d "examples/consumer-direct-copy" ]; then
+            cd examples/consumer-direct-copy
+
+            # Test the copy script exists and is executable
+            if [ -x "scripts/copy-leyline-standards.rb" ]; then
+              echo "✅ Direct copy script is executable"
+
+              # Dry run test
+              if ruby scripts/copy-leyline-standards.rb --dry-run; then
+                echo "✅ Direct copy script dry run successful"
+              else
+                echo "❌ Direct copy script failed dry run"
+                exit 1
+              fi
+            else
+              echo "❌ Direct copy script not found or not executable"
+              exit 1
+            fi
+          else
+            echo "⚠️ Direct copy example directory not found"
+          fi
+
+      - name: Validate GitHub release
+        id: validate_release
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Validating GitHub release..."
+
+          version="${{ needs.release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          # Check release exists
+          if gh release view "$tag_name" > /dev/null 2>&1; then
+            echo "✅ GitHub release $tag_name exists"
+
+            # Check release has assets or body
+            release_body=$(gh release view "$tag_name" --json body -q '.body')
+            if [ -z "$release_body" ]; then
+              echo "⚠️ Release has no body/description"
+            else
+              echo "✅ Release has changelog content"
+            fi
+          else
+            echo "❌ GitHub release $tag_name not found"
+            exit 1
+          fi
+
+      - name: Check documentation generation
+        id: check_docs
+        continue-on-error: true
+        run: |
+          echo "📚 Checking documentation generation..."
+
+          # Verify index files were updated
+          if [ -f "docs/tenets/00-index.md" ]; then
+            echo "✅ Tenet index exists"
+          else
+            echo "❌ Tenet index missing"
+            exit 1
+          fi
+
+          if [ -f "docs/bindings/00-index.md" ]; then
+            echo "✅ Binding index exists"
+          else
+            echo "❌ Binding index missing"
+            exit 1
+          fi
+
+          # Run validation one more time
+          if ruby tools/validate_front_matter.rb; then
+            echo "✅ Post-release YAML validation passed"
+          else
+            echo "❌ Post-release YAML validation failed"
+            exit 1
+          fi
+
+      - name: Final validation check
+        id: final_check
+        run: |
+          echo "🎯 Post-release validation summary:"
+
+          validation_passed=true
+          rollback_needed=false
+
+          # Check each validation step
+          if [ "${{ steps.test_submodule.outcome }}" = "failure" ]; then
+            echo "  ❌ Git submodule example test failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ Git submodule example test passed"
+          fi
+
+          if [ "${{ steps.test_direct_copy.outcome }}" = "failure" ]; then
+            echo "  ❌ Direct copy example test failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ Direct copy example test passed"
+          fi
+
+          if [ "${{ steps.validate_release.outcome }}" = "failure" ]; then
+            echo "  ❌ GitHub release validation failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ GitHub release validation passed"
+          fi
+
+          if [ "${{ steps.check_docs.outcome }}" = "failure" ]; then
+            echo "  ❌ Documentation generation check failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ Documentation generation check passed"
+          fi
+
+          if [ "$validation_passed" = "true" ]; then
+            echo ""
+            echo "🟢 All post-release validations passed"
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "rollback_needed=false" >> $GITHUB_OUTPUT
+          else
+            echo ""
+            echo "🔴 Post-release validation failed - rollback recommended"
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "rollback_needed=true" >> $GITHUB_OUTPUT
+          fi
+
+  # Automated rollback if post-release validation fails
+  automated-rollback:
+    runs-on: ubuntu-latest
+    needs: [release, post-release-validation]
+    if: |
+      needs.post-release-validation.outputs.rollback_needed == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Perform automated rollback
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "⚠️ Initiating automated rollback..."
+
+          version="${{ needs.release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          # Run rollback script
+          if ruby tools/rollback_release.rb \
+            --version "$tag_name" \
+            --repo "${{ github.repository }}" \
+            --token "${{ secrets.GITHUB_TOKEN }}"; then
+            echo "✅ Automated rollback completed"
+          else
+            echo "❌ Automated rollback failed - manual intervention required"
+
+            # Create issue for manual intervention
+            gh issue create \
+              --title "🚨 Automated rollback failed for $tag_name" \
+              --body "The automated rollback for release $tag_name failed.
+
+              Manual intervention is required to:
+              1. Delete the GitHub release
+              2. Delete the git tag
+              3. Revert VERSION and CHANGELOG.md changes
+
+              Please run: \`ruby tools/rollback_release.rb --version $tag_name\`" \
+              --label "bug,release,urgent"
+          fi
+
+  # Keep the existing consumer notification job, but trigger it after validation
+  notify-consumers:
+    runs-on: ubuntu-latest
+    needs: [pre-release-validation, release, post-release-validation]
+    if: |
+      needs.pre-release-validation.outputs.validation_passed == 'true' &&
+      needs.release.outputs.release_created == 'true' &&
+      needs.post-release-validation.outputs.validation_passed == 'true'
     steps:
       - uses: actions/checkout@v4
 
