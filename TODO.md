@@ -406,6 +406,131 @@
         ```
     - **Depends-on:** [T007]
 
+## CI Fix Tasks (Critical - Blocking PR Merge)
+
+- [ ] **CI-001 · Fix · P0: Create automated migration script for adding version field**
+    - **Context:** All tenets and bindings need version field in YAML front-matter
+    - **Action:**
+        1. Create `tools/add_version_to_metadata.rb` migration script
+        2. Script should:
+           - Read VERSION file to get current version
+           - Find all .md files in docs/tenets/ and docs/bindings/
+           - Parse YAML front-matter
+           - Add `version: '0.1.0'` if missing
+           - Preserve all other fields and formatting
+        3. Handle edge cases: malformed YAML, existing version fields
+    - **Commands:**
+        ```bash
+        ruby tools/add_version_to_metadata.rb --dry-run
+        ruby tools/add_version_to_metadata.rb
+        ```
+    - **Done-when:**
+        1. Migration script created and tested
+        2. Handles all edge cases gracefully
+        3. Dry-run mode shows what will be changed
+    - **Depends-on:** none
+
+- [ ] **CI-002 · Fix · P0: Test migration script on single file**
+    - **Context:** Verify script works correctly before bulk changes
+    - **Action:**
+        1. Backup a single tenet file
+        2. Run migration on that file only
+        3. Verify YAML is valid and content unchanged
+        4. Check version field is correctly added
+    - **Commands:**
+        ```bash
+        cp docs/tenets/simplicity.md docs/tenets/simplicity.md.bak
+        ruby tools/add_version_to_metadata.rb -f docs/tenets/simplicity.md
+        diff -u docs/tenets/simplicity.md.bak docs/tenets/simplicity.md
+        ```
+    - **Done-when:**
+        1. Single file migration successful
+        2. Only version field added, no other changes
+        3. YAML remains valid
+    - **Depends-on:** [CI-001]
+
+- [ ] **CI-003 · Fix · P0: Run migration on all tenet documents**
+    - **Context:** Add version field to all 13 tenet files
+    - **Action:**
+        1. Run migration script on docs/tenets/
+        2. Validate all files with validate_front_matter.rb
+        3. Review git diff to ensure only version added
+    - **Commands:**
+        ```bash
+        ruby tools/add_version_to_metadata.rb --path docs/tenets/
+        ruby tools/validate_front_matter.rb -d docs/tenets/
+        git diff docs/tenets/
+        ```
+    - **Done-when:**
+        1. All 13 tenets have version field
+        2. Validation passes for all tenets
+        3. No content changes except version field
+    - **Depends-on:** [CI-002]
+
+- [ ] **CI-004 · Fix · P0: Run migration on all binding documents**
+    - **Context:** Add version field to all binding files
+    - **Action:**
+        1. Run migration script on docs/bindings/
+        2. Validate all files with validate_front_matter.rb
+        3. Review changes for correctness
+    - **Commands:**
+        ```bash
+        ruby tools/add_version_to_metadata.rb --path docs/bindings/
+        ruby tools/validate_front_matter.rb -d docs/bindings/
+        git diff docs/bindings/
+        ```
+    - **Done-when:**
+        1. All bindings have version field
+        2. Validation passes for all bindings
+        3. No unintended changes
+    - **Depends-on:** [CI-002]
+
+- [ ] **CI-005 · Fix · P1: Update document templates with version field**
+    - **Context:** Prevent future documents from missing version
+    - **Action:**
+        1. Update docs/templates/tenet_template.md
+        2. Update docs/templates/binding_template.md
+        3. Add version field with placeholder
+    - **Commands:**
+        ```bash
+        # Edit templates to include:
+        # version: '<CURRENT_VERSION>'
+        ```
+    - **Done-when:**
+        1. Both templates include version field
+        2. Clear instructions for version value
+    - **Depends-on:** none
+
+- [ ] **CI-006 · Fix · P1: Document version field requirement**
+    - **Context:** Ensure contributors know about this requirement
+    - **Action:**
+        1. Update CONTRIBUTING.md with version field requirement
+        2. Update docs/TENET_FORMATTING.md if it exists
+        3. Add example showing required fields
+    - **Done-when:**
+        1. Requirement clearly documented
+        2. Examples show version field
+        3. Explanation of why it's needed
+    - **Depends-on:** none
+
+- [ ] **CI-007 · Verify · P0: Run full local validation before push**
+    - **Context:** Ensure all CI checks will pass
+    - **Action:**
+        1. Run full validation suite locally
+        2. Run any pre-commit hooks
+        3. Verify no errors or warnings
+    - **Commands:**
+        ```bash
+        ruby tools/validate_front_matter.rb -v
+        ruby tools/reindex.rb --strict
+        pre-commit run --all-files
+        ```
+    - **Done-when:**
+        1. All validation passes locally
+        2. No errors or warnings
+        3. Ready to commit and push
+    - **Depends-on:** [CI-003, CI-004]
+
 ## Implementation Commands
 
 ### Quick Start
