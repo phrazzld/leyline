@@ -1,13 +1,184 @@
 # Migration Guide
 
-This guide covers migration scenarios for adopting or upgrading your Leyline integration:
+This comprehensive guide covers migration scenarios for adopting, upgrading, and transitioning between different versions and integration methods of Leyline:
 
-1. **[Migrating from Symlinks to Leyline](#migrating-from-symlinks-to-leyline)** - For repositories using symlinked philosophy documents
-2. **[Migrating from Legacy Workflows](#migrating-from-legacy-workflows)** - For repositories using the old vendor.yml workflow
-3. **[Migrating to Directory-Based Structure](#migrating-to-directory-based-structure)** - For existing Leyline users updating to the new directory-based structure
-4. **[Migrating to Enhanced Pragmatic Programming Tenets](#migrating-to-enhanced-pragmatic-programming-tenets)** - For existing Leyline users adopting the expanded 12-tenet system
+## Quick Navigation
+
+1. **[Version-to-Version Migrations](#version-to-version-migrations)** - Automated migration between Leyline versions
+2. **[Integration Method Migrations](#integration-method-migrations)** - Switching between git submodule, direct copy, and pull-based approaches
+3. **[Migrating from Symlinks to Leyline](#migrating-from-symlinks-to-leyline)** - For repositories using symlinked philosophy documents
+4. **[Migrating from Legacy Workflows](#migrating-from-legacy-workflows)** - For repositories using the old vendor.yml workflow
+5. **[Migrating to Directory-Based Structure](#migrating-to-directory-based-structure)** - For existing Leyline users updating to the new directory-based structure
+6. **[Migrating to Enhanced Pragmatic Programming Tenets](#migrating-to-enhanced-pragmatic-programming-tenets)** - For existing Leyline users adopting the expanded 12-tenet system
+
+## Migration Automation Tools
+
+Leyline provides automated migration tools to simplify and validate version transitions:
+
+- **Migration Checker**: Analyzes compatibility and breaking changes between versions
+- **Migration Automation**: Automated migration execution with backup and rollback
+- **Migration Validation**: Post-migration verification and integrity checking
 
 For comprehensive integration instructions, see the [Pull-Based Integration Guide](integration/pull-model-guide.md).
+
+---
+
+# Version-to-Version Migrations
+
+This section covers automated migration between different versions of Leyline using the built-in migration system.
+
+## Migration Overview
+
+Leyline follows semantic versioning with specific migration paths:
+
+- **Patch versions** (0.1.0 → 0.1.1): No migration required, safe to update immediately
+- **Minor versions** (0.1.0 → 0.2.0): Backward compatible, optional migration for new features
+- **Major versions** (0.1.0 → 1.0.0): Breaking changes, migration required
+
+## Pre-Migration Checklist
+
+Before starting any version migration:
+
+- [ ] **Backup your current setup** - Create a backup branch or commit
+- [ ] **Review release notes** - Understand what's changing in the target version
+- [ ] **Check compatibility** - Use the migration tool to assess compatibility
+- [ ] **Plan downtime** - Some migrations may require temporary CI/CD disruption
+- [ ] **Test in staging** - Always test migrations in a non-production environment first
+
+## Automated Migration Tools
+
+### Migration Checker
+
+Analyzes differences between versions and provides migration guidance:
+
+```bash
+# Basic compatibility check
+ruby tools/migration_checker.rb --from v0.1.0 --to v0.2.0
+
+# Detailed analysis with recommendations
+ruby tools/migration_checker.rb --from v0.1.0 --to v0.2.0 --detailed
+
+# Check for breaking changes only
+ruby tools/migration_checker.rb --from v0.1.0 --to v0.2.0 --breaking-changes-only
+
+# Generate migration plan
+ruby tools/migration_checker.rb --from v0.1.0 --to v0.2.0 --generate-plan
+```
+
+### Migration Automation
+
+Automatically applies migrations when possible:
+
+```bash
+# Dry run (show what would be changed)
+ruby tools/migrate_version.rb --from v0.1.0 --to v0.2.0 --dry-run
+
+# Interactive migration (prompts for decisions)
+ruby tools/migrate_version.rb --from v0.1.0 --to v0.2.0 --interactive
+
+# Automatic migration (applies all safe changes)
+ruby tools/migrate_version.rb --from v0.1.0 --to v0.2.0 --auto
+
+# Backup and migrate (creates backup before applying changes)
+ruby tools/migrate_version.rb --from v0.1.0 --to v0.2.0 --backup
+```
+
+### Migration Validation
+
+Validates that migrations were successful:
+
+```bash
+# Validate migration completeness
+ruby tools/validate_migration.rb --target v0.2.0
+
+# Validate specific components
+ruby tools/validate_migration.rb --target v0.2.0 --component yaml-frontmatter
+ruby tools/validate_migration.rb --target v0.2.0 --component directory-structure
+ruby tools/validate_migration.rb --target v0.2.0 --component validation-config
+```
+
+---
+
+# Integration Method Migrations
+
+Migrate between different integration approaches while preserving standards and customizations.
+
+## Available Integration Methods
+
+1. **Git Submodule Integration** - Full ecosystem with automatic updates
+2. **Direct Copy Integration** - Selective adoption with customization
+3. **Pull-Based Synchronization** - Workflow-based automated updates
+
+## Migration Paths
+
+### From Git Submodule to Direct Copy
+
+When you want more control over which standards to adopt:
+
+```bash
+# 1. Export current submodule configuration
+ruby tools/export_submodule_config.rb --output .leyline-selection.yml
+
+# 2. Copy current standards to project
+ruby examples/consumer-direct-copy/scripts/copy-leyline-standards.rb --config .leyline-selection.yml
+
+# 3. Remove submodule (after validating copy)
+git submodule deinit leyline
+git rm leyline
+rm -rf .git/modules/leyline
+```
+
+### From Direct Copy to Git Submodule
+
+When you want comprehensive governance and automatic updates:
+
+```bash
+# 1. Backup current standards
+cp -r docs/standards docs/standards-backup
+
+# 2. Add Leyline as submodule
+git submodule add https://github.com/phrazzld/leyline.git leyline
+
+# 3. Generate submodule configuration from current standards
+ruby tools/generate_submodule_config.rb --from docs/standards --output leyline-config.yml
+
+# 4. Remove copied standards (after validating submodule)
+rm -rf docs/standards
+```
+
+### From Pull-Based to Git Submodule
+
+When you want local access to Leyline tools and tighter integration:
+
+```bash
+# 1. Add submodule
+git submodule add https://github.com/phrazzld/leyline.git leyline
+
+# 2. Convert workflow configuration to submodule config
+ruby tools/convert_workflow_to_submodule.rb --workflow .github/workflows/sync-leyline.yml --output leyline-config.yml
+
+# 3. Update workflows to use submodule validation
+cp leyline/examples/consumer-git-submodule/.github/workflows/leyline-validation.yml .github/workflows/
+
+# 4. Remove pull-based workflow (after validation)
+rm .github/workflows/sync-leyline.yml
+```
+
+### From Git Submodule to Pull-Based
+
+When you prefer workflow-based updates with PR review:
+
+```bash
+# 1. Export submodule configuration
+ruby tools/export_submodule_to_workflow.rb --config leyline-config.yml --output .github/workflows/sync-leyline.yml
+
+# 2. Remove submodule
+git submodule deinit leyline
+git rm leyline
+
+# 3. Trigger initial sync
+gh workflow run sync-leyline.yml
+```
 
 ---
 
