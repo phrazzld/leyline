@@ -399,7 +399,7 @@ def migrate_yaml_frontmatter
 
   # This would call the actual YAML migration tool
   log_info("Running YAML front-matter migration...")
-  # system("ruby tools/migrate_yaml_frontmatter.rb")
+  system("ruby tools/migrate_yaml_frontmatter.rb")
   log_info("YAML front-matter migration completed")
 end
 
@@ -413,7 +413,7 @@ def migrate_directory_structure
 
   # This would call the actual directory migration tool
   log_info("Running directory structure migration...")
-  # system("ruby tools/migrate_directory_structure.rb")
+  system("ruby tools/migrate_directory_structure.rb")
   log_info("Directory structure migration completed")
 end
 

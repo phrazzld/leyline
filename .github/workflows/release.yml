@@ -16,7 +16,7 @@ permissions:
 jobs:
   pre-release-validation:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: github.actor != 'github-actions[bot]'
     outputs:
       validation_passed: ${{ steps.final_validation.outputs.passed }}
 
@@ -173,27 +173,12 @@ jobs:
             echo "ℹ️ No Gemfile found - skipping dependency vulnerability scan"
           fi
 
-          # Check Ruby scripts for common security issues
-          echo "🔍 Scanning Ruby scripts for security issues..."
+          # Run comprehensive security scan using dedicated tool
+          echo "🔍 Running comprehensive security scan..."
 
-          security_issues=0
-
-          # Check for eval/exec usage
-          if grep -r "eval\|exec\|system\|`" tools/ --include="*.rb" | \
-             grep -v "exit\|exec\|system.*exit"; then
-            echo "⚠️ Found potentially dangerous code execution patterns"
-            security_issues=$((security_issues + 1))
-          fi
-
-          # Check for hardcoded secrets patterns
-          if grep -r -i "password\|secret\|token\|key.*=" tools/ \
-             --include="*.rb" | grep -v "GITHUB_TOKEN"; then
-            echo "⚠️ Found potential hardcoded secrets"
-            security_issues=$((security_issues + 1))
-          fi
-
-          if [ $security_issues -gt 0 ]; then
-            echo "❌ Security issues found - manual review required"
+          if ! ruby tools/security_scan.rb --strict; then
+            echo "❌ Security vulnerabilities found in Ruby scripts"
+            echo "   Run 'ruby tools/security_scan.rb' locally for details"
             exit 1
           fi
 

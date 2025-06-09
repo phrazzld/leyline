@@ -157,77 +157,216 @@ def migration_type(from_version, to_version)
   end
 end
 
-# Fetch version information from GitHub
+# Fetch version information from repository analysis
 def fetch_version_info(version)
-  log_verbose("Fetching version info for #{version}")
+  log_verbose("Analyzing repository data for #{version}")
 
-  # In a real implementation, this would fetch from GitHub API
-  # For now, return mock data based on version patterns
-  case version
-  when /^v0\.1\./
-    {
-      'tenets_count' => 8,
-      'core_bindings_count' => 15,
-      'category_bindings' => {
-        'typescript' => 3,
-        'go' => 3,
-        'rust' => 2,
-        'frontend' => 2
-      },
-      'directory_structure' => 'flat',
-      'yaml_frontmatter_version' => '1.0',
-      'breaking_changes' => []
-    }
-  when /^v0\.2\./
-    {
-      'tenets_count' => 12,
-      'core_bindings_count' => 18,
-      'category_bindings' => {
-        'typescript' => 4,
-        'go' => 4,
-        'rust' => 3,
-        'frontend' => 3,
-        'backend' => 2
-      },
-      'directory_structure' => 'hierarchical',
-      'yaml_frontmatter_version' => '1.0',
-      'breaking_changes' => [
-        'Enhanced tenet content with pragmatic programming concepts',
-        'New binding categories (backend)',
-        'Additional validation requirements'
-      ]
-    }
-  when /^v1\.0\./
-    {
-      'tenets_count' => 12,
-      'core_bindings_count' => 22,
-      'category_bindings' => {
-        'typescript' => 5,
-        'go' => 5,
-        'rust' => 4,
-        'frontend' => 4,
-        'backend' => 3
-      },
-      'directory_structure' => 'hierarchical',
-      'yaml_frontmatter_version' => '2.0',
-      'breaking_changes' => [
-        'YAML front-matter structure changed (v2.0)',
-        'Directory structure reorganization',
-        'New validation tool requirements',
-        'Configuration format updates'
-      ]
-    }
-  else
-    log_warning("Unknown version #{version}, using default structure")
-    {
-      'tenets_count' => 8,
-      'core_bindings_count' => 15,
-      'category_bindings' => {},
-      'directory_structure' => 'flat',
-      'yaml_frontmatter_version' => '1.0',
-      'breaking_changes' => []
-    }
+  # Check if this is the current working directory
+  if version == 'HEAD' || version == 'current'
+    return analyze_current_repository
   end
+
+  # Check if the version tag exists
+  unless tag_exists?(version)
+    log_warning("Version tag #{version} not found in repository")
+    return nil
+  end
+
+  # Analyze the repository at this specific version
+  analyze_repository_at_version(version)
+end
+
+# Check if a Git tag exists
+def tag_exists?(version)
+  result = system("git rev-parse #{version} >/dev/null 2>&1")
+  result == true
+end
+
+# Analyze current repository state
+def analyze_current_repository
+  log_verbose("Analyzing current repository state")
+
+  info = {
+    'tenets_count' => 0,
+    'core_bindings_count' => 0,
+    'category_bindings' => {},
+    'directory_structure' => 'unknown',
+    'yaml_frontmatter_version' => '1.0',
+    'breaking_changes' => []
+  }
+
+  # Count tenets
+  if Dir.exist?('docs/tenets')
+    tenets = Dir.glob('docs/tenets/*.md').reject { |f| f.include?('00-index.md') }
+    info['tenets_count'] = tenets.length
+    log_verbose("Found #{tenets.length} tenets")
+  end
+
+  # Count core bindings
+  if Dir.exist?('docs/bindings/core')
+    core_bindings = Dir.glob('docs/bindings/core/*.md').reject { |f| f.include?('00-index.md') }
+    info['core_bindings_count'] = core_bindings.length
+    log_verbose("Found #{core_bindings.length} core bindings")
+  end
+
+  # Count category bindings
+  if Dir.exist?('docs/bindings/categories')
+    categories = Dir.glob('docs/bindings/categories/*').select { |d| File.directory?(d) }
+    categories.each do |category_dir|
+      category = File.basename(category_dir)
+      binding_files = Dir.glob("#{category_dir}/*.md").reject { |f| f.include?('00-index.md') }
+      if binding_files.length > 0
+        info['category_bindings'][category] = binding_files.length
+        log_verbose("Found #{binding_files.length} #{category} bindings")
+      end
+    end
+  end
+
+  # Determine directory structure
+  if Dir.exist?('docs/bindings/categories')
+    info['directory_structure'] = 'hierarchical'
+  elsif Dir.exist?('docs/bindings') && Dir.glob('docs/bindings/*.md').any?
+    info['directory_structure'] = 'flat'
+  else
+    info['directory_structure'] = 'unknown'
+  end
+
+  # Detect YAML front-matter version by examining a sample file
+  sample_files = Dir.glob('docs/**/*.md').reject { |f| f.include?('00-index.md') }.first(3)
+  sample_files.each do |file|
+    if File.exist?(file)
+      content = File.read(file)
+      if content.start_with?('---')
+        yaml_end = content.index('---', 3)
+        if yaml_end
+          begin
+            yaml_content = content[4...yaml_end]
+            yaml_data = YAML.safe_load(yaml_content)
+            if yaml_data.is_a?(Hash) && yaml_data.key?('version')
+              info['yaml_frontmatter_version'] = '1.0'  # Has version field
+              break
+            end
+          rescue
+            # Skip invalid YAML
+          end
+        end
+      end
+    end
+  end
+
+  log_verbose("Repository analysis complete")
+  info
+end
+
+# Analyze repository at a specific version/tag
+def analyze_repository_at_version(version)
+  log_verbose("Analyzing repository at version #{version}")
+
+  info = {
+    'tenets_count' => 0,
+    'core_bindings_count' => 0,
+    'category_bindings' => {},
+    'directory_structure' => 'unknown',
+    'yaml_frontmatter_version' => '1.0',
+    'breaking_changes' => []
+  }
+
+  # Use git show to get file listings at the specific version
+  begin
+    # Count tenets at this version
+    tenets_output = `git ls-tree -r --name-only #{version} -- docs/tenets/ 2>/dev/null`
+    if $?.success?
+      tenets = tenets_output.lines.map(&:strip).select { |f| f.end_with?('.md') && !f.include?('00-index.md') }
+      info['tenets_count'] = tenets.length
+      log_verbose("Found #{tenets.length} tenets at #{version}")
+    end
+
+    # Count core bindings at this version
+    core_bindings_output = `git ls-tree -r --name-only #{version} -- docs/bindings/core/ 2>/dev/null`
+    if $?.success?
+      core_bindings = core_bindings_output.lines.map(&:strip).select { |f| f.end_with?('.md') && !f.include?('00-index.md') }
+      info['core_bindings_count'] = core_bindings.length
+      log_verbose("Found #{core_bindings.length} core bindings at #{version}")
+    end
+
+    # Count category bindings at this version
+    categories_output = `git ls-tree -r --name-only #{version} -- docs/bindings/categories/ 2>/dev/null`
+    if $?.success?
+      category_files = categories_output.lines.map(&:strip).select { |f| f.end_with?('.md') && !f.include?('00-index.md') }
+
+      # Group by category
+      category_files.each do |file|
+        # Extract category from path like "docs/bindings/categories/go/interface-design.md"
+        parts = file.split('/')
+        if parts.length >= 5 && parts[2] == 'categories'
+          category = parts[3]
+          info['category_bindings'][category] ||= 0
+          info['category_bindings'][category] += 1
+        end
+      end
+
+      info['category_bindings'].each do |category, count|
+        log_verbose("Found #{count} #{category} bindings at #{version}")
+      end
+    end
+
+    # Determine directory structure at this version
+    structure_check = `git ls-tree -r --name-only #{version} -- docs/bindings/ 2>/dev/null`
+    if $?.success?
+      files = structure_check.lines.map(&:strip)
+      if files.any? { |f| f.include?('docs/bindings/categories/') }
+        info['directory_structure'] = 'hierarchical'
+      elsif files.any? { |f| f.match(/^docs\/bindings\/[^\/]+\.md$/) }
+        info['directory_structure'] = 'flat'
+      end
+    end
+
+    # Get breaking changes from commit messages since previous version
+    info['breaking_changes'] = get_breaking_changes_since_previous_version(version)
+
+  rescue => e
+    log_warning("Error analyzing version #{version}: #{e.message}")
+    return nil
+  end
+
+  log_verbose("Repository analysis complete for #{version}")
+  info
+end
+
+# Get breaking changes from Git history
+def get_breaking_changes_since_previous_version(version)
+  breaking_changes = []
+
+  begin
+    # Get the previous tag
+    previous_tags = `git tag --sort=-version:refname`.lines.map(&:strip)
+    current_index = previous_tags.index(version)
+
+    if current_index && current_index < previous_tags.length - 1
+      previous_version = previous_tags[current_index + 1]
+
+      # Get commits between versions that mention breaking changes
+      commits = `git log #{previous_version}..#{version} --oneline --grep="BREAKING CHANGE" --grep="breaking change" -i 2>/dev/null`
+
+      if $?.success? && !commits.empty?
+        commits.lines.each do |commit|
+          # Extract breaking change info from commit message
+          commit_detail = `git show --format=%B -s #{commit.split(' ').first} 2>/dev/null`
+          if commit_detail.match(/BREAKING CHANGE[:\s]+(.+?)$/i)
+            breaking_changes << $1.strip
+          elsif commit_detail.match(/breaking change[:\s]+(.+?)$/i)
+            breaking_changes << $1.strip
+          else
+            breaking_changes << "Breaking change in #{commit.strip}"
+          end
+        end
+      end
+    end
+  rescue => e
+    log_verbose("Could not determine breaking changes: #{e.message}")
+  end
+
+  breaking_changes.uniq
 end
 
 # Analyze changes between versions
