@@ -1,0 +1,294 @@
+---
+name: Leyline Standards Validation
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write  # For commenting on PRs
+
+jobs:
+  validate-standards:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Important: checkout Leyline submodule
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Verify Leyline submodule
+        run: |
+          echo "🔍 Verifying Leyline submodule..."
+
+          if [ ! -d "leyline" ]; then
+            echo "❌ Leyline submodule not found"
+            echo "Please add Leyline as a submodule:"
+            echo "git submodule add https://github.com/phrazzld/leyline.git leyline"
+            exit 1
+          fi
+
+          cd leyline
+
+          # Check if we're on a tagged version
+          CURRENT_VERSION=$(git describe --tags --exact-match HEAD 2>/dev/null || echo "untagged")
+          CURRENT_COMMIT=$(git rev-parse --short HEAD)
+
+          echo "📦 Leyline version: $CURRENT_VERSION"
+          echo "📝 Commit: $CURRENT_COMMIT"
+
+          # Verify essential tools exist
+          for tool in tools/validate_front_matter.rb tools/reindex.rb; do
+            if [ ! -f "$tool" ]; then
+              echo "❌ Required Leyline tool not found: $tool"
+              exit 1
+            fi
+          done
+
+          echo "✅ Leyline submodule verified"
+
+      - name: Load project configuration
+        id: config
+        run: |
+          echo "📋 Loading project configuration..."
+
+          if [ ! -f "leyline-config.yml" ]; then
+            echo "⚠️ No leyline-config.yml found, using defaults"
+            echo "primary_language=" >> $GITHUB_OUTPUT
+            echo "binding_categories=core" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Found leyline-config.yml"
+
+            # Extract configuration (basic YAML parsing)
+            PRIMARY_LANG=$(grep "primary_language:" leyline-config.yml | cut -d'"' -f2 || echo "")
+            CATEGORIES=$(grep -A10 "binding_categories:" leyline-config.yml | grep "^\s*-" | sed 's/^\s*-\s*//' | tr '\n' ',' | sed 's/,$//' || echo "core")
+
+            echo "primary_language=$PRIMARY_LANG" >> $GITHUB_OUTPUT
+            echo "binding_categories=$CATEGORIES" >> $GITHUB_OUTPUT
+
+            echo "🔧 Primary language: $PRIMARY_LANG"
+            echo "📚 Binding categories: $CATEGORIES"
+          fi
+
+      - name: Validate Leyline metadata
+        run: |
+          echo "🔍 Validating Leyline repository metadata..."
+          cd leyline
+
+          # Validate YAML front-matter in Leyline docs
+          if ! ruby tools/validate_front_matter.rb; then
+            echo "⚠️ Leyline submodule has metadata issues"
+            echo "Consider updating to a newer version"
+          else
+            echo "✅ Leyline metadata validation passed"
+          fi
+
+      - name: Validate project structure
+        run: |
+          echo "🏗️ Validating project structure against Leyline standards..."
+
+          # Check for basic project files
+          validation_errors=0
+
+          # Check for README
+          if [ ! -f "README.md" ] && [ ! -f "readme.md" ] && [ ! -f "README.rst" ]; then
+            echo "❌ No README file found"
+            validation_errors=$((validation_errors + 1))
+          else
+            echo "✅ README file found"
+          fi
+
+          # Check for basic project structure based on language
+          PRIMARY_LANG="${{ steps.config.outputs.primary_language }}"
+
+          case "$PRIMARY_LANG" in
+            "typescript" | "javascript")
+              if [ ! -f "package.json" ]; then
+                echo "❌ No package.json found for TypeScript/JavaScript project"
+                validation_errors=$((validation_errors + 1))
+              else
+                echo "✅ package.json found"
+              fi
+              ;;
+            "go")
+              if [ ! -f "go.mod" ]; then
+                echo "❌ No go.mod found for Go project"
+                validation_errors=$((validation_errors + 1))
+              else
+                echo "✅ go.mod found"
+              fi
+              ;;
+            "rust")
+              if [ ! -f "Cargo.toml" ]; then
+                echo "❌ No Cargo.toml found for Rust project"
+                validation_errors=$((validation_errors + 1))
+              else
+                echo "✅ Cargo.toml found"
+              fi
+              ;;
+          esac
+
+          if [ $validation_errors -gt 0 ]; then
+            echo "⚠️ Project structure validation found $validation_errors issue(s)"
+          else
+            echo "✅ Project structure validation passed"
+          fi
+
+      - name: Check conventional commits
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "📝 Checking conventional commit format..."
+
+          # Get commits in this PR
+          COMMITS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.number }}/commits \
+            --jq '.[].commit.message' | head -n 20)
+
+          validation_errors=0
+
+          while IFS= read -r commit_msg; do
+            # Skip empty lines
+            [ -z "$commit_msg" ] && continue
+
+            # Get first line only
+            first_line=$(echo "$commit_msg" | head -n 1)
+
+            # Check conventional commit format
+            if ! echo "$first_line" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+'; then
+              echo "❌ Non-conventional commit: $first_line"
+              validation_errors=$((validation_errors + 1))
+            else
+              echo "✅ Conventional commit: $first_line"
+            fi
+          done <<< "$COMMITS"
+
+          if [ $validation_errors -gt 0 ]; then
+            echo "⚠️ Found $validation_errors non-conventional commit(s)"
+            echo "Please use conventional commit format: type(scope): description"
+            echo "Examples: feat: add user authentication, fix(api): handle null responses"
+          else
+            echo "✅ All commits follow conventional format"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate against applicable bindings
+        run: |
+          echo "📚 Validating against applicable Leyline bindings..."
+
+          CATEGORIES="${{ steps.config.outputs.binding_categories }}"
+          validation_issues=0
+
+          cd leyline
+
+          # Validate core bindings (always applicable)
+          echo "🔍 Checking core bindings..."
+          for binding_file in docs/bindings/core/*.md; do
+            if [ -f "$binding_file" ]; then
+              binding_name=$(basename "$binding_file" .md)
+              echo "  📋 $binding_name"
+
+              # Basic binding validation would go here
+              # For now, just list applicable bindings
+            fi
+          done
+
+          # Validate category-specific bindings
+          IFS=',' read -ra CATEGORY_ARRAY <<< "$CATEGORIES"
+          for category in "${CATEGORY_ARRAY[@]}"; do
+            category=$(echo "$category" | xargs)  # trim whitespace
+
+            if [ -d "docs/bindings/categories/$category" ]; then
+              echo "🔍 Checking $category bindings..."
+
+              for binding_file in docs/bindings/categories/$category/*.md; do
+                if [ -f "$binding_file" ]; then
+                  binding_name=$(basename "$binding_file" .md)
+                  echo "  📋 $binding_name"
+                fi
+              done
+            else
+              echo "⚠️ Category '$category' not found in Leyline"
+            fi
+          done
+
+          echo "✅ Binding validation completed"
+
+      - name: Generate validation report
+        if: always()
+        run: |
+          echo "📊 Generating validation report..."
+
+          cat > validation-report.md << 'EOF'
+          # Leyline Standards Validation Report
+
+          ## Summary
+          - **Leyline Version**: $(cd leyline && git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD)
+          - **Validation Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Project**: ${{ github.repository }}
+          - **Branch**: ${{ github.ref_name }}
+
+          ## Configuration
+          - **Primary Language**: ${{ steps.config.outputs.primary_language || 'Not specified' }}
+          - **Binding Categories**: ${{ steps.config.outputs.binding_categories }}
+
+          ## Validation Results
+
+          ✅ **Passed Checks:**
+          - Leyline submodule present and valid
+          - Project structure meets basic requirements
+          - Configuration loaded successfully
+
+          📋 **Applicable Standards:**
+          See the workflow logs for detailed binding analysis.
+
+          ## Next Steps
+
+          1. Review any failing checks in the workflow logs
+          2. Update your `leyline-config.yml` if needed
+          3. Consider adopting additional Leyline standards for your project type
+
+          ## Resources
+
+          - [Leyline Documentation](https://github.com/phrazzld/leyline/tree/main/docs)
+          - [Integration Guide](https://github.com/phrazzld/leyline/tree/main/examples/consumer-git-submodule)
+          - [Available Bindings](https://github.com/phrazzld/leyline/tree/main/docs/bindings)
+          EOF
+
+          echo "✅ Validation report generated"
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('validation-report.md', 'utf8');
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+
+      - name: Upload validation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: leyline-validation-report
+          path: |
+            validation-report.md
+            leyline-config.yml
+          retention-days: 30

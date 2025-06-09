@@ -1,0 +1,48 @@
+# Breaking Change Detection Rules for Leyline
+# Used by automated versioning to detect when major/minor version bumps are needed
+
+# File patterns that indicate breaking changes when deleted or moved
+breaking_patterns:
+  # Deleted or renamed tenet files
+  - "^docs/tenets/.+\\.md$"
+
+  # Deleted or renamed binding files
+  - "^docs/bindings/.+\\.md$"
+
+  # Moved binding category files (directory restructuring)
+  - "^docs/bindings/categories/.+/.+\\.md$"
+
+  # Changes to core documentation structure
+  - "^docs/templates/.+\\.md$"
+
+# Files that when modified may indicate schema/structure changes
+schema_change_indicators:
+  # Changes to validation tools indicate potential schema changes
+  - "tools/validate_front_matter.rb"
+
+  # Changes to templates may affect required structure
+  - "docs/templates/tenet_template.md"
+  - "docs/templates/binding_template.md"
+
+  # Core formatting documentation changes
+  - "docs/TENET_FORMATTING.md"
+
+# Commit message patterns that explicitly indicate breaking changes
+commit_breaking_patterns:
+  - "BREAKING CHANGE:"
+  - "!:"  # Conventional commits breaking change indicator
+
+# Commit message patterns for conventional commits analysis
+commit_types:
+  major:
+    - "BREAKING CHANGE"
+  minor:
+    - "feat"
+  patch:
+    - "fix"
+    - "docs"
+    - "style"
+    - "refactor"
+    - "perf"
+    - "test"
+    - "chore"

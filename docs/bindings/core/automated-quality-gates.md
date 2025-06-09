@@ -1,10 +1,10 @@
 ---
 id: automated-quality-gates
 last_modified: '2025-06-02'
+version: '0.1.0'
 derived_from: fix-broken-windows
 enforced_by: 'CI/CD pipelines, pre-commit hooks, automated testing, code analysis tools'
 ---
-
 # Binding: Establish Comprehensive Automated Quality Gates
 
 Implement automated validation checkpoints that prevent low-quality code from progressing through the development pipeline. Create systematic barriers that catch quality issues early, before they can compound into larger system problems.

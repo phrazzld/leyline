@@ -1,8 +1,8 @@
 ---
 id: maintainability
 last_modified: '2025-06-02'
+version: '0.1.0'
 ---
-
 # Tenet: Maintainability Over Premature Optimization
 
 Write code primarily for human understanding and future modification, not machine

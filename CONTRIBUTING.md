@@ -46,10 +46,13 @@ properly.
 
 1. **Format**: Use YAML front-matter enclosed by triple dashes (`---`)
 1. **Required Fields**:
-   - For tenets: `id` and `last_modified`
-   - For bindings: `id`, `last_modified`, `derived_from`, and `enforced_by`
+   - For tenets: `id`, `last_modified`, and `version`
+   - For bindings: `id`, `last_modified`, `version`, `derived_from`, and `enforced_by`
 1. **All dates** must be in ISO format (YYYY-MM-DD) and enclosed in quotes (e.g.,
    `'2025-05-09'`)
+1. **Version field** must match the current VERSION file content (e.g., `'0.1.0'`).
+   This tracks which repository version the document was last modified in and enables
+   semantic versioning and breaking change detection.
 
 Binding applicability is determined by its location in the directory structure:
 - `/docs/bindings/core/` - Core bindings that apply to all projects
@@ -299,6 +302,47 @@ For detailed guidance with examples, see the
 Each release must maintain consistent front-matter standards in YAML format as described in [TENET_FORMATTING.md](TENET_FORMATTING.md).
 
 When new content is released, consumers using the pull-based model can update at their own pace by adjusting the `leyline_ref` in their sync workflow. See the [Versioning Guide](docs/integration/versioning-guide.md) for consumer versioning best practices.
+
+## Versioning Policy
+
+Leyline follows [Semantic Versioning](https://semver.org/) with special considerations for the pre-1.0 development phase.
+
+### Current Version Strategy (Pre-1.0)
+
+While Leyline is in active development (versions 0.x.x), we use a modified semantic versioning approach:
+
+- **Breaking Changes**: Increment the **minor** version (0.1.0 → 0.2.0)
+- **New Features**: Increment the **minor** version (0.1.0 → 0.2.0)
+- **Bug Fixes/Clarifications**: Increment the **patch** version (0.1.0 → 0.1.1)
+
+### Post-1.0 Strategy (Stable API)
+
+Once Leyline reaches 1.0.0 (marking our commitment to API stability), we will follow standard semantic versioning:
+
+- **Breaking Changes**: Increment the **major** version (1.0.0 → 2.0.0)
+- **New Features**: Increment the **minor** version (1.0.0 → 1.1.0)
+- **Bug Fixes/Clarifications**: Increment the **patch** version (1.0.0 → 1.0.1)
+
+### What Constitutes Breaking Changes
+
+Breaking changes in Leyline include:
+
+1. **Removed or renamed tenet files** (e.g., deleting `docs/tenets/simplicity.md`)
+2. **Removed or renamed binding files** (e.g., deleting `docs/bindings/core/pure-functions.md`)
+3. **Changes to YAML front-matter schema** (e.g., renaming required fields, changing date format)
+4. **Directory restructuring** (e.g., moving bindings between categories)
+5. **Changes to binding metadata structure** that affect consumer tooling
+
+### Path to 1.0.0
+
+Version 1.0.0 will be released when:
+
+- The core tenet and binding structure is stable
+- Consumer integration patterns are well-established and tested
+- The pull-based distribution model is fully mature
+- Breaking changes become infrequent and well-justified
+
+This represents our commitment to API stability and backward compatibility for consumers who depend on Leyline's structure and content.
 
 ## Code of Conduct
 

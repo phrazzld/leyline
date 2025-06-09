@@ -3,6 +3,7 @@ derived_from: automation
 enforced_by: linters & code review
 id: use-structured-logging
 last_modified: '2025-05-14'
+version: '0.1.0'
 ---
 # Binding: Implement Complete Observability with Structured Logs, Metrics, and Traces
 

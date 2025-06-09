@@ -3,6 +3,7 @@ derived_from: simplicity
 enforced_by: rust compiler & code review
 id: ownership-patterns
 last_modified: '2025-05-14'
+version: '0.1.0'
 ---
 # Binding: Embrace Rust's Ownership System, Don't Fight It
 

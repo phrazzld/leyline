@@ -5,6 +5,10 @@ id: binding-id
 # Date of last modification in ISO format (YYYY-MM-DD) with single quotes
 last_modified: '2025-05-09'
 
+# Version of the repository when this binding was last modified
+# This should match the current VERSION file. Update when making changes.
+version: '0.1.0'
+
 # ID of the parent tenet this binding implements (must be an existing tenet ID)
 derived_from: tenet-id
 

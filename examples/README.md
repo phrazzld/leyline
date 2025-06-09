@@ -1,72 +1,182 @@
 # Leyline Integration Examples
 
-This directory contains example configuration files and workflows for integrating Leyline into your repository using the pull-based content synchronization model.
+This directory contains comprehensive examples for integrating Leyline standards into your project using different approaches based on your team's needs and preferences.
 
-## 📖 Primary Example
+## 🛠️ Integration Approaches
 
-**Start here:** [`consumer-workflows/sync-leyline-example.yml`](consumer-workflows/sync-leyline-example.yml)
+Choose the integration method that best fits your project:
 
-This comprehensive example includes:
-- Complete configuration with all available options
-- Extensive inline documentation and best practices
-- Multiple trigger strategies (scheduled, manual, event-driven)
-- Troubleshooting tips and common issues
-- Post-sync actions and advanced patterns
+### 1. 📦 Git Submodule Integration
+- **Best for:** Teams wanting the full Leyline ecosystem with automatic updates
+- **Location:** [`consumer-git-submodule/`](consumer-git-submodule/)
+- **Features:** Complete validation toolchain, automatic updates, centralized management
+
+### 2. 📋 Direct Copy Integration
+- **Best for:** Teams wanting selective standards adoption with customization
+- **Location:** [`consumer-direct-copy/`](consumer-direct-copy/)
+- **Features:** Cherry-pick specific standards, local customization, version control
+
+### 3. 🔄 Pull-Based Synchronization
+- **Best for:** Teams wanting automated content updates via workflows
+- **Primary Example:** [`consumer-workflows/sync-leyline-example.yml`](consumer-workflows/sync-leyline-example.yml)
+- **Features:** GitHub Actions automation, PR-based updates, scheduled sync
+
+## 📖 Quick Start by Use Case
+
+### 🚀 "I want to get started quickly"
+→ **Use Direct Copy Integration**
+```bash
+# Download and run the copy script
+curl -L https://raw.githubusercontent.com/phrazzld/leyline/main/examples/consumer-direct-copy/scripts/copy-leyline-standards.rb -o copy-standards.rb
+ruby copy-standards.rb --interactive
+```
+
+### 🏢 "My team wants comprehensive governance"
+→ **Use Git Submodule Integration**
+```bash
+# Add Leyline as a submodule
+git submodule add https://github.com/phrazzld/leyline.git leyline
+# Copy configuration template
+cp leyline/examples/consumer-git-submodule/leyline-config.yml .
+```
+
+### ⚙️ "I want automated workflow-based updates"
+→ **Use Pull-Based Synchronization**
+```bash
+# Copy the comprehensive workflow example
+cp examples/consumer-workflows/sync-leyline-example.yml .github/workflows/sync-leyline.yml
+```
 
 ## Directory Structure
 
 ```
 examples/
-├── consumer-workflows/    # Primary workflow examples (START HERE)
-│   └── sync-leyline-example.yml
-├── github-workflows/      # Additional workflow patterns
-│   ├── sync-leyline-content.yml    # Minimal quick-start example
-│   ├── language-specific-sync.yml  # Auto-detect languages example
-│   ├── vendor-docs.yml            # DEPRECATED - old pattern
-│   └── correct-vendor-docs.yml    # DEPRECATED - old pattern
-├── pre-commit/           # Pre-commit hook configurations
-└── renovate/             # Automated dependency update configurations
+├── consumer-git-submodule/       # Git submodule integration example
+│   ├── README.md                 # Complete submodule integration guide
+│   ├── leyline-config.yml        # Project configuration template
+│   └── .github/workflows/        # Validation workflows
+│       └── leyline-validation.yml
+├── consumer-direct-copy/         # Direct copy integration example
+│   ├── README.md                 # Direct copy integration guide
+│   ├── standards-selection.yml   # Standards selection configuration
+│   ├── scripts/                  # Copy and management scripts
+│   │   └── copy-leyline-standards.rb
+│   └── .github/workflows/        # Validation workflows
+│       └── validate-standards.yml
+├── consumer-workflows/           # Pull-based synchronization examples
+│   └── sync-leyline-example.yml  # Comprehensive workflow example
+├── github-workflows/             # Additional workflow patterns
+│   ├── sync-leyline-content.yml  # Minimal quick-start example
+│   ├── language-specific-sync.yml # Auto-detect languages example
+│   ├── vendor-docs.yml           # DEPRECATED - old pattern
+│   └── correct-vendor-docs.yml   # DEPRECATED - old pattern
+├── pre-commit/                   # Pre-commit hook configurations
+└── renovate/                     # Automated dependency update configurations
 ```
 
 ## Integration Guide
 
-### Quick Start
+### Choose Your Integration Method
 
-1. **Copy the workflow example** to your repository:
-   ```bash
-   # Create the workflows directory
-   mkdir -p .github/workflows
+Select the integration approach that best matches your team's workflow and requirements:
 
-   # Copy the comprehensive example
-   cp examples/consumer-workflows/sync-leyline-example.yml .github/workflows/sync-leyline.yml
-   ```
+#### 🏗️ Git Submodule Integration
+Perfect for teams that want the full Leyline ecosystem with automatic updates and comprehensive validation.
 
-2. **Customize the configuration**:
-   - Set your desired `leyline_ref` version
-   - Choose relevant `categories` for your tech stack
-   - Adjust trigger schedule or events
-   - Review optional parameters
+```bash
+# Add Leyline as a submodule
+git submodule add https://github.com/phrazzld/leyline.git leyline
 
-3. **Commit and push** to activate the workflow
+# Copy configuration template
+cp leyline/examples/consumer-git-submodule/leyline-config.yml .
 
-4. **Review the created PR** with Leyline content
+# Copy validation workflow
+mkdir -p .github/workflows
+cp leyline/examples/consumer-git-submodule/.github/workflows/leyline-validation.yml .github/workflows/
+
+# Initialize and update submodule
+git submodule update --init --recursive
+```
+
+#### 📝 Direct Copy Integration
+Ideal for teams that want to selectively adopt specific standards with customization options.
+
+```bash
+# Download the copy script
+curl -L https://raw.githubusercontent.com/phrazzld/leyline/main/examples/consumer-direct-copy/scripts/copy-leyline-standards.rb -o scripts/copy-leyline-standards.rb
+chmod +x scripts/copy-leyline-standards.rb
+
+# Copy selection configuration template
+curl -L https://raw.githubusercontent.com/phrazzld/leyline/main/examples/consumer-direct-copy/standards-selection.yml -o .leyline-selection.yml
+
+# Run interactive selection or use config
+ruby scripts/copy-leyline-standards.rb --interactive
+# OR
+ruby scripts/copy-leyline-standards.rb --config .leyline-selection.yml
+```
+
+#### ⚙️ Pull-Based Synchronization (GitHub Actions)
+Great for teams that want automated workflow-based updates with PR review processes.
+
+```bash
+# Create the workflows directory
+mkdir -p .github/workflows
+
+# Copy the comprehensive example
+cp examples/consumer-workflows/sync-leyline-example.yml .github/workflows/sync-leyline.yml
+
+# Customize configuration and commit
+```
 
 ### Available Examples
 
-#### 🌟 Comprehensive Example
-- **File:** `consumer-workflows/sync-leyline-example.yml`
-- **Use case:** Full-featured integration with all options documented
-- **Best for:** Production use, learning all features
+#### 🏗️ Git Submodule Integration Examples
+- **Location:** `consumer-git-submodule/`
+- **Use case:** Complete Leyline ecosystem integration with submodules
+- **Best for:** Teams wanting full governance, automatic updates, comprehensive validation
+- **Includes:** Configuration templates, validation workflows, team onboarding guides
 
-#### 🚀 Minimal Example
+#### 📝 Direct Copy Integration Examples
+- **Location:** `consumer-direct-copy/`
+- **Use case:** Selective standards adoption with local customization
+- **Best for:** Teams wanting specific standards, customization control, version pinning
+- **Includes:** Copy scripts, selection configuration, validation workflows, update management
+
+#### ⚙️ Pull-Based Synchronization Examples
+
+##### 🌟 Comprehensive Workflow Example
+- **File:** `consumer-workflows/sync-leyline-example.yml`
+- **Use case:** Full-featured GitHub Actions integration with all options documented
+- **Best for:** Production use, learning all features, automated updates
+
+##### 🚀 Minimal Workflow Example
 - **File:** `github-workflows/sync-leyline-content.yml`
 - **Use case:** Quick start with basic configuration
 - **Best for:** Simple projects, getting started quickly
 
-#### 🔍 Language Detection Example
+##### 🔍 Language Detection Example
 - **File:** `github-workflows/language-specific-sync.yml`
 - **Use case:** Automatically detect and sync only relevant language bindings
 - **Best for:** Multi-language projects, dynamic teams
+
+## 🤔 Which Integration Method Should I Choose?
+
+| Factor | Git Submodule | Direct Copy | Pull-Based Sync |
+|--------|---------------|-------------|-----------------|
+| **Setup Complexity** | Medium | Low | Medium |
+| **Maintenance** | Low | Medium | Low |
+| **Customization** | Limited | High | Medium |
+| **Update Control** | Automatic | Manual | Scheduled |
+| **Team Onboarding** | Included | DIY | DIY |
+| **Validation Tools** | Comprehensive | Basic | Custom |
+| **Version Pinning** | Git-based | Explicit | Workflow-based |
+| **Local Changes** | Not recommended | Supported | Not applicable |
+
+### Decision Matrix
+
+- **Choose Git Submodule if:** You want comprehensive governance, automatic updates, and don't need customization
+- **Choose Direct Copy if:** You want selective adoption, need local customization, or have specific compliance requirements
+- **Choose Pull-Based Sync if:** You want automated updates with PR review, or need to integrate with existing workflows
 
 ### Additional Integrations
 

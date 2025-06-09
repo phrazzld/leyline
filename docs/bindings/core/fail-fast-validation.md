@@ -1,10 +1,10 @@
 ---
 id: fail-fast-validation
 last_modified: '2025-06-03'
+version: '0.1.0'
 derived_from: explicit-over-implicit
 enforced_by: 'static analysis tools & runtime assertions'
 ---
-
 # Binding: Validate Inputs and Fail Fast When Preconditions Fail
 
 Immediately validate all inputs and assumptions at function entry points, failing with clear error messages when expectations aren't met. Prevent invalid data from propagating through the system by catching violations as early as possible in the execution flow.

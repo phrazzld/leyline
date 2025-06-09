@@ -30,12 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Removed legacy horizontal rule metadata format support
-- Removed legacy metadata conversion tools (moved to archive)
+- Removed legacy metadata conversion tools (migration history preserved in git)
 - Removed `--strict` flag from `validate_front_matter.rb` (now always strict)
 
 ### Added
 
-- Added archive directory with migration history documentation
 - Added more robust error handling for YAML validation in tools
 
 ## [1.0.0] - 2025-05-01

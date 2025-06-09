@@ -1,10 +1,19 @@
-______________________________________________________________________
+---
+# Unique identifier for this tenet (must be kebab-case, matching the filename without .md)
+id: tenet-id
 
-## id: tenet-id last_modified: '2025-05-09'
+# Date of last modification in ISO format (YYYY-MM-DD) with single quotes
+last_modified: '2025-05-09'
+
+# Version of the repository when this tenet was last modified
+# This should match the current VERSION file. Update when making changes.
+version: '0.1.0'
+---
 
 <!-- Template instructions:
 - The id must be kebab-case, matching the filename without .md extension
 - last_modified must be in ISO format (YYYY-MM-DD) with single quotes
+- version must match the current VERSION file (e.g., '0.1.0')
 - Replace all placeholders enclosed in brackets [] with your content
 - Remove these comments in the final document
 -->

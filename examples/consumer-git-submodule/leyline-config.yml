@@ -1,0 +1,101 @@
+# Leyline Configuration for Your Project
+# This file defines which Leyline standards apply to your project
+
+# Leyline version tracking (automatically updated by tools)
+leyline_version: "0.1.5"
+
+# Core tenets that your project follows
+# These are the fundamental principles that guide development
+tenets:
+  - simplicity              # Prefer simple solutions over complex ones
+  - testability             # Design for comprehensive testing
+  - explicit-over-implicit  # Make dependencies and behavior explicit
+  - maintainability         # Write code that's easy to maintain
+  - modularity             # Build loosely coupled, highly cohesive components
+
+# Binding categories that apply to your project
+# Only include categories relevant to your technology stack
+binding_categories:
+  - core                   # Universal bindings that apply to all projects
+
+  # Language-specific bindings (uncomment as needed)
+  # - typescript           # TypeScript-specific standards
+  # - go                   # Go-specific standards
+  # - rust                 # Rust-specific standards
+
+  # Platform-specific bindings (uncomment as needed)
+  # - frontend             # Frontend development standards
+  # - backend              # Backend development standards
+
+# Specific bindings to exclude (optional)
+# Use this for standards you're working toward but haven't achieved yet
+excluded_bindings:
+  # Example: Exclude if you haven't migrated away from TypeScript 'any' yet
+  # - no-any
+
+  # Example: Exclude if you don't have comprehensive logging yet
+  # - use-structured-logging
+
+# Custom validation rules for your project
+validation_rules:
+  # Enforce conventional commit message format
+  enforce_conventional_commits: true
+
+  # Require CHANGELOG.md to be maintained
+  require_changelog: true
+
+  # Validate that README.md exists and has minimum content
+  require_readme: true
+
+  # Check for basic project documentation
+  require_contributing_guide: false  # Set to true once you have CONTRIBUTING.md
+
+# Project-specific configuration
+project:
+  # Your project's primary language (affects default binding selection)
+  primary_language: ""  # e.g., "typescript", "go", "rust", "python"
+
+  # Project type (affects which standards are most relevant)
+  project_type: ""      # e.g., "library", "service", "cli", "web-app"
+
+  # Maturity level (affects strictness of validation)
+  maturity: "developing"  # "prototype", "developing", "mature", "legacy"
+
+# Directories to validate (relative to project root)
+validation_scope:
+  include:
+    - "src/"              # Source code
+    - "lib/"              # Library code
+    - "docs/"             # Documentation
+    - ".github/"          # GitHub workflows and templates
+
+  exclude:
+    - "node_modules/"     # Dependencies
+    - "vendor/"           # Dependencies
+    - "target/"           # Build artifacts
+    - "dist/"             # Build artifacts
+    - "build/"            # Build artifacts
+    - ".git/"             # Git internals
+    - "leyline/"          # Don't validate the Leyline submodule itself
+
+# Reporting configuration
+reporting:
+  # How detailed should validation reports be?
+  verbosity: "normal"     # "minimal", "normal", "verbose"
+
+  # Should validation fail the build on any standard violation?
+  fail_on_violation: true
+
+  # Should warnings be treated as errors?
+  warnings_as_errors: false
+
+# Integration hooks (optional)
+hooks:
+  # Command to run before validation
+  pre_validation: ""
+
+  # Command to run after validation
+  post_validation: ""
+
+  # Command to run on validation failure
+  on_failure: ""

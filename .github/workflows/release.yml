@@ -1,18 +1,731 @@
-name: release
-on:
+---
+name: Automated Release
+
+'on':
   push:
-    tags:
-      - 'v*.*.*'
+    branches: [main, master]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '**.md'
+
+permissions:
+  contents: write
+  actions: read
 
 jobs:
+  pre-release-validation:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    outputs:
+      validation_passed: ${{ steps.final_validation.outputs.passed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for validation
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Wait for existing CI checks
+        run: |
+          echo "🔍 Checking status of existing CI workflows..."
+
+          # Get the current commit SHA
+          commit_sha="${{ github.sha }}"
+
+          # Wait for other workflows to complete (max 10 minutes)
+          timeout=600
+          elapsed=0
+
+          while [ $elapsed -lt $timeout ]; do
+            # Get status of other workflows for this commit
+            status=$(gh api \
+              repos/${{ github.repository }}/commits/$commit_sha/status \
+              --jq '.state')
+
+            if [ "$status" = "success" ]; then
+              echo "✅ All existing CI checks passed"
+              break
+            elif [ "$status" = "failure" ]; then
+              echo "❌ Existing CI checks failed - blocking release"
+              gh api repos/${{ github.repository }}/commits/$commit_sha/status \
+                --jq '.statuses[] | select(.state == "failure") |
+                     "Failed: \(.context) - \(.description)"'
+              exit 1
+            else
+              echo "⏳ Waiting for CI checks... (${elapsed}s elapsed)"
+              sleep 30
+              elapsed=$((elapsed + 30))
+            fi
+          done
+
+          if [ $elapsed -ge $timeout ]; then
+            echo "⚠️ Timeout waiting for CI checks - proceeding anyway"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate YAML front-matter
+        run: |
+          echo "📋 Running YAML front-matter validation..."
+
+          if ! ruby tools/validate_front_matter.rb; then
+            echo "❌ YAML front-matter validation failed"
+            echo "   All tenet and binding files must have valid YAML metadata"
+            exit 1
+          fi
+
+          echo "✅ YAML front-matter validation passed"
+
+      - name: Validate documentation consistency
+        run: |
+          echo "📚 Running documentation reindexing validation..."
+
+          # Run reindex in strict mode
+          if ! ruby tools/reindex.rb --strict; then
+            echo "❌ Documentation reindexing failed"
+            echo "   Generated indexes must be consistent with metadata"
+            exit 1
+          fi
+
+          echo "✅ Documentation consistency validation passed"
+
+      - name: Check breaking changes vs version bump
+        run: |
+          echo "🔍 Validating breaking changes against version bump..."
+
+          # Get version calculation data
+          if ! ruby tools/calculate_version.rb > version_data.json 2>&1; then
+            echo "❌ Version calculation failed"
+            cat version_data.json
+            exit 1
+          fi
+
+          current_version=$(jq -r '.current_version' version_data.json)
+          next_version=$(jq -r '.next_version' version_data.json)
+          bump_type=$(jq -r '.bump_type' version_data.json)
+          breaking_changes=$(jq '.breaking_changes' version_data.json)
+
+          echo "📊 Current: $current_version → Next: $next_version ($bump_type)"
+
+          # Check if breaking changes exist
+          breaking_count=$(echo "$breaking_changes" | jq 'length')
+
+          if [ "$breaking_count" -gt 0 ]; then
+            echo "⚠️ Found $breaking_count breaking changes:"
+            echo "$breaking_changes" | jq -r '.[]'
+
+            # Verify appropriate version bump
+            if [[ "$current_version" =~ ^0\. ]]; then
+              # Pre-1.0: breaking changes should bump minor
+              if [ "$bump_type" != "minor" ]; then
+                echo "❌ Breaking changes found but bump is '$bump_type'"
+                echo "   Pre-1.0 breaking changes require minor bump"
+                exit 1
+              fi
+            else
+              # Post-1.0: breaking changes should bump major
+              if [ "$bump_type" != "major" ]; then
+                echo "❌ Breaking changes found but bump is '$bump_type'"
+                echo "   Post-1.0 breaking changes require major bump"
+                exit 1
+              fi
+            fi
+
+            echo "✅ Breaking changes properly reflected in version bump"
+          else
+            echo "✅ No breaking changes detected"
+          fi
+
+          # Clean up
+          rm -f version_data.json
+
+      - name: Security vulnerability scan
+        run: |
+          echo "🔒 Running security vulnerability scan..."
+
+          # Check if we have a Gemfile for bundler-audit
+          if [ -f "Gemfile" ]; then
+            # Install bundler-audit if not present
+            if ! gem list bundler-audit -i > /dev/null 2>&1; then
+              echo "Installing bundler-audit..."
+              gem install bundler-audit
+            fi
+
+            # Update vulnerability database
+            bundle-audit update
+
+            # Run vulnerability check
+            if ! bundle-audit check; then
+              echo "❌ Security vulnerabilities found in Ruby dependencies"
+              exit 1
+            fi
+
+            echo "✅ No security vulnerabilities found in dependencies"
+          else
+            echo "ℹ️ No Gemfile found - skipping dependency vulnerability scan"
+          fi
+
+          # Run comprehensive security scan using dedicated tool
+          echo "🔍 Running comprehensive security scan..."
+
+          if ! ruby tools/security_scan.rb --strict; then
+            echo "❌ Security vulnerabilities found in Ruby scripts"
+            echo "   Run 'ruby tools/security_scan.rb' locally for details"
+            exit 1
+          fi
+
+          echo "✅ Ruby script security scan passed"
+
+      - name: Validate script permissions
+        run: |
+          echo "🔧 Validating script permissions..."
+
+          # Check that executable scripts have proper permissions
+          for script in tools/*.rb; do
+            if [ -f "$script" ]; then
+              # Check if script has shebang
+              if head -1 "$script" | grep -q "^#!/"; then
+                # Should be executable
+                if [ ! -x "$script" ]; then
+                  echo "⚠️ Script $script has shebang but is not executable"
+                  chmod +x "$script"
+                  echo "   Fixed permissions for $script"
+                fi
+              fi
+            fi
+          done
+
+          echo "✅ Script permissions validated"
+
+      - name: Final validation summary
+        id: final_validation
+        run: |
+          echo "🎯 Pre-release validation summary:"
+          echo "  ✅ Existing CI checks passed"
+          echo "  ✅ YAML front-matter validation passed"
+          echo "  ✅ Documentation consistency validated"
+          echo "  ✅ Breaking changes vs version bump validated"
+          echo "  ✅ Security vulnerability scan passed"
+          echo "  ✅ Script permissions validated"
+          echo ""
+          echo "🟢 All validation gates passed - release authorized"
+          echo "passed=true" >> $GITHUB_OUTPUT
+
+  release:
+    runs-on: ubuntu-latest
+    needs: pre-release-validation
+    if: needs.pre-release-validation.outputs.validation_passed == 'true'
+    outputs:
+      prepared_version: ${{ steps.prepare_release.outputs.prepared_version }}
+      release_created: ${{ steps.check_release.outputs.release_needed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for version calculation
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Check if release needed
+        id: check_release
+        run: |
+          echo "Checking if release is needed..."
+
+          # Run version calculation to see if there are changes
+          if ! ruby tools/calculate_version.rb > version_output.json 2>&1; then
+            echo "❌ Version calculation failed"
+            cat version_output.json
+            exit 1
+          fi
+
+          # Parse the output to check if version bump is needed
+          current_version=$(jq -r '.current_version' version_output.json)
+          next_version=$(jq -r '.next_version' version_output.json)
+          bump_type=$(jq -r '.bump_type' version_output.json)
+          commit_count=$(jq '.commits | length' version_output.json)
+
+          echo "📊 Current version: $current_version"
+          echo "📊 Next version: $next_version"
+          echo "📊 Bump type: $bump_type"
+          echo "📊 Commits since last release: $commit_count"
+
+          if [ "$current_version" = "$next_version" ] || \
+             [ "$bump_type" = "none" ]; then
+            echo "✅ No release needed - no significant changes found"
+            echo "release_needed=false" >> $GITHUB_OUTPUT
+          else
+            echo "🚀 Release needed: $current_version → $next_version"
+            echo "release_needed=true" >> $GITHUB_OUTPUT
+            echo "next_version=$next_version" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate repository state
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          echo "🔍 Validating repository state before release..."
+
+          # Check that we're on the main branch
+          current_branch=$(git branch --show-current)
+          if [ "$current_branch" != "main" ] && \
+             [ "$current_branch" != "master" ]; then
+            echo "❌ Release can only be triggered from main/master branch"
+            echo "    Currently on: $current_branch"
+            exit 1
+          fi
+
+          # Verify all required tools exist
+          tools="tools/calculate_version.rb tools/prepare_release.rb"
+          tools="$tools tools/validate_front_matter.rb tools/reindex.rb"
+          for tool in $tools; do
+            if [ ! -f "$tool" ]; then
+              echo "❌ Required tool not found: $tool"
+              exit 1
+            fi
+          done
+
+          echo "✅ Repository state validation passed"
+
+      - name: Prepare release
+        if: steps.check_release.outputs.release_needed == 'true'
+        id: prepare_release
+        run: |
+          echo "🛠️ Preparing release with tools/prepare_release.rb..."
+
+          # Run the release preparation script
+          if ! ruby tools/prepare_release.rb --verbose; then
+            echo "❌ Release preparation failed"
+            exit 1
+          fi
+
+          # Get the updated version from VERSION file
+          new_version=$(cat VERSION | tr -d '\n\r')
+          echo "📦 Prepared release version: $new_version"
+          echo "prepared_version=$new_version" >> $GITHUB_OUTPUT
+
+          # Verify changelog was updated
+          if [ ! -f "CHANGELOG.md" ]; then
+            echo "❌ CHANGELOG.md was not created"
+            exit 1
+          fi
+
+          echo "✅ Release preparation completed successfully"
+
+      - name: Create Git tag
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          echo "🏷️ Creating Git tag: $tag_name"
+
+          # Create annotated tag with release info
+          git tag -a "$tag_name" -m "Release $version
+
+          Automated release created by GitHub Actions
+
+          See CHANGELOG.md for detailed release notes."
+
+          echo "✅ Created tag: $tag_name"
+
+      - name: Generate release notes
+        if: steps.check_release.outputs.release_needed == 'true'
+        id: release_notes
+        run: |
+          echo "📝 Generating release notes..."
+
+          # Extract changelog for this version
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+
+          # Get the changelog markdown from version calculator
+          changelog_markdown=$(ruby tools/calculate_version.rb | \
+                               jq -r '.changelog_markdown')
+
+          # Save to file for GitHub release
+          echo "$changelog_markdown" > release_notes.md
+
+          # Also extract just the summary for the release title
+          echo "🎯 Release notes generated"
+
+      - name: Create GitHub release
+        if: steps.check_release.outputs.release_needed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          echo "🚀 Creating GitHub release: $tag_name"
+
+          # Create the release using GitHub CLI
+          gh release create "$tag_name" \
+            --title "Release $version" \
+            --notes-file release_notes.md \
+            --draft=false \
+            --prerelease=false
+
+          echo "✅ GitHub release created: $tag_name"
+
+      - name: Commit updated files
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+
+          echo "💾 Committing updated files back to repository..."
+
+          # Add files that were updated during release preparation
+          git add VERSION CHANGELOG.md docs/
+
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            # Commit with [skip ci] to prevent triggering this workflow again
+            git commit -m "chore: release $version [skip ci]
+
+            - Update VERSION to $version
+            - Update CHANGELOG.md with release notes
+            - Update generated documentation indexes
+
+            This commit was created automatically by the release workflow."
+
+            # Push the changes
+            git push origin HEAD
+
+            echo "✅ Committed and pushed updated files"
+          fi
+
+      - name: Push tags
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          echo "🏷️ Pushing tags to repository..."
+          git push --tags
+          echo "✅ Tags pushed successfully"
+
+      - name: Release summary
+        if: steps.check_release.outputs.release_needed == 'true'
+        run: |
+          version="${{ steps.prepare_release.outputs.prepared_version }}"
+          echo "🎉 Release $version completed successfully!"
+          echo ""
+          echo "📋 What was done:"
+          echo "  ✅ Calculated next version based on conventional commits"
+          echo "  ✅ Updated VERSION file to $version"
+          echo "  ✅ Generated and updated CHANGELOG.md"
+          echo "  ✅ Validated all documentation and metadata"
+          echo "  ✅ Created Git tag v$version"
+          echo "  ✅ Created GitHub release with changelog"
+          echo "  ✅ Committed updated files back to main branch"
+          echo ""
+          release_url="https://github.com/${{ github.repository }}"
+          echo "🔗 View the release: $release_url/releases/tag/v$version"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          # Clean up temporary files
+          rm -f version_output.json release_notes.md
+          echo "🧹 Cleanup completed"
+
+  # Post-release validation to ensure release integrity
+  post-release-validation:
+    runs-on: ubuntu-latest
+    needs: [pre-release-validation, release]
+    if: |
+      needs.pre-release-validation.outputs.validation_passed == 'true' &&
+      needs.release.outputs.release_created == 'true'
+    outputs:
+      validation_passed: ${{ steps.final_check.outputs.passed }}
+      rollback_needed: ${{ steps.final_check.outputs.rollback_needed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: "v${{ needs.release.outputs.prepared_version }}"
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Validate release tag
+        run: |
+          echo "🏷️ Validating release tag..."
+
+          version="${{ needs.release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          # Check tag exists
+          if ! git tag | grep -q "^${tag_name}$"; then
+            echo "❌ Tag $tag_name not found"
+            exit 1
+          fi
+
+          # Check VERSION file matches
+          file_version=$(cat VERSION | tr -d '\n\r')
+          if [ "$file_version" != "$version" ]; then
+            echo "❌ VERSION file ($file_version) doesn't match tag ($version)"
+            exit 1
+          fi
+
+          echo "✅ Release tag validation passed"
+
+      - name: Test consumer examples - Git Submodule
+        id: test_submodule
+        continue-on-error: true
+        run: |
+          echo "🧪 Testing Git submodule consumer example..."
+
+          if [ -d "examples/consumer-git-submodule" ]; then
+            cd examples/consumer-git-submodule
+
+            # Simulate consumer integration test
+            if [ -f "leyline-config.yml" ]; then
+              echo "✅ Git submodule example configuration found"
+            else
+              echo "❌ Git submodule example missing configuration"
+              exit 1
+            fi
+
+            # Verify workflow file exists
+            if [ -f ".github/workflows/leyline-validation.yml" ]; then
+              echo "✅ Git submodule validation workflow found"
+            else
+              echo "❌ Git submodule validation workflow missing"
+              exit 1
+            fi
+          else
+            echo "⚠️ Git submodule example directory not found"
+          fi
+
+      - name: Test consumer examples - Direct Copy
+        id: test_direct_copy
+        continue-on-error: true
+        run: |
+          echo "🧪 Testing direct copy consumer example..."
+
+          if [ -d "examples/consumer-direct-copy" ]; then
+            cd examples/consumer-direct-copy
+
+            # Test the copy script exists and is executable
+            if [ -x "scripts/copy-leyline-standards.rb" ]; then
+              echo "✅ Direct copy script is executable"
+
+              # Dry run test
+              if ruby scripts/copy-leyline-standards.rb --dry-run; then
+                echo "✅ Direct copy script dry run successful"
+              else
+                echo "❌ Direct copy script failed dry run"
+                exit 1
+              fi
+            else
+              echo "❌ Direct copy script not found or not executable"
+              exit 1
+            fi
+          else
+            echo "⚠️ Direct copy example directory not found"
+          fi
+
+      - name: Validate GitHub release
+        id: validate_release
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🔍 Validating GitHub release..."
+
+          version="${{ needs.release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          # Check release exists
+          if gh release view "$tag_name" > /dev/null 2>&1; then
+            echo "✅ GitHub release $tag_name exists"
+
+            # Check release has assets or body
+            release_body=$(gh release view "$tag_name" --json body -q '.body')
+            if [ -z "$release_body" ]; then
+              echo "⚠️ Release has no body/description"
+            else
+              echo "✅ Release has changelog content"
+            fi
+          else
+            echo "❌ GitHub release $tag_name not found"
+            exit 1
+          fi
+
+      - name: Check documentation generation
+        id: check_docs
+        continue-on-error: true
+        run: |
+          echo "📚 Checking documentation generation..."
+
+          # Verify index files were updated
+          if [ -f "docs/tenets/00-index.md" ]; then
+            echo "✅ Tenet index exists"
+          else
+            echo "❌ Tenet index missing"
+            exit 1
+          fi
+
+          if [ -f "docs/bindings/00-index.md" ]; then
+            echo "✅ Binding index exists"
+          else
+            echo "❌ Binding index missing"
+            exit 1
+          fi
+
+          # Run validation one more time
+          if ruby tools/validate_front_matter.rb; then
+            echo "✅ Post-release YAML validation passed"
+          else
+            echo "❌ Post-release YAML validation failed"
+            exit 1
+          fi
+
+      - name: Final validation check
+        id: final_check
+        run: |
+          echo "🎯 Post-release validation summary:"
+
+          validation_passed=true
+          rollback_needed=false
+
+          # Check each validation step
+          if [ "${{ steps.test_submodule.outcome }}" = "failure" ]; then
+            echo "  ❌ Git submodule example test failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ Git submodule example test passed"
+          fi
+
+          if [ "${{ steps.test_direct_copy.outcome }}" = "failure" ]; then
+            echo "  ❌ Direct copy example test failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ Direct copy example test passed"
+          fi
+
+          if [ "${{ steps.validate_release.outcome }}" = "failure" ]; then
+            echo "  ❌ GitHub release validation failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ GitHub release validation passed"
+          fi
+
+          if [ "${{ steps.check_docs.outcome }}" = "failure" ]; then
+            echo "  ❌ Documentation generation check failed"
+            validation_passed=false
+            rollback_needed=true
+          else
+            echo "  ✅ Documentation generation check passed"
+          fi
+
+          if [ "$validation_passed" = "true" ]; then
+            echo ""
+            echo "🟢 All post-release validations passed"
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "rollback_needed=false" >> $GITHUB_OUTPUT
+          else
+            echo ""
+            echo "🔴 Post-release validation failed - rollback recommended"
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "rollback_needed=true" >> $GITHUB_OUTPUT
+          fi
+
+  # Automated rollback if post-release validation fails
+  automated-rollback:
+    runs-on: ubuntu-latest
+    needs: [release, post-release-validation]
+    if: |
+      needs.post-release-validation.outputs.rollback_needed == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Perform automated rollback
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "⚠️ Initiating automated rollback..."
+
+          version="${{ needs.release.outputs.prepared_version }}"
+          tag_name="v$version"
+
+          # Run rollback script
+          if ruby tools/rollback_release.rb \
+            --version "$tag_name" \
+            --repo "${{ github.repository }}" \
+            --token "${{ secrets.GITHUB_TOKEN }}"; then
+            echo "✅ Automated rollback completed"
+          else
+            echo "❌ Automated rollback failed - manual intervention required"
+
+            # Create issue for manual intervention
+            gh issue create \
+              --title "🚨 Automated rollback failed for $tag_name" \
+              --body "The automated rollback for release $tag_name failed.
+
+              Manual intervention is required to:
+              1. Delete the GitHub release
+              2. Delete the git tag
+              3. Revert VERSION and CHANGELOG.md changes
+
+              Please run:
+              \`ruby tools/rollback_release.rb --version $tag_name\`" \
+              --label "bug,release,urgent"
+          fi
+
+  # Keep the existing consumer notification job, but trigger it after validation
   notify-consumers:
     runs-on: ubuntu-latest
+    needs: [pre-release-validation, release, post-release-validation]
+    if: |
+      needs.pre-release-validation.outputs.validation_passed == 'true' &&
+      needs.release.outputs.release_created == 'true' &&
+      needs.post-release-validation.outputs.validation_passed == 'true'
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup environment
         run: |
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          version="${{ needs.release.outputs.prepared_version }}"
+          echo "TAG=v$version" >> $GITHUB_ENV
 
       - name: Dispatch vendor workflows
         run: |

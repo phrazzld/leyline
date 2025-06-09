@@ -1,10 +1,10 @@
 ---
 id: dependency-injection-patterns
 last_modified: '2025-06-03'
+version: '0.1.0'
 derived_from: orthogonality
 enforced_by: 'Go interfaces, constructor functions, dependency injection frameworks, code review'
 ---
-
 # Binding: Design Modular Systems Through Go's Interface-Based Dependency Injection
 
 Use Go's interface system and constructor patterns to create loosely coupled, testable components that depend on abstractions rather than concrete implementations. Proper dependency injection enables component independence while maintaining clear boundaries and making testing straightforward.

@@ -1,8 +1,8 @@
 ---
 id: document-decisions
 last_modified: '2025-05-08'
+version: '0.1.0'
 ---
-
 # Tenet: Document Decisions, Not Mechanics
 
 Document the "why" behind your code—the context, constraints, and reasoning that drove
