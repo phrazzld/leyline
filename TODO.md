@@ -485,7 +485,7 @@
         3. No unintended changes
     - **Depends-on:** [CI-002]
 
-- [ ] **CI-005 · Fix · P1: Update document templates with version field**
+- [x] **CI-005 · Fix · P1: Update document templates with version field**
     - **Context:** Prevent future documents from missing version
     - **Action:**
         1. Update docs/templates/tenet_template.md
