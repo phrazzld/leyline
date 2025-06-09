@@ -408,7 +408,7 @@
 
 ## CI Fix Tasks (Critical - Blocking PR Merge)
 
-- [ ] **CI-001 · Fix · P0: Create automated migration script for adding version field**
+- [x] **CI-001 · Fix · P0: Create automated migration script for adding version field**
     - **Context:** All tenets and bindings need version field in YAML front-matter
     - **Action:**
         1. Create `tools/add_version_to_metadata.rb` migration script
@@ -430,7 +430,7 @@
         3. Dry-run mode shows what will be changed
     - **Depends-on:** none
 
-- [ ] **CI-002 · Fix · P0: Test migration script on single file**
+- [x] **CI-002 · Fix · P0: Test migration script on single file**
     - **Context:** Verify script works correctly before bulk changes
     - **Action:**
         1. Backup a single tenet file
@@ -449,7 +449,7 @@
         3. YAML remains valid
     - **Depends-on:** [CI-001]
 
-- [ ] **CI-003 · Fix · P0: Run migration on all tenet documents**
+- [x] **CI-003 · Fix · P0: Run migration on all tenet documents**
     - **Context:** Add version field to all 13 tenet files
     - **Action:**
         1. Run migration script on docs/tenets/
@@ -467,7 +467,7 @@
         3. No content changes except version field
     - **Depends-on:** [CI-002]
 
-- [ ] **CI-004 · Fix · P0: Run migration on all binding documents**
+- [x] **CI-004 · Fix · P0: Run migration on all binding documents**
     - **Context:** Add version field to all binding files
     - **Action:**
         1. Run migration script on docs/bindings/

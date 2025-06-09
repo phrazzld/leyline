@@ -1,10 +1,10 @@
 ---
 id: configuration-management
 last_modified: '2025-06-03'
+version: '0.1.0'
 derived_from: adaptability-and-reversibility
 enforced_by: 'Cargo features, serde configuration, environment validation, code review'
 ---
-
 # Binding: Enable Adaptable Systems Through Rust's Configuration and Feature Management
 
 Design systems that can adapt to changing requirements without code changes by leveraging Rust's powerful configuration management, feature flags, and conditional compilation capabilities. Build applications that can be configured for different environments, use cases, and deployment scenarios while maintaining type safety and performance.

@@ -1,10 +1,10 @@
 ---
 id: yagni-pattern-enforcement
 last_modified: '2025-06-03'
+version: '0.1.0'
 derived_from: simplicity
 enforced_by: 'code review & feature specification validation'
 ---
-
 # Binding: Apply YAGNI to Prevent Speculative Development
 
 Rigorously apply "You Aren't Gonna Need It" principles by only implementing features that solve immediate, demonstrated needs. Reject any functionality added "just in case" or for imagined future requirements without concrete evidence or user demand.

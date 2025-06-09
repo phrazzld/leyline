@@ -1,8 +1,8 @@
 ---
 id: fix-broken-windows
 last_modified: '2025-06-02'
+version: '0.1.0'
 ---
-
 # Tenet: Don't Live with Broken Windows
 
 Address quality problems immediately when they're discovered. Small defects, poor
