@@ -19,6 +19,7 @@ All tenet and binding documents must use YAML front-matter at the beginning of t
 ---
 id: tenet-id
 last_modified: '2025-05-08'
+version: '0.1.0'
 ---
 
 # Document Title
@@ -48,6 +49,12 @@ fields for each type.
   - Must be enclosed in quotes (e.g., `'2025-05-08'`)
   - Use the current date when creating or updating documents
 
+- **version**: Repository version when this document was last modified
+
+  - Must match the current VERSION file content (e.g., `'0.1.0'`)
+  - Must be enclosed in quotes
+  - Enables semantic versioning and breaking change detection
+
 ### For Bindings
 
 - **id**: Unique identifier in kebab-case
@@ -58,6 +65,12 @@ fields for each type.
 - **last_modified**: Date of last modification in ISO format (YYYY-MM-DD)
 
   - Same format as tenet dates
+
+- **version**: Repository version when this document was last modified
+
+  - Must match the current VERSION file content (e.g., `'0.1.0'`)
+  - Must be enclosed in quotes
+  - Same format and purpose as tenet version field
 
 - **derived_from**: The tenet this binding implements
 
@@ -79,6 +92,8 @@ fields for each type.
 id: modularity
 # Last modified date in ISO format with quotes
 last_modified: '2025-05-08'
+# Repository version when last modified
+version: '0.1.0'
 ---
 
 # Tenet: Modularity
@@ -94,6 +109,8 @@ The tenet content begins here...
 id: automate-changelog
 # Last modified date with quotes
 last_modified: '2025-05-08'
+# Repository version when last modified
+version: '0.1.0'
 # The parent tenet for this binding
 derived_from: automation
 # How this binding is enforced

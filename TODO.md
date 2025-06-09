@@ -501,7 +501,7 @@
         2. Clear instructions for version value
     - **Depends-on:** none
 
-- [ ] **CI-006 · Fix · P1: Document version field requirement**
+- [x] **CI-006 · Fix · P1: Document version field requirement**
     - **Context:** Ensure contributors know about this requirement
     - **Action:**
         1. Update CONTRIBUTING.md with version field requirement

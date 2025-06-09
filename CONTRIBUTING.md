@@ -46,10 +46,13 @@ properly.
 
 1. **Format**: Use YAML front-matter enclosed by triple dashes (`---`)
 1. **Required Fields**:
-   - For tenets: `id` and `last_modified`
-   - For bindings: `id`, `last_modified`, `derived_from`, and `enforced_by`
+   - For tenets: `id`, `last_modified`, and `version`
+   - For bindings: `id`, `last_modified`, `version`, `derived_from`, and `enforced_by`
 1. **All dates** must be in ISO format (YYYY-MM-DD) and enclosed in quotes (e.g.,
    `'2025-05-09'`)
+1. **Version field** must match the current VERSION file content (e.g., `'0.1.0'`).
+   This tracks which repository version the document was last modified in and enables
+   semantic versioning and breaking change detection.
 
 Binding applicability is determined by its location in the directory structure:
 - `/docs/bindings/core/` - Core bindings that apply to all projects
