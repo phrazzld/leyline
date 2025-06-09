@@ -721,7 +721,8 @@ jobs:
               2. Delete the git tag
               3. Revert VERSION and CHANGELOG.md changes
 
-              Please run: \`ruby tools/rollback_release.rb --version $tag_name\`" \
+              Please run:
+              \`ruby tools/rollback_release.rb --version $tag_name\`" \
               --label "bug,release,urgent"
           fi
 
