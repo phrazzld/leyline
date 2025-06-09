@@ -6,8 +6,11 @@ This file contains an automatically generated list of all tenets with their one-
 |---|---|---|
 | [adaptability-and-reversibility](./adaptability-and-reversibility.md) | 0.1.0 | The only constant in software development is change. Requirements evolve as users |
 | [automation](./automation.md) | 0.1.0 | Automation is fundamentally about respecting the scarcity of human attention and |
+| [build-trust-through-collaboration](./build-trust-through-collaboration.md) | 0.1.0 | Your team is your most valuable asset, more than any single piece of technology, architecture, or process. A team that trusts each other can adapt ... |
+| [deliver-value-continuously](./deliver-value-continuously.md) | 0.1.0 | This tenet connects the "how" of our development (our other principles) to the "why" (business and user value). It frames our work not as a series ... |
 | [document-decisions](./document-decisions.md) | 0.1.0 | Software development is fundamentally a decision-making process. Each line of code |
 | [dry-dont-repeat-yourself](./dry-dont-repeat-yourself.md) | 0.1.0 | The DRY principle is fundamentally about knowledge management and maintaining |
+| [empathize-with-your-user](./empathize-with-your-user.md) | 0.1.0 | Think of the difference between an architect and a construction worker. Both are skilled professionals, but an architect must understand how people... |
 | [explicit-over-implicit](./explicit-over-implicit.md) | 0.1.0 | Software development is fundamentally about managing complexity, and explicitness is one |
 | [fix-broken-windows](./fix-broken-windows.md) | 0.1.0 | The broken windows theory, originally from criminology, applies powerfully to software |
 | [maintainability](./maintainability.md) | 0.1.0 | Most of a software project's lifetime is spent in maintenance mode. The code you write |
