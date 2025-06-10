@@ -14,6 +14,7 @@ This file contains an automatically generated list of all bindings with their on
 | [code-size](./core/code-size.md) | 0.1.0 | This binding implements our simplicity tenet by addressing the cognitive overhead |
 | [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding directly implements our modularity tenet by establishing a systematic |
 | [component-isolation](./core/component-isolation.md) | 0.1.0 | This binding directly implements our orthogonality tenet by eliminating unwanted coupling between components. When components are truly isolated, c... |
+| [comprehensive-security-automation](./core/comprehensive-security-automation.md) | 0.1.0 | This binding extends our automation tenet by establishing security as a foundational automation concern that must be woven throughout all platform ... |
 | [context-propagation](./core/context-propagation.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by making |
 | [continuous-learning-investment](./core/continuous-learning-investment.md) | 0.1.0 | This binding implements our maintainability tenet by ensuring that the people maintaining code have the knowledge and perspective needed to make go... |
 | [continuous-refactoring](./core/continuous-refactoring.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by establishing systematic practices that prevent code quality from degrading over time. Conti... |

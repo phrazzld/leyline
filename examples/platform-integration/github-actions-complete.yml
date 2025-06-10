@@ -1,0 +1,579 @@
+# Complete GitHub Actions CI/CD Pipeline
+# Implements Leyline platform integration standards with comprehensive security and quality automation
+#
+# Usage: Copy to .github/workflows/ci-cd.yml in your repository
+# Customize: Update environment variables and secrets for your project
+
+name: 🚀 Complete CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, 'release/**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  # Language and Runtime Configuration
+  NODE_VERSION: '20.11.0'
+  PYTHON_VERSION: '3.11'
+  GO_VERSION: '1.21'
+
+  # Quality Gate Thresholds
+  COVERAGE_THRESHOLD: 85
+  PERFORMANCE_BUDGET_KB: 1024
+  SECURITY_AUDIT_LEVEL: 'high'
+
+  # Build Configuration
+  BUILD_TIMEOUT_MINUTES: 30
+  TEST_TIMEOUT_MINUTES: 15
+  DEPLOY_TIMEOUT_MINUTES: 10
+
+# Security: Restrict permissions to minimum required
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  checks: write
+  statuses: write
+
+jobs:
+  # Stage 1: Setup and Validation
+  setup:
+    name: 🔧 Environment Setup & Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      cache-key: ${{ steps.cache-keys.outputs.cache-key }}
+      changed-files: ${{ steps.changes.outputs.changed-files }}
+      should-deploy: ${{ steps.deploy-check.outputs.should-deploy }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for conventional commit validation
+
+      - name: Generate cache keys
+        id: cache-keys
+        run: |
+          echo "cache-key=deps-${{ runner.os }}-${{ hashFiles('**/package-lock.json', '**/requirements.txt', '**/go.mod', '**/Cargo.lock') }}" >> $GITHUB_OUTPUT
+
+      - name: Detect changed files
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | tr '\n' ' ')
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | tr '\n' ' ')
+          fi
+          echo "changed-files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "Changed files: $CHANGED_FILES"
+
+      - name: Check deployment conditions
+        id: deploy-check
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Stage 2: Security Scanning (High Priority)
+  security:
+    name: 🔒 Security Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run secret detection
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: Setup Node.js for security scanning
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Install dependencies for auditing
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci --only=prod
+          fi
+
+      - name: Run dependency vulnerability scan
+        run: |
+          if [ -f "package.json" ]; then
+            npm audit --audit-level=${{ env.SECURITY_AUDIT_LEVEL }}
+            if [ $? -ne 0 ]; then
+              echo "::error::High/Critical vulnerabilities found in dependencies"
+              exit 1
+            fi
+          fi
+
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, python, go
+          config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript,python,go"
+
+      - name: Upload security scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: results.sarif
+
+  # Stage 3: Code Quality Validation
+  quality:
+    name: 📊 Code Quality & Standards
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: setup
+    strategy:
+      matrix:
+        check: [lint, format, complexity, dependencies]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+          fi
+
+      - name: Run linting
+        if: matrix.check == 'lint'
+        run: |
+          npm run lint
+          if [ $? -ne 0 ]; then
+            echo "::error::Code linting failed. Run 'npm run lint:fix' locally."
+            exit 1
+          fi
+
+      - name: Check code formatting
+        if: matrix.check == 'format'
+        run: |
+          npm run format:check
+          if [ $? -ne 0 ]; then
+            echo "::error::Code formatting violations found. Run 'npm run format' locally."
+            exit 1
+          fi
+
+      - name: Analyze code complexity
+        if: matrix.check == 'complexity'
+        run: |
+          npm run complexity:analyze
+          if [ $? -ne 0 ]; then
+            echo "::error::Code complexity exceeds acceptable thresholds"
+            exit 1
+          fi
+
+      - name: Check dependency licenses
+        if: matrix.check == 'dependencies'
+        run: |
+          npx license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'
+          if [ $? -ne 0 ]; then
+            echo "::error::Incompatible dependency licenses detected"
+            exit 1
+          fi
+
+      - name: Validate conventional commits
+        if: matrix.check == 'lint' && github.event_name == 'pull_request'
+        run: |
+          npx commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.sha }}
+
+  # Stage 4: Comprehensive Testing
+  test:
+    name: 🧪 Testing & Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJson(env.TEST_TIMEOUT_MINUTES) }}
+    needs: [setup, security, quality]
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+        test-type: [unit, integration]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        if: matrix.test-type == 'unit'
+        run: |
+          npm run test:unit -- --coverage --ci --watchAll=false --maxWorkers=2
+          if [ $? -ne 0 ]; then
+            echo "::error::Unit tests failed"
+            exit 1
+          fi
+
+      - name: Run integration tests
+        if: matrix.test-type == 'integration'
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
+          REDIS_URL: redis://localhost:6379
+        services:
+          postgres:
+            image: postgres:15
+            env:
+              POSTGRES_PASSWORD: test
+              POSTGRES_USER: test
+              POSTGRES_DB: testdb
+            options: >-
+              --health-cmd pg_isready
+              --health-interval 10s
+              --health-timeout 5s
+              --health-retries 5
+          redis:
+            image: redis:7
+            options: >-
+              --health-cmd "redis-cli ping"
+              --health-interval 10s
+              --health-timeout 5s
+              --health-retries 5
+        run: |
+          npm run test:integration -- --ci --maxWorkers=1
+          if [ $? -ne 0 ]; then
+            echo "::error::Integration tests failed"
+            exit 1
+          fi
+
+      - name: Check test coverage
+        if: matrix.test-type == 'unit' && matrix.node-version == 20
+        run: |
+          COVERAGE=$(npm run test:coverage:report --silent | grep "All files" | awk '{print $10}' | sed 's/%//')
+          echo "Test coverage: ${COVERAGE}%"
+
+          if [ ${COVERAGE%.*} -lt ${{ env.COVERAGE_THRESHOLD }} ]; then
+            echo "::error::Test coverage ${COVERAGE}% below required threshold ${{ env.COVERAGE_THRESHOLD }}%"
+            exit 1
+          fi
+
+          echo "::notice::✅ Test coverage: ${COVERAGE}% (threshold: ${{ env.COVERAGE_THRESHOLD }}%)"
+
+      - name: Upload coverage reports
+        if: matrix.test-type == 'unit' && matrix.node-version == 20
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  # Stage 5: Performance & Build Validation
+  build:
+    name: 🏗️ Build & Performance
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJson(env.BUILD_TIMEOUT_MINUTES) }}
+    needs: [test]
+    outputs:
+      build-artifacts: ${{ steps.artifacts.outputs.artifacts }}
+      image-digest: ${{ steps.container.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: |
+          npm run build
+          if [ $? -ne 0 ]; then
+            echo "::error::Application build failed"
+            exit 1
+          fi
+
+      - name: Analyze bundle size
+        run: |
+          BUNDLE_SIZE=$(du -sk dist/ | cut -f1)
+          echo "Bundle size: ${BUNDLE_SIZE}KB"
+
+          if [ $BUNDLE_SIZE -gt ${{ env.PERFORMANCE_BUDGET_KB }} ]; then
+            echo "::error::Bundle size ${BUNDLE_SIZE}KB exceeds budget ${{ env.PERFORMANCE_BUDGET_KB }}KB"
+            exit 1
+          fi
+
+          echo "::notice::✅ Bundle size: ${BUNDLE_SIZE}KB (budget: ${{ env.PERFORMANCE_BUDGET_KB }}KB)"
+
+      - name: Run performance benchmarks
+        run: |
+          npm run perf:benchmark
+          if [ $? -ne 0 ]; then
+            echo "::error::Performance benchmarks failed"
+            exit 1
+          fi
+
+      - name: Build container image
+        id: container
+        if: needs.setup.outputs.should-deploy == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: |
+            app:latest
+            app:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/app-image.tar
+
+      - name: Test container security
+        if: needs.setup.outputs.should-deploy == 'true'
+        run: |
+          docker load -i /tmp/app-image.tar
+          docker run --rm -d -p 3000:3000 --name test-container app:latest
+          sleep 10
+
+          # Health check
+          curl -f http://localhost:3000/health || {
+            echo "::error::Container health check failed"
+            docker logs test-container
+            exit 1
+          }
+
+          docker stop test-container
+          echo "::notice::✅ Container validation successful"
+
+      - name: Prepare build artifacts
+        id: artifacts
+        run: |
+          tar -czf build-artifacts.tar.gz dist/ package.json package-lock.json
+          echo "artifacts=build-artifacts.tar.gz" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-${{ github.sha }}
+          path: |
+            build-artifacts.tar.gz
+            /tmp/app-image.tar
+          retention-days: 30
+
+  # Stage 6: Staging Deployment
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJson(env.DEPLOY_TIMEOUT_MINUTES) }}
+    needs: [setup, build]
+    if: needs.setup.outputs.should-deploy == 'true'
+    environment:
+      name: staging
+      url: https://staging.example.com
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts-${{ github.sha }}
+
+      - name: Extract artifacts
+        run: tar -xzf build-artifacts.tar.gz
+
+      - name: Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "Version: ${{ github.sha }}"
+          echo "Artifacts: $(ls -la)"
+
+          # Simulate deployment process
+          sleep 5
+
+          echo "✅ Staging deployment completed"
+
+      - name: Run staging verification tests
+        run: |
+          echo "🔍 Running staging verification..."
+
+          # Health check
+          curl -f https://staging.example.com/health
+          if [ $? -ne 0 ]; then
+            echo "::error::Staging health check failed"
+            exit 1
+          fi
+
+          # Smoke tests
+          echo "Running smoke tests..."
+          # npm run test:smoke -- --env=staging
+
+          echo "✅ Staging verification successful"
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          message: |
+            Staging deployment ${{ job.status }}: ${{ github.sha }}
+            Environment: https://staging.example.com
+            Author: ${{ github.actor }}
+
+  # Stage 7: Production Deployment (Manual Approval)
+  deploy-production:
+    name: 🌟 Deploy to Production
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ fromJson(env.DEPLOY_TIMEOUT_MINUTES) }}
+    needs: [setup, deploy-staging]
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'production'
+    environment:
+      name: production
+      url: https://api.example.com
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts-${{ github.sha }}
+
+      - name: Extract artifacts
+        run: tar -xzf build-artifacts.tar.gz
+
+      - name: Load container image
+        run: docker load -i app-image.tar
+
+      - name: Deploy to production
+        run: |
+          echo "🌟 Deploying to production environment..."
+          echo "Version: ${{ github.sha }}"
+
+          # Blue-green deployment simulation
+          sleep 10
+
+          echo "✅ Production deployment completed"
+
+      - name: Verify production deployment
+        run: |
+          echo "🔍 Verifying production deployment..."
+
+          curl -f https://api.example.com/health
+          if [ $? -ne 0 ]; then
+            echo "::error::Production health check failed - initiating rollback"
+            # Rollback logic would go here
+            exit 1
+          fi
+
+          echo "✅ Production verification successful"
+
+      - name: Update monitoring dashboards
+        run: |
+          curl -X POST https://monitoring.example.com/api/deployments \
+            -H "Authorization: Bearer ${{ secrets.MONITORING_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "version": "${{ github.sha }}",
+              "environment": "production",
+              "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+              "deployer": "${{ github.actor }}"
+            }'
+
+      - name: Create GitHub release
+        if: github.ref == 'refs/heads/main'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            Production deployment of commit ${{ github.sha }}
+
+            ## Changes
+            ${{ github.event.head_commit.message }}
+
+            ## Deployment Details
+            - Environment: Production
+            - Deployed by: ${{ github.actor }}
+            - Deployment time: ${{ github.event.head_commit.timestamp }}
+          draft: false
+          prerelease: false
+
+      - name: Notify production deployment
+        uses: 8398a7/action-slack@v3
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          status: ${{ job.status }}
+          channel: '#deployments'
+          message: |
+            🌟 Production deployment ${{ job.status }}: ${{ github.sha }}
+            Environment: https://api.example.com
+            Author: ${{ github.actor }}
+            Release: v${{ github.run_number }}
+
+  # Quality Reporting and Metrics
+  report:
+    name: 📊 Pipeline Report
+    runs-on: ubuntu-latest
+    needs: [setup, security, quality, test, build]
+    if: always()
+    steps:
+      - name: Generate pipeline summary
+        run: |
+          echo "## 🚀 Pipeline Execution Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status | Duration |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Setup | ${{ needs.setup.result == 'success' && '✅ Pass' || '❌ Fail' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | ${{ needs.security.result == 'success' && '✅ Pass' || '❌ Fail' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Quality | ${{ needs.quality.result == 'success' && '✅ Pass' || '❌ Fail' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Testing | ${{ needs.test.result == 'success' && '✅ Pass' || '❌ Fail' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result == 'success' && '✅ Pass' || '❌ Fail' }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Author**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
