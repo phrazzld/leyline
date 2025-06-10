@@ -161,3 +161,10 @@ choices).
   often discover that simpler approaches serve them better than sophisticated but
   confusing alternatives. Simplicity enhances empathy by reducing cognitive load
   for users.
+
+- [Product Value First](product-value-first.md): Product value focus naturally drives
+  simplicity because unnecessary complexity doesn't serve users. When you consistently
+  ask "How does this complexity benefit users?", you eliminate technical sophistication
+  that exists purely for its own sake. Both tenets work together to ensure that
+  engineering effort goes toward user-beneficial outcomes rather than abstract
+  technical pursuits.
