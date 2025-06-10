@@ -17,5 +17,6 @@ This file contains an automatically generated list of all tenets with their one-
 | [modularity](./modularity.md) | 0.1.0 | Modularity is the fundamental approach for taming complexity in software systems. When |
 | [no-secret-suppression](./no-secret-suppression.md) | 0.1.0 | Software quality tools—linters, type checkers, test suites, security scanners—represent |
 | [orthogonality](./orthogonality.md) | 0.1.0 | Orthogonality is about isolation and independence—ensuring that unrelated components in |
+| [product-value-first](./product-value-first.md) | 0.1.0 | Code is not an end in itself—it's a means to deliver value to users. When you write code, you're not just creating instructions for computers; you'... |
 | [simplicity](./simplicity.md) | 0.1.0 | Simplicity is a fundamental requirement for building high-quality, maintainable |
 | [testability](./testability.md) | 0.1.0 | Testable code is inherently better code. When you design your systems with testability |
