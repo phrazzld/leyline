@@ -154,3 +154,10 @@ choices).
   maintainability. Simple systems are easier to understand, modify, and extend. The
   relationship is bidirectional: following maintainability practices often naturally
   leads to simpler solutions as well.
+
+- [Empathize With Your User](empathize-with-your-user.md): User empathy naturally
+  leads to simpler solutions because complex interfaces and interactions are harder
+  for users to understand and navigate. When you truly understand user needs, you
+  often discover that simpler approaches serve them better than sophisticated but
+  confusing alternatives. Simplicity enhances empathy by reducing cognitive load
+  for users.
