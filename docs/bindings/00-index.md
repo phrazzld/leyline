@@ -10,19 +10,23 @@ This file contains an automatically generated list of all bindings with their on
 | [automate-changelog](./core/automate-changelog.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual |
 | [automated-quality-gates](./core/automated-quality-gates.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating automated systems that prevent quality degradation before it begins. Quality gates... |
 | [centralized-configuration](./core/centralized-configuration.md) | 0.1.0 | This binding implements our DRY tenet by creating a single source of truth for all configuration knowledge in your system. When configuration value... |
+| [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. While git hooks provi... |
 | [code-size](./core/code-size.md) | 0.1.0 | This binding implements our simplicity tenet by addressing the cognitive overhead |
 | [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding directly implements our modularity tenet by establishing a systematic |
 | [component-isolation](./core/component-isolation.md) | 0.1.0 | This binding directly implements our orthogonality tenet by eliminating unwanted coupling between components. When components are truly isolated, c... |
+| [comprehensive-security-automation](./core/comprehensive-security-automation.md) | 0.1.0 | This binding extends our automation tenet by establishing security as a foundational automation concern that must be woven throughout all platform ... |
 | [context-propagation](./core/context-propagation.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by making |
 | [continuous-learning-investment](./core/continuous-learning-investment.md) | 0.1.0 | This binding implements our maintainability tenet by ensuring that the people maintaining code have the knowledge and perspective needed to make go... |
 | [continuous-refactoring](./core/continuous-refactoring.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by establishing systematic practices that prevent code quality from degrading over time. Conti... |
 | [dependency-inversion](./core/dependency-inversion.md) | 0.1.0 | This binding directly implements our testability tenet by making code inherently more |
 | [dependency-management](./core/dependency-management.md) | 0.1.0 | This binding implements our simplicity tenet by addressing a major source of hidden |
+| [development-environment-consistency](./core/development-environment-consistency.md) | 0.1.0 | This binding applies our automation tenet to development environment management, transforming manual setup processes that are error-prone and time-... |
 | [external-configuration](./core/external-configuration.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by preventing one of |
 | [extract-common-logic](./core/extract-common-logic.md) | 0.1.0 | This binding directly implements our DRY tenet by eliminating knowledge duplication at the code level. When the same logic appears in multiple plac... |
 | [fail-fast-validation](./core/fail-fast-validation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function assumptions and constraints visible through immediate validation rather... |
 | [feature-flag-management](./core/feature-flag-management.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating software that can change behavior dynamically without requiring code c... |
 | [flexible-architecture-patterns](./core/flexible-architecture-patterns.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that can evolve gracefully over time. Software requirements ch... |
+| [git-hooks-automation](./core/git-hooks-automation.md) | 0.1.0 | This binding directly implements our automation tenet by eliminating manual quality checks that are prone to human error and inconsistent applicati... |
 | [hex-domain-purity](./core/hex-domain-purity.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
 | [immutable-by-default](./core/immutable-by-default.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
 | [incremental-delivery](./core/incremental-delivery.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating a delivery process that prioritizes safety, speed, and adaptability ov... |
@@ -41,6 +45,7 @@ This file contains an automatically generated list of all bindings with their on
 | [unified-documentation](./core/unified-documentation.md) | 0.1.0 | This binding implements our DRY tenet by ensuring that knowledge about system behavior, APIs, processes, and decisions exists in exactly one place.... |
 | [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding directly implements our automation tenet by transforming system telemetry |
 | [value-driven-prioritization](./core/value-driven-prioritization.md) | 0.1.0 | This binding directly implements our product-value-first tenet by establishing concrete criteria for development decisions, preventing the accumula... |
+| [version-control-workflows](./core/version-control-workflows.md) | 0.1.0 | This binding applies our automation tenet to version control collaboration, transforming ad-hoc manual processes into systematic, automated workflo... |
 | [yagni-pattern-enforcement](./core/yagni-pattern-enforcement.md) | 0.1.0 | This binding implements our simplicity tenet by attacking complexity at its source—the temptation to build more than what's actually required. YAGN... |
 
 ## Backend Bindings

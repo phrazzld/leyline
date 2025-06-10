@@ -1,0 +1,617 @@
+# Complete GitLab CI/CD Pipeline
+# Implements Leyline platform integration standards with comprehensive security and quality automation
+#
+# Usage: Copy to .gitlab-ci.yml in your repository root
+# Customize: Update variables and configure GitLab CI/CD settings for your project
+
+stages:
+  - setup
+  - security
+  - quality
+  - test
+  - build
+  - deploy-staging
+  - deploy-production
+
+variables:
+  # Language and Runtime Configuration
+  NODE_VERSION: "20.11.0"
+  PYTHON_VERSION: "3.11"
+  GO_VERSION: "1.21"
+
+  # Quality Gate Thresholds
+  COVERAGE_THRESHOLD: "85"
+  PERFORMANCE_BUDGET_KB: "1024"
+  SECURITY_AUDIT_LEVEL: "high"
+
+  # Pipeline Configuration
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  DOCKER_DRIVER: overlay2
+  DOCKER_BUILDKIT: 1
+
+  # Deployment Settings
+  STAGING_URL: "https://staging.example.com"
+  PRODUCTION_URL: "https://api.example.com"
+
+# Global cache configuration
+.cache_template: &cache_template
+  cache:
+    key:
+      files:
+        - package-lock.json
+        - requirements.txt
+        - go.mod
+        - Cargo.lock
+    paths:
+      - node_modules/
+      - .cache/pip
+      - .cache/go-build
+      - target/
+
+# Security scanning template
+.security_template: &security_template
+  image: node:${NODE_VERSION}
+  before_script:
+    - apt-get update && apt-get install -y curl
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Stage 1: Setup and Validation
+setup:
+  stage: setup
+  image: alpine:latest
+  script:
+    - echo "🔧 Pipeline setup and validation"
+    - echo "Commit SHA: $CI_COMMIT_SHA"
+    - echo "Branch: $CI_COMMIT_REF_NAME"
+    - echo "Pipeline source: $CI_PIPELINE_SOURCE"
+
+    # Detect changed files for optimized pipeline execution
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then
+        CHANGED_FILES=$(git diff --name-only $CI_MERGE_REQUEST_DIFF_BASE_SHA $CI_COMMIT_SHA | tr '\n' ' ')
+      else
+        CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | tr '\n' ' ')
+      fi
+      echo "Changed files: $CHANGED_FILES"
+      echo "CHANGED_FILES=$CHANGED_FILES" > changed_files.env
+
+    # Determine deployment eligibility
+    - |
+      if [[ "$CI_COMMIT_REF_NAME" == "main" ]] || [[ "$CI_PIPELINE_SOURCE" == "web" ]]; then
+        echo "SHOULD_DEPLOY=true" >> deploy_status.env
+      else
+        echo "SHOULD_DEPLOY=false" >> deploy_status.env
+      fi
+  artifacts:
+    reports:
+      dotenv:
+        - changed_files.env
+        - deploy_status.env
+    expire_in: 1 hour
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "web"
+
+# Stage 2: Security Scanning (Highest Priority)
+secret-detection:
+  <<: *security_template
+  stage: security
+  script:
+    - echo "🔒 Running secret detection scan"
+    - |
+      # Install TruffleHog
+      curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+
+      # Run secret detection
+      trufflehog git file://. --since-commit HEAD~1 --only-verified --fail
+      if [ $? -ne 0 ]; then
+        echo "🚨 Secrets detected in repository!"
+        exit 1
+      fi
+      echo "✅ No secrets detected"
+  artifacts:
+    reports:
+      sast: gl-secret-detection-report.json
+    when: always
+    expire_in: 1 week
+
+dependency-scanning:
+  <<: *security_template
+  stage: security
+  cache:
+    key:
+      files:
+        - package-lock.json
+        - requirements.txt
+        - go.mod
+        - Cargo.lock
+    paths:
+      - node_modules/
+      - .cache/pip
+      - .cache/go-build
+      - target/
+  script:
+    - echo "🔒 Running dependency vulnerability scan"
+
+    # Node.js dependency scanning
+    - |
+      if [ -f "package.json" ]; then
+        npm ci --only=prod
+        npm audit --audit-level=$SECURITY_AUDIT_LEVEL
+        if [ $? -ne 0 ]; then
+          echo "🚨 High/Critical vulnerabilities found in Node.js dependencies"
+          exit 1
+        fi
+        echo "✅ Node.js dependencies clean"
+      fi
+
+    # Python dependency scanning
+    - |
+      if [ -f "requirements.txt" ]; then
+        pip install --upgrade pip
+        pip install safety
+        safety check -r requirements.txt
+        if [ $? -ne 0 ]; then
+          echo "🚨 Vulnerabilities found in Python dependencies"
+          exit 1
+        fi
+        echo "✅ Python dependencies clean"
+      fi
+  artifacts:
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+    when: always
+    expire_in: 1 week
+
+# SAST (Static Application Security Testing)
+sast:
+  stage: security
+  image: registry.gitlab.com/security-products/semgrep:latest
+  script:
+    - echo "🔒 Running static application security testing"
+    - semgrep --config=auto --json --output=gl-sast-report.json .
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+    when: always
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Stage 3: Code Quality Validation
+lint-code:
+  stage: quality
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  script:
+    - echo "📊 Running code linting"
+    - npm ci
+    - |
+      npm run lint
+      if [ $? -ne 0 ]; then
+        echo "❌ Code linting failed. Run 'npm run lint:fix' locally."
+        exit 1
+      fi
+      echo "✅ Code linting passed"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+format-check:
+  stage: quality
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  script:
+    - echo "📊 Checking code formatting"
+    - npm ci
+    - |
+      npm run format:check
+      if [ $? -ne 0 ]; then
+        echo "❌ Code formatting violations found. Run 'npm run format' locally."
+        exit 1
+      fi
+      echo "✅ Code formatting compliant"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+complexity-analysis:
+  stage: quality
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  script:
+    - echo "📊 Analyzing code complexity"
+    - npm ci
+    - |
+      npm run complexity:analyze
+      if [ $? -ne 0 ]; then
+        echo "❌ Code complexity exceeds acceptable thresholds"
+        exit 1
+      fi
+      echo "✅ Code complexity within limits"
+  artifacts:
+    reports:
+      junit: reports/complexity-report.xml
+    when: always
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+license-check:
+  stage: quality
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  script:
+    - echo "📊 Checking dependency licenses"
+    - npm ci
+    - |
+      npx license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause;ISC'
+      if [ $? -ne 0 ]; then
+        echo "❌ Incompatible dependency licenses detected"
+        exit 1
+      fi
+      echo "✅ All dependency licenses compatible"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+conventional-commits:
+  stage: quality
+  image: node:${NODE_VERSION}
+  script:
+    - echo "📊 Validating conventional commit format"
+    - npm install -g @commitlint/cli @commitlint/config-conventional
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then
+        npx commitlint --from=$CI_MERGE_REQUEST_DIFF_BASE_SHA --to=$CI_COMMIT_SHA
+        if [ $? -ne 0 ]; then
+          echo "❌ Commit messages do not follow conventional commit format"
+          exit 1
+        fi
+        echo "✅ All commit messages follow conventional format"
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Stage 4: Comprehensive Testing
+unit-tests:
+  stage: test
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  parallel:
+    matrix:
+      - NODE_VERSION: ["18", "20", "22"]
+  script:
+    - echo "🧪 Running unit tests with Node.js $NODE_VERSION"
+    - npm ci
+    - |
+      npm run test:unit -- --coverage --ci --watchAll=false --maxWorkers=2
+      if [ $? -ne 0 ]; then
+        echo "❌ Unit tests failed"
+        exit 1
+      fi
+      echo "✅ Unit tests passed"
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    reports:
+      junit: reports/unit-test-results.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+    when: always
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+integration-tests:
+  stage: test
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  services:
+    - name: postgres:15
+      alias: postgres
+      variables:
+        POSTGRES_DB: testdb
+        POSTGRES_USER: test
+        POSTGRES_PASSWORD: test
+    - name: redis:7
+      alias: redis
+  variables:
+    DATABASE_URL: "postgresql://test:test@postgres:5432/testdb"
+    REDIS_URL: "redis://redis:6379"
+  script:
+    - echo "🧪 Running integration tests"
+    - npm ci
+
+    # Wait for services to be ready
+    - apt-get update && apt-get install -y postgresql-client redis-tools
+    - |
+      until pg_isready -h postgres -p 5432 -U test; do
+        echo "Waiting for PostgreSQL..."
+        sleep 2
+      done
+
+      until redis-cli -h redis ping; do
+        echo "Waiting for Redis..."
+        sleep 2
+      done
+
+    - |
+      npm run test:integration -- --ci --maxWorkers=1
+      if [ $? -ne 0 ]; then
+        echo "❌ Integration tests failed"
+        exit 1
+      fi
+      echo "✅ Integration tests passed"
+  artifacts:
+    reports:
+      junit: reports/integration-test-results.xml
+    when: always
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+coverage-check:
+  stage: test
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  needs: ["unit-tests"]
+  script:
+    - echo "🧪 Checking test coverage thresholds"
+    - npm ci
+    - |
+      COVERAGE=$(npm run test:coverage:report --silent | grep "All files" | awk '{print $10}' | sed 's/%//')
+      echo "Test coverage: ${COVERAGE}%"
+
+      if [ ${COVERAGE%.*} -lt $COVERAGE_THRESHOLD ]; then
+        echo "❌ Test coverage ${COVERAGE}% below required threshold ${COVERAGE_THRESHOLD}%"
+        exit 1
+      fi
+
+      echo "✅ Test coverage: ${COVERAGE}% (threshold: ${COVERAGE_THRESHOLD}%)"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Stage 5: Build and Performance Validation
+build-application:
+  stage: build
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  script:
+    - echo "🏗️ Building application"
+    - npm ci
+    - |
+      npm run build
+      if [ $? -ne 0 ]; then
+        echo "❌ Application build failed"
+        exit 1
+      fi
+      echo "✅ Application build successful"
+
+    # Bundle size analysis
+    - |
+      BUNDLE_SIZE=$(du -sk dist/ | cut -f1)
+      echo "Bundle size: ${BUNDLE_SIZE}KB"
+
+      if [ $BUNDLE_SIZE -gt $PERFORMANCE_BUDGET_KB ]; then
+        echo "❌ Bundle size ${BUNDLE_SIZE}KB exceeds budget ${PERFORMANCE_BUDGET_KB}KB"
+        exit 1
+      fi
+
+      echo "✅ Bundle size: ${BUNDLE_SIZE}KB (budget: ${PERFORMANCE_BUDGET_KB}KB)"
+  artifacts:
+    paths:
+      - dist/
+      - package.json
+      - package-lock.json
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+performance-tests:
+  stage: build
+  image: node:${NODE_VERSION}
+  <<: *cache_template
+  needs: ["build-application"]
+  script:
+    - echo "🏗️ Running performance benchmarks"
+    - npm ci
+    - |
+      npm run perf:benchmark
+      if [ $? -ne 0 ]; then
+        echo "❌ Performance benchmarks failed"
+        exit 1
+      fi
+      echo "✅ Performance benchmarks passed"
+  artifacts:
+    reports:
+      performance: performance-report.json
+    when: always
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-container:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  needs: ["build-application"]
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    LATEST_TAG: $CI_REGISTRY_IMAGE:latest
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - echo "🏗️ Building and testing container image"
+
+    # Build container image
+    - |
+      docker build -t $IMAGE_TAG -t $LATEST_TAG .
+      if [ $? -ne 0 ]; then
+        echo "❌ Container build failed"
+        exit 1
+      fi
+
+    # Test container functionality
+    - |
+      docker run --rm -d -p 3000:3000 --name test-container $IMAGE_TAG
+      sleep 10
+
+      # Health check
+      wget --spider --timeout=30 http://localhost:3000/health
+      if [ $? -ne 0 ]; then
+        echo "❌ Container health check failed"
+        docker logs test-container
+        docker stop test-container
+        exit 1
+      fi
+
+      docker stop test-container
+      echo "✅ Container validation successful"
+
+    # Push to registry
+    - docker push $IMAGE_TAG
+    - docker push $LATEST_TAG
+    - echo "✅ Container image built and pushed: $IMAGE_TAG"
+  rules:
+    - if: ($CI_COMMIT_REF_NAME == "main" || $CI_PIPELINE_SOURCE == "web") && $CI_PIPELINE_SOURCE != "merge_request_event"
+
+# Stage 6: Staging Deployment
+deploy-staging:
+  stage: deploy-staging
+  image: alpine:latest
+  environment:
+    name: staging
+    url: $STAGING_URL
+  needs:
+    - job: build-container
+      optional: true
+    - setup
+  variables:
+    DEPLOY_ENV: "staging"
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "🚀 Deploying to staging environment"
+    - echo "Version: $CI_COMMIT_SHA"
+    - echo "Environment: $DEPLOY_ENV"
+
+    # Simulate deployment process
+    - sleep 5
+
+    # Health check
+    - |
+      curl -f $STAGING_URL/health
+      if [ $? -ne 0 ]; then
+        echo "❌ Staging health check failed"
+        exit 1
+      fi
+      echo "✅ Staging deployment verified"
+
+    # Run smoke tests
+    - echo "🔍 Running staging smoke tests"
+    # Additional smoke tests would go here
+
+    - echo "✅ Staging deployment completed successfully"
+  artifacts:
+    reports:
+      dotenv: staging-deploy.env
+  rules:
+    - if: ($CI_COMMIT_REF_NAME == "main" || $CI_PIPELINE_SOURCE == "web") && $CI_PIPELINE_SOURCE != "merge_request_event"
+
+# Stage 7: Production Deployment (Manual Approval)
+deploy-production:
+  stage: deploy-production
+  image: alpine:latest
+  environment:
+    name: production
+    url: $PRODUCTION_URL
+  needs: ["deploy-staging"]
+  variables:
+    DEPLOY_ENV: "production"
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "🌟 Deploying to production environment"
+    - echo "Version: $CI_COMMIT_SHA"
+    - echo "Environment: $DEPLOY_ENV"
+
+    # Blue-green deployment simulation
+    - echo "Implementing blue-green deployment strategy..."
+    - sleep 10
+
+    # Health check
+    - |
+      curl -f $PRODUCTION_URL/health
+      if [ $? -ne 0 ]; then
+        echo "❌ Production health check failed - initiating rollback"
+        # Rollback logic would be implemented here
+        exit 1
+      fi
+      echo "✅ Production deployment verified"
+
+    # Update monitoring
+    - |
+      curl -X POST https://monitoring.example.com/api/deployments \
+        -H "Authorization: Bearer $MONITORING_API_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{
+          \"version\": \"$CI_COMMIT_SHA\",
+          \"environment\": \"production\",
+          \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+          \"deployer\": \"$GITLAB_USER_LOGIN\"
+        }"
+
+    - echo "🌟 Production deployment completed successfully"
+  when: manual
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "main"
+
+# Create release
+create-release:
+  stage: deploy-production
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs: ["deploy-production"]
+  script:
+    - echo "📦 Creating release for production deployment"
+  release:
+    tag_name: v$CI_PIPELINE_IID
+    name: 'Release v$CI_PIPELINE_IID'
+    description: |
+      Production deployment of commit $CI_COMMIT_SHA
+
+      ## Changes
+      $CI_COMMIT_MESSAGE
+
+      ## Deployment Details
+      - Environment: Production
+      - Deployed by: $GITLAB_USER_LOGIN
+      - Pipeline: $CI_PIPELINE_URL
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "main"
+      when: manual
+
+# Pipeline metrics and reporting
+pipeline-report:
+  stage: .post
+  image: alpine:latest
+  script:
+    - echo "📊 Generating pipeline execution report"
+    - |
+      cat > pipeline-report.json << EOF
+      {
+        "pipeline_id": "$CI_PIPELINE_ID",
+        "commit_sha": "$CI_COMMIT_SHA",
+        "branch": "$CI_COMMIT_REF_NAME",
+        "author": "$GITLAB_USER_LOGIN",
+        "status": "$CI_JOB_STATUS",
+        "duration": "$CI_PIPELINE_DURATION",
+        "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      }
+      EOF
+    - cat pipeline-report.json
+  artifacts:
+    reports:
+      dotenv: pipeline-report.json
+    expire_in: 30 days
+  when: always

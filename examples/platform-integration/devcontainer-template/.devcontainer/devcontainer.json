@@ -1,0 +1,312 @@
+{
+  "name": "Leyline Platform Integration Development",
+  "dockerFile": "Dockerfile",
+
+  // Development environment configuration
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // Container runtime settings
+  "runArgs": [
+    "--init",
+    "--privileged",
+    "--network=host"
+  ],
+
+  // Environment variables for development
+  "containerEnv": {
+    "TZ": "UTC",
+    "TERM": "xterm-256color",
+    "SHELL": "/bin/zsh",
+    "NODE_ENV": "development",
+    "PYTHONPATH": "/workspace",
+    "GOPATH": "/go",
+    "CARGO_HOME": "/usr/local/cargo",
+    "RUSTUP_HOME": "/usr/local/rustup",
+    "PATH": "/usr/local/cargo/bin:${PATH}"
+  },
+
+  // Port forwarding for development services
+  "forwardPorts": [
+    3000,    // Frontend development server
+    3001,    // API server
+    5432,    // PostgreSQL database
+    6379,    // Redis cache
+    8080,    // Alternative HTTP port
+    9090     // Monitoring/metrics
+  ],
+
+  // Port attributes and labels
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend Dev Server",
+      "onAutoForward": "notify"
+    },
+    "3001": {
+      "label": "API Server",
+      "onAutoForward": "silent"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "ignore"
+    },
+    "6379": {
+      "label": "Redis",
+      "onAutoForward": "ignore"
+    },
+    "8080": {
+      "label": "Alt HTTP",
+      "onAutoForward": "silent"
+    },
+    "9090": {
+      "label": "Monitoring",
+      "onAutoForward": "ignore"
+    }
+  },
+
+  // Mount points for persistent data and caching
+  "mounts": [
+    // Node.js dependency cache
+    "source=devcontainer-node-modules,target=/workspace/node_modules,type=volume",
+
+    // Python package cache
+    "source=devcontainer-pip-cache,target=/root/.cache/pip,type=volume",
+
+    // Go module cache
+    "source=devcontainer-go-cache,target=/go/pkg/mod,type=volume",
+
+    // Cargo registry cache
+    "source=devcontainer-cargo-registry,target=/usr/local/cargo/registry,type=volume",
+
+    // Git configuration from host
+    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached",
+
+    // SSH keys for development (optional)
+    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
+
+    // Docker socket for container builds (if needed)
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+
+  // VS Code customizations
+  "customizations": {
+    "vscode": {
+      // Extensions to install automatically
+      "extensions": [
+        // Language support
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "golang.go",
+        "rust-lang.rust-analyzer",
+
+        // Code quality and formatting
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-python.flake8",
+        "charliermarsh.ruff",
+
+        // Git and version control
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "github.vscode-pull-request-github",
+
+        // Testing
+        "ms-vscode.test-adapter-converter",
+        "hbenl.vscode-test-explorer",
+        "orta.vscode-jest",
+
+        // Containers and deployment
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+
+        // Documentation and markup
+        "yzhang.markdown-all-in-one",
+        "davidanson.vscode-markdownlint",
+        "streetsidesoftware.code-spell-checker",
+
+        // Productivity
+        "vscodevim.vim",
+        "ms-vscode.hexdump",
+        "humao.rest-client",
+        "ms-vscode.vscode-json",
+
+        // Security
+        "gitguardian.gitguardian",
+        "ms-vscode.vscode-github-issue-notebooks",
+
+        // Theme and UI
+        "github.github-vscode-theme",
+        "pkief.material-icon-theme"
+      ],
+
+      // VS Code settings for development environment
+      "settings": {
+        // Editor configuration
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true,
+          "source.organizeImports": true
+        },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.rulers": [80, 120],
+        "editor.wordWrap": "wordWrapColumn",
+        "editor.wordWrapColumn": 80,
+
+        // File associations and handling
+        "files.associations": {
+          "*.yaml": "yaml",
+          "*.yml": "yaml",
+          "Dockerfile*": "dockerfile",
+          ".env*": "dotenv"
+        },
+        "files.exclude": {
+          "**/node_modules": true,
+          "**/.git": true,
+          "**/.DS_Store": true,
+          "**/dist": true,
+          "**/build": true,
+          "**/.next": true,
+          "**/__pycache__": true,
+          "**/*.pyc": true,
+          "**/target": true
+        },
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true,
+
+        // Language-specific settings
+        "typescript.preferences.quoteStyle": "single",
+        "javascript.preferences.quoteStyle": "single",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "javascript.updateImportsOnFileMove.enabled": "always",
+
+        "python.defaultInterpreterPath": "/usr/local/bin/python3",
+        "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.flake8Enabled": true,
+        "python.linting.pylintEnabled": false,
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"],
+
+        "go.useLanguageServer": true,
+        "go.formatTool": "goimports",
+        "go.lintOnSave": "workspace",
+        "go.vetOnSave": "workspace",
+        "go.buildOnSave": "workspace",
+
+        "rust-analyzer.check.command": "clippy",
+        "rust-analyzer.cargo.buildScripts.enable": true,
+        "rust-analyzer.procMacro.enable": true,
+
+        // Git configuration
+        "git.autofetch": true,
+        "git.enableCommitSigning": true,
+        "git.defaultCloneDirectory": "/workspace",
+        "gitlens.defaultDateStyle": "absolute",
+        "gitlens.blame.format": "${author}, ${date}",
+
+        // Terminal configuration
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh",
+            "args": ["-l"]
+          }
+        },
+        "terminal.integrated.cwd": "/workspace",
+
+        // Testing configuration
+        "testExplorer.useNativeTesting": true,
+        "jest.autoRun": {
+          "watch": false,
+          "onSave": "test-src-file"
+        },
+
+        // Security settings
+        "gitguardian.api.url": "https://api.gitguardian.com",
+        "security.workspace.trust.enabled": false,
+
+        // Performance optimization
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/build": true,
+          "**/.next": true,
+          "**/target": true,
+          "**/__pycache__": true
+        },
+        "typescript.tsc.autoDetect": "off",
+        "npm.autoDetect": "off"
+      }
+    }
+  },
+
+  // Features to install (alternative to Dockerfile RUN commands)
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true,
+      "username": "vscode",
+      "userUid": 1000,
+      "userGid": 1000
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "20.11.0"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11",
+      "installTools": true
+    },
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "1.21"
+    },
+    "ghcr.io/devcontainers/features/rust:1": {
+      "version": "latest",
+      "profile": "default"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "enableNonRootDocker": true,
+      "moby": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "ppa": true,
+      "version": "latest"
+    }
+  },
+
+  // Lifecycle scripts
+  "onCreateCommand": "bash .devcontainer/scripts/on-create.sh",
+  "updateContentCommand": "bash .devcontainer/scripts/update-content.sh",
+  "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+  "postStartCommand": "bash .devcontainer/scripts/post-start.sh",
+
+  // Container user settings
+  "remoteUser": "vscode",
+  "containerUser": "vscode",
+
+  // Additional development configuration
+  "shutdownAction": "stopContainer",
+  "overrideCommand": false,
+  "userEnvProbe": "loginInteractiveShell",
+
+  // Security and development settings
+  "capAdd": ["SYS_PTRACE"],
+  "securityOpt": ["seccomp=unconfined"],
+
+  // IDE integration
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "32gb"
+  }
+}

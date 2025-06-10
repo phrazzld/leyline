@@ -1,0 +1,416 @@
+# Comprehensive Pre-commit Configuration
+# Implements Leyline git-hooks-automation standards with security-first approach
+#
+# Setup Instructions:
+# 1. Copy this file to your repository root as .pre-commit-config.yaml
+# 2. Install pre-commit: pip install pre-commit
+# 3. Install hooks: pre-commit install
+# 4. Optional: pre-commit install --hook-type commit-msg
+#
+# Customization: Adjust language versions and enable/disable hooks per project needs
+
+# Configuration
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [commit, merge-commit]
+fail_fast: false  # Run all hooks even if one fails
+minimum_pre_commit_version: '3.0.0'
+
+# CI Integration - runs same hooks in CI environment
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit.com hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
+
+repos:
+  # ============================================================================
+  # SECURITY SCANNING (Highest Priority)
+  # ============================================================================
+
+  # Secret Detection with TruffleHog
+  - repo: https://github.com/trufflesecurity/trufflehog
+    rev: v3.63.2
+    hooks:
+      - id: trufflehog
+        name: 🔒 TruffleHog - Secret Detection
+        description: Scan for secrets and credentials
+        entry: trufflehog git file://. --since-commit HEAD --only-verified --fail
+        language: system
+        stages: [commit, push]
+        types: [text]
+
+  # Alternative: detect-secrets for broader detection patterns
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: 🔒 Detect Secrets - Pattern Analysis
+        description: Detect hardcoded secrets using entropy and patterns
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package-lock.json
+
+  # ============================================================================
+  # UNIVERSAL CODE QUALITY
+  # ============================================================================
+
+  # Basic file hygiene and standards
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # File format and encoding standards
+      - id: trailing-whitespace
+        name: 🧹 Remove trailing whitespace
+        args: [--markdown-linebreak-ext=md]
+
+      - id: end-of-file-fixer
+        name: 🧹 Ensure files end with newline
+
+      - id: fix-byte-order-marker
+        name: 🧹 Remove UTF-8 byte order marker
+
+      - id: mixed-line-ending
+        name: 🧹 Fix mixed line endings
+        args: [--fix=lf]
+
+      # Security and safety checks
+      - id: check-executables-have-shebangs
+        name: 🔒 Check executable files have shebangs
+
+      - id: check-shebang-scripts-are-executable
+        name: 🔒 Check shebang scripts are executable
+
+      - id: check-private-key
+        name: 🔒 Check for private keys
+
+      - id: check-added-large-files
+        name: 🔒 Check for large files (>500KB)
+        args: ['--maxkb=500']
+
+      # Data format validation
+      - id: check-json
+        name: ✅ Validate JSON syntax
+
+      - id: check-yaml
+        name: ✅ Validate YAML syntax
+        args: [--allow-multiple-documents]
+
+      - id: check-toml
+        name: ✅ Validate TOML syntax
+
+      - id: check-xml
+        name: ✅ Validate XML syntax
+
+      # Merge conflict detection
+      - id: check-merge-conflict
+        name: 🔍 Check for merge conflict markers
+
+      - id: check-case-conflict
+        name: 🔍 Check for case conflicts
+
+  # ============================================================================
+  # JAVASCRIPT/TYPESCRIPT/NODE.JS
+  # ============================================================================
+
+  # ESLint for code quality and standards
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        name: 📊 ESLint - Code Quality Analysis
+        files: \.(js|jsx|ts|tsx|vue)$
+        types: [file]
+        args: [--fix, --ext, .js,.jsx,.ts,.tsx,.vue]
+        additional_dependencies:
+          - eslint@8.56.0
+          - '@typescript-eslint/eslint-plugin@6.18.1'
+          - '@typescript-eslint/parser@6.18.1'
+          - eslint-plugin-react@7.33.2
+          - eslint-plugin-react-hooks@4.6.0
+          - eslint-plugin-import@2.29.1
+
+  # Prettier for code formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        name: 🎨 Prettier - Code Formatting
+        files: \.(js|jsx|ts|tsx|vue|json|md|yaml|yml|css|scss|html)$
+        args: [--write]
+
+  # TypeScript compilation check
+  - repo: https://github.com/pre-commit/mirrors-typescript
+    rev: v5.3.3
+    hooks:
+      - id: tsc
+        name: 🔍 TypeScript - Type Checking
+        files: \.(ts|tsx)$
+        args: [--noEmit, --skipLibCheck]
+
+  # Package.json validation
+  - repo: https://github.com/Mateusz-Grzelinski/pre-commit-hooks
+    rev: v1.1.0
+    hooks:
+      - id: check-package-json
+        name: ✅ Validate package.json structure
+
+  # ============================================================================
+  # PYTHON
+  # ============================================================================
+
+  # Black for code formatting
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        name: 🎨 Black - Python Code Formatting
+        language_version: python3
+        args: [--line-length=88]
+
+  # isort for import sorting
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: 🧹 isort - Python Import Sorting
+        args: [--profile, black, --filter-files]
+
+  # Flake8 for style guide enforcement
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: 📊 Flake8 - Python Style Guide
+        args: [--max-line-length=88, --extend-ignore=E203,W503]
+
+  # MyPy for static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: 🔍 MyPy - Python Type Checking
+        additional_dependencies: [types-requests, types-PyYAML]
+        args: [--ignore-missing-imports, --strict]
+
+  # Bandit for security vulnerability scanning
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        name: 🔒 Bandit - Python Security Analysis
+        args: [-r, ., -f, json, -o, bandit-report.json]
+        files: \.py$
+        exclude: tests/
+
+  # ============================================================================
+  # GO
+  # ============================================================================
+
+  # gofmt for code formatting
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+        name: 🎨 gofmt - Go Code Formatting
+
+      - id: go-imports
+        name: 🧹 goimports - Go Import Management
+
+      - id: go-vet
+        name: 🔍 go vet - Go Static Analysis
+
+      - id: go-mod-tidy
+        name: 🧹 go mod tidy - Clean Dependencies
+
+      - id: golangci-lint
+        name: 📊 golangci-lint - Go Code Quality
+        args: [--fast]
+
+  # ============================================================================
+  # RUST
+  # ============================================================================
+
+  # Rust formatting and linting
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        name: 🎨 rustfmt - Rust Code Formatting
+        args: [--edition, '2021']
+
+      - id: clippy
+        name: 📊 Clippy - Rust Linting
+        args: [--all-targets, --all-features, --workspace, --, -D, warnings]
+
+      - id: cargo-check
+        name: 🔍 cargo check - Rust Compilation Check
+
+  # ============================================================================
+  # DOCUMENTATION AND MARKUP
+  # ============================================================================
+
+  # Markdownlint for Markdown standards
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        name: 📊 Markdownlint - Documentation Standards
+        args: [--fix]
+        files: \.md$
+
+  # Vale for prose style and consistency
+  - repo: https://github.com/errata-ai/vale
+    rev: v2.29.7
+    hooks:
+      - id: vale
+        name: 📝 Vale - Prose Style Checking
+        files: \.(md|rst|txt)$
+        args: [--config=.vale.ini]
+
+  # ============================================================================
+  # CONTAINER AND INFRASTRUCTURE
+  # ============================================================================
+
+  # Dockerfile linting with hadolint
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
+        name: 🐳 Hadolint - Dockerfile Linting
+        files: Dockerfile.*
+
+  # Terraform formatting and validation
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.86.0
+    hooks:
+      - id: terraform_fmt
+        name: 🎨 Terraform - Code Formatting
+
+      - id: terraform_validate
+        name: ✅ Terraform - Configuration Validation
+
+      - id: terraform_tflint
+        name: 📊 TFLint - Terraform Best Practices
+
+      - id: terraform_docs
+        name: 📝 Terraform - Documentation Generation
+        args: [--hook-config=--path-to-file=README.md]
+
+  # Kubernetes manifest validation
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: insert-license
+        name: 📄 Insert License Headers
+        files: \.(py|js|ts|go|rs|java)$
+        args:
+          - --license-filepath
+          - LICENSE-header.txt
+          - --use-current-year
+
+  # ============================================================================
+  # COMMIT MESSAGE VALIDATION
+  # ============================================================================
+
+  # Conventional Commits validation
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.0.0
+    hooks:
+      - id: conventional-pre-commit
+        name: 📝 Conventional Commits - Message Format
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, test, chore, ci, build, perf]
+
+  # ============================================================================
+  # LANGUAGE-SPECIFIC DEPENDENCY MANAGEMENT
+  # ============================================================================
+
+  # Python requirements.txt validation
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: forbid-crlf
+        name: 🔍 Forbid CRLF line endings
+        files: \.(py|js|ts|md|yml|yaml|json)$
+
+      - id: remove-crlf
+        name: 🧹 Remove CRLF line endings
+        files: \.(py|js|ts|md|yml|yaml|json)$
+
+  # Check for requirements.txt updates
+  - repo: local
+    hooks:
+      - id: requirements-txt-fixer
+        name: 🔍 Requirements.txt - Sort and Fix
+        entry: python -m piptools compile --upgrade
+        language: system
+        files: requirements\.in$
+        pass_filenames: false
+
+  # ============================================================================
+  # PROJECT-SPECIFIC VALIDATION (Examples)
+  # ============================================================================
+
+  # Custom hooks for project-specific validation
+  - repo: local
+    hooks:
+      # Example: API schema validation
+      - id: api-schema-validation
+        name: 🔍 API Schema - OpenAPI Validation
+        entry: swagger-codegen validate
+        language: system
+        files: ^api/.*\.ya?ml$
+        pass_filenames: true
+
+      # Example: Database migration validation
+      - id: db-migration-check
+        name: 🔍 Database - Migration Validation
+        entry: python scripts/validate_migrations.py
+        language: system
+        files: ^migrations/.*\.sql$
+        pass_filenames: false
+
+      # Example: Environment configuration validation
+      - id: env-config-check
+        name: 🔍 Environment - Configuration Validation
+        entry: python scripts/validate_env_config.py
+        language: system
+        files: ^\.env.*|config/.*\.ya?ml$
+        pass_filenames: false
+
+# ============================================================================
+# MINIMAL CONFIGURATION EXAMPLE
+# ============================================================================
+#
+# For projects starting with basic quality gates, use this minimal configuration:
+#
+# repos:
+#   - repo: https://github.com/pre-commit/pre-commit-hooks
+#     rev: v4.5.0
+#     hooks:
+#       - id: trailing-whitespace
+#       - id: end-of-file-fixer
+#       - id: check-json
+#       - id: check-yaml
+#       - id: check-added-large-files
+#       - id: check-merge-conflict
+#
+#   - repo: https://github.com/trufflesecurity/trufflehog
+#     rev: v3.63.2
+#     hooks:
+#       - id: trufflehog
+#         entry: trufflehog git file://. --since-commit HEAD --only-verified --fail
+#         language: system
+#
+#   - repo: https://github.com/compilerla/conventional-pre-commit
+#     rev: v3.0.0
+#     hooks:
+#       - id: conventional-pre-commit
+#         stages: [commit-msg]
+#
+# ============================================================================

@@ -808,3 +808,7 @@ if (!report.overallPassed) {
 - [no-lint-suppression.md](../../docs/bindings/core/no-lint-suppression.md): Quality gates should enforce lint rules without allowing suppressions. Both bindings prevent the accumulation of quality violations through systematic enforcement of coding standards.
 
 - [use-structured-logging.md](../../docs/bindings/core/use-structured-logging.md): Quality gates can validate that proper logging practices are followed throughout the codebase. Both bindings support systematic quality enforcement and operational excellence.
+
+- [git-hooks-automation.md](../../docs/bindings/core/git-hooks-automation.md): Git hooks provide the first layer of automated quality gates with immediate feedback at commit time. Both bindings create comprehensive quality automation that scales from local development to production deployment.
+
+- [ci-cd-pipeline-standards.md](../../docs/bindings/core/ci-cd-pipeline-standards.md): CI/CD pipelines implement comprehensive automated quality gates across the entire deployment pipeline. Both bindings establish systematic quality enforcement through automation at multiple validation layers.
