@@ -23,6 +23,7 @@ This file contains an automatically generated list of all bindings with their on
 | [fail-fast-validation](./core/fail-fast-validation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function assumptions and constraints visible through immediate validation rather... |
 | [feature-flag-management](./core/feature-flag-management.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating software that can change behavior dynamically without requiring code c... |
 | [flexible-architecture-patterns](./core/flexible-architecture-patterns.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that can evolve gracefully over time. Software requirements ch... |
+| [git-hooks-automation](./core/git-hooks-automation.md) | 0.1.0 | This binding directly implements our automation tenet by eliminating manual quality checks that are prone to human error and inconsistent applicati... |
 | [hex-domain-purity](./core/hex-domain-purity.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
 | [immutable-by-default](./core/immutable-by-default.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
 | [incremental-delivery](./core/incremental-delivery.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating a delivery process that prioritizes safety, speed, and adaptability ov... |
