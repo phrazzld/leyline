@@ -40,6 +40,7 @@ This file contains an automatically generated list of all bindings with their on
 | [technical-debt-tracking](./core/technical-debt-tracking.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating systematic approaches to identify and manage technical shortcuts, compromises, and... |
 | [unified-documentation](./core/unified-documentation.md) | 0.1.0 | This binding implements our DRY tenet by ensuring that knowledge about system behavior, APIs, processes, and decisions exists in exactly one place.... |
 | [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding directly implements our automation tenet by transforming system telemetry |
+| [value-driven-prioritization](./core/value-driven-prioritization.md) | 0.1.0 | This binding directly implements our product-value-first tenet by establishing concrete criteria for development decisions, preventing the accumula... |
 | [yagni-pattern-enforcement](./core/yagni-pattern-enforcement.md) | 0.1.0 | This binding implements our simplicity tenet by attacking complexity at its source—the temptation to build more than what's actually required. YAGN... |
 
 ## Backend Bindings
