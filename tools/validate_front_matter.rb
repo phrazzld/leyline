@@ -182,6 +182,55 @@ def determine_exit_code(errors)
   end
 end
 
+# Validate file path for security and existence
+def validate_file_path(file_path)
+  # Convert to absolute path for consistent checking
+  begin
+    absolute_path = File.expand_path(file_path)
+  rescue ArgumentError => e
+    puts "ERROR: Invalid file path '#{file_path}': #{e.message}"
+    exit 1
+  end
+
+  # Check for directory traversal sequences in the original path
+  if file_path.include?('..')
+    puts "ERROR: Directory traversal detected in path '#{file_path}'"
+    puts "Paths containing '..' are not allowed for security reasons."
+    exit 1
+  end
+
+  # Check if path exists
+  unless File.exist?(absolute_path)
+    puts "ERROR: File does not exist: #{file_path}"
+    exit 1
+  end
+
+  # Check for symlinks first (before File.file? check since it returns true for symlinks to files)
+  if File.symlink?(absolute_path)
+    puts "ERROR: Symbolic links are not allowed: #{file_path}"
+    exit 1
+  end
+
+  # Check if it's a regular file (not directory, device, etc.)
+  unless File.file?(absolute_path)
+    if File.directory?(absolute_path)
+      puts "ERROR: Path is a directory, not a file: #{file_path}"
+    else
+      puts "ERROR: Path is not a regular file: #{file_path}"
+    end
+    exit 1
+  end
+
+  # Check if file is readable
+  unless File.readable?(absolute_path)
+    puts "ERROR: File is not readable: #{file_path}"
+    exit 1
+  end
+
+  # Return the validated absolute path
+  absolute_path
+end
+
 # Process directories and files
 def process_tenets_files
   dir = 'docs/tenets'
@@ -603,6 +652,9 @@ end
 if $single_file
   # If a specific file is specified, just validate that one
   puts "Validating single file: #{$single_file}"
+
+  # Validate file path for security first
+  validated_file = validate_file_path($single_file)
 
   # Determine if it's a tenet or binding based on path
   if $single_file.include?('/tenets/')

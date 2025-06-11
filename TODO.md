@@ -127,7 +127,7 @@
     - **Depends‑on:** [T011]
 
 ## Security
-- [ ] **T013 · Security · P2: implement file path sanitization**
+- [x] **T013 · Security · P2: implement file path sanitization**
     - **Context:** PLAN.md > Security & Configuration > Input Validation
     - **Action:**
         1. Add a check at script startup to validate any input file paths.
