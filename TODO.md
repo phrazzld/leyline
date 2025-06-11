@@ -89,7 +89,7 @@
     - **Depends‑on:** [T007]
 
 ## Main Script & Validation Logic
-- [ ] **T009 · Refactor · P1: integrate new components into the main validation script**
+- [x] **T009 · Refactor · P1: integrate new components into the main validation script**
     - **Context:** PLAN.md > Implementation Priorities > Phase 1
     - **Action:**
         1. Modify the main script to use `YAMLLineTracker.parse` for front-matter extraction.
