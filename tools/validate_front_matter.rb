@@ -223,8 +223,17 @@ def redact_secrets_from_content(content, front_matter)
   front_matter.each do |key, value|
     if is_secret_field?(key) && value.is_a?(String) && !value.empty?
       # Replace the actual secret value with [REDACTED] in the content
-      # Use word boundaries to avoid partial matches
-      redacted_content = redacted_content.gsub(/#{Regexp.escape(value)}\b/, '[REDACTED]')
+      # Use regex replacement without word boundaries to ensure all instances are redacted
+      redacted_content = redacted_content.gsub(/#{Regexp.escape(value)}/, '[REDACTED]')
+
+      # For multiline secrets, also redact individual lines to prevent leaks
+      if value.include?("\n")
+        value.split("\n").each do |line|
+          line = line.strip
+          next if line.empty?
+          redacted_content = redacted_content.gsub(/#{Regexp.escape(line)}/, '[REDACTED]')
+        end
+      end
     end
   end
 
