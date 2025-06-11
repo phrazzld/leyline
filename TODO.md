@@ -117,7 +117,7 @@
         1. Running the script against an invalid file produces the new, richly formatted error output.
     - **Depends‑on:** [T008, T010]
 
-- [ ] **T012 · Chore · P2: preserve exit code strategy for CI compatibility**
+- [x] **T012 · Chore · P2: preserve exit code strategy for CI compatibility**
     - **Context:** PLAN.md > Detailed Build Steps > 5. Maintain Script Structure
     - **Action:**
         1. Ensure the script strictly exits with `0` for success and `1` for any validation error by default.
