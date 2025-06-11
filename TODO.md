@@ -184,7 +184,7 @@
         1. CI-specific output behavior is verified by an automated test.
     - **Depends‑on:** [T017]
 
-- [ ] **T019 · Chore · P3: profile performance against baseline**
+- [x] **T019 · Chore · P3: profile performance against baseline**
     - **Context:** PLAN.md > Risk Matrix & Mitigations > Performance regression
     - **Action:**
         1. Create a benchmark script to run the validator against a large set of files.
