@@ -11,7 +11,7 @@
         2. The class captures `Psych::SyntaxError` with line/column info and returns it in the `errors` array.
     - **Depends‑on:** none
 
-- [ ] **T002 · Feature · P0: implement key-to-line-number mapping in YAMLLineTracker**
+- [x] **T002 · Feature · P0: implement key-to-line-number mapping in YAMLLineTracker**
     - **Context:** PLAN.md > Detailed Build Steps > 1. Extract YAMLLineTracker Class > Implementation
     - **Action:**
         1. Enhance `YAMLLineTracker.parse` to scan the raw YAML text.
@@ -31,7 +31,7 @@
     - **Depends‑on:** [T002]
 
 ## Core Modules: ErrorCollector
-- [ ] **T004 · Feature · P0: create ErrorCollector for structured error aggregation**
+- [x] **T004 · Feature · P0: create ErrorCollector for structured error aggregation**
     - **Context:** PLAN.md > Detailed Build Steps > 2. Create ErrorCollector Class
     - **Action:**
         1. Create `lib/error_collector.rb` with the `ErrorCollector` class.
