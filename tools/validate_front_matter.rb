@@ -182,6 +182,55 @@ def determine_exit_code(errors)
   end
 end
 
+# Common secret field patterns - case insensitive matching
+SECRET_FIELD_PATTERNS = [
+  /\bapi[_-]?key\b/i,
+  /\bpassword\b/i,
+  /\btoken\b/i,
+  /\bsecret\b/i,
+  /\bauth[_-]token\b/i,
+  /\bcredential\b/i,
+  /\bprivate[_-]?key\b/i,
+  /\baccess[_-]?key\b/i,
+  /\bauth[_-]?key\b/i,
+  /\bbearer\b/i,
+  /\boauth\b/i,
+  /\bjwt\b/i
+].freeze
+
+# Check if a field name appears to contain secrets
+def is_secret_field?(field_name)
+  return false unless field_name.is_a?(String)
+
+  SECRET_FIELD_PATTERNS.any? { |pattern| field_name.match?(pattern) }
+end
+
+# Redact a value if it appears to be a secret
+def redact_if_secret(field_name, value)
+  if is_secret_field?(field_name)
+    '[REDACTED]'
+  else
+    value
+  end
+end
+
+# Redact secret values from YAML content for context snippets
+def redact_secrets_from_content(content, front_matter)
+  return content unless front_matter.is_a?(Hash)
+
+  redacted_content = content.dup
+
+  front_matter.each do |key, value|
+    if is_secret_field?(key) && value.is_a?(String) && !value.empty?
+      # Replace the actual secret value with [REDACTED] in the content
+      # Use word boundaries to avoid partial matches
+      redacted_content = redacted_content.gsub(/#{Regexp.escape(value)}\b/, '[REDACTED]')
+    end
+  end
+
+  redacted_content
+end
+
 # Validate file path for security and existence
 def validate_file_path(file_path)
   # Convert to absolute path for consistent checking
@@ -290,6 +339,11 @@ def process_single_file(file, dir_base)
     front_matter = parse_result[:data]
     line_map = parse_result[:line_map]
 
+    # Redact secret values from content for context snippets (if YAML parsed successfully)
+    if front_matter
+      $file_contents[file] = redact_secrets_from_content(content, front_matter)
+    end
+
     # Handle any YAML parsing errors
     parse_result[:errors].each do |error|
       $error_collector.add_error(
@@ -370,7 +424,7 @@ def process_single_file(file, dir_base)
         line: line_map['id'],
         field: 'id',
         type: 'duplicate_id',
-        message: "Duplicate ID '#{id}' in YAML front-matter (already used in #{$all_ids[id]})",
+        message: "Duplicate ID '#{redact_if_secret('id', id)}' in YAML front-matter (already used in #{$all_ids[id]})",
         suggestion: suggestion
       )
       $files_with_issues << file unless $files_with_issues.include?(file)
@@ -397,7 +451,7 @@ def process_single_file(file, dir_base)
         line: line_map['id'],
         field: 'id',
         type: 'invalid_id_format',
-        message: "Invalid ID format '#{id}' in YAML front-matter",
+        message: "Invalid ID format '#{redact_if_secret('id', id)}' in YAML front-matter",
         suggestion: suggestion
       )
       $files_with_issues << file unless $files_with_issues.include?(file)
@@ -525,7 +579,7 @@ def process_single_file(file, dir_base)
             line: line_map['derived_from'],
             field: 'derived_from',
             type: 'nonexistent_tenet_reference',
-            message: "References non-existent tenet '#{derived_from}'",
+            message: "References non-existent tenet '#{redact_if_secret('derived_from', derived_from)}'",
             suggestion: suggestion
           )
           $files_with_issues << file unless $files_with_issues.include?(file)
@@ -586,7 +640,7 @@ def process_single_file(file, dir_base)
               line: line_map[key],
               field: key,
               type: 'invalid_optional_field_format',
-              message: "Invalid format for '#{key}' in YAML front-matter",
+              message: "Invalid format for '#{redact_if_secret(key, key)}' in YAML front-matter",
               suggestion: suggestion
             )
             $files_with_issues << file unless $files_with_issues.include?(file)
@@ -631,6 +685,22 @@ def process_single_file(file, dir_base)
         message: "Unknown key(s) in YAML front-matter: #{unknown_keys.join(', ')}",
         suggestion: suggestion
       )
+      $files_with_issues << file unless $files_with_issues.include?(file)
+    end
+
+    # Check for potential secret fields
+    secret_fields = front_matter.keys.select { |key| is_secret_field?(key) }
+    unless secret_fields.empty?
+      secret_fields.each do |field|
+        $error_collector.add_error(
+          file: file,
+          line: line_map[field],
+          field: field,
+          type: 'potential_secret',
+          message: "Potential secret field '#{field}' detected in YAML front-matter",
+          suggestion: "Remove secret fields from metadata. Secrets should not be stored in version-controlled documentation files. Consider using environment variables or secure secret management systems instead."
+        )
+      end
       $files_with_issues << file unless $files_with_issues.include?(file)
     end
 

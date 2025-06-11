@@ -145,7 +145,7 @@
         1. All YAML parsing is confirmed safe.
     - **Depends‑on:** [T002]
 
-- [ ] **T015 · Security · P2: implement secret detection and redaction in error output**
+- [x] **T015 · Security · P2: implement secret detection and redaction in error output**
     - **Context:** PLAN.md > Security & Configuration > Secrets Handling
     - **Action:**
         1. Add a validation check to identify common secret key names (e.g., `api_key`, `token`, `password`).
