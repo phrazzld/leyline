@@ -175,7 +175,7 @@
         1. The integration suite provides E2E coverage for all defined error scenarios.
     - **Depends‑on:** [T011, T012, T016]
 
-- [ ] **T018 · Test · P2: validate non-TTY output for CI compatibility**
+- [x] **T018 · Test · P2: validate non-TTY output for CI compatibility**
     - **Context:** PLAN.md > Risk Matrix & Mitigations > Color output in CI
     - **Action:**
         1. Add an integration test that runs the script and pipes its output to simulate a non-TTY environment.
