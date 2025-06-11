@@ -76,7 +76,6 @@ FIXTURE_TESTS = {
   "spec/fixtures/bindings/yaml-syntax-error.md" => {
     should_pass: false,
     expected_exit_code: 1,
-    expected_exit_code_granular: 2, # Syntax errors in granular mode
     expected_stderr_includes: [
       "Validation failed with",
       "YAML syntax error",
@@ -89,7 +88,6 @@ FIXTURE_TESTS = {
   "spec/fixtures/bindings/no-front-matter.md" => {
     should_pass: false,
     expected_exit_code: 1,
-    expected_exit_code_granular: 2, # Syntax errors in granular mode
     expected_stderr_includes: [
       "No front-matter found",
       "files must begin with YAML front-matter"
@@ -100,7 +98,6 @@ FIXTURE_TESTS = {
   "spec/fixtures/bindings/missing-required-fields.md" => {
     should_pass: false,
     expected_exit_code: 1,
-    expected_exit_code_granular: 3, # Field errors in granular mode
     expected_stderr_includes: [
       "Missing required keys",
       "derived_from, enforced_by, version",
@@ -113,7 +110,6 @@ FIXTURE_TESTS = {
   "spec/fixtures/bindings/invalid-field-formats.md" => {
     should_pass: false,
     expected_exit_code: 1,
-    expected_exit_code_granular: 3, # Field errors in granular mode
     expected_stderr_includes: [
       "Invalid ID format",
       "Invalid date format",
@@ -126,7 +122,6 @@ FIXTURE_TESTS = {
   "spec/fixtures/bindings/unknown-fields.md" => {
     should_pass: false,
     expected_exit_code: 1,
-    expected_exit_code_granular: 3, # Field errors in granular mode
     expected_stderr_includes: [
       "Unknown key(s) in YAML front-matter"
     ]
@@ -135,7 +130,6 @@ FIXTURE_TESTS = {
   "spec/fixtures/bindings/nonexistent-tenet-reference.md" => {
     should_pass: false,
     expected_exit_code: 1,
-    expected_exit_code_granular: 3, # Field errors in granular mode
     expected_stderr_includes: [
       "References non-existent tenet"
     ]
@@ -145,7 +139,6 @@ FIXTURE_TESTS = {
   "spec/fixtures/bindings/potential-secrets.md" => {
     should_pass: false,
     expected_exit_code: 1,
-    expected_exit_code_granular: 3, # Field errors in granular mode
     expected_stderr_includes: [
       "Potential secret field",
       "api_key",
@@ -216,15 +209,6 @@ def test_fixtures
       end
     end
 
-    # Test granular exit codes if specified
-    if expected[:expected_exit_code_granular]
-      test "#{test_name} - granular exit codes" do
-        result = run_validation(file_path, "-g")
-
-        assert_equal(expected[:expected_exit_code_granular], result[:exit_code],
-                     "Granular exit code mismatch for #{file_path}")
-      end
-    end
   end
 end
 
@@ -269,19 +253,19 @@ def test_ci_compatibility
   end
 
   test "CI environment handles different exit code modes correctly" do
-    # Test granular exit codes work properly in CI (using proper exit code capture)
-    cmd = "ruby tools/validate_front_matter.rb -g -f spec/fixtures/bindings/yaml-syntax-error.md"
+    # Test consistent exit codes work properly in CI (using proper exit code capture)
+    cmd = "ruby tools/validate_front_matter.rb -f spec/fixtures/bindings/yaml-syntax-error.md"
     stdout, stderr, status = Open3.capture3(cmd)
 
-    # Should have exit code 2 for syntax errors in granular mode
-    assert_equal(2, status.exitstatus, "Expected exit code 2 for syntax errors in granular mode")
+    # Should have exit code 1 for any validation errors
+    assert_equal(1, status.exitstatus, "Expected exit code 1 for validation errors")
 
     # Combine output and check for no color codes (simulating CI pipe behavior)
     combined_output = stdout + stderr
-    assert_not_includes(combined_output, "\e[", "Expected no ANSI codes in granular mode output")
+    assert_not_includes(combined_output, "\e[", "Expected no ANSI codes in CI output")
 
     # Should still have structured content
-    assert_includes(stderr, "Validation failed with", "Expected error header in granular mode")
+    assert_includes(stderr, "Validation failed with", "Expected error header in CI output")
   end
 end
 

@@ -21,7 +21,7 @@
         3. Check both TTY and non-TTY output modes
     - **Depends-on:** none
 
-- [~] **CRITICAL-002 · Bugfix · P0: fix script crash on invalid path detection**
+- [x] **CRITICAL-002 · Bugfix · P0: fix script crash on invalid path detection**
     - **Context:** Code Review Synthesis > BLOCK-002 - Script Crash on Invalid Path Detection
     - **Location:** `tools/validate_front_matter.rb:356-363`
     - **Issue:** Script continues execution after detecting invalid path, causing nil `dir_base` crash
@@ -39,7 +39,7 @@
         3. Verify no subsequent processing attempts
     - **Depends-on:** none
 
-- [ ] **CRITICAL-003 · Bugfix · P0: standardize exit code handling throughout script**
+- [~] **CRITICAL-003 · Bugfix · P0: standardize exit code handling throughout script**
     - **Context:** Code Review Synthesis > BLOCK-003 - Inconsistent Exit Code Handling
     - **Location:** Multiple exit points throughout script
     - **Issue:** Inconsistent exit code strategy could break CI/CD pipelines

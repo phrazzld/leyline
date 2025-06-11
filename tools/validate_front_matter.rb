@@ -20,7 +20,7 @@
 # 5. All referenced tenets exist
 #
 # The script will report errors and warnings:
-# - Errors will cause validation to fail (exit code 1)
+# - Exit codes: 0 = success, 1 = any validation errors
 # - Warnings are reported but will not fail validation
 #
 # Warnings include:
@@ -104,9 +104,6 @@ parser = OptionParser.new do |opts|
     options[:verbose] = true
   end
 
-  opts.on("-g", "--granular-exit-codes", "Use granular exit codes (2=syntax, 3=field errors) instead of 1 for all errors") do
-    options[:granular_exit_codes] = true
-  end
 
   opts.on("-h", "--help", "Show this help message") do
     puts opts
@@ -116,14 +113,11 @@ parser = OptionParser.new do |opts|
   opts.separator ""
   opts.separator "Exit Codes:"
   opts.separator "  0 - All files validated successfully"
-  opts.separator "  1 - Validation errors found (default mode)"
-  opts.separator "  2 - YAML syntax errors found (granular mode only)"
-  opts.separator "  3 - Field validation errors found (granular mode only)"
+  opts.separator "  1 - Validation errors found"
   opts.separator ""
   opts.separator "Examples:"
   opts.separator "  ruby tools/validate_front_matter.rb             # Validate all files"
   opts.separator "  ruby tools/validate_front_matter.rb -f path.md  # Validate single file"
-  opts.separator "  ruby tools/validate_front_matter.rb -g          # Use granular exit codes"
 end
 
 parser.parse!
@@ -134,7 +128,6 @@ $files_with_issues = []  # Track files with issues
 $warnings_found = []     # Track warnings (non-fatal issues)
 $single_file = options[:file]
 $verbose = options[:verbose]
-$granular_exit_codes = options[:granular_exit_codes]
 $error_collector = ErrorCollector.new  # Enhanced error collection
 $file_contents = {}      # Store file contents for context snippets
 
@@ -162,24 +155,9 @@ def detect_front_matter_format(content)
   end
 end
 
-# Determine exit code based on error types (when granular exit codes are enabled)
+# Determine exit code - always returns 1 for any error, 0 for success
 def determine_exit_code(errors)
-  return 1 unless $granular_exit_codes
-
-  # Categorize error types
-  syntax_error_types = %w[yaml_syntax empty_frontmatter no_frontmatter]
-
-  has_syntax_errors = errors.any? { |error| syntax_error_types.include?(error[:type]) }
-  has_field_errors = errors.any? { |error| !syntax_error_types.include?(error[:type]) }
-
-  # Priority: syntax errors take precedence over field errors
-  if has_syntax_errors
-    2  # Syntax errors
-  elsif has_field_errors
-    3  # Field errors
-  else
-    1  # Fallback for any other errors
-  end
+  errors.any? ? 1 : 0
 end
 
 # Common secret field patterns - case insensitive matching
@@ -791,7 +769,7 @@ if $error_collector.any?
   $stderr.puts
   $stderr.puts "Metadata validation failed!"
 
-  # Use granular exit codes if enabled, otherwise default to 1
+  # Exit with code 1 for any validation errors
   exit_code = determine_exit_code($error_collector.errors)
   exit exit_code
 else
