@@ -20,7 +20,7 @@
         1. The `:line_map` hash is accurately populated for valid YAML input.
     - **Depends‑on:** [T001]
 
-- [ ] **T003 · Test · P1: add unit tests for YAMLLineTracker**
+- [x] **T003 · Test · P1: add unit tests for YAMLLineTracker**
     - **Context:** PLAN.md > Testing Strategy > Unit Tests
     - **Action:**
         1. Write tests to verify correct key-to-line number mapping.
@@ -42,7 +42,7 @@
         2. A method exists to retrieve all collected errors.
     - **Depends‑on:** none
 
-- [ ] **T005 · Test · P1: add unit tests for ErrorCollector**
+- [x] **T005 · Test · P1: add unit tests for ErrorCollector**
     - **Context:** PLAN.md > Testing Strategy > Unit Tests
     - **Action:**
         1. Write tests to verify that multiple errors are added and stored correctly.
@@ -52,7 +52,7 @@
     - **Depends‑on:** [T004]
 
 ## Core Modules: ErrorFormatter
-- [ ] **T006 · Feature · P1: build ErrorFormatter with colorization and TTY support**
+- [x] **T006 · Feature · P1: build ErrorFormatter with colorization and TTY support**
     - **Context:** PLAN.md > Detailed Build Steps > 3. Build ErrorFormatter Class
     - **Action:**
         1. Create `lib/error_formatter.rb` with the `ErrorFormatter` class and a `render` method.
@@ -66,7 +66,7 @@
         2. Run script with `NO_COLOR=1` or pipe output (`| cat`); confirm output is plain text.
     - **Depends‑on:** [T005]
 
-- [ ] **T007 · Feature · P2: add context snippets to ErrorFormatter output**
+- [x] **T007 · Feature · P2: add context snippets to ErrorFormatter output**
     - **Context:** PLAN.md > Detailed Build Steps > 3. Build ErrorFormatter Class > Features
     - **Action:**
         1. Modify the `ErrorFormatter.render` method to accept the original file content.
@@ -78,7 +78,7 @@
         2. Confirm the formatted output includes the correct lines from the source file.
     - **Depends‑on:** [T006]
 
-- [ ] **T008 · Test · P2: add unit tests for ErrorFormatter**
+- [x] **T008 · Test · P2: add unit tests for ErrorFormatter**
     - **Context:** PLAN.md > Testing Strategy > Unit Tests
     - **Action:**
         1. Test colorization logic for TTY and `NO_COLOR` scenarios.
@@ -99,7 +99,7 @@
         2. The script's public CLI interface and basic exit codes (0/1) remain unchanged.
     - **Depends‑on:** [T002, T004]
 
-- [ ] **T010 · Feature · P1: enhance field validators with specific suggestions**
+- [x] **T010 · Feature · P1: enhance field validators with specific suggestions**
     - **Context:** PLAN.md > Detailed Build Steps > 4. Enhanced Field Validation
     - **Action:**
         1. Update validators to generate precise, actionable `suggestion` strings for common errors (e.g., unquoted dates, invalid formats, missing fields, unknown fields).
@@ -108,7 +108,7 @@
         1. All core validation checks produce a helpful `suggestion` string and include the correct line number.
     - **Depends‑on:** [T009]
 
-- [ ] **T011 · Feature · P2: integrate ErrorFormatter for final output**
+- [x] **T011 · Feature · P2: integrate ErrorFormatter for final output**
     - **Context:** PLAN.md > Architecture Blueprint > Data Flow
     - **Action:**
         1. At the end of the script's execution, check if the `ErrorCollector` has errors.
@@ -136,7 +136,7 @@
         1. The script exits with a clear error if a malicious or invalid path is provided.
     - **Depends‑on:** none
 
-- [ ] **T014 · Security · P1: confirm safe YAML parsing is used exclusively**
+- [x] **T014 · Security · P1: confirm safe YAML parsing is used exclusively**
     - **Context:** PLAN.md > Security & Configuration > YAML Safety
     - **Action:**
         1. Confirm that `YAMLLineTracker` uses `Psych.parse` or `YAML.safe_load` and not the unsafe `YAML.load`.
@@ -155,7 +155,7 @@
     - **Depends‑on:** [T010]
 
 ## Testing & Quality Assurance
-- [ ] **T016 · Chore · P1: create fixture files for all error scenarios**
+- [x] **T016 · Chore · P1: create fixture files for all error scenarios**
     - **Context:** PLAN.md > Testing Strategy > Integration Tests
     - **Action:**
         1. Create a `spec/fixtures` directory.

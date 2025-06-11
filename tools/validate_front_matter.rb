@@ -36,6 +36,7 @@ require 'date'
 # Load enhanced validation components
 require_relative '../lib/yaml_line_tracker'
 require_relative '../lib/error_collector'
+require_relative '../lib/error_formatter'
 
 # Configuration
 REQUIRED_KEYS = {
@@ -123,6 +124,7 @@ $warnings_found = []     # Track warnings (non-fatal issues)
 $single_file = options[:file]
 $verbose = options[:verbose]
 $error_collector = ErrorCollector.new  # Enhanced error collection
+$file_contents = {}      # Store file contents for context snippets
 
 # Helper to print styled error messages
 def print_error(file, message, details = nil, exit_code = 1)
@@ -194,6 +196,8 @@ end
 
 def process_single_file(file, dir_base)
   content = File.read(file)
+  # Store content for ErrorFormatter context snippets
+  $file_contents[file] = content
   format = detect_front_matter_format(content)
 
   # Extract front-matter - must use YAML format with triple dashes
@@ -234,13 +238,33 @@ def process_single_file(file, dir_base)
     # Check required keys
     missing_keys = REQUIRED_KEYS[dir_base] - front_matter.keys
     unless missing_keys.empty?
+      # Generate specific suggestions for each missing field
+      examples = missing_keys.map do |key|
+        case key
+        when 'id'
+          "id: #{File.basename(file, '.md').gsub('_', '-')}"
+        when 'last_modified'
+          "last_modified: '#{Date.today.strftime('%Y-%m-%d')}'"
+        when 'version'
+          "version: '#{get_expected_version}'"
+        when 'derived_from'
+          "derived_from: parent-tenet-id"
+        when 'enforced_by'
+          "enforced_by: 'Linter, Code Review'"
+        else
+          "#{key}: [value]"
+        end
+      end
+
+      suggestion = "Add missing field(s) to your front-matter:\n#{examples.map { |ex| "  #{ex}" }.join("\n")}"
+
       $error_collector.add_error(
         file: file,
         line: nil,
         field: nil,
         type: 'missing_required_fields',
         message: "Missing required keys in YAML front-matter: #{missing_keys.join(', ')}",
-        suggestion: "#{dir_base.capitalize} must include: #{REQUIRED_KEYS[dir_base].join(', ')}. See TENET_FORMATTING.md for the standard format."
+        suggestion: suggestion
       )
       $files_with_issues << file unless $files_with_issues.include?(file)
     end
@@ -248,26 +272,52 @@ def process_single_file(file, dir_base)
     # Check for unique ID
     id = front_matter['id']
     if $all_ids[id]
+      # Generate specific alternative suggestions
+      base_filename = File.basename(file, '.md').gsub('_', '-')
+      alternatives = [
+        "#{base_filename}",
+        "#{id}-v2",
+        "#{id}-#{dir_base.gsub('s', '')}",
+        "#{base_filename}-#{Dir.glob("#{File.dirname(file)}/*.md").length}"
+      ].uniq.reject { |alt| alt == id }
+
+      suggestion = "ID '#{id}' is already used in #{$all_ids[id]}. Try one of these alternatives:\n" +
+                   alternatives.first(3).map { |alt| "  id: #{alt}" }.join("\n")
+
       $error_collector.add_error(
         file: file,
         line: line_map['id'],
         field: 'id',
         type: 'duplicate_id',
         message: "Duplicate ID '#{id}' in YAML front-matter (already used in #{$all_ids[id]})",
-        suggestion: "Each document must have a unique ID. Choose a different ID value."
+        suggestion: suggestion
       )
       $files_with_issues << file unless $files_with_issues.include?(file)
     end
 
     # Validate ID format
     unless VALIDATORS['id'].call(id)
+      # Generate specific fix based on the invalid ID
+      fixed_id = id.to_s.downcase.gsub(/[^a-z0-9-]/, '-').gsub(/-+/, '-').gsub(/^-|-$/, '')
+      fixed_id = 'invalid-id' if fixed_id.empty?
+
+      suggestion = if id.to_s.match?(/[A-Z]/)
+        "ID contains uppercase letters. Use lowercase: id: #{fixed_id}"
+      elsif id.to_s.match?(/[^a-z0-9-]/)
+        "ID contains invalid characters. Use only lowercase letters, numbers, and hyphens: id: #{fixed_id}"
+      elsif id.to_s.match?(/^-|-$/)
+        "ID cannot start or end with hyphens: id: #{fixed_id}"
+      else
+        "ID must contain only lowercase letters, numbers, and hyphens: id: #{fixed_id}"
+      end
+
       $error_collector.add_error(
         file: file,
         line: line_map['id'],
         field: 'id',
         type: 'invalid_id_format',
         message: "Invalid ID format '#{id}' in YAML front-matter",
-        suggestion: "ID must contain only lowercase letters, numbers, and hyphens (e.g., 'example-id')."
+        suggestion: suggestion
       )
       $files_with_issues << file unless $files_with_issues.include?(file)
     end
@@ -297,7 +347,7 @@ def process_single_file(file, dir_base)
     version = front_matter['version']
     expected_version = get_expected_version
     unless VALIDATORS['version'].call(version)
-      if version.nil? || version.empty?
+      if version.nil? || (version.is_a?(String) && version.empty?)
         $error_collector.add_error(
           file: file,
           line: line_map['version'],
@@ -335,41 +385,99 @@ def process_single_file(file, dir_base)
       # Validate derived_from exists and has correct format
       derived_from = front_matter['derived_from']
       unless VALIDATORS['derived_from'].call(derived_from)
+        # Generate specific fix suggestion based on the type of error
+        suggestion = if derived_from.nil?
+          "The 'derived_from' field is required for bindings. Example: derived_from: 'simplicity'"
+        elsif !derived_from.is_a?(String)
+          "The 'derived_from' field must be a string. Change to: derived_from: '#{derived_from}'"
+        elsif derived_from.match?(/[A-Z]/)
+          fixed_id = derived_from.downcase.gsub(/[^a-z0-9-]/, '-').gsub(/-+/, '-').gsub(/^-|-$/, '')
+          "The 'derived_from' field contains uppercase letters. Use: derived_from: '#{fixed_id}'"
+        elsif derived_from.match?(/[^a-z0-9-]/)
+          fixed_id = derived_from.downcase.gsub(/[^a-z0-9-]/, '-').gsub(/-+/, '-').gsub(/^-|-$/, '')
+          "The 'derived_from' field contains invalid characters. Use: derived_from: '#{fixed_id}'"
+        else
+          "The 'derived_from' field must contain only lowercase letters, numbers, and hyphens. Example: derived_from: 'simplicity'"
+        end
+
         $error_collector.add_error(
           file: file,
           line: line_map['derived_from'],
           field: 'derived_from',
           type: 'invalid_derived_from_format',
           message: "Invalid format for 'derived_from' in YAML front-matter",
-          suggestion: "The 'derived_from' field must be a string containing only lowercase letters, numbers, and hyphens."
+          suggestion: suggestion
         )
         $files_with_issues << file unless $files_with_issues.include?(file)
       end
 
-      # Check that derived_from references an existing tenet
-      tenet_file = Dir.glob("docs/tenets/#{derived_from}.md").first
-      unless tenet_file
-        $error_collector.add_error(
-          file: file,
-          line: line_map['derived_from'],
-          field: 'derived_from',
-          type: 'nonexistent_tenet_reference',
-          message: "References non-existent tenet '#{derived_from}'",
-          suggestion: "The 'derived_from' field must reference an existing tenet ID. Check docs/tenets/ for available tenets."
-        )
-        $files_with_issues << file unless $files_with_issues.include?(file)
+      # Check that derived_from references an existing tenet (only if not nil)
+      if derived_from && !derived_from.empty?
+        tenet_file = Dir.glob("docs/tenets/#{derived_from}.md").first
+        unless tenet_file
+        # Get available tenets to suggest alternatives
+        available_tenets = Dir.glob("docs/tenets/*.md")
+          .reject { |f| f =~ /00-index\.md$/ }
+          .map { |f| File.basename(f, '.md') }
+          .sort
+
+        # Find close matches using simple string similarity
+        close_matches = available_tenets.select { |tenet|
+          tenet.include?(derived_from) || derived_from.include?(tenet) ||
+          (tenet.length > 3 && derived_from.length > 3 &&
+           (tenet[0..2] == derived_from[0..2] || tenet[-3..-1] == derived_from[-3..-1]))
+        }.first(3)
+
+        suggestion = if close_matches.any?
+          "Tenet '#{derived_from}' does not exist. Did you mean one of these?\n" +
+          close_matches.map { |t| "  derived_from: '#{t}'" }.join("\n") +
+          "\n\nAvailable tenets: #{available_tenets.first(5).join(', ')}" +
+          (available_tenets.length > 5 ? ", and #{available_tenets.length - 5} more" : "")
+        else
+          "Tenet '#{derived_from}' does not exist. Available tenets:\n" +
+          available_tenets.first(10).map { |t| "  #{t}" }.join("\n") +
+          (available_tenets.length > 10 ? "\n  ... and #{available_tenets.length - 10} more" : "")
+        end
+
+          $error_collector.add_error(
+            file: file,
+            line: line_map['derived_from'],
+            field: 'derived_from',
+            type: 'nonexistent_tenet_reference',
+            message: "References non-existent tenet '#{derived_from}'",
+            suggestion: suggestion
+          )
+          $files_with_issues << file unless $files_with_issues.include?(file)
+        end
       end
 
       # Validate enforced_by field
       enforced_by = front_matter['enforced_by']
       unless VALIDATORS['enforced_by'].call(enforced_by)
+        # Generate specific suggestions based on the error type
+        suggestion = if enforced_by.nil?
+          "The 'enforced_by' field is required for bindings. Examples:\n" +
+          "  enforced_by: 'Linter, Code Review'\n" +
+          "  enforced_by: 'CI Pipeline, Static Analysis'\n" +
+          "  enforced_by: 'Manual Review'"
+        elsif !enforced_by.is_a?(String)
+          "The 'enforced_by' field must be a string. Change to: enforced_by: '#{enforced_by}'"
+        elsif enforced_by.empty?
+          "The 'enforced_by' field cannot be empty. Examples:\n" +
+          "  enforced_by: 'Linter, Code Review'\n" +
+          "  enforced_by: 'CI Pipeline, Static Analysis'\n" +
+          "  enforced_by: 'Manual Review'"
+        else
+          "The 'enforced_by' field must be a non-empty string describing how this binding is enforced."
+        end
+
         $error_collector.add_error(
           file: file,
           line: line_map['enforced_by'],
           field: 'enforced_by',
           type: 'invalid_enforced_by_format',
           message: "Invalid format for 'enforced_by' in YAML front-matter",
-          suggestion: "The 'enforced_by' field must be a non-empty string."
+          suggestion: suggestion
         )
         $files_with_issues << file unless $files_with_issues.include?(file)
       end
@@ -380,13 +488,25 @@ def process_single_file(file, dir_base)
       OPTIONAL_KEYS['bindings'].each do |key, validator|
         if front_matter.key?(key)
           unless validator.call(front_matter[key])
+            # Generate specific suggestions for optional field validation errors
+            suggestion = case key
+            when 'category'
+              "The 'category' field should be a string. Example: category: 'frontend'"
+            when 'priority'
+              "The 'priority' field should be a string like 'high', 'medium', or 'low'."
+            when 'tags'
+              "The 'tags' field should be an array of strings. Example: tags: ['security', 'performance']"
+            else
+              "The '#{key}' field has an invalid format. Check the documentation for the expected format."
+            end
+
             $error_collector.add_error(
               file: file,
               line: line_map[key],
               field: key,
               type: 'invalid_optional_field_format',
               message: "Invalid format for '#{key}' in YAML front-matter",
-              suggestion: "Invalid value format."
+              suggestion: suggestion
             )
             $files_with_issues << file unless $files_with_issues.include?(file)
           end
@@ -402,13 +522,33 @@ def process_single_file(file, dir_base)
 
     unknown_keys = front_matter.keys - allowed_keys
     unless unknown_keys.empty?
+      # Generate specific suggestions for unknown fields
+      suggestions_for_keys = unknown_keys.map do |key|
+        # Check if it's a common typo or similar to a valid key
+        close_match = allowed_keys.find { |valid_key|
+          # Check for common typos or similar names
+          valid_key.include?(key) || key.include?(valid_key) ||
+          (key.length > 2 && valid_key.length > 2 &&
+           (key[0..1] == valid_key[0..1] || key[-2..-1] == valid_key[-2..-1]))
+        }
+
+        if close_match
+          "  '#{key}' -> did you mean '#{close_match}'?"
+        else
+          "  '#{key}' -> not a valid field, remove it"
+        end
+      end
+
+      suggestion = "Remove or fix unknown field(s):\n#{suggestions_for_keys.join("\n")}\n\n" +
+                   "Valid #{dir_base} fields: #{allowed_keys.join(', ')}"
+
       $error_collector.add_error(
         file: file,
         line: nil,
         field: nil,
         type: 'unknown_fields',
         message: "Unknown key(s) in YAML front-matter: #{unknown_keys.join(', ')}",
-        suggestion: "Only these keys are allowed: #{allowed_keys.join(', ')}. Remove unknown keys or check TENET_FORMATTING.md for valid fields."
+        suggestion: suggestion
       )
       $files_with_issues << file unless $files_with_issues.include?(file)
     end
@@ -471,18 +611,14 @@ end
 
 # Summarize results
 if $error_collector.any?
-  # Output collected errors (enhanced format will be added later)
-  puts "\nValidation errors found:"
-  $error_collector.errors.each do |error|
-    puts "  [ERROR] #{error[:file]}: #{error[:message]}"
-    if error[:line]
-      puts "    Line #{error[:line]}" + (error[:field] ? " (field: #{error[:field]})" : "")
-    end
-    puts "    Suggestion: #{error[:suggestion]}" if error[:suggestion]
-    puts
-  end
+  # Use ErrorFormatter for enhanced error output
+  formatter = ErrorFormatter.new
+  formatted_output = formatter.render($error_collector.errors, $file_contents)
 
-  puts "Metadata validation failed!"
+  # Output to STDERR for proper error stream handling
+  $stderr.puts formatted_output
+  $stderr.puts
+  $stderr.puts "Metadata validation failed!"
   exit 1
 else
   puts "All files validated successfully!"
