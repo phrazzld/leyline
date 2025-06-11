@@ -750,6 +750,14 @@ if $single_file
       suggestion: "Path must include /tenets/ or /bindings/ to identify the file type."
     )
     $files_with_issues << $single_file unless $files_with_issues.include?($single_file)
+
+    # Display the error and exit immediately to prevent nil dir_base crash in process_single_file
+    formatter = ErrorFormatter.new
+    formatted_output = formatter.render($error_collector.errors, $file_contents)
+    $stderr.puts formatted_output
+    $stderr.puts
+    $stderr.puts "Metadata validation failed!"
+    exit 1
   end
 
   process_single_file($single_file, dir_base)

@@ -2,7 +2,7 @@
 
 ## Merge-Blocking Issues
 
-- [~] **CRITICAL-001 · Security · P0: fix secret redaction regex vulnerability**
+- [x] **CRITICAL-001 · Security · P0: fix secret redaction regex vulnerability**
     - **Context:** Code Review Synthesis > BLOCK-001 - Secret Redaction Security Vulnerability
     - **Location:** `tools/validate_front_matter.rb:525-535`
     - **Issue:** Current regex `/\b#{Regexp.escape(value)}\b/` fails to redact secrets not on word boundaries
@@ -21,7 +21,7 @@
         3. Check both TTY and non-TTY output modes
     - **Depends-on:** none
 
-- [ ] **CRITICAL-002 · Bugfix · P0: fix script crash on invalid path detection**
+- [~] **CRITICAL-002 · Bugfix · P0: fix script crash on invalid path detection**
     - **Context:** Code Review Synthesis > BLOCK-002 - Script Crash on Invalid Path Detection
     - **Location:** `tools/validate_front_matter.rb:356-363`
     - **Issue:** Script continues execution after detecting invalid path, causing nil `dir_base` crash
