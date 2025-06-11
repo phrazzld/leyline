@@ -165,7 +165,7 @@
         1. A comprehensive set of fixture files exists to cover all defined error conditions.
     - **Depends‑on:** none
 
-- [ ] **T017 · Test · P2: write end-to-end integration tests using fixtures**
+- [x] **T017 · Test · P2: write end-to-end integration tests using fixtures**
     - **Context:** PLAN.md > Testing Strategy > Integration Tests
     - **Action:**
         1. Create an integration test suite that runs the main script as a subprocess against each fixture file.
