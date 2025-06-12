@@ -21,7 +21,7 @@
         1. A documented standard for security bindings, including required front-matter fields, is created and checked in.
     - **Depends‑on:** none
 
-- [ ] **T003 · Chore · P1: decide on cross-category dependency reference standards**
+- [x] **T003 · Chore · P1: decide on cross-category dependency reference standards**
     - **Context:** Open Questions for Resolution > 4. Cross-Category Dependencies
     - **Action:**
         1. Analyze how security bindings should reference patterns in other categories (e.g., observability) to maintain clarity.
