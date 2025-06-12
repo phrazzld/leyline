@@ -95,4 +95,6 @@ _No cli bindings defined yet._
 
 ## Security Bindings
 
-_No security bindings defined yet._
+| ID | Version | Summary |
+|---|---|---|
+| [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that security concerns be visible, documented, and intentional archi... |

@@ -40,7 +40,7 @@
     - **Depends‑on:** none
 
 ## Security Binding Category - Core Content
-- [ ] **T005 · Feature · P2: create `secure-by-design-principles.md` binding**
+- [x] **T005 · Feature · P2: create `secure-by-design-principles.md` binding**
     - **Context:** Detailed Implementation Steps > Phase 2: Core Security Bindings Implementation > 2.1 Secure-by-Design Principles
     - **Action:**
         1. Create the file `docs/bindings/categories/security/secure-by-design-principles.md`.
