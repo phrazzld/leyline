@@ -92,3 +92,7 @@ _No cli bindings defined yet._
 | [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, |
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
+
+## Security Bindings
+
+_No security bindings defined yet._

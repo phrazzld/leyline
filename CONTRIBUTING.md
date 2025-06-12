@@ -233,7 +233,26 @@ The pre-commit hooks will handle basic formatting like trailing whitespace and l
 
   ```
 
-  ```
+### Security-Specific Bindings
+
+Security bindings require additional considerations beyond the standard binding requirements:
+
+**Location**: All security bindings are placed in `docs/bindings/categories/security/`
+
+**Additional Requirements:**
+- Must follow [Security Binding Documentation Standards](docs/security-binding-standards.md)
+- Examples must use only placeholder credentials (never real secrets)
+- Must specify concrete security tools in the `enforced_by` field
+- Must address realistic security threats and vulnerabilities
+- Must be reviewed for security domain accuracy
+
+**Security Content Standards:**
+- **No sensitive information**: Examples must contain only placeholder credentials like `your-api-key-here` or `${API_KEY}`
+- **Realistic scenarios**: Address actual security challenges developers face
+- **Clear enforcement**: Specify concrete security tools and processes
+- **Threat-focused**: Connect security practices to real threats and attack vectors
+
+For complete guidelines on creating security bindings, including enforcement patterns, content standards, and security-specific template adaptations, see the [Security Binding Documentation Standards](docs/security-binding-standards.md).
 
 ### Cross-Cutting Bindings Strategy
 

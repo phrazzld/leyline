@@ -11,7 +11,7 @@
         2. Directory permissions are consistent with other category directories.
     - **Depends‑on:** none
 
-- [ ] **T002 · Chore · P1: establish security binding documentation standards**
+- [x] **T002 · Chore · P1: establish security binding documentation standards**
     - **Context:** Detailed Implementation Steps > Phase 1: Foundation Setup > 2. Establish Security Binding Standards
     - **Action:**
         1. Review the existing binding template and create a security-specific version or document security-specific sections.
