@@ -73,7 +73,7 @@
         2. The content includes sections on enforcement (audit tools) and validation (test coverage, compliance checks).
     - **Depends‑on:** [T001, T002, T003]
 
-- [ ] **T008 · Feature · P2: create `secrets-management-practices.md` binding**
+- [x] **T008 · Feature · P2: create `secrets-management-practices.md` binding**
     - **Context:** Detailed Implementation Steps > Phase 2: Core Security Bindings Implementation > 2.4 Secrets Management Practices
     - **Action:**
         1. Create the file `docs/bindings/categories/security/secrets-management-practices.md`.
