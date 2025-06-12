@@ -118,7 +118,7 @@
         2. Run `ruby reindex.rb` and check generated index files for new entries.
     - **Depends‑on:** [T010]
 
-- [ ] **T012 · Chore · P1: perform content quality assurance on all new security bindings**
+- [x] **T012 · Chore · P1: perform content quality assurance on all new security bindings**
     - **Context:** Detailed Implementation Steps > Phase 3: Integration and Validation > 3. Content Quality Assurance
     - **Action:**
         1. Review all 5 new security bindings for consistency in style, structure, and tone.
