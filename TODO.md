@@ -51,7 +51,7 @@
         2. The content includes sections on enforcement (review checklists) and validation (review process).
     - **Depends‑on:** [T001, T002, T003]
 
-- [ ] **T006 · Feature · P2: create `input-validation-standards.md` binding**
+- [x] **T006 · Feature · P2: create `input-validation-standards.md` binding**
     - **Context:** Detailed Implementation Steps > Phase 2: Core Security Bindings Implementation > 2.2 Input Validation Standards
     - **Action:**
         1. Create the file `docs/bindings/categories/security/input-validation-standards.md`.
