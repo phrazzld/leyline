@@ -62,7 +62,7 @@
         2. The content includes sections on enforcement (static analysis) and validation (test coverage requirements).
     - **Depends‑on:** [T001, T002, T003]
 
-- [ ] **T007 · Feature · P2: create `authentication-authorization-patterns.md` binding**
+- [x] **T007 · Feature · P2: create `authentication-authorization-patterns.md` binding**
     - **Context:** Detailed Implementation Steps > Phase 2: Core Security Bindings Implementation > 2.3 Authentication/Authorization Patterns
     - **Action:**
         1. Create the file `docs/bindings/categories/security/authentication-authorization-patterns.md`.
