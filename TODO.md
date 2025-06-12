@@ -96,7 +96,7 @@
     - **Depends‑on:** [T001, T002, T003]
 
 ## Security Binding Category - Integration & Validation
-- [ ] **T010 · Refactor · P2: integrate security cross-references into related bindings**
+- [~] **T010 · Refactor · P2: integrate security cross-references into related bindings**
     - **Context:** Detailed Implementation Steps > Phase 3: Integration and Validation > 1. Cross-Reference Integration
     - **Action:**
         1. Identify existing tenets and bindings that should link to the new security bindings.
