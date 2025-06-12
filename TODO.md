@@ -84,7 +84,7 @@
         2. The content includes sections on enforcement (secret detection tools) and validation (scanning automation).
     - **Depends‑on:** [T001, T002, T003]
 
-- [ ] **T009 · Feature · P2: create `secure-coding-checklist.md` binding**
+- [x] **T009 · Feature · P2: create `secure-coding-checklist.md` binding**
     - **Context:** Detailed Implementation Steps > Phase 2: Core Security Bindings Implementation > 2.5 Secure Coding Checklist
     - **Action:**
         1. Create the file `docs/bindings/categories/security/secure-coding-checklist.md`.
