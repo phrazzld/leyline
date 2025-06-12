@@ -30,7 +30,7 @@
         1. A standard for cross-category references is documented in the project's contribution guidelines.
     - **Depends‑on:** none
 
-- [ ] **T004 · Chore · P1: decide on engagement of external security experts for review**
+- [x] **T004 · Chore · P1: decide on engagement of external security experts for review**
     - **Context:** Open Questions for Resolution > 1. Security Domain Expertise
     - **Action:**
         1. Evaluate the need and cost/benefit of engaging an external security expert for content review.
