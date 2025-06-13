@@ -93,6 +93,12 @@ _No cli bindings defined yet._
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 
+## Database Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [migration-management-strategy](./categories/database/migration-management-strategy.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating the complexity |
+
 ## Security Bindings
 
 | ID | Version | Summary |

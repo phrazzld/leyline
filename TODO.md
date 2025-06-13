@@ -21,7 +21,7 @@
     - **Depends‑on:** [T001]
 
 ## Binding Content Creation
-- [ ] **T003 · Feature · P2: implement migration management strategy binding**
+- [x] **T003 · Feature · P2: implement migration management strategy binding**
     - **Context:** Phase 2.1 Migration Management Strategy Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/migration-management-strategy.md` using the template.
