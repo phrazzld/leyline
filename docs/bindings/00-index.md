@@ -92,3 +92,13 @@ _No cli bindings defined yet._
 | [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, |
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
+
+## Security Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [authentication-authorization-patterns](./categories/security/authentication-authorization-patterns.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that all authentication and authorization decisions be visible, docu... |
+| [input-validation-standards](./categories/security/input-validation-standards.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by applying security-focused validation at every trust boundary in your system, b... |
+| [secrets-management-practices](./categories/security/secrets-management-practices.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by preventing the suppression, hardcoding, or improper handling of secrets and cre... |
+| [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that security concerns be visible, documented, and intentional archi... |
+| [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual security review processes into automated, systematic validation that r... |

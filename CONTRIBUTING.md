@@ -233,7 +233,26 @@ The pre-commit hooks will handle basic formatting like trailing whitespace and l
 
   ```
 
-  ```
+### Security-Specific Bindings
+
+Security bindings require additional considerations beyond the standard binding requirements:
+
+**Location**: All security bindings are placed in `docs/bindings/categories/security/`
+
+**Additional Requirements:**
+- Must follow [Security Binding Documentation Standards](docs/security-binding-standards.md)
+- Examples must use only placeholder credentials (never real secrets)
+- Must specify concrete security tools in the `enforced_by` field
+- Must address realistic security threats and vulnerabilities
+- Must be reviewed for security domain accuracy
+
+**Security Content Standards:**
+- **No sensitive information**: Examples must contain only placeholder credentials like `your-api-key-here` or `${API_KEY}`
+- **Realistic scenarios**: Address actual security challenges developers face
+- **Clear enforcement**: Specify concrete security tools and processes
+- **Threat-focused**: Connect security practices to real threats and attack vectors
+
+For complete guidelines on creating security bindings, including enforcement patterns, content standards, and security-specific template adaptations, see the [Security Binding Documentation Standards](docs/security-binding-standards.md).
 
 ### Cross-Cutting Bindings Strategy
 
@@ -256,6 +275,82 @@ When deciding where to place bindings that could apply across multiple categorie
    - Place the binding in that primary category directory
    - In the binding document, clearly explain its relevance to other categories
    - Reference the binding from relevant documentation in other categories
+
+### Cross-Category Reference Standards
+
+When bindings need to reference patterns from other categories (e.g., security bindings referencing observability patterns), follow these standardized approaches to maintain clarity and consistency:
+
+#### Reference Path Structure
+
+Use relative paths with consistent format based on the target location:
+
+**For Core Bindings:**
+```markdown
+[binding-name](../../docs/bindings/core/binding-name.md)
+```
+
+**For Category Bindings:**
+```markdown
+[binding-name](../../docs/bindings/categories/category-name/binding-name.md)
+```
+
+**For Tenets:**
+```markdown
+[tenet-name](../../docs/tenets/tenet-name.md)
+```
+
+#### Reference Context Requirements
+
+Every cross-category reference must include explanatory text that:
+
+1. **Explains the relationship**: How the bindings work together or complement each other
+2. **Describes the functional connection**: What specific aspects relate and why
+3. **Provides implementation guidance**: How following both bindings leads to better outcomes
+
+**Example Reference Format:**
+```markdown
+- [use-structured-logging](../../docs/bindings/core/use-structured-logging.md): Security monitoring requires structured logging to enable automated threat detection and incident correlation. Both bindings work together to create comprehensive security observability through machine-readable logs that security tools can analyze for anomalies and attack patterns.
+```
+
+#### Security-Specific Cross-Category Patterns
+
+Security bindings commonly reference these patterns from other categories:
+
+**Core Observability Bindings:**
+- `use-structured-logging.md` - For security monitoring and incident correlation
+- `context-propagation.md` - For security event tracing across system boundaries
+
+**Core Configuration Bindings:**
+- `external-configuration.md` - For secure credential management and environment-specific security settings
+- `fail-fast-validation.md` - For input validation security patterns
+
+**Core Automation Bindings:**
+- `git-hooks-automation.md` - For security validation in development workflows
+- `ci-cd-pipeline-standards.md` - For security gates in deployment pipelines
+
+#### Bidirectional Reference Guidelines
+
+When security bindings are referenced by other categories:
+
+1. **Core bindings referencing security**: Use standard relative path format
+2. **Category bindings referencing security**: Include security domain context in explanation
+3. **Maintain consistency**: Follow the same explanation format regardless of direction
+
+**Example of Category → Security Reference:**
+```markdown
+- [input-validation-standards](../../docs/bindings/categories/security/input-validation-standards.md): TypeScript's type system provides compile-time input validation that complements runtime security validation. Both approaches create layered protection against invalid data and injection attacks.
+```
+
+#### Cross-Category Reference Maintenance
+
+To ensure references remain accurate and valuable:
+
+1. **Validate during reviews**: Check that cross-references accurately describe relationships
+2. **Update when needed**: Modify reference text when binding functionality changes
+3. **Remove broken references**: Clean up references to deprecated or moved bindings
+4. **Test reference paths**: Ensure all relative paths resolve correctly
+
+This standardized approach ensures that cross-category relationships are clear, maintainable, and provide genuine value to readers understanding how different patterns work together.
 
 ### Editing Existing Documents
 
