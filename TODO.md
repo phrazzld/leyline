@@ -112,7 +112,7 @@
         1. The validation script exits with status 0 and reports no errors for the database category.
     - **Depends‑on:** [T003, T004, T005, T006, T007, T008, T009, T010, T011]
 
-- [~] **T013 · Chore · P1: verify and fix cross-references for database bindings**
+- [x] **T013 · Chore · P1: verify and fix cross-references for database bindings**
     - **Context:** Phase 4.2 Cross-reference Verification from PLAN.md
     - **Action:**
         1. Populate the "Related Bindings" section in each of the 9 new files.
@@ -124,7 +124,7 @@
         1. Manually click on a sample of links in the "Related Bindings" sections to confirm they navigate correctly.
     - **Depends‑on:** [T003, T004, T005, T006, T007, T008, T009, T010, T011]
 
-- [ ] **T014 · Test · P1: perform full content quality assurance review**
+- [x] **T014 · Test · P1: perform full content quality assurance review**
     - **Context:** Phase 4.4 Content Quality Assurance & Manual Review Protocol from PLAN.md
     - **Action:**
         1. Conduct a peer review of all 9 bindings for technical accuracy, clarity, and tone consistency.
@@ -134,7 +134,7 @@
         2. All required content sections are present and substantial in every binding.
     - **Depends‑on:** [T012]
 
-- [ ] **T015 · Chore · P1: regenerate and validate content indexes**
+- [~] **T015 · Chore · P1: regenerate and validate content indexes**
     - **Context:** Phase 4.3 Index Regeneration from PLAN.md
     - **Action:**
         1. Run the strict re-indexing script: `ruby tools/reindex.rb --strict`.
