@@ -30,7 +30,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T004 · Feature · P2: implement orm usage patterns binding**
+- [x] **T004 · Feature · P2: implement orm usage patterns binding**
     - **Context:** Phase 2.2 ORM Usage Patterns Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/orm-usage-patterns.md` using the template.
