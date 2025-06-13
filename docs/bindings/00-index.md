@@ -97,6 +97,7 @@ _No cli bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
+| [audit-logging-implementation](./categories/database/audit-logging-implementation.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
 | [connection-pooling-standards](./categories/database/connection-pooling-standards.md) | 0.1.0 | This binding directly implements our simplicity tenet by ensuring that database |
 | [data-validation-at-boundaries](./categories/database/data-validation-at-boundaries.md) | 0.1.0 | This binding directly implements our modularity tenet by ensuring that each |
 | [database-testing-strategies](./categories/database/database-testing-strategies.md) | 0.1.0 | This binding directly implements our testability tenet by ensuring that database |

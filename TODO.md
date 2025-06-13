@@ -48,7 +48,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T006 · Feature · P2: implement connection pooling standards binding**
+- [x] **T006 · Feature · P2: implement connection pooling standards binding**
     - **Context:** Phase 2.4 Connection Pooling Standards Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/connection-pooling-standards.md` using the template.
@@ -57,7 +57,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T007 · Feature · P2: implement transaction management patterns binding**
+- [x] **T007 · Feature · P2: implement transaction management patterns binding**
     - **Context:** Phase 2.5 Transaction Management Patterns Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/transaction-management-patterns.md` using the template.
@@ -66,7 +66,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T008 · Feature · P2: implement data validation at boundaries binding**
+- [x] **T008 · Feature · P2: implement data validation at boundaries binding**
     - **Context:** Phase 3.1 Data Validation at Boundaries Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/data-validation-at-boundaries.md` using the template.
@@ -75,7 +75,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T009 · Feature · P2: implement database testing strategies binding**
+- [x] **T009 · Feature · P2: implement database testing strategies binding**
     - **Context:** Phase 3.2 Database Testing Strategies Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/database-testing-strategies.md` using the template.
@@ -84,7 +84,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T010 · Feature · P2: implement read replica patterns binding**
+- [x] **T010 · Feature · P2: implement read replica patterns binding**
     - **Context:** Phase 3.3 Read Replica Patterns Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/read-replica-patterns.md` using the template.
@@ -93,7 +93,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T011 · Feature · P2: implement audit logging implementation binding**
+- [x] **T011 · Feature · P2: implement audit logging implementation binding**
     - **Context:** Phase 3.4 Audit Logging Implementation Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/audit-logging-implementation.md` using the template.
