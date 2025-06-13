@@ -21,7 +21,7 @@
         2. The review process is documented in a `CONTRIBUTING.md` or a governance file.
     - **Depends‑on:** none
 
-- [~] **T003 · Feature · P1: integrate python code example linting into ci**
+- [x] **T003 · Feature · P1: integrate python code example linting into ci**
     - **Context:** Phase 3: Quality Assurance - Python Code Linting
     - **Action:**
         1. Implement a script to extract Python code blocks from markdown files in the `docs/bindings/categories/python/` directory.
@@ -32,7 +32,7 @@
         2. A pull request with a faulty code example fails the CI build at this step.
     - **Depends‑on:** [T001]
 
-- [ ] **T004 · Test · P1: configure ci to validate python binding front-matter**
+- [x] **T004 · Test · P1: configure ci to validate python binding front-matter**
     - **Context:** Phase 3: Quality Assurance - YAML front-matter validation
     - **Action:**
         1. Ensure the existing `validate_front_matter.rb` script is configured to scan markdown files in the `docs/bindings/categories/python/` path.
