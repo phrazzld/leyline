@@ -96,7 +96,7 @@
     - **Depends‑on:** [T001, T002, T003]
 
 ## Security Binding Category - Integration & Validation
-- [~] **T010 · Refactor · P2: integrate security cross-references into related bindings**
+- [x] **T010 · Refactor · P2: integrate security cross-references into related bindings**
     - **Context:** Detailed Implementation Steps > Phase 3: Integration and Validation > 1. Cross-Reference Integration
     - **Action:**
         1. Identify existing tenets and bindings that should link to the new security bindings.
@@ -105,7 +105,7 @@
         1. At least 3 existing binding/tenet files are updated with valid cross-references.
     - **Depends‑on:** [T005, T006, T007, T008, T009]
 
-- [ ] **T011 · Test · P1: validate tool integration with new security category**
+- [x] **T011 · Test · P1: validate tool integration with new security category**
     - **Context:** Detailed Implementation Steps > Phase 3: Integration and Validation > 2. Tool Integration Testing
     - **Action:**
         1. Run the `validate_front_matter.rb` script against the entire `docs/` directory.
@@ -139,7 +139,7 @@
         1. A prioritized backlog of at least 3 future security binding topics is created.
     - **Depends‑on:** [T012]
 
-- [ ] **T014 · Chore · P2: evaluate extending validation tools for security-specific checks**
+- [x] **T014 · Chore · P2: evaluate extending validation tools for security-specific checks**
     - **Context:** Open Questions for Resolution > 3. Tool Integration Scope
     - **Action:**
         1. Investigate the feasibility of adding security-specific checks to `validate_front_matter.rb` (e.g., ensuring `enforcement` fields are not empty).
