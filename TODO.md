@@ -145,7 +145,7 @@
         1. Manually inspect the main index and the category index files to confirm the new content is present and correctly formatted.
     - **Depends‑on:** [T013, T014]
 
-- [~] **T016 · Test · P1: execute regression tests for all documentation**
+- [x] **T016 · Test · P1: execute regression tests for all documentation**
     - **Context:** Testing Strategy / Regression Testing from PLAN.md
     - **Action:**
         1. Run the full validation suite (front-matter, cross-references, indexing) on the entire documentation set.
