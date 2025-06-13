@@ -21,7 +21,7 @@
         2. The review process is documented in a `CONTRIBUTING.md` or a governance file.
     - **Depends‑on:** none
 
-- [ ] **T003 · Feature · P1: integrate python code example linting into ci**
+- [~] **T003 · Feature · P1: integrate python code example linting into ci**
     - **Context:** Phase 3: Quality Assurance - Python Code Linting
     - **Action:**
         1. Implement a script to extract Python code blocks from markdown files in the `docs/bindings/categories/python/` directory.

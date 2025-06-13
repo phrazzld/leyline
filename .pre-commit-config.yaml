@@ -39,3 +39,14 @@ repos:
         pass_filenames: false
         types: [markdown]
         stages: [pre-commit]
+
+      # Validate Python code examples in Python binding files
+      - id: validate-python-examples
+        name: Validate Python code examples
+        description: Validates Python code blocks in Python binding markdown files
+        entry: bash -c 'ruby tools/validate_python_examples.rb -f "$1"' --
+        language: system
+        files: ^docs/bindings/categories/python/.*\.md$
+        types: [markdown]
+        fail_fast: true
+        verbose: true
