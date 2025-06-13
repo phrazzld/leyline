@@ -130,7 +130,7 @@
     - **Depends‑on:** [T004, T005, T006, T007, T008, T009]
 
 ## Security Binding Category - Future Planning
-- [ ] **T013 · Chore · P3: prioritize tier 2/3 advanced security patterns for future roadmap**
+- [x] **T013 · Chore · P3: prioritize tier 2/3 advanced security patterns for future roadmap**
     - **Context:** Open Questions for Resolution > 2. Advanced Security Patterns
     - **Action:**
         1. Brainstorm a list of potential advanced security patterns (e.g., incident response, advanced cryptography).
