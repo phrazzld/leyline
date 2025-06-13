@@ -11,7 +11,7 @@
         1. Running `ls docs/bindings/categories/` shows the `database` directory.
     - **Depends‑on:** none
 
-- [ ] **T002 · Chore · P2: create a standard binding template file**
+- [x] **T002 · Chore · P2: create a standard binding template file**
     - **Context:** Risk Analysis and Mitigation / High-Risk Areas / YAML Front-matter Inconsistencies from PLAN.md
     - **Action:**
         1. Create a `_TEMPLATE.md` file in `docs/bindings/categories/database/`.
