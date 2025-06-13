@@ -480,7 +480,7 @@ class ReportService {
 
 ## Related Bindings
 
-- [orm-usage-patterns](orm-usage-patterns.md): ORM query optimization works
+- [orm-usage-patterns](../../docs/bindings/categories/database/orm-usage-patterns.md): ORM query optimization works
   hand-in-hand with explicit optimization. Understanding how your ORM generates
   SQL is essential for creating appropriate indexes and recognizing when to bypass
   the ORM for performance-critical queries.

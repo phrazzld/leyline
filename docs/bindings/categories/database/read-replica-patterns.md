@@ -1246,12 +1246,12 @@ public class ProductService {
 
 ## Related Bindings
 
-- [connection-pooling-standards](connection-pooling-standards.md): Read replica
+- [connection-pooling-standards](../../docs/bindings/categories/database/connection-pooling-standards.md): Read replica
   patterns must coordinate with connection pooling to manage connections
   efficiently across multiple database instances. Both patterns work together
   to create scalable, maintainable database architectures.
 
-- [query-optimization-and-indexing](query-optimization-and-indexing.md): Read
+- [query-optimization-and-indexing](../../docs/bindings/categories/database/query-optimization-and-indexing.md): Read
   replicas require proper indexing strategies to perform well, and query
   optimization becomes more complex when queries may execute on different
   instances with different lag characteristics.

@@ -103,7 +103,7 @@
     - **Depends‑on:** [T002]
 
 ## Integration and Validation
-- [ ] **T012 · Test · P1: validate yaml front-matter for all database bindings**
+- [x] **T012 · Test · P1: validate yaml front-matter for all database bindings**
     - **Context:** Phase 4.1 YAML Front-matter Validation from PLAN.md
     - **Action:**
         1. Run `ruby tools/validate_front_matter.rb docs/bindings/categories/database/`.
@@ -112,7 +112,7 @@
         1. The validation script exits with status 0 and reports no errors for the database category.
     - **Depends‑on:** [T003, T004, T005, T006, T007, T008, T009, T010, T011]
 
-- [ ] **T013 · Chore · P1: verify and fix cross-references for database bindings**
+- [~] **T013 · Chore · P1: verify and fix cross-references for database bindings**
     - **Context:** Phase 4.2 Cross-reference Verification from PLAN.md
     - **Action:**
         1. Populate the "Related Bindings" section in each of the 9 new files.

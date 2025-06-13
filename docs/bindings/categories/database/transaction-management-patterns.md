@@ -663,7 +663,7 @@ async function updateOrderWithInventory(orderId, updates) {
 
 ## Related Bindings
 
-- [migration-management-strategy](migration-management-strategy.md): Transaction
+- [migration-management-strategy](../../docs/bindings/categories/database/migration-management-strategy.md): Transaction
   management patterns complement migration strategies by ensuring that database
   schema changes and data operations both maintain proper transaction boundaries.
   Both patterns work together to ensure data integrity during system evolution.

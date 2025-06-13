@@ -1013,17 +1013,17 @@ public void testQueryWithProperIndexing() {
 
 ## Related Bindings
 
-- [data-validation-at-boundaries](data-validation-at-boundaries.md): Testing
+- [data-validation-at-boundaries](../../docs/bindings/categories/database/data-validation-at-boundaries.md): Testing
   strategies should validate that boundary validation works correctly under
   various conditions. Both patterns work together to ensure data integrity
   through comprehensive validation testing at database boundaries.
 
-- [transaction-management-patterns](transaction-management-patterns.md): Database
+- [transaction-management-patterns](../../docs/bindings/categories/database/transaction-management-patterns.md): Database
   testing must validate transaction behavior including rollback scenarios,
   isolation levels, and concurrent access patterns. Both patterns ensure that
   transactional systems behave correctly under test conditions.
 
-- [orm-usage-patterns](orm-usage-patterns.md): Testing strategies should verify
+- [orm-usage-patterns](../../docs/bindings/categories/database/orm-usage-patterns.md): Testing strategies should verify
   that ORM usage patterns perform correctly and don't introduce N+1 queries
   or other performance issues. Both patterns work together to ensure database
   interactions remain efficient and testable.

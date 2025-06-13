@@ -394,7 +394,7 @@ class OrderService {
 
 ## Related Bindings
 
-- [query-optimization-and-indexing](query-optimization-and-indexing.md): Proper ORM usage
+- [query-optimization-and-indexing](../../docs/bindings/categories/database/query-optimization-and-indexing.md): Proper ORM usage
   goes hand-in-hand with query optimization. Understanding the queries your ORM generates
   is essential for creating appropriate indexes and recognizing performance bottlenecks.
   Both bindings work together to ensure database interactions remain performant.

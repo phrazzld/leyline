@@ -779,7 +779,7 @@ class OrderService {
   debugging. Both patterns support observability by making validation events
   visible and trackable across the system.
 
-- [transaction-management-patterns](transaction-management-patterns.md):
+- [transaction-management-patterns](../../docs/bindings/categories/database/transaction-management-patterns.md):
   Validation and transaction management work together to ensure data integrity.
   Validation should occur before beginning transactions, and transaction
   boundaries should include validation of the final state before commit.

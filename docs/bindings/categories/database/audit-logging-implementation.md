@@ -1180,12 +1180,12 @@ async function deleteUserGdpr(userId, requestContext) {
   correlation IDs, business context, and compliance metadata across all system
   logs. Both patterns work together to create comprehensive observability.
 
-- [data-validation-at-boundaries](data-validation-at-boundaries.md): Audit
+- [data-validation-at-boundaries](../../docs/bindings/categories/database/data-validation-at-boundaries.md): Audit
   logging requires validation of audit context and business process identifiers
   to ensure audit records contain accurate, complete information for compliance
   and investigation purposes.
 
-- [transaction-management-patterns](transaction-management-patterns.md): Audit
+- [transaction-management-patterns](../../docs/bindings/categories/database/transaction-management-patterns.md): Audit
   logging must be integrated with transaction boundaries to ensure audit records
   are created atomically with data changes, preventing scenarios where data
   changes succeed but audit logging fails.
