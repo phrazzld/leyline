@@ -1,0 +1,122 @@
+---
+# Unique identifier for this binding (must be kebab-case, matching the filename without .md)
+id: binding-id
+
+# Date of last modification in ISO format (YYYY-MM-DD) with single quotes
+last_modified: '2025-01-12'
+
+# Version of the repository when this binding was last modified
+# This should match the current VERSION file. Update when making changes.
+version: '0.1.0'
+
+# ID of the parent tenet this binding implements (must be an existing tenet ID)
+# Common tenets for database bindings: simplicity, modularity, testability,
+# explicit-over-implicit, maintainability
+derived_from: tenet-id
+
+# Tool, rule, or process that enforces this binding
+# Common enforcement: code review, migration tools, ORM linters, query analyzers,
+# performance monitoring, CI pipeline
+enforced_by: '[enforcement mechanism]'
+---
+
+# Binding: [Database Pattern Name]
+
+[A concise 1-2 sentence statement of the database pattern or rule in plain language.
+Focus on clarity and directness. This statement should clearly communicate what the
+pattern requires or prohibits for database interactions.]
+
+## Rationale
+
+[Write a 2-3 paragraph natural language explanation of why this database pattern exists
+and the benefits it provides. This section should:
+
+1. Connect explicitly to the parent tenet, explaining how this binding serves the
+   tenet's principle (e.g., "This binding directly implements our simplicity tenet by
+   reducing the complexity of database schema evolution...")
+2. Focus on the data persistence problems this pattern solves and the value it delivers
+3. Explain the reasoning in terms of database patterns and principles
+
+Consider using analogies to make database concepts more relatable (e.g., "Think of
+database migrations like version control for your schema..."). Address the consequences
+of not following this pattern in terms of data integrity, performance degradation,
+or maintenance burden.]
+
+## Rule Definition
+
+[Provide a clear, conversational explanation of the database pattern itself. Explain
+concepts with examples and database-specific considerations:
+
+- What database operations or structures this pattern applies to
+- What is explicitly required or prohibited
+- Common anti-patterns to avoid in database design
+- When exceptions might be appropriate (e.g., performance requirements)
+
+Include specifics about:
+- Schema design considerations
+- Query patterns and optimization
+- Transaction boundaries
+- Data integrity requirements
+- Performance implications]
+
+## Practical Implementation
+
+[Offer actionable guidelines for implementing this database pattern. Structure this
+as a numbered list with bold headings:]
+
+1. **[Implementation Strategy]**: [Explanation of how to implement this aspect of the
+   pattern. Be specific about database tooling, query structure, or schema design.
+   Include code snippets where appropriate.]
+
+2. **[Performance Considerations]**: [Guidance on performance implications and
+   optimization strategies. Include benchmarking approaches where relevant.]
+
+3. **[Migration Strategy]**: [How to adopt this pattern in existing databases.
+   Suggest incremental approaches that minimize disruption.]
+
+4. **[Monitoring and Validation]**: [How to verify the pattern is being followed
+   correctly. Include metrics, query analysis, or automated checking approaches.]
+
+5. **[Testing Approach]**: [Specific strategies for testing database code that
+   follows this pattern. Address test data management and isolation.]
+
+## Examples
+
+[Provide 2-3 pairs of concrete examples that illustrate both good and bad
+implementations. Use realistic database scenarios:]
+
+```sql
+-- ❌ BAD: [Brief description of what's wrong]
+-- [Anti-pattern example with SQL, schema definition, or ORM code]
+
+-- ✅ GOOD: [Brief description of what's right]
+-- [Positive example that follows the binding]
+```
+
+```javascript
+// ❌ BAD: [Brief description of another database issue]
+// [Anti-pattern example showing problematic database interaction]
+
+// ✅ GOOD: [Brief description of the proper approach]
+// [Positive example showing correct database usage]
+```
+
+```python
+# ❌ BAD: [Brief description of a more complex violation]
+# [More complex anti-pattern example with database operations]
+
+# ✅ GOOD: [Brief description of the comprehensive solution]
+# [More complex positive example that demonstrates best practices]
+```
+
+## Related Bindings
+
+[List links to related bindings with brief explanations of the relationships. Focus
+on how database patterns work together or interact with other system components:]
+
+- [binding-name](../binding-path.md): [Explanation of how these database patterns
+  complement each other or work together to achieve better data management.]
+
+- [binding-name](../binding-path.md): [Explanation of how this database pattern
+  interacts with other architectural patterns, including any potential tensions
+  and how to balance them effectively.]

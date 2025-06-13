@@ -93,6 +93,20 @@ _No cli bindings defined yet._
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 
+## Database Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [audit-logging-implementation](./categories/database/audit-logging-implementation.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
+| [connection-pooling-standards](./categories/database/connection-pooling-standards.md) | 0.1.0 | This binding directly implements our simplicity tenet by ensuring that database |
+| [data-validation-at-boundaries](./categories/database/data-validation-at-boundaries.md) | 0.1.0 | This binding directly implements our modularity tenet by ensuring that each |
+| [database-testing-strategies](./categories/database/database-testing-strategies.md) | 0.1.0 | This binding directly implements our testability tenet by ensuring that database |
+| [migration-management-strategy](./categories/database/migration-management-strategy.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating the complexity |
+| [orm-usage-patterns](./categories/database/orm-usage-patterns.md) | 0.1.0 | This binding directly implements our simplicity tenet by ensuring that database |
+| [query-optimization-and-indexing](./categories/database/query-optimization-and-indexing.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
+| [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding directly implements our maintainability tenet by ensuring that read |
+| [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding directly implements our modularity tenet by ensuring that database |
+
 ## Security Bindings
 
 | ID | Version | Summary |
