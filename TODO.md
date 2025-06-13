@@ -39,7 +39,7 @@
         1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
     - **Depends‑on:** [T002]
 
-- [ ] **T005 · Feature · P2: implement query optimization and indexing binding**
+- [x] **T005 · Feature · P2: implement query optimization and indexing binding**
     - **Context:** Phase 2.3 Query Optimization and Indexing Binding from PLAN.md
     - **Action:**
         1. Create `docs/bindings/categories/database/query-optimization-and-indexing.md` using the template.
