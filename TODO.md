@@ -134,7 +134,7 @@
         2. All required content sections are present and substantial in every binding.
     - **Depends‑on:** [T012]
 
-- [~] **T015 · Chore · P1: regenerate and validate content indexes**
+- [x] **T015 · Chore · P1: regenerate and validate content indexes**
     - **Context:** Phase 4.3 Index Regeneration from PLAN.md
     - **Action:**
         1. Run the strict re-indexing script: `ruby tools/reindex.rb --strict`.
@@ -145,7 +145,7 @@
         1. Manually inspect the main index and the category index files to confirm the new content is present and correctly formatted.
     - **Depends‑on:** [T013, T014]
 
-- [ ] **T016 · Test · P1: execute regression tests for all documentation**
+- [~] **T016 · Test · P1: execute regression tests for all documentation**
     - **Context:** Testing Strategy / Regression Testing from PLAN.md
     - **Action:**
         1. Run the full validation suite (front-matter, cross-references, indexing) on the entire documentation set.
