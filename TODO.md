@@ -180,7 +180,7 @@
         2. Verify gitleaks actually scans Python binding directory.
     - **Depends‑on:** none
 
-- [~] **T019 · Test · P1: implement fallback gitleaks installation strategies**
+- [x] **T019 · Test · P1: implement fallback gitleaks installation strategies**
     - **Context:** CI resilience - prevent future installation failures
     - **Action:**
         1. If GitHub Action fails, add fallback manual installation using GitHub API for dynamic URL resolution.
