@@ -36,7 +36,7 @@
     - **Depends‑on:** [T002, T003]
 
 ## New Bindings
-- [ ] **T005 · Feature · P2: create binding for pnpm usage in node.js projects**
+- [x] **T005 · Feature · P2: create binding for pnpm usage in node.js projects**
     - **Context:** PLAN.md › New Bindings to Create › TypeScript Category
     - **Action:**
         1. Create the file `docs/bindings/categories/typescript/use-pnpm-for-nodejs.md`.
