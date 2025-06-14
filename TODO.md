@@ -18,7 +18,7 @@
         2. The file's git history is preserved.
     - **Depends‑on:** [T001]
 
-- [ ] **T003 · Refactor · P2: move web-accessibility.md to web category**
+- [x] **T003 · Refactor · P2: move web-accessibility.md to web category**
     - **Context:** PLAN.md › Existing Bindings to Recategorize › `web-accessibility.md`
     - **Action:**
         1. Use `git mv` to move the file from `docs/bindings/categories/frontend/web-accessibility.md` to `docs/bindings/categories/web/`.

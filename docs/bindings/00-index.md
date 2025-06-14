@@ -58,9 +58,7 @@ _No cli bindings defined yet._
 
 ## Frontend Bindings
 
-| ID | Version | Summary |
-|---|---|---|
-| [web-accessibility](./categories/frontend/web-accessibility.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring |
+_No frontend bindings defined yet._
 
 ## GO Bindings
 
@@ -142,4 +140,6 @@ _No browser-extensions bindings defined yet._
 
 ## Web Bindings
 
-_No web bindings defined yet._
+| ID | Version | Summary |
+|---|---|---|
+| [web-accessibility](./categories/web/web-accessibility.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring |
