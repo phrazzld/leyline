@@ -9,7 +9,7 @@
         1. The five new category directories (`api`, `cli`, `browser-extensions`, `react`, `web`) exist under `docs/bindings/categories/`.
     - **Depends‑on:** none
 
-- [ ] **T002 · Refactor · P2: move state-management.md to react category**
+- [x] **T002 · Refactor · P2: move state-management.md to react category**
     - **Context:** PLAN.md › Existing Bindings to Recategorize › `state-management.md`
     - **Action:**
         1. Use `git mv` to move the file from `docs/bindings/categories/frontend/state-management.md` to `docs/bindings/categories/react/`.

@@ -60,7 +60,6 @@ _No cli bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [state-management](./categories/frontend/state-management.md) | 0.1.0 | This binding directly implements our simplicity tenet by addressing one of the most |
 | [web-accessibility](./categories/frontend/web-accessibility.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring |
 
 ## GO Bindings
@@ -93,6 +92,14 @@ _No cli bindings defined yet._
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 
+## Api Bindings
+
+_No api bindings defined yet._
+
+## Browser-extensions Bindings
+
+_No browser-extensions bindings defined yet._
+
 ## Database Bindings
 
 | ID | Version | Summary |
@@ -117,6 +124,12 @@ _No cli bindings defined yet._
 | [testing-patterns](./categories/python/testing-patterns.md) | 0.1.0 | This binding implements our testability tenet by ensuring that tests provide meaningful feedback about system correctness rather than coupling to i... |
 | [type-hinting](./categories/python/type-hinting.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function contracts and data structures visible through the type system rather th... |
 
+## React Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [state-management](./categories/react/state-management.md) | 0.1.0 | This binding directly implements our simplicity tenet by addressing one of the most |
+
 ## Security Bindings
 
 | ID | Version | Summary |
@@ -126,3 +139,7 @@ _No cli bindings defined yet._
 | [secrets-management-practices](./categories/security/secrets-management-practices.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by preventing the suppression, hardcoding, or improper handling of secrets and cre... |
 | [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that security concerns be visible, documented, and intentional archi... |
 | [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual security review processes into automated, systematic validation that r... |
+
+## Web Bindings
+
+_No web bindings defined yet._
