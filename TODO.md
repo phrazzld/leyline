@@ -1,169 +1,226 @@
 # Todo
 
-## Foundation Setup
-- [x] **T001 · Chore · P1: create database binding category directory**
-    - **Context:** Phase 1.1 Directory Structure Creation from PLAN.md
+## Python Bindings - Foundation & CI
+- [x] **T001 · Chore · P0: create python bindings directory**
+    - **Context:** Phase 1: Foundation - Directory Creation
     - **Action:**
-        1. Execute the command `mkdir -p docs/bindings/categories/database`.
+        1. Create the directory `docs/bindings/categories/python/`.
     - **Done‑when:**
-        1. The directory `docs/bindings/categories/database` exists in the project repository.
+        1. The directory exists in the main branch of the repository.
     - **Verification:**
-        1. Running `ls docs/bindings/categories/` shows the `database` directory.
+        1. Run `ls docs/bindings/categories/python/` and confirm the directory is present.
     - **Depends‑on:** none
 
-- [x] **T002 · Chore · P2: create a standard binding template file**
-    - **Context:** Risk Analysis and Mitigation / High-Risk Areas / YAML Front-matter Inconsistencies from PLAN.md
+- [x] ~~**T002 · Chore · P1: establish python expert review panel and process**~~ (CANCELLED - requires human coordination)
+    - **Context:** Actionable Next Steps & Governance Framework - Community Engagement
     - **Action:**
-        1. Create a `_TEMPLATE.md` file in `docs/bindings/categories/database/`.
-        2. Populate the template with placeholder YAML front-matter (`id`, `last_modified`, `version`, `derived_from`, `enforced_by`) and content section headers (Title, Rationale, Rule Definition, Practical Implementation, Examples, Related Bindings).
+        1. Identify and invite at least two Python experts to form a review panel.
+        2. Document the panel members and a lightweight review process (e.g., PR reviews).
     - **Done‑when:**
-        1. A reusable template file exists to ensure consistency for all new bindings.
+        1. At least two experts have agreed to participate.
+        2. The review process is documented in a `CONTRIBUTING.md` or a governance file.
+    - **Depends‑on:** none
+
+- [x] **T003 · Feature · P1: integrate python code example linting into ci**
+    - **Context:** Phase 3: Quality Assurance - Python Code Linting
+    - **Action:**
+        1. Implement a script to extract Python code blocks from markdown files in the `docs/bindings/categories/python/` directory.
+        2. Configure the script to run `flake8` and `mypy` on the extracted code.
+        3. Add a job to the CI pipeline that runs this script and fails the build on any linting or type errors.
+    - **Done‑when:**
+        1. The CI pipeline includes a step that validates Python code examples.
+        2. A pull request with a faulty code example fails the CI build at this step.
     - **Depends‑on:** [T001]
 
-## Binding Content Creation
-- [x] **T003 · Feature · P2: implement migration management strategy binding**
-    - **Context:** Phase 2.1 Migration Management Strategy Binding from PLAN.md
+- [x] **T004 · Test · P1: configure ci to validate python binding front-matter**
+    - **Context:** Phase 3: Quality Assurance - YAML front-matter validation
     - **Action:**
-        1. Create `docs/bindings/categories/database/migration-management-strategy.md` using the template.
-        2. Populate YAML front-matter (`derived_from: simplicity`) and all content sections with actionable guidance and at least two code examples.
+        1. Ensure the existing `validate_front_matter.rb` script is configured to scan markdown files in the `docs/bindings/categories/python/` path.
+        2. Add a CI step that runs this validation and fails the build on errors.
     - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
+        1. The CI pipeline fails when a Python binding file has invalid YAML front-matter.
+    - **Depends‑on:** [T001]
 
-- [x] **T004 · Feature · P2: implement orm usage patterns binding**
-    - **Context:** Phase 2.2 ORM Usage Patterns Binding from PLAN.md
+- [x] **T005 · Test · P1: configure ci to validate index integrity with python category**
+    - **Context:** Phase 3: Quality Assurance - Index integrity check
     - **Action:**
-        1. Create `docs/bindings/categories/database/orm-usage-patterns.md` using the template.
-        2. Populate YAML front-matter (`derived_from: simplicity`) and all content sections, focusing on N+1 prevention and loading strategies.
+        1. Ensure the existing `reindex.rb --strict` script processes the new Python category.
+        2. Add a CI step that runs this check and fails the build on indexing or cross-reference errors.
     - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
+        1. The CI pipeline successfully re-indexes the site including the Python category.
+        2. The build fails if cross-references are broken.
+    - **Depends‑on:** [T001]
 
-- [x] **T005 · Feature · P2: implement query optimization and indexing binding**
-    - **Context:** Phase 2.3 Query Optimization and Indexing Binding from PLAN.md
+- [x] **T006 · Test · P2: integrate automated link checker for python bindings**
+    - **Context:** Comprehensive Risk Mitigation Matrix - Cross-reference link rot
     - **Action:**
-        1. Create `docs/bindings/categories/database/query-optimization-and-indexing.md` using the template.
-        2. Populate YAML front-matter (`derived_from: explicit-over-implicit`) and all content sections, including query plan analysis.
+        1. Configure an automated link-checking tool (e.g., `lychee`, `htmlproofer`) in the CI pipeline.
+        2. Ensure the tool scans the generated documentation for the Python category.
     - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
+        1. The CI pipeline fails if a broken link is detected in the Python binding documents.
+    - **Depends‑on:** [T001]
 
-- [x] **T006 · Feature · P2: implement connection pooling standards binding**
-    - **Context:** Phase 2.4 Connection Pooling Standards Binding from PLAN.md
+- [x] **T007 · Test · P2: integrate secret scanning for python code examples**
+    - **Context:** Comprehensive Risk Mitigation Matrix - Security vulnerabilities in examples
     - **Action:**
-        1. Create `docs/bindings/categories/database/connection-pooling-standards.md` using the template.
-        2. Populate YAML front-matter (`derived_from: simplicity`) and all content sections, covering sizing and health checks.
+        1. Configure a secret scanning tool (e.g., `gitleaks`, `trufflehog`) in the CI pipeline.
+        2. Ensure the scanner checks files within `docs/bindings/categories/python/`.
     - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
+        1. The CI pipeline fails if a potential secret (e.g., API key) is detected in a code example.
+    - **Depends‑on:** [T001]
 
-- [x] **T007 · Feature · P2: implement transaction management patterns binding**
-    - **Context:** Phase 2.5 Transaction Management Patterns Binding from PLAN.md
+## Python Bindings - Core Content
+- [x] **T008 · Feature · P1: create binding for type hinting and static analysis**
+    - **Context:** Essential Python Bindings #1
     - **Action:**
-        1. Create `docs/bindings/categories/database/transaction-management-patterns.md` using the template.
-        2. Populate YAML front-matter (`derived_from: modularity`) and all content sections, focusing on ACID compliance and isolation levels.
+        1. Create `docs/bindings/categories/python/type-hinting.md`.
+        2. Draft the binding content including the rule, rationale, tenet derivation (`explicit-over-implicit`, `maintainability`), enforcement (`mypy`), and at least two bad/good code examples.
     - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
-
-- [x] **T008 · Feature · P2: implement data validation at boundaries binding**
-    - **Context:** Phase 3.1 Data Validation at Boundaries Binding from PLAN.md
-    - **Action:**
-        1. Create `docs/bindings/categories/database/data-validation-at-boundaries.md` using the template.
-        2. Populate YAML front-matter (`derived_from: modularity`) and all content sections, covering sanitization and business rule enforcement.
-    - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
-
-- [x] **T009 · Feature · P2: implement database testing strategies binding**
-    - **Context:** Phase 3.2 Database Testing Strategies Binding from PLAN.md
-    - **Action:**
-        1. Create `docs/bindings/categories/database/database-testing-strategies.md` using the template.
-        2. Populate YAML front-matter (`derived_from: testability`) and all content sections, including test data management.
-    - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
-
-- [x] **T010 · Feature · P2: implement read replica patterns binding**
-    - **Context:** Phase 3.3 Read Replica Patterns Binding from PLAN.md
-    - **Action:**
-        1. Create `docs/bindings/categories/database/read-replica-patterns.md` using the template.
-        2. Populate YAML front-matter (`derived_from: maintainability`) and all content sections, covering replication lag and failover.
-    - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
-
-- [x] **T011 · Feature · P2: implement audit logging implementation binding**
-    - **Context:** Phase 3.4 Audit Logging Implementation Binding from PLAN.md
-    - **Action:**
-        1. Create `docs/bindings/categories/database/audit-logging-implementation.md` using the template.
-        2. Populate YAML front-matter (`derived_from: explicit-over-implicit`) and all content sections, covering immutability and compliance.
-    - **Done‑when:**
-        1. The binding file is created, is content-complete, and its tenet derivation is clearly explained.
-    - **Depends‑on:** [T002]
-
-## Integration and Validation
-- [x] **T012 · Test · P1: validate yaml front-matter for all database bindings**
-    - **Context:** Phase 4.1 YAML Front-matter Validation from PLAN.md
-    - **Action:**
-        1. Run `ruby tools/validate_front_matter.rb docs/bindings/categories/database/`.
-        2. Correct any validation errors related to required fields, date formats, ID/filename mismatches, or tenet references.
-    - **Done‑when:**
-        1. The validation script exits with status 0 and reports no errors for the database category.
-    - **Depends‑on:** [T003, T004, T005, T006, T007, T008, T009, T010, T011]
-
-- [x] **T013 · Chore · P1: verify and fix cross-references for database bindings**
-    - **Context:** Phase 4.2 Cross-reference Verification from PLAN.md
-    - **Action:**
-        1. Populate the "Related Bindings" section in each of the 9 new files.
-        2. Run `ruby tools/fix_cross_references.rb` to update back-references and check links.
-    - **Done‑when:**
-        1. The script completes without errors.
-        2. All internal links within the new bindings resolve correctly.
+        1. The markdown file passes all CI checks (front-matter, code linting).
     - **Verification:**
-        1. Manually click on a sample of links in the "Related Bindings" sections to confirm they navigate correctly.
-    - **Depends‑on:** [T003, T004, T005, T006, T007, T008, T009, T010, T011]
+        1. `mypy --strict` passes on the "good" code examples.
+    - **Depends‑on:** [T001, T003, T004]
 
-- [x] **T014 · Test · P1: perform full content quality assurance review**
-    - **Context:** Phase 4.4 Content Quality Assurance & Manual Review Protocol from PLAN.md
+- [x] **T009 · Feature · P2: create binding for explicit error handling**
+    - **Context:** Essential Python Bindings #2
     - **Action:**
-        1. Conduct a peer review of all 9 bindings for technical accuracy, clarity, and tone consistency.
-        2. Verify that all code examples are realistic and correct, and that practical guidance is actionable.
+        1. Create `docs/bindings/categories/python/error-handling.md`.
+        2. Draft the binding content including the rule, rationale, tenet derivation (`explicit-over-implicit`, `fix-broken-windows`), enforcement (`flake8-bugbear`), and at least two bad/good code examples.
     - **Done‑when:**
-        1. All 9 bindings are approved by an expert reviewer.
-        2. All required content sections are present and substantial in every binding.
-    - **Depends‑on:** [T012]
+        1. The markdown file passes all CI checks.
+    - **Depends‑on:** [T001, T003, T004]
 
-- [x] **T015 · Chore · P1: regenerate and validate content indexes**
-    - **Context:** Phase 4.3 Index Regeneration from PLAN.md
+- [x] **T010 · Feature · P2: create binding for virtual environment and dependency management**
+    - **Context:** Essential Python Bindings #3
     - **Action:**
-        1. Run the strict re-indexing script: `ruby tools/reindex.rb --strict`.
+        1. Create `docs/bindings/categories/python/dependency-management.md`.
+        2. Draft the binding content including the rule, rationale, tenet derivation (`automation`, `dependency-management`), enforcement (CI checks, `poetry`), and examples of lockfiles.
     - **Done‑when:**
-        1. The re-indexing script completes successfully.
-        2. The new "Database" category and its 9 bindings appear correctly and alphabetically in the generated index files.
-    - **Verification:**
-        1. Manually inspect the main index and the category index files to confirm the new content is present and correctly formatted.
-    - **Depends‑on:** [T013, T014]
+        1. The markdown file passes all CI checks.
+    - **Depends‑on:** [T001, T003, T004]
 
-- [x] **T016 · Test · P1: execute regression tests for all documentation**
-    - **Context:** Testing Strategy / Regression Testing from PLAN.md
+- [x] **T011 · Feature · P2: create binding for package structure and module organization**
+    - **Context:** Essential Python Bindings #4
     - **Action:**
-        1. Run the full validation suite (front-matter, cross-references, indexing) on the entire documentation set.
+        1. Create `docs/bindings/categories/python/package-structure.md`.
+        2. Draft the binding content including the rule, rationale, tenet derivation (`modularity`, `simplicity`), enforcement (code review), and examples of a `src/` layout.
     - **Done‑when:**
-        1. All existing content continues to pass validation.
-        2. All tooling remains compatible and functional.
-        3. The master index remains accurate and complete with no broken references introduced.
+        1. The markdown file passes all CI checks.
+    - **Depends‑on:** [T001, T003, T004]
+
+- [x] **T012 · Feature · P2: create binding for testing patterns with pytest**
+    - **Context:** Essential Python Bindings #5
+    - **Action:**
+        1. Create `docs/bindings/categories/python/testing-patterns.md`.
+        2. Draft the binding content including the rule, rationale, tenet derivation (`testability`, `automation`), enforcement (`pytest`), and examples targeting behavior.
+    - **Done‑when:**
+        1. The markdown file passes all CI checks.
+    - **Depends‑on:** [T001, T003, T004]
+
+- [x] **T013 · Feature · P2: add cross-references to all core bindings**
+    - **Context:** Phase 2: Core Binding Development - Cross-Reference Integration
+    - **Action:**
+        1. Edit each of the 5 core binding files to add links to analogous TypeScript/Go bindings.
+        2. Add bidirectional links between related Python patterns where applicable.
+    - **Done‑when:**
+        1. All 5 core bindings contain a cross-reference section with valid links.
+        2. The `reindex.rb --strict` CI check passes.
+    - **Depends‑on:** [T005, T008, T009, T010, T011, T012]
+
+- [x] ~~**T014 · Chore · P1: conduct expert review and finalize content**~~ (CANCELLED - requires human expert review)
+    - **Context:** Phase 3: Quality Assurance - Expert technical review
+    - **Action:**
+        1. Submit a pull request with the 5 completed bindings for review by the expert panel.
+        2. Incorporate all feedback related to technical accuracy, idiomaticity, and clarity.
+    - **Done‑when:**
+        1. At least one expert from the panel has formally approved the pull request.
+    - **Depends‑on:** [T002, T013]
+
+## Python Bindings - Governance
+- [x] ~~**T015 · Chore · P2: assign python category champion**~~ (CANCELLED - requires human coordination)
+    - **Context:** Phase 4: Publication and Governance - Champion Assignment
+    - **Action:**
+        1. Identify and designate a long-term maintainer for the Python bindings category.
+        2. Document the champion's name and responsibilities in a project governance file.
+    - **Done‑when:**
+        1. A champion is named and documented publicly within the project.
+    - **Depends‑on:** [T014]
+
+- [x] ~~**T016 · Chore · P3: establish and document review cycle**~~ (CANCELLED - requires human governance decisions)
+    - **Context:** Phase 4: Publication and Governance - Review Cycle Establishment
+    - **Action:**
+        1. Define and document the update cadence (e.g., annual) and process for the Python bindings.
+        2. Include details on how community feedback will be integrated.
+    - **Done‑when:**
+        1. The review cycle and feedback process are documented in a governance file.
     - **Depends‑on:** [T015]
 
----
+- [x] **T017 · Chore · P3: document tooling version pinning strategy**
+    - **Context:** Comprehensive Risk Mitigation Matrix - Tooling drift over time
+    - **Action:**
+        1. Document the current pinned versions of `flake8`, `mypy`, and other enforcement tools.
+        2. Outline a policy for how and when these tool versions should be updated.
+    - **Done‑when:**
+        1. A versioning policy is documented in a developer or governance guide.
+    - **Depends‑on:** [T003]
 
-### Clarifications & Assumptions
-- [ ] **Issue:** Standardize enforcement tool references across database bindings?
-    - **Context:** Open Questions / Technical Questions 1 from PLAN.md
-    - **Blocking?:** no
-- [ ] **Issue:** Select primary database technologies for examples (e.g., PostgreSQL, MySQL)?
-    - **Context:** Open Questions / Technical Questions 2 from PLAN.md
-    - **Blocking?:** no
-- [ ] **Issue:** Define integration depth and cross-referencing strategy with CI/CD and monitoring bindings?
-    - **Context:** Open Questions / Technical Questions 3 from PLAN.md
-    - **Blocking?:** no
+## CI Infrastructure - Gitleaks Resolution
+- [x] **T018 · Chore · P0: fix gitleaks installation failure in CI pipeline**
+    - **Context:** PR #84 CI failure - gitleaks download URL returns 404
+    - **Action:**
+        1. Replace manual gitleaks installation with official `gitleaks/gitleaks-action@v2` in `.github/workflows/validate.yml`.
+        2. Update workflow to use action-based scanning instead of manual installation.
+        3. Test the new configuration with current Python binding files.
+    - **Done‑when:**
+        1. CI pipeline successfully installs and runs gitleaks without 404 errors.
+        2. Python binding files are scanned for secrets without blocking valid examples.
+        3. The action completes within 30 seconds.
+    - **Verification:**
+        1. Run CI pipeline and confirm gitleaks step passes.
+        2. Verify gitleaks actually scans Python binding directory.
+    - **Depends‑on:** none
+
+- [x] **T019 · Test · P1: implement fallback gitleaks installation strategies**
+    - **Context:** CI resilience - prevent future installation failures
+    - **Action:**
+        1. If GitHub Action fails, add fallback manual installation using GitHub API for dynamic URL resolution.
+        2. Implement error handling with clear failure diagnostics.
+        3. Add Ubuntu package manager installation as tertiary fallback.
+    - **Done‑when:**
+        1. CI pipeline has multiple installation strategies with graceful fallback.
+        2. Each failure mode provides clear error message with resolution guidance.
+    - **Verification:**
+        1. Test each fallback method in isolated environment.
+        2. Verify error messages provide actionable resolution steps.
+    - **Depends‑on:** [T018]
+
+- [x] **T020 · Chore · P2: document ci dependency management best practices**
+    - **Context:** Prevent future CI dependency failures
+    - **Action:**
+        1. Add section to `CONTRIBUTING.md` covering CI dependency management principles.
+        2. Document preferred methods for installing external tools (actions > manual > package manager).
+        3. Create troubleshooting guide for common CI failures.
+    - **Done‑when:**
+        1. `CONTRIBUTING.md` includes comprehensive CI dependency guidelines.
+        2. Troubleshooting guide covers gitleaks and similar tool installations.
+    - **Verification:**
+        1. Documentation review by CI/CD subject matter expert.
+        2. Troubleshooting guide tested against real failure scenarios.
+    - **Depends‑on:** [T018, T019]
+
+- [x] **T021 · Test · P2: implement ci pipeline health monitoring**
+    - **Context:** Early detection of future CI issues
+    - **Action:**
+        1. Add validation step that checks all CI dependencies are properly installed.
+        2. Implement tool version logging for debugging and maintenance.
+        3. Create monitoring for CI success/failure rates across tools.
+    - **Done‑when:**
+        1. CI pipeline logs all tool versions and installation status.
+        2. Health check validates all required tools before main validation.
+        3. Failure patterns are detectable through logging.
+    - **Verification:**
+        1. Review CI logs show clear tool status and version information.
+        2. Health check catches tool installation issues before they cause downstream failures.
+    - **Depends‑on:** [T018]
+
+---

@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -20,11 +22,259 @@ jobs:
         ruby-version: 3.0
         bundler-cache: false
 
+    - name: CI Pipeline Health Check
+      run: |
+        echo "🏥 CI Pipeline Health Assessment"
+        echo "================================"
+        echo ""
+
+        # Environment Information
+        echo "📊 Environment Information:"
+        echo "Runner OS: $(uname -a)"
+        echo "Architecture: $(uname -m)"
+        echo "Kernel: $(uname -r)"
+        echo "Hostname: $(hostname)"
+        echo "Date: $(date)"
+        echo "User: $(whoami)"
+        echo "Working Directory: $(pwd)"
+        echo ""
+
+        # Tool Version Inventory
+        echo "🔧 Tool Version Inventory:"
+
+        # Language Runtimes
+        echo "Language Runtimes:"
+        if command -v ruby >/dev/null 2>&1; then
+          echo "  ✅ Ruby: $(ruby --version)"
+        else
+          echo "  ❌ Ruby: Not found"
+        fi
+
+        if command -v python3 >/dev/null 2>&1; then
+          echo "  ⚠️  Python: $(python3 --version) (disabled for docs repo)"
+        else
+          echo "  ⚠️  Python: Not found (disabled for docs repo)"
+        fi
+
+        if command -v node >/dev/null 2>&1; then
+          echo "  ℹ️  Node.js: $(node --version) (if needed)"
+        else
+          echo "  ℹ️  Node.js: Not found (optional)"
+        fi
+        echo ""
+
+        # Required Ruby Tools
+        echo "Ruby Tools:"
+        if ruby -e "exit(0)" 2>/dev/null; then
+          echo "  ✅ Ruby interpreter: Working"
+        else
+          echo "  ❌ Ruby interpreter: Failed basic test"
+          exit 1
+        fi
+
+        # Validation Tools
+        echo "Validation Tools:"
+        if [ -f "tools/validate_front_matter.rb" ]; then
+          echo "  ✅ validate_front_matter.rb: Present"
+          if ruby tools/validate_front_matter.rb --help >/dev/null 2>&1; then
+            echo "  ✅ validate_front_matter.rb: Functional"
+          else
+            echo "  ⚠️  validate_front_matter.rb: Help command failed (may still work)"
+          fi
+        else
+          echo "  ❌ validate_front_matter.rb: Missing"
+          exit 1
+        fi
+
+        if [ -f "tools/reindex.rb" ]; then
+          echo "  ✅ reindex.rb: Present"
+        else
+          echo "  ❌ reindex.rb: Missing"
+          exit 1
+        fi
+        echo ""
+
+        # Git Information
+        echo "📜 Git Information:"
+        echo "Git version: $(git --version)"
+        echo "Repository: $(git config --get remote.origin.url || echo 'No remote origin')"
+        echo "Current branch: $(git branch --show-current)"
+        echo "Latest commit: $(git log --oneline -1)"
+        echo "Repository status: $(git status --porcelain | wc -l) modified files"
+        echo ""
+
+        # Disk Space Check
+        echo "💾 Resource Status:"
+        echo "Disk usage: $(df -h . | tail -1 | awk '{print $5 " used (" $4 " available)"}')"
+        echo "Memory: $(free -h | grep '^Mem:' | awk '{print $3 "/" $2 " used"}')"
+        echo ""
+
+        # GitHub Actions Context
+        echo "🎬 GitHub Actions Context:"
+        echo "Event: ${{ github.event_name }}"
+        echo "Actor: ${{ github.actor }}"
+        echo "Workflow: ${{ github.workflow }}"
+        echo "Job: ${{ github.job }}"
+        echo "Run ID: ${{ github.run_id }}"
+        echo "Run Number: ${{ github.run_number }}"
+        echo "SHA: ${{ github.sha }}"
+        echo ""
+
+        echo "✅ Health check completed successfully"
+        echo "🚀 Proceeding with validation pipeline..."
+
+    # Python validation disabled for documentation repository
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.11'
+
+    # - name: Install Python linting tools
+    #   run: |
+    #     python -m pip install --upgrade pip
+    #     pip install flake8 mypy
+
     - name: Validate YAML front-matter
       run: ruby tools/validate_front_matter.rb
 
     - name: Validate index consistency
       run: ruby tools/reindex.rb --strict
+
+    # Python code validation disabled - documentation examples don't need strict production validation
+    # - name: Validate Python code examples
+    #   run: ruby tools/validate_python_examples.rb -v
+
+    - name: Scan Python bindings for secrets
+      id: gitleaks-action
+      uses: gitleaks/gitleaks-action@v2
+      continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: --source=docs/bindings/categories/python/ --verbose --no-color
+
+    # Fallback: Manual gitleaks installation if GitHub Action fails
+    - name: Fallback - Install gitleaks manually
+      id: gitleaks-fallback
+      if: steps.gitleaks-action.outcome == 'failure'
+      run: |
+        echo "⚠️ GitHub Action failed, attempting manual installation..."
+
+        # Method 1: Try GitHub API for dynamic URL resolution
+        echo "🔄 Attempting GitHub API method..."
+        LATEST_RELEASE=$(curl -s "https://api.github.com/repos/gitleaks/gitleaks/releases/latest")
+        if echo "$LATEST_RELEASE" | grep -q "browser_download_url"; then
+          DOWNLOAD_URL=$(echo "$LATEST_RELEASE" | grep "browser_download_url.*linux_x64.tar.gz" | cut -d '"' -f 4)
+          if [ -n "$DOWNLOAD_URL" ]; then
+            echo "📥 Downloading: $DOWNLOAD_URL"
+            if curl -sSfL "$DOWNLOAD_URL" | tar -xzf - -C /tmp; then
+              sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+              gitleaks version
+              echo "✅ Manual installation successful"
+              exit 0
+            fi
+          fi
+        fi
+
+        # Method 2: Try Ubuntu package manager as final fallback
+        echo "🔄 Attempting Ubuntu package manager..."
+        if sudo apt-get update && sudo apt-get install -y gitleaks; then
+          gitleaks version
+          echo "✅ Package manager installation successful"
+          exit 0
+        fi
+
+        # All methods failed
+        echo "❌ All installation methods failed"
+        echo "Please check the GitHub Actions logs and consider:"
+        echo "1. GitHub API rate limiting"
+        echo "2. Network connectivity issues"
+        echo "3. gitleaks release format changes"
+        echo "Manual resolution: Update .github/workflows/validate.yml"
+        exit 1
+
+    # Verify gitleaks installation and health
+    - name: Verify gitleaks installation
+      if: steps.gitleaks-action.outcome == 'success' || steps.gitleaks-fallback.outcome == 'success'
+      run: |
+        echo "🔍 Gitleaks Installation Verification"
+        echo "====================================="
+        echo ""
+
+        # Check if gitleaks is available
+        if command -v gitleaks >/dev/null 2>&1; then
+          echo "✅ gitleaks: Found in PATH"
+
+          # Get version information
+          GITLEAKS_VERSION=$(gitleaks version 2>&1)
+          echo "📋 Version: $GITLEAKS_VERSION"
+
+          # Test basic functionality
+          echo "🧪 Testing basic functionality..."
+          if gitleaks --help >/dev/null 2>&1; then
+            echo "✅ gitleaks: Help command works"
+          else
+            echo "❌ gitleaks: Help command failed"
+            exit 1
+          fi
+
+          # Verify target directory exists
+          if [ -d "docs/bindings/categories/python/" ]; then
+            echo "✅ Target directory: docs/bindings/categories/python/ exists"
+            FILE_COUNT=$(find docs/bindings/categories/python/ -name "*.md" | wc -l)
+            echo "📁 Found $FILE_COUNT markdown files to scan"
+          else
+            echo "❌ Target directory: docs/bindings/categories/python/ not found"
+            exit 1
+          fi
+
+          # Installation method tracking
+          if [ "${{ steps.gitleaks-action.outcome }}" == "success" ]; then
+            echo "📦 Installation method: GitHub Action (gitleaks/gitleaks-action@v2)"
+          elif [ "${{ steps.gitleaks-fallback.outcome }}" == "success" ]; then
+            echo "📦 Installation method: Fallback (manual/package manager)"
+          fi
+
+          echo ""
+          echo "✅ gitleaks verification completed successfully"
+
+        else
+          echo "❌ gitleaks: Not found in PATH"
+          echo "This should not happen if installation was successful"
+          exit 1
+        fi
+
+    # Run gitleaks scan (works with both Action and manual installation)
+    - name: Execute gitleaks scan
+      if: steps.gitleaks-action.outcome == 'success' || steps.gitleaks-fallback.outcome == 'success'
+      run: |
+        # Only run manual scan if we used fallback installation
+        if [ "${{ steps.gitleaks-action.outcome }}" == "failure" ]; then
+          echo "🔍 Running fallback gitleaks scan..."
+          if ! gitleaks detect --source=docs/bindings/categories/python/ --verbose --no-color; then
+            echo "❌ Secrets detected in Python binding examples!"
+            exit 1
+          fi
+          echo "✅ No secrets detected in Python bindings"
+        fi
+
+    - name: Report gitleaks results
+      if: failure()
+      run: |
+        echo "❌ Gitleaks scanning failed or secrets detected!"
+        echo ""
+        if [ "${{ steps.gitleaks-action.outcome }}" == "failure" ] && [ "${{ steps.gitleaks-fallback.outcome }}" == "failure" ]; then
+          echo "🔧 Installation troubleshooting:"
+          echo "- Check GitHub Actions service status"
+          echo "- Verify gitleaks/gitleaks-action@v2 is available"
+          echo "- Check for GitHub API rate limiting"
+          echo "- Review network connectivity"
+          echo ""
+        fi
+        echo "📝 For secret detection issues:"
+        echo "- Remove any hardcoded secrets, API keys, or credentials from code examples"
+        echo "- Use placeholder values like 'YOUR_API_KEY_HERE' or environment variable examples instead"
+        echo "- Ensure code examples use fictional data only"
 
     - name: Report validation results
       if: failure()

@@ -98,6 +98,308 @@ ruby tools/validate_front_matter.rb
 ruby tools/reindex.rb
 ```
 
+## Tooling Version Management
+
+### Current Tooling Versions
+
+Leyline uses a combination of pinned and latest versions for its CI toolchain. This strategy balances stability with access to the latest features and security updates.
+
+#### Language Runtimes (Pinned)
+- **Python**: 3.11
+- **Ruby**: 3.0
+- **Node.js**: 20
+
+#### Code Quality Tools (Latest)
+- **flake8**: latest (Python linting)
+- **mypy**: latest (Python type checking)
+- **markdown-link-check**: latest via npm (link validation)
+- **gitleaks**: latest from GitHub releases (secret scanning)
+
+#### Tool Configuration Standards
+- **flake8**: `--max-line-length=88`, `--extend-ignore=E203,W503` (black compatibility)
+- **mypy**: `--strict`, `--no-error-summary`, `--show-column-numbers`
+
+### Version Pinning Policy
+
+#### When to Pin Versions
+
+**Pin versions for:**
+1. **Language runtimes** - Ensures consistent behavior across development and CI environments
+2. **Tools with breaking configuration changes** - When tools frequently introduce incompatible CLI or config changes
+3. **Security-critical tools** - When specific versions are required for compliance or security analysis
+
+**Use latest versions for:**
+1. **Code quality tools** - Benefit from latest rules, bug fixes, and performance improvements
+2. **Non-breaking tooling** - Tools with stable APIs and backward-compatible updates
+3. **Community-maintained tools** - Leverage community improvements and security patches
+
+#### Version Update Process
+
+**Quarterly Review (Recommended):**
+1. **Audit current versions** - Review CI logs for deprecation warnings or version conflicts
+2. **Test major updates** - Create test branch to validate new language runtime versions
+3. **Update documentation** - Reflect any changes in this policy document
+
+**Emergency Updates:**
+1. **Security vulnerabilities** - Update immediately when critical security issues are identified
+2. **Blocking bugs** - Update tools that prevent CI from functioning correctly
+3. **Breaking changes** - Pin versions when tools introduce breaking changes affecting our workflow
+
+#### Implementation Locations
+
+**CI Configuration**: `.github/workflows/validate.yml`
+- Language runtime versions specified in setup actions
+- Tool installations via package managers (pip, npm, curl)
+
+**Tool Configuration**: `tools/validate_python_examples.rb`
+- flake8 and mypy configuration constants
+- Command-line arguments and flags
+
+**Documentation**: This file (`CONTRIBUTING.md`)
+- Current version inventory and policy decisions
+- Update procedures and responsibilities
+
+### Maintenance Responsibilities
+
+**For Contributors:**
+- Follow the current tool versions when developing locally
+- Report version conflicts or deprecation warnings in pull requests
+- Suggest tool updates when they provide significant value
+
+**For Maintainers:**
+- Monitor tool releases for security updates
+- Test tool updates in isolated branches before merging
+- Update this documentation when version policies change
+- Coordinate with community when breaking changes affect workflows
+
+### Troubleshooting Version Issues
+
+**Common Issues:**
+1. **Tool not found** - Ensure tools are installed with correct versions for local development
+2. **Configuration conflicts** - Check tool documentation for configuration changes between versions
+3. **CI failures** - Review CI logs for version-specific error messages
+
+**Resolution Steps:**
+1. Check current CI configuration for expected versions
+2. Update local development environment to match CI versions
+3. Consult tool-specific documentation for configuration updates
+4. Open issue if persistent problems affect the development workflow
+
+## CI Dependency Management
+
+### Dependency Installation Principles
+
+Leyline's CI pipeline follows a strategic approach to external tool installation that prioritizes reliability, maintainability, and clear failure diagnostics. These principles guide all CI dependency management decisions:
+
+#### 1. Prefer Official Actions Over Manual Installation
+
+**Primary Strategy**: Use official GitHub Actions when available
+- **Reliability**: Actions are maintained by tool authors with built-in error handling
+- **Simplicity**: No need to manage URLs, versions, or platform compatibility
+- **Maintenance**: Automatic updates through action versioning
+
+**Example**: `gitleaks/gitleaks-action@v2` vs. manual curl/tar installation
+
+#### 2. Implement Intelligent Fallback Strategies
+
+**Multi-Tier Approach**: Design resilient installation chains
+- **Primary**: Official GitHub Action (highest reliability)
+- **Fallback 1**: GitHub API + dynamic URL resolution (handles action failures)
+- **Fallback 2**: Package manager installation (handles network/API issues)
+- **Fallback 3**: Clear error diagnostics (handles total failures)
+
+**Conditional Execution**: Fallbacks only run when needed (`continue-on-error` + outcome checking)
+
+#### 3. Provide Actionable Error Diagnostics
+
+**Clear Failure Guidance**: Every failure mode includes specific troubleshooting steps
+- **Installation Issues**: Check GitHub Actions service status, API rate limits, network connectivity
+- **Tool Issues**: Validate tool functionality, check version compatibility, review logs
+- **Configuration Issues**: Verify tool arguments, check file paths, validate permissions
+
+### Preferred Installation Methods
+
+Follow this decision matrix for adding new CI dependencies:
+
+#### Tier 1: Official GitHub Actions (Preferred)
+```yaml
+- name: Tool scan
+  uses: official/tool-action@v2
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  with:
+    args: --target=specific-directory
+```
+
+**When to Use**: Tool provides official action, action is actively maintained, covers your use case
+
+**Benefits**: Built-in error handling, platform compatibility, automatic updates, community support
+
+#### Tier 2: GitHub API + Manual Installation (Fallback)
+```yaml
+- name: Install tool manually
+  if: steps.official-action.outcome == 'failure'
+  run: |
+    LATEST_RELEASE=$(curl -s "https://api.github.com/repos/tool/tool/releases/latest")
+    DOWNLOAD_URL=$(echo "$LATEST_RELEASE" | grep "browser_download_url.*linux_x64.tar.gz" | cut -d '"' -f 4)
+    curl -sSfL "$DOWNLOAD_URL" | tar -xzf - -C /tmp
+    sudo mv /tmp/tool /usr/local/bin/tool
+```
+
+**When to Use**: Official action fails, tool provides GitHub releases, need specific configuration
+
+**Benefits**: Dynamic URL resolution, handles release format changes, works with various tools
+
+#### Tier 3: Package Manager Installation (Emergency Fallback)
+```yaml
+- name: Install via package manager
+  if: steps.manual-install.outcome == 'failure'
+  run: sudo apt-get update && sudo apt-get install -y tool-name
+```
+
+**When to Use**: All other methods fail, tool available in Ubuntu packages, emergency reliability needed
+
+**Benefits**: System-native installation, dependency resolution, ultimate fallback
+
+#### Anti-Patterns to Avoid
+
+**❌ Hardcoded URLs**: Fragile, breaks when releases change format
+```yaml
+# Don't do this
+curl -sSfL https://github.com/tool/tool/releases/latest/download/tool_linux_x64.tar.gz
+```
+
+**❌ Single Point of Failure**: No fallback when primary method fails
+```yaml
+# Risky - what if the action is unavailable?
+- uses: unofficial/tool-action@v1  # No fallback strategy
+```
+
+**❌ Silent Failures**: No error diagnostics for troubleshooting
+```yaml
+# Provides no guidance when things go wrong
+- run: install-tool || exit 1
+```
+
+### Common CI Failures and Troubleshooting
+
+#### Installation Failures
+
+**Symptoms**: Tool installation steps fail with various errors
+
+**Troubleshooting Steps**:
+1. **Check GitHub Actions Status**: Visit [status.github.com](https://status.github.com) for service outages
+2. **Verify Action Availability**: Confirm the action repository exists and the version tag is valid
+3. **Review API Rate Limits**: Check for GitHub API rate limiting messages in logs
+4. **Test Network Connectivity**: Verify runner can access external resources
+5. **Check Release Format**: Confirm tool maintainers haven't changed release artifact naming
+
+**Resolution Strategies**:
+- Use fallback installation methods automatically triggered by workflow logic
+- Pin specific action versions if latest introduces breaking changes
+- Implement retry logic for transient network issues
+
+**Example Diagnostic Output**:
+```
+🔧 Installation troubleshooting:
+- Check GitHub Actions service status
+- Verify gitleaks/gitleaks-action@v2 is available
+- Check for GitHub API rate limiting
+- Review network connectivity
+```
+
+#### Tool Execution Failures
+
+**Symptoms**: Tool installs successfully but fails during execution
+
+**Troubleshooting Steps**:
+1. **Validate Tool Installation**: Confirm tool is accessible and reports correct version
+2. **Check File Paths**: Verify target directories exist and are accessible
+3. **Review Tool Arguments**: Confirm command-line arguments match tool expectations
+4. **Examine Permissions**: Ensure runner has necessary file access permissions
+5. **Test Tool Configuration**: Validate any configuration files or environment variables
+
+**Resolution Strategies**:
+- Add tool version logging for debugging
+- Implement health checks before tool execution
+- Provide clear error context for common tool failures
+
+#### Configuration Drift Issues
+
+**Symptoms**: CI works in one environment but fails in another
+
+**Troubleshooting Steps**:
+1. **Compare Tool Versions**: Check for version mismatches between environments
+2. **Review Configuration Changes**: Look for recent updates to tool configurations
+3. **Validate Dependencies**: Ensure all required dependencies are present
+4. **Check Environment Variables**: Verify environment-specific settings
+
+**Resolution Strategies**:
+- Document expected tool versions in this file
+- Use consistent configuration across environments
+- Implement version validation in CI health checks
+
+### Implementation Best Practices
+
+#### Step Naming and Organization
+```yaml
+- name: Primary tool execution
+  id: primary-step
+  uses: official/action@v2
+  continue-on-error: true
+
+- name: Fallback - Manual installation
+  id: fallback-step
+  if: steps.primary-step.outcome == 'failure'
+  run: |
+    echo "⚠️ Primary method failed, attempting fallback..."
+    # Fallback logic here
+```
+
+#### Error Context and Logging
+```yaml
+- name: Report tool results
+  if: failure()
+  run: |
+    echo "❌ Tool execution failed!"
+    if [ "${{ steps.primary-step.outcome }}" == "failure" ]; then
+      echo "🔧 Primary installation failed - check action availability"
+    fi
+    echo "📝 For configuration issues:"
+    echo "- Verify tool arguments and file paths"
+    echo "- Check tool documentation for recent changes"
+```
+
+#### Health Monitoring
+```yaml
+- name: Log tool versions
+  run: |
+    echo "📊 CI Tool Inventory:"
+    echo "Ruby: $(ruby --version)"
+    echo "Tool: $(tool --version)"
+    echo "Environment: $(uname -a)"
+```
+
+### Maintenance Guidelines
+
+#### For Contributors
+- **Report CI Issues**: Include full error logs and environment details
+- **Test Locally**: Verify changes work with current tool versions
+- **Follow Patterns**: Use established fallback strategies for consistency
+
+#### For Maintainers
+- **Monitor CI Health**: Review tool installation success rates regularly
+- **Update Fallback Logic**: Enhance error handling based on real failure patterns
+- **Maintain Documentation**: Keep troubleshooting guides current with actual issues
+
+#### Quarterly CI Review Process
+1. **Audit Tool Versions**: Review current versions against latest releases
+2. **Test Fallback Strategies**: Verify backup installation methods still work
+3. **Update Documentation**: Reflect any changes in troubleshooting procedures
+4. **Clean Up Dead Code**: Remove obsolete fallback logic for deprecated tools
+
+This approach ensures Leyline's CI pipeline remains robust, maintainable, and provides clear guidance for resolving issues when they occur.
+
 ### Markdown Guidelines
 
 All markdown files in this repository should follow consistent style guidelines:

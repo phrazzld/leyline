@@ -475,6 +475,9 @@ func (s *Service) CheckCredit(userID string, amount decimal.Decimal) bool {
   consumer packages rather than implementation packages, you create a more flexible,
   testable system with dependencies pointing in the right direction.
 
+### Language-Specific Analogies
+- [package-structure](../python/package-structure.md) - Python equivalent: organizing code by business domain with src/ layout and clear module boundaries
+
 - [code-size](../../docs/bindings/core/code-size.md): Package design and code size work together to maintain
   manageable units of code. When packages grow too large, they often need to be broken
   down into smaller, more focused packages.

@@ -107,6 +107,16 @@ _No cli bindings defined yet._
 | [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding directly implements our maintainability tenet by ensuring that read |
 | [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding directly implements our modularity tenet by ensuring that database |
 
+## Python Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [python-dependency-management](./categories/python/dependency-management.md) | 0.1.0 | This binding implements our automation tenet by transforming manual, error-prone dependency management into automated, reproducible processes. It a... |
+| [python-error-handling](./categories/python/error-handling.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error handling strategies visible and intentional rather than hidden behind catc... |
+| [package-structure](./categories/python/package-structure.md) | 0.1.0 | This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. It also supports... |
+| [testing-patterns](./categories/python/testing-patterns.md) | 0.1.0 | This binding implements our testability tenet by ensuring that tests provide meaningful feedback about system correctness rather than coupling to i... |
+| [type-hinting](./categories/python/type-hinting.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function contracts and data structures visible through the type system rather th... |
+
 ## Security Bindings
 
 | ID | Version | Summary |
