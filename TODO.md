@@ -194,7 +194,7 @@
         2. Verify error messages provide actionable resolution steps.
     - **Depends‑on:** [T018]
 
-- [~] **T020 · Chore · P2: document ci dependency management best practices**
+- [x] **T020 · Chore · P2: document ci dependency management best practices**
     - **Context:** Prevent future CI dependency failures
     - **Action:**
         1. Add section to `CONTRIBUTING.md` covering CI dependency management principles.
