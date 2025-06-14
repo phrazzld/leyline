@@ -165,7 +165,7 @@
     - **Depends‑on:** [T003]
 
 ## CI Infrastructure - Gitleaks Resolution
-- [~] **T018 · Chore · P0: fix gitleaks installation failure in CI pipeline**
+- [x] **T018 · Chore · P0: fix gitleaks installation failure in CI pipeline**
     - **Context:** PR #84 CI failure - gitleaks download URL returns 404
     - **Action:**
         1. Replace manual gitleaks installation with official `gitleaks/gitleaks-action@v2` in `.github/workflows/validate.yml`.
