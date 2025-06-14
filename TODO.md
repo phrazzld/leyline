@@ -208,7 +208,7 @@
         2. Troubleshooting guide tested against real failure scenarios.
     - **Depends‑on:** [T018, T019]
 
-- [~] **T021 · Test · P2: implement ci pipeline health monitoring**
+- [x] **T021 · Test · P2: implement ci pipeline health monitoring**
     - **Context:** Early detection of future CI issues
     - **Action:**
         1. Add validation step that checks all CI dependencies are properly installed.
