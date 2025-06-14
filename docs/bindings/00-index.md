@@ -54,7 +54,9 @@ _No backend bindings defined yet._
 
 ## Cli Bindings
 
-_No cli bindings defined yet._
+| ID | Version | Summary |
+|---|---|---|
+| [cli-developer-experience](./categories/cli/cli-developer-experience.md) | 0.1.0 | This binding implements our empathize-with-your-user tenet by recognizing that CLI tool users are developers working under time pressure, often con... |
 
 ## Frontend Bindings
 
@@ -93,11 +95,15 @@ _No frontend bindings defined yet._
 
 ## Api Bindings
 
-_No api bindings defined yet._
+| ID | Version | Summary |
+|---|---|---|
+| [rest-first-api-design](./categories/api/rest-first-api-design.md) | 0.1.0 | This binding implements our simplicity tenet by establishing REST as the foundation for API design, avoiding the accidental complexity that often c... |
 
 ## Browser-extensions Bindings
 
-_No browser-extensions bindings defined yet._
+| ID | Version | Summary |
+|---|---|---|
+| [browser-extension-security-patterns](./categories/browser-extensions/browser-extension-security-patterns.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring that browser extension security concerns be visible, documented, and intentio... |
 
 ## Database Bindings
 
