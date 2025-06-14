@@ -164,6 +164,65 @@
         1. A versioning policy is documented in a developer or governance guide.
     - **Depends‑on:** [T003]
 
+## CI Infrastructure - Gitleaks Resolution
+- [~] **T018 · Chore · P0: fix gitleaks installation failure in CI pipeline**
+    - **Context:** PR #84 CI failure - gitleaks download URL returns 404
+    - **Action:**
+        1. Replace manual gitleaks installation with official `gitleaks/gitleaks-action@v2` in `.github/workflows/validate.yml`.
+        2. Update workflow to use action-based scanning instead of manual installation.
+        3. Test the new configuration with current Python binding files.
+    - **Done‑when:**
+        1. CI pipeline successfully installs and runs gitleaks without 404 errors.
+        2. Python binding files are scanned for secrets without blocking valid examples.
+        3. The action completes within 30 seconds.
+    - **Verification:**
+        1. Run CI pipeline and confirm gitleaks step passes.
+        2. Verify gitleaks actually scans Python binding directory.
+    - **Depends‑on:** none
+
+- [ ] **T019 · Test · P1: implement fallback gitleaks installation strategies**
+    - **Context:** CI resilience - prevent future installation failures
+    - **Action:**
+        1. If GitHub Action fails, add fallback manual installation using GitHub API for dynamic URL resolution.
+        2. Implement error handling with clear failure diagnostics.
+        3. Add Ubuntu package manager installation as tertiary fallback.
+    - **Done‑when:**
+        1. CI pipeline has multiple installation strategies with graceful fallback.
+        2. Each failure mode provides clear error message with resolution guidance.
+    - **Verification:**
+        1. Test each fallback method in isolated environment.
+        2. Verify error messages provide actionable resolution steps.
+    - **Depends‑on:** [T018]
+
+- [ ] **T020 · Chore · P2: document ci dependency management best practices**
+    - **Context:** Prevent future CI dependency failures
+    - **Action:**
+        1. Add section to `CONTRIBUTING.md` covering CI dependency management principles.
+        2. Document preferred methods for installing external tools (actions > manual > package manager).
+        3. Create troubleshooting guide for common CI failures.
+    - **Done‑when:**
+        1. `CONTRIBUTING.md` includes comprehensive CI dependency guidelines.
+        2. Troubleshooting guide covers gitleaks and similar tool installations.
+    - **Verification:**
+        1. Documentation review by CI/CD subject matter expert.
+        2. Troubleshooting guide tested against real failure scenarios.
+    - **Depends‑on:** [T018, T019]
+
+- [ ] **T021 · Test · P2: implement ci pipeline health monitoring**
+    - **Context:** Early detection of future CI issues
+    - **Action:**
+        1. Add validation step that checks all CI dependencies are properly installed.
+        2. Implement tool version logging for debugging and maintenance.
+        3. Create monitoring for CI success/failure rates across tools.
+    - **Done‑when:**
+        1. CI pipeline logs all tool versions and installation status.
+        2. Health check validates all required tools before main validation.
+        3. Failure patterns are detectable through logging.
+    - **Verification:**
+        1. Review CI logs show clear tool status and version information.
+        2. Health check catches tool installation issues before they cause downstream failures.
+    - **Depends‑on:** [T018]
+
 ---
 
 ### Clarifications & Assumptions

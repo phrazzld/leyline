@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
@@ -41,23 +43,19 @@ jobs:
     # - name: Validate Python code examples
     #   run: ruby tools/validate_python_examples.rb -v
 
-    - name: Install gitleaks
-      run: |
-        # Install gitleaks for secret scanning
-        curl -sSfL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_linux_x64.tar.gz | tar -xzf - -C /tmp
-        sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
-        gitleaks version
-
     - name: Scan Python bindings for secrets
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        args: --source=docs/bindings/categories/python/ --verbose --no-color
+
+    - name: Report gitleaks results
+      if: failure()
       run: |
-        echo "🔍 Scanning Python bindings for secrets..."
-        if ! gitleaks dir docs/bindings/categories/python/ --no-color; then
-          echo "❌ Secrets detected in Python binding examples!"
-          echo "Please remove any hardcoded secrets, API keys, or credentials from code examples"
-          echo "Use placeholder values like 'YOUR_API_KEY_HERE' or environment variable examples instead"
-          exit 1
-        fi
-        echo "✅ No secrets detected in Python bindings"
+        echo "❌ Secrets detected in Python binding examples!"
+        echo "Please remove any hardcoded secrets, API keys, or credentials from code examples"
+        echo "Use placeholder values like 'YOUR_API_KEY_HERE' or environment variable examples instead"
 
     - name: Report validation results
       if: failure()
