@@ -11,7 +11,7 @@
         1. Run `ls docs/bindings/categories/python/` and confirm the directory is present.
     - **Depends‑on:** none
 
-- [ ] **T002 · Chore · P1: establish python expert review panel and process**
+- [x] ~~**T002 · Chore · P1: establish python expert review panel and process**~~ (CANCELLED - requires human coordination)
     - **Context:** Actionable Next Steps & Governance Framework - Community Engagement
     - **Action:**
         1. Identify and invite at least two Python experts to form a review panel.
@@ -41,7 +41,7 @@
         1. The CI pipeline fails when a Python binding file has invalid YAML front-matter.
     - **Depends‑on:** [T001]
 
-- [ ] **T005 · Test · P1: configure ci to validate index integrity with python category**
+- [x] **T005 · Test · P1: configure ci to validate index integrity with python category**
     - **Context:** Phase 3: Quality Assurance - Index integrity check
     - **Action:**
         1. Ensure the existing `reindex.rb --strict` script processes the new Python category.
@@ -51,7 +51,7 @@
         2. The build fails if cross-references are broken.
     - **Depends‑on:** [T001]
 
-- [ ] **T006 · Test · P2: integrate automated link checker for python bindings**
+- [x] **T006 · Test · P2: integrate automated link checker for python bindings**
     - **Context:** Comprehensive Risk Mitigation Matrix - Cross-reference link rot
     - **Action:**
         1. Configure an automated link-checking tool (e.g., `lychee`, `htmlproofer`) in the CI pipeline.
@@ -60,7 +60,7 @@
         1. The CI pipeline fails if a broken link is detected in the Python binding documents.
     - **Depends‑on:** [T001]
 
-- [ ] **T007 · Test · P2: integrate secret scanning for python code examples**
+- [x] **T007 · Test · P2: integrate secret scanning for python code examples**
     - **Context:** Comprehensive Risk Mitigation Matrix - Security vulnerabilities in examples
     - **Action:**
         1. Configure a secret scanning tool (e.g., `gitleaks`, `trufflehog`) in the CI pipeline.
@@ -70,7 +70,7 @@
     - **Depends‑on:** [T001]
 
 ## Python Bindings - Core Content
-- [ ] **T008 · Feature · P1: create binding for type hinting and static analysis**
+- [x] **T008 · Feature · P1: create binding for type hinting and static analysis**
     - **Context:** Essential Python Bindings #1
     - **Action:**
         1. Create `docs/bindings/categories/python/type-hinting.md`.
@@ -81,7 +81,7 @@
         1. `mypy --strict` passes on the "good" code examples.
     - **Depends‑on:** [T001, T003, T004]
 
-- [ ] **T009 · Feature · P2: create binding for explicit error handling**
+- [x] **T009 · Feature · P2: create binding for explicit error handling**
     - **Context:** Essential Python Bindings #2
     - **Action:**
         1. Create `docs/bindings/categories/python/error-handling.md`.
@@ -90,7 +90,7 @@
         1. The markdown file passes all CI checks.
     - **Depends‑on:** [T001, T003, T004]
 
-- [ ] **T010 · Feature · P2: create binding for virtual environment and dependency management**
+- [x] **T010 · Feature · P2: create binding for virtual environment and dependency management**
     - **Context:** Essential Python Bindings #3
     - **Action:**
         1. Create `docs/bindings/categories/python/dependency-management.md`.
@@ -99,7 +99,7 @@
         1. The markdown file passes all CI checks.
     - **Depends‑on:** [T001, T003, T004]
 
-- [ ] **T011 · Feature · P2: create binding for package structure and module organization**
+- [x] **T011 · Feature · P2: create binding for package structure and module organization**
     - **Context:** Essential Python Bindings #4
     - **Action:**
         1. Create `docs/bindings/categories/python/package-structure.md`.
@@ -108,7 +108,7 @@
         1. The markdown file passes all CI checks.
     - **Depends‑on:** [T001, T003, T004]
 
-- [ ] **T012 · Feature · P2: create binding for testing patterns with pytest**
+- [x] **T012 · Feature · P2: create binding for testing patterns with pytest**
     - **Context:** Essential Python Bindings #5
     - **Action:**
         1. Create `docs/bindings/categories/python/testing-patterns.md`.
@@ -117,7 +117,7 @@
         1. The markdown file passes all CI checks.
     - **Depends‑on:** [T001, T003, T004]
 
-- [ ] **T013 · Feature · P2: add cross-references to all core bindings**
+- [x] **T013 · Feature · P2: add cross-references to all core bindings**
     - **Context:** Phase 2: Core Binding Development - Cross-Reference Integration
     - **Action:**
         1. Edit each of the 5 core binding files to add links to analogous TypeScript/Go bindings.
@@ -127,7 +127,7 @@
         2. The `reindex.rb --strict` CI check passes.
     - **Depends‑on:** [T005, T008, T009, T010, T011, T012]
 
-- [ ] **T014 · Chore · P1: conduct expert review and finalize content**
+- [x] ~~**T014 · Chore · P1: conduct expert review and finalize content**~~ (CANCELLED - requires human expert review)
     - **Context:** Phase 3: Quality Assurance - Expert technical review
     - **Action:**
         1. Submit a pull request with the 5 completed bindings for review by the expert panel.
@@ -137,7 +137,7 @@
     - **Depends‑on:** [T002, T013]
 
 ## Python Bindings - Governance
-- [ ] **T015 · Chore · P2: assign python category champion**
+- [x] ~~**T015 · Chore · P2: assign python category champion**~~ (CANCELLED - requires human coordination)
     - **Context:** Phase 4: Publication and Governance - Champion Assignment
     - **Action:**
         1. Identify and designate a long-term maintainer for the Python bindings category.
@@ -146,7 +146,7 @@
         1. A champion is named and documented publicly within the project.
     - **Depends‑on:** [T014]
 
-- [ ] **T016 · Chore · P3: establish and document review cycle**
+- [x] ~~**T016 · Chore · P3: establish and document review cycle**~~ (CANCELLED - requires human governance decisions)
     - **Context:** Phase 4: Publication and Governance - Review Cycle Establishment
     - **Action:**
         1. Define and document the update cadence (e.g., annual) and process for the Python bindings.
@@ -155,7 +155,7 @@
         1. The review cycle and feedback process are documented in a governance file.
     - **Depends‑on:** [T015]
 
-- [ ] **T017 · Chore · P3: document tooling version pinning strategy**
+- [x] **T017 · Chore · P3: document tooling version pinning strategy**
     - **Context:** Comprehensive Risk Mitigation Matrix - Tooling drift over time
     - **Action:**
         1. Document the current pinned versions of `flake8`, `mypy`, and other enforcement tools.

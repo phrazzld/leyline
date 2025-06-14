@@ -98,6 +98,93 @@ ruby tools/validate_front_matter.rb
 ruby tools/reindex.rb
 ```
 
+## Tooling Version Management
+
+### Current Tooling Versions
+
+Leyline uses a combination of pinned and latest versions for its CI toolchain. This strategy balances stability with access to the latest features and security updates.
+
+#### Language Runtimes (Pinned)
+- **Python**: 3.11
+- **Ruby**: 3.0
+- **Node.js**: 20
+
+#### Code Quality Tools (Latest)
+- **flake8**: latest (Python linting)
+- **mypy**: latest (Python type checking)
+- **markdown-link-check**: latest via npm (link validation)
+- **gitleaks**: latest from GitHub releases (secret scanning)
+
+#### Tool Configuration Standards
+- **flake8**: `--max-line-length=88`, `--extend-ignore=E203,W503` (black compatibility)
+- **mypy**: `--strict`, `--no-error-summary`, `--show-column-numbers`
+
+### Version Pinning Policy
+
+#### When to Pin Versions
+
+**Pin versions for:**
+1. **Language runtimes** - Ensures consistent behavior across development and CI environments
+2. **Tools with breaking configuration changes** - When tools frequently introduce incompatible CLI or config changes
+3. **Security-critical tools** - When specific versions are required for compliance or security analysis
+
+**Use latest versions for:**
+1. **Code quality tools** - Benefit from latest rules, bug fixes, and performance improvements
+2. **Non-breaking tooling** - Tools with stable APIs and backward-compatible updates
+3. **Community-maintained tools** - Leverage community improvements and security patches
+
+#### Version Update Process
+
+**Quarterly Review (Recommended):**
+1. **Audit current versions** - Review CI logs for deprecation warnings or version conflicts
+2. **Test major updates** - Create test branch to validate new language runtime versions
+3. **Update documentation** - Reflect any changes in this policy document
+
+**Emergency Updates:**
+1. **Security vulnerabilities** - Update immediately when critical security issues are identified
+2. **Blocking bugs** - Update tools that prevent CI from functioning correctly
+3. **Breaking changes** - Pin versions when tools introduce breaking changes affecting our workflow
+
+#### Implementation Locations
+
+**CI Configuration**: `.github/workflows/validate.yml`
+- Language runtime versions specified in setup actions
+- Tool installations via package managers (pip, npm, curl)
+
+**Tool Configuration**: `tools/validate_python_examples.rb`
+- flake8 and mypy configuration constants
+- Command-line arguments and flags
+
+**Documentation**: This file (`CONTRIBUTING.md`)
+- Current version inventory and policy decisions
+- Update procedures and responsibilities
+
+### Maintenance Responsibilities
+
+**For Contributors:**
+- Follow the current tool versions when developing locally
+- Report version conflicts or deprecation warnings in pull requests
+- Suggest tool updates when they provide significant value
+
+**For Maintainers:**
+- Monitor tool releases for security updates
+- Test tool updates in isolated branches before merging
+- Update this documentation when version policies change
+- Coordinate with community when breaking changes affect workflows
+
+### Troubleshooting Version Issues
+
+**Common Issues:**
+1. **Tool not found** - Ensure tools are installed with correct versions for local development
+2. **Configuration conflicts** - Check tool documentation for configuration changes between versions
+3. **CI failures** - Review CI logs for version-specific error messages
+
+**Resolution Steps:**
+1. Check current CI configuration for expected versions
+2. Update local development environment to match CI versions
+3. Consult tool-specific documentation for configuration updates
+4. Open issue if persistent problems affect the development workflow
+
 ### Markdown Guidelines
 
 All markdown files in this repository should follow consistent style guidelines:

@@ -497,6 +497,9 @@ func Process[T constraints.Ordered](input T) T {
   achieving dependency inversion, which creates more testable, modular code by
   decoupling components and focusing on behaviors rather than implementations.
 
+### Language-Specific Analogies
+- [type-hinting](../python/type-hinting.md) - Python equivalent: using explicit type hints and interfaces to define clear contracts between components
+
 - [go-package-design](../../docs/bindings/categories/go/package-design.md): Interface design and package design work
   together closely in Go. Well-designed interfaces define the boundaries between
   packages and enable clean dependency management. The consumer-defined interface
