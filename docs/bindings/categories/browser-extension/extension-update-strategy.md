@@ -104,4 +104,3 @@ Always prioritize user communication even in exceptional circumstances.
 
 - [extension-permissions-model](./extension-permissions-model.md): Managing permission changes during updates
 - [cross-browser-compatibility](./cross-browser-compatibility.md): Update compatibility across browsers
-- [deliver-value-continuously](../../tenets/deliver-value-continuously.md): Continuous delivery principles for extensions
