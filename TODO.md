@@ -180,7 +180,7 @@
         2. Verify gitleaks actually scans Python binding directory.
     - **Depends‑on:** none
 
-- [ ] **T019 · Test · P1: implement fallback gitleaks installation strategies**
+- [~] **T019 · Test · P1: implement fallback gitleaks installation strategies**
     - **Context:** CI resilience - prevent future installation failures
     - **Action:**
         1. If GitHub Action fails, add fallback manual installation using GitHub API for dynamic URL resolution.
@@ -224,14 +224,3 @@
     - **Depends‑on:** [T018]
 
 ---
-
-### Clarifications & Assumptions
-- [ ] **Issue:** A specific tool or method for extracting Python code from markdown files for CI linting is not defined.
-    - **Context:** Phase 3, Quality Gates
-    - **Blocking?:** no
-- [ ] **Issue:** The canonical location for governance documentation (Champion, Review Cycle, Expert Panel) is not specified.
-    - **Context:** Governance Framework
-    - **Blocking?:** no
-- [ ] **Issue:** The plan assumes existing Ruby tooling (`validate_front_matter.rb`, `reindex.rb`) can be easily adapted for a new category.
-    - **Context:** Unified Architecture Blueprint
-    - **Blocking?:** no

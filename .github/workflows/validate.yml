@@ -44,18 +44,85 @@ jobs:
     #   run: ruby tools/validate_python_examples.rb -v
 
     - name: Scan Python bindings for secrets
+      id: gitleaks-action
       uses: gitleaks/gitleaks-action@v2
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: --source=docs/bindings/categories/python/ --verbose --no-color
 
+    # Fallback: Manual gitleaks installation if GitHub Action fails
+    - name: Fallback - Install gitleaks manually
+      id: gitleaks-fallback
+      if: steps.gitleaks-action.outcome == 'failure'
+      run: |
+        echo "⚠️ GitHub Action failed, attempting manual installation..."
+
+        # Method 1: Try GitHub API for dynamic URL resolution
+        echo "🔄 Attempting GitHub API method..."
+        LATEST_RELEASE=$(curl -s "https://api.github.com/repos/gitleaks/gitleaks/releases/latest")
+        if echo "$LATEST_RELEASE" | grep -q "browser_download_url"; then
+          DOWNLOAD_URL=$(echo "$LATEST_RELEASE" | grep "browser_download_url.*linux_x64.tar.gz" | cut -d '"' -f 4)
+          if [ -n "$DOWNLOAD_URL" ]; then
+            echo "📥 Downloading: $DOWNLOAD_URL"
+            if curl -sSfL "$DOWNLOAD_URL" | tar -xzf - -C /tmp; then
+              sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+              gitleaks version
+              echo "✅ Manual installation successful"
+              exit 0
+            fi
+          fi
+        fi
+
+        # Method 2: Try Ubuntu package manager as final fallback
+        echo "🔄 Attempting Ubuntu package manager..."
+        if sudo apt-get update && sudo apt-get install -y gitleaks; then
+          gitleaks version
+          echo "✅ Package manager installation successful"
+          exit 0
+        fi
+
+        # All methods failed
+        echo "❌ All installation methods failed"
+        echo "Please check the GitHub Actions logs and consider:"
+        echo "1. GitHub API rate limiting"
+        echo "2. Network connectivity issues"
+        echo "3. gitleaks release format changes"
+        echo "Manual resolution: Update .github/workflows/validate.yml"
+        exit 1
+
+    # Run gitleaks scan (works with both Action and manual installation)
+    - name: Execute gitleaks scan
+      if: steps.gitleaks-action.outcome == 'success' || steps.gitleaks-fallback.outcome == 'success'
+      run: |
+        # Only run manual scan if we used fallback installation
+        if [ "${{ steps.gitleaks-action.outcome }}" == "failure" ]; then
+          echo "🔍 Running fallback gitleaks scan..."
+          if ! gitleaks detect --source=docs/bindings/categories/python/ --verbose --no-color; then
+            echo "❌ Secrets detected in Python binding examples!"
+            exit 1
+          fi
+          echo "✅ No secrets detected in Python bindings"
+        fi
+
     - name: Report gitleaks results
       if: failure()
       run: |
-        echo "❌ Secrets detected in Python binding examples!"
-        echo "Please remove any hardcoded secrets, API keys, or credentials from code examples"
-        echo "Use placeholder values like 'YOUR_API_KEY_HERE' or environment variable examples instead"
+        echo "❌ Gitleaks scanning failed or secrets detected!"
+        echo ""
+        if [ "${{ steps.gitleaks-action.outcome }}" == "failure" ] && [ "${{ steps.gitleaks-fallback.outcome }}" == "failure" ]; then
+          echo "🔧 Installation troubleshooting:"
+          echo "- Check GitHub Actions service status"
+          echo "- Verify gitleaks/gitleaks-action@v2 is available"
+          echo "- Check for GitHub API rate limiting"
+          echo "- Review network connectivity"
+          echo ""
+        fi
+        echo "📝 For secret detection issues:"
+        echo "- Remove any hardcoded secrets, API keys, or credentials from code examples"
+        echo "- Use placeholder values like 'YOUR_API_KEY_HERE' or environment variable examples instead"
+        echo "- Ensure code examples use fictional data only"
 
     - name: Report validation results
       if: failure()
