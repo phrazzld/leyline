@@ -1,8 +1,8 @@
 ---
 derived_from: automation
-enforced_by: uv & poetry & pipenv & pip-tools & CI lockfile validation
+enforced_by: uv (primary) & alternative tools (poetry, pipenv, pip-tools) & CI lockfile validation
 id: python-dependency-management
-last_modified: '2025-06-14'
+last_modified: '2025-06-15'
 version: '0.1.0'
 ---
 # Binding: Use Isolated Virtual Environments and Pin Dependencies in Lockfiles
@@ -33,12 +33,11 @@ Python's dependency ecosystem requires careful isolation and version management.
 - Manual dependency installation without tool-managed environments
 - Ignoring or excluding lockfiles from version control
 
-**Recommended tools:**
-- **uv** for ultra-fast dependency management with automatic virtual environment handling
-- **Poetry** for modern dependency management (alternative approach)
-- **Pipenv** for traditional pip-based workflows (alternative approach)
-- **pip-tools** for minimal setups that compile requirements.txt files (alternative approach)
-- **conda** for scientific computing with non-Python dependencies
+**Primary tool:**
+- **uv** for ultra-fast dependency resolution, automatic virtual environment handling, and seamless CI/CD integration
+
+**Specialized use cases:**
+- **conda** for scientific computing with non-Python dependencies (C/C++ extensions, system libraries)
 
 ## Practical Implementation
 
@@ -174,6 +173,8 @@ uv add --optional docs sphinx sphinx-rtd-theme
 ```
 
 ## Alternative Approaches
+
+While **uv is the recommended primary tool** for new projects due to its speed and simplicity, these alternative approaches may be appropriate for specific scenarios such as existing project constraints, team preferences, or specialized publishing workflows.
 
 ### Poetry Setup
 
@@ -558,11 +559,11 @@ if __name__ == '__main__':
 
 | Tool | Strengths | Best For |
 |------|-----------|----------|
-| **uv** *(Recommended)* | Ultra-fast dependency resolution, automatic virtual environments, simple configuration, excellent performance | All new projects, teams wanting the fastest modern tooling |
-| **Poetry** | Modern dependency resolution, automatic virtual environments, build system integration | Teams preferring established tooling, complex publishing workflows |
-| **Pipenv** | Simple pip-compatible workflow, automatic .env loading | Teams transitioning from pip, Docker-first workflows |
-| **pip-tools** | Minimal overhead, integrates with existing pip workflows | Legacy projects, minimal dependencies, simple requirements |
-| **conda** | Non-Python dependencies, scientific computing packages | Data science, packages requiring compiled extensions |
+| **uv** *(Primary Choice)* | Ultra-fast dependency resolution, automatic virtual environments, simple configuration, excellent performance, seamless CI/CD integration | **All new projects** - the recommended standard for modern Python development |
+| **Poetry** *(Alternative)* | Modern dependency resolution, automatic virtual environments, build system integration | Existing Poetry projects, teams with complex publishing workflows |
+| **Pipenv** *(Alternative)* | Simple pip-compatible workflow, automatic .env loading | Legacy projects transitioning from pip, Docker-first workflows |
+| **pip-tools** *(Alternative)* | Minimal overhead, integrates with existing pip workflows | Legacy projects, minimal dependencies, simple requirements |
+| **conda** *(Specialized)* | Non-Python dependencies, scientific computing packages | Data science, packages requiring compiled extensions |
 
 ## Related Bindings
 
