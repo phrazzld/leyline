@@ -35,6 +35,7 @@ This file contains an automatically generated list of all bindings with their on
 | [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding directly implements our testability tenet by forcing you to design code |
 | [no-lint-suppression](./core/no-lint-suppression.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by requiring |
 | [normalized-data-design](./core/normalized-data-design.md) | 0.1.0 | This binding implements our DRY tenet at the data layer by ensuring that knowledge represented in data exists in only one location. When the same i... |
+| [preferred-technology-patterns](./core/preferred-technology-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by recognizing that every piece of novel technology introduces complexity that extends far beyond its ... |
 | [property-based-testing](./core/property-based-testing.md) | 0.1.0 | This binding implements our testability tenet by dramatically expanding test coverage beyond what's practical with manually written examples. Prope... |
 | [pure-functions](./core/pure-functions.md) | 0.1.0 | This binding implements our simplicity tenet by reducing complexity at its most |
 | [require-conventional-commits](./core/require-conventional-commits.md) | 0.1.0 | This binding directly implements our automation tenet by transforming commit messages |
@@ -42,6 +43,7 @@ This file contains an automatically generated list of all bindings with their on
 | [semantic-versioning](./core/semantic-versioning.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by bringing clarity to |
 | [system-boundaries](./core/system-boundaries.md) | 0.1.0 | This binding implements our orthogonality tenet by creating architectural separation that prevents components from becoming entangled across differ... |
 | [technical-debt-tracking](./core/technical-debt-tracking.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating systematic approaches to identify and manage technical shortcuts, compromises, and... |
+| [toolchain-selection-criteria](./core/toolchain-selection-criteria.md) | 0.1.0 | This binding implements our simplicity and maintainability tenets by establishing a framework for toolchain decisions that prevents the accumulatio... |
 | [unified-documentation](./core/unified-documentation.md) | 0.1.0 | This binding implements our DRY tenet by ensuring that knowledge about system behavior, APIs, processes, and decisions exists in exactly one place.... |
 | [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding directly implements our automation tenet by transforming system telemetry |
 | [value-driven-prioritization](./core/value-driven-prioritization.md) | 0.1.0 | This binding directly implements our product-value-first tenet by establishing concrete criteria for development decisions, preventing the accumula... |
@@ -57,6 +59,9 @@ _No backend bindings defined yet._
 | ID | Version | Summary |
 |---|---|---|
 | [cli-developer-experience](./categories/cli/cli-developer-experience.md) | 0.1.0 | This binding implements our empathize-with-your-user tenet by recognizing that CLI tool users are developers working under time pressure, often con... |
+| [cli-error-handling](./categories/cli/cli-error-handling.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by preventing the degradation of user experience that occurs when errors are cryptic, unhelpfu... |
+| [cli-help-and-documentation](./categories/cli/cli-help-and-documentation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making CLI functionality and usage patterns discoverable within the tool itself. When u... |
+| [command-interface-design](./categories/cli/command-interface-design.md) | 0.1.0 | This binding implements our empathize-with-your-user tenet by recognizing that CLI users are working under time pressure, often in high-stress situ... |
 
 ## Frontend Bindings
 
@@ -97,7 +102,18 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
+| [api-documentation-requirements](./categories/api/api-documentation-requirements.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making API contracts, expectations, and behaviors visible and discoverable. Poor or mis... |
+| [api-versioning-strategy](./categories/api/api-versioning-strategy.md) | 0.1.0 | This binding implements our adaptability-and-reversibility tenet by acknowledging that APIs must evolve to meet changing business needs while maint... |
+| [rest-api-standards](./categories/api/rest-api-standards.md) | 0.1.0 | This binding implements our simplicity tenet by leveraging the established semantics of HTTP rather than inventing custom conventions. When APIs fo... |
 | [rest-first-api-design](./categories/api/rest-first-api-design.md) | 0.1.0 | This binding implements our simplicity tenet by establishing REST as the foundation for API design, avoiding the accidental complexity that often c... |
+
+## Browser-extension Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [cross-browser-compatibility](./categories/browser-extension/cross-browser-compatibility.md) | 0.1.0 | This binding implements our adaptability-and-reversibility tenet by ensuring extensions can adapt to different browser environments and evolve as b... |
+| [extension-permissions-model](./categories/browser-extension/extension-permissions-model.md) | 0.1.0 | This binding implements our no-secret-suppression tenet by making extension capabilities and data access explicit to users. Browser extensions oper... |
+| [extension-update-strategy](./categories/browser-extension/extension-update-strategy.md) | 0.1.0 | This binding implements our deliver-value-continuously tenet by ensuring that improvements and fixes reach users efficiently while maintaining trus... |
 
 ## Browser-extensions Bindings
 

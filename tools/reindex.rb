@@ -55,8 +55,8 @@ def process_tenets_dir
   dir_base = dir.split('/').last
   entries = []
 
-  # Get all markdown files except the index
-  tenet_files = Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.sort
+  # Get all markdown files except the index and glance files
+  tenet_files = Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ || f =~ /glance\.md$/ }.sort
   puts "Processing #{tenet_files.size} tenet files..." if $options[:verbose]
 
   tenet_files.each do |file|
@@ -159,7 +159,7 @@ def process_bindings_dir
   dir = "#{get_docs_base_path}/bindings"
 
   # Check for misplaced files in the root directory
-  misplaced_files = Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }
+  misplaced_files = Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ || f =~ /glance\.md$/ }
   misplaced_files.each do |file|
     report_error(file, "Misplaced binding file found in root directory")
     puts "       This file should be moved to either:" if $options[:verbose]
@@ -175,8 +175,8 @@ def process_bindings_dir
   core_entries = []
   category_entries = {}
 
-  # 1. Process core bindings
-  core_files = Dir.glob("#{dir}/core/*.md").sort
+  # 1. Process core bindings, excluding glance files
+  core_files = Dir.glob("#{dir}/core/*.md").reject { |f| f =~ /glance\.md$/ }.sort
   puts "Processing #{core_files.size} core binding files..." if $options[:verbose]
 
   core_files.each do |file|
@@ -208,8 +208,8 @@ def process_bindings_dir
   category_dirs.each do |category_dir|
     category_name = File.basename(category_dir)
 
-    # Look for markdown files in this category directory
-    binding_files = Dir.glob("#{category_dir}/*.md").sort
+    # Look for markdown files in this category directory, excluding glance files
+    binding_files = Dir.glob("#{category_dir}/*.md").reject { |f| f =~ /glance\.md$/ }.sort
     puts "Processing #{binding_files.size} binding files in category '#{category_name}'..." if $options[:verbose]
 
     # Process each binding file (if any)
