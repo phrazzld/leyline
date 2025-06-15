@@ -293,5 +293,6 @@ def process_config(config_path: str) -> Dict[str, Any]:
 - [error-context-propagation](../go/error-context-propagation.md) - Go patterns for maintaining error context through call stacks
 
 ### Related Python Patterns
-- [type-hinting](./type-hinting.md) - Explicit type hints complement explicit error handling for complete API contracts
-- [testing-patterns](./testing-patterns.md) - Explicit error handling enables better testing of failure scenarios
+- [type-hinting](../../docs/bindings/categories/python/type-hinting.md) - Explicit type hints complement explicit error handling for complete API contracts
+- [testing-patterns](../../docs/bindings/categories/python/testing-patterns.md) - Explicit error handling enables better testing of failure scenarios
+- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md) - Unified toolchain supports consistent error handling patterns through structured logging and automation
