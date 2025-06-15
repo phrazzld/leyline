@@ -57,7 +57,7 @@ Apply boring technology principles through:
 
 This binding should be enforced through:
 
-- **Technology Radar**: Maintain a explicit list of approved, evaluated, and experimental technologies
+- **Technology Radar**: Maintain an explicit list of approved, evaluated, and experimental technologies
 - **Innovation Budget Tracking**: Monitor how many unproven technologies are in use
 - **Architecture Review**: Require justification for any non-mainstream technology choices
 - **Hiring Reality Check**: Verify you can actually hire people with required expertise
