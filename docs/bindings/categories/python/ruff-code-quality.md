@@ -421,9 +421,9 @@ profile = "black"
 ## Related Bindings
 
 ### Core Python Bindings
-- [modern-python-toolchain](./modern-python-toolchain.md): ruff serves as the code quality component of the unified Python development stack
-- [type-hinting](./type-hinting.md): ruff's ANN rules enforce comprehensive type annotation coverage
-- [dependency-management](./dependency-management.md): ruff integrates with uv-based workflows for consistent development experience
+- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md): ruff serves as the code quality component of the unified Python development stack
+- [type-hinting](../../docs/bindings/categories/python/type-hinting.md): ruff's ANN rules enforce comprehensive type annotation coverage
+- [dependency-management](../../docs/bindings/categories/python/dependency-management.md): ruff integrates with uv-based workflows for consistent development experience
 
 ### Core Tenets & Bindings
 - [automation](../../../tenets/automation.md): ruff automates code quality checking and formatting to eliminate manual, error-prone processes

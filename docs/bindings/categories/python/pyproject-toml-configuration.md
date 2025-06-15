@@ -440,9 +440,9 @@ build-backend = "hatchling.build"
 ## Related Bindings
 
 ### Core Python Bindings
-- [modern-python-toolchain](./modern-python-toolchain.md): pyproject.toml serves as the unified configuration foundation for the entire modern Python stack
-- [ruff-code-quality](./ruff-code-quality.md): ruff configuration consolidates into pyproject.toml rather than separate .flake8 or setup.cfg files
-- [dependency-management](./dependency-management.md): dependency specifications move from requirements.txt files into pyproject.toml structure
+- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md): pyproject.toml serves as the unified configuration foundation for the entire modern Python stack
+- [ruff-code-quality](../../docs/bindings/categories/python/ruff-code-quality.md): ruff configuration consolidates into pyproject.toml rather than separate .flake8 or setup.cfg files
+- [dependency-management](../../docs/bindings/categories/python/dependency-management.md): dependency specifications move from requirements.txt files into pyproject.toml structure
 
 ### Core Tenets & Bindings
 - [simplicity](../../../tenets/simplicity.md): single configuration file dramatically reduces project complexity and cognitive overhead

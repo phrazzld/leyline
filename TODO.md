@@ -111,7 +111,7 @@
         1. All links between Python-related documents are accurate and there are no dead links.
     - **Depends-on:** [T003, T005, T006, T007, T008]
 
-- [ ] **T012 · Test · P1: run all documentation validation scripts**
+- [~] **T012 · Test · P1: run all documentation validation scripts**
     - **Context:** PLAN.md > Phase 3 > 3.2 Tool Validation
     - **Action:**
         1. Run `ruby tools/validate_front_matter.rb` on all modified and new files.

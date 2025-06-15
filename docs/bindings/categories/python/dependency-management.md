@@ -227,6 +227,146 @@ poetry add --group dev pytest
 poetry update
 ```
 
+## Migration from Poetry to uv
+
+Teams using Poetry can migrate to uv systematically while maintaining dependency specifications and lockfile benefits.
+
+### Migration Strategy
+
+**1. Audit current Poetry configuration:**
+
+```bash
+# Review current dependencies
+poetry show --tree
+
+# Export current lockfile
+poetry export -f requirements.txt --output requirements-poetry.txt
+poetry export -f requirements.txt --with dev --output requirements-dev-poetry.txt
+```
+
+**2. Convert pyproject.toml structure:**
+
+```toml
+# Before: Poetry configuration
+[tool.poetry]
+name = "my-project"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.28.0"
+pydantic = "^1.10.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+ruff = "^0.1.0"
+mypy = "^0.991"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+```
+
+```toml
+# After: Standard Python configuration
+[project]
+name = "my-project"
+version = "0.1.0"
+description = ""
+authors = [{name = "Your Name", email = "you@example.com"}]
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.28.0,<3.0.0",
+    "pydantic>=1.10.0,<2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "ruff>=0.1.0",
+    "mypy>=0.991",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+```
+
+**3. Initialize uv environment:**
+
+```bash
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Initialize project (will detect existing pyproject.toml)
+uv init --no-readme
+
+# Sync dependencies
+uv sync --extra dev
+```
+
+**4. Validate migration:**
+
+```bash
+# Compare installed packages
+poetry show --no-dev > poetry-packages.txt
+uv pip list --format freeze > uv-packages.txt
+
+# Test that project still works
+uv run python -c "import requests, pydantic; print('Migration successful')"
+uv run pytest  # If you have tests
+```
+
+**5. Clean up Poetry artifacts:**
+
+```bash
+# Remove Poetry-specific files
+rm poetry.lock
+rm -rf .venv  # Poetry virtual environment
+
+# Update .gitignore
+echo "uv.lock" >> .gitignore  # Add uv lockfile
+# Remove poetry.lock from .gitignore if present
+```
+
+### Migration Troubleshooting
+
+**Version constraint conversion:**
+
+```bash
+# Poetry caret constraints (^1.2.0 = >=1.2.0,<2.0.0)
+poetry: "requests = '^2.28.0'"
+uv: "requests>=2.28.0,<3.0.0"
+
+# Poetry tilde constraints (~1.2.0 = >=1.2.0,<1.3.0)
+poetry: "requests = '~2.28.0'"
+uv: "requests>=2.28.0,<2.29.0"
+```
+
+**Dependency groups mapping:**
+
+```toml
+# Poetry groups
+[tool.poetry.group.dev.dependencies]
+[tool.poetry.group.test.dependencies]
+[tool.poetry.group.docs.dependencies]
+
+# Standard Python optional dependencies
+[project.optional-dependencies]
+dev = [...]
+test = [...]
+docs = [...]
+```
+
+**Build backend migration:**
+
+Most projects can switch from `poetry-core` to `hatchling` without issues. For complex builds, consider:
+- `setuptools` for maximum compatibility
+- `pdm-backend` for PDM users
+- Keep `poetry-core` temporarily if needed
+
 ### pip-tools Setup
 
 **1. Create requirements files:**
@@ -578,7 +718,7 @@ if __name__ == '__main__':
 - [module-organization](../typescript/module-organization.md) - TypeScript patterns for organizing and managing module dependencies
 
 ### Related Python Patterns
-- [package-structure](./package-structure.md) - Well-organized packages support cleaner dependency management
-- [testing-patterns](./testing-patterns.md) - Isolated dependencies enable more reliable and reproducible testing
-- [modern-python-toolchain](./modern-python-toolchain.md) - uv serves as the foundation for the unified modern Python toolchain approach
-- [pyproject-toml-configuration](./pyproject-toml-configuration.md) - Dependency management should use pyproject.toml as the single configuration source
+- [package-structure](../../docs/bindings/categories/python/package-structure.md) - Well-organized packages support cleaner dependency management
+- [testing-patterns](../../docs/bindings/categories/python/testing-patterns.md) - Isolated dependencies enable more reliable and reproducible testing
+- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md) - uv serves as the foundation for the unified modern Python toolchain approach
+- [pyproject-toml-configuration](../../docs/bindings/categories/python/pyproject-toml-configuration.md) - Dependency management should use pyproject.toml as the single configuration source

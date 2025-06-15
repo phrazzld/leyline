@@ -424,5 +424,7 @@ force_sort_within_sections = true
 - [module-organization](../typescript/module-organization.md) - TypeScript patterns for organizing modules by feature with clean import hierarchies
 
 ### Related Python Patterns
-- [dependency-management](./dependency-management.md) - Well-structured packages support cleaner dependency management and isolation
-- [testing-patterns](./testing-patterns.md) - Good package structure enables more effective testing and test organization
+- [dependency-management](../../docs/bindings/categories/python/dependency-management.md) - Well-structured packages support cleaner dependency management and isolation
+- [testing-patterns](../../docs/bindings/categories/python/testing-patterns.md) - Good package structure enables more effective testing and test organization
+- [pyproject-toml-configuration](../../docs/bindings/categories/python/pyproject-toml-configuration.md) - Package metadata and build configuration should be centralized in pyproject.toml
+- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md) - Unified toolchain approach supports consistent package structure patterns

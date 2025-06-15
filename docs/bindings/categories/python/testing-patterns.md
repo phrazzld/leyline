@@ -403,6 +403,8 @@ def test_complete_user_registration_workflow(db_session):
 - [functional-composition-patterns](../typescript/functional-composition-patterns.md) - TypeScript patterns for composable, testable functions
 
 ### Related Python Patterns
-- [type-hinting](./type-hinting.md) - Explicit type hints enable more effective testing by catching errors at development time
-- [error-handling](./error-handling.md) - Explicit error handling enables comprehensive testing of both success and failure scenarios
-- [package-structure](./package-structure.md) - Well-organized packages enable focused, maintainable test suites
+- [type-hinting](../../docs/bindings/categories/python/type-hinting.md) - Explicit type hints enable more effective testing by catching errors at development time
+- [error-handling](../../docs/bindings/categories/rust/error-handling.md) - Explicit error handling enables comprehensive testing of both success and failure scenarios
+- [package-structure](../../docs/bindings/categories/python/package-structure.md) - Well-organized packages enable focused, maintainable test suites
+- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md) - pytest configuration and test automation are integral parts of the unified Python toolchain
+- [ruff-code-quality](../../docs/bindings/categories/python/ruff-code-quality.md) - Code quality standards apply to test code to ensure maintainable and reliable test suites

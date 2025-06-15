@@ -357,9 +357,9 @@ profile = "black"
 ## Related Bindings
 
 ### Core Python Bindings
-- [dependency-management](./dependency-management.md): uv provides the foundation for modern dependency management with lockfiles and virtual environments
-- [type-hinting](./type-hinting.md): mypy enforces the comprehensive type hinting standards defined in the type-hinting binding
-- [ruff-code-quality](./ruff-code-quality.md): ruff configuration and usage patterns for comprehensive code quality automation
+- [dependency-management](../../docs/bindings/categories/python/dependency-management.md): uv provides the foundation for modern dependency management with lockfiles and virtual environments
+- [type-hinting](../../docs/bindings/categories/python/type-hinting.md): mypy enforces the comprehensive type hinting standards defined in the type-hinting binding
+- [ruff-code-quality](../../docs/bindings/categories/python/ruff-code-quality.md): ruff configuration and usage patterns for comprehensive code quality automation
 
 ### Core Tenets & Bindings
 - [automation](../../../tenets/automation.md): The modern toolchain automates all essential development tasks to eliminate manual, error-prone processes
