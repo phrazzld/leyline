@@ -11,6 +11,7 @@ This file contains an automatically generated list of all bindings with their on
 | [automated-quality-gates](./core/automated-quality-gates.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating automated systems that prevent quality degradation before it begins. Quality gates... |
 | [centralized-configuration](./core/centralized-configuration.md) | 0.1.0 | This binding implements our DRY tenet by creating a single source of truth for all configuration knowledge in your system. When configuration value... |
 | [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. While git hooks provi... |
+| [code-review-excellence](./core/code-review-excellence.md) | 0.1.0 | While automation can catch formatting issues, syntax errors, and common bugs, human review remains essential for evaluating design decisions, ident... |
 | [code-size](./core/code-size.md) | 0.1.0 | This binding implements our simplicity tenet by addressing the cognitive overhead |
 | [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding directly implements our modularity tenet by establishing a systematic |
 | [component-isolation](./core/component-isolation.md) | 0.1.0 | This binding directly implements our orthogonality tenet by eliminating unwanted coupling between components. When components are truly isolated, c... |
@@ -35,14 +36,18 @@ This file contains an automatically generated list of all bindings with their on
 | [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding directly implements our testability tenet by forcing you to design code |
 | [no-lint-suppression](./core/no-lint-suppression.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by requiring |
 | [normalized-data-design](./core/normalized-data-design.md) | 0.1.0 | This binding implements our DRY tenet at the data layer by ensuring that knowledge represented in data exists in only one location. When the same i... |
+| [performance-testing-standards](./core/performance-testing-standards.md) | 0.1.0 | This binding implements our automation tenet by transforming performance testing from manual, ad-hoc activities into systematic, automated processe... |
 | [preferred-technology-patterns](./core/preferred-technology-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by recognizing that every piece of novel technology introduces complexity that extends far beyond its ... |
 | [property-based-testing](./core/property-based-testing.md) | 0.1.0 | This binding implements our testability tenet by dramatically expanding test coverage beyond what's practical with manually written examples. Prope... |
 | [pure-functions](./core/pure-functions.md) | 0.1.0 | This binding implements our simplicity tenet by reducing complexity at its most |
+| [quality-metrics-and-monitoring](./core/quality-metrics-and-monitoring.md) | 0.1.0 | Quality metrics serve as early warning systems and progress indicators, but only when they measure outcomes that teams can act upon. Poorly chosen ... |
 | [require-conventional-commits](./core/require-conventional-commits.md) | 0.1.0 | This binding directly implements our automation tenet by transforming commit messages |
 | [runtime-adaptability](./core/runtime-adaptability.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that can respond intelligently to changing conditions in real-... |
 | [semantic-versioning](./core/semantic-versioning.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by bringing clarity to |
 | [system-boundaries](./core/system-boundaries.md) | 0.1.0 | This binding implements our orthogonality tenet by creating architectural separation that prevents components from becoming entangled across differ... |
 | [technical-debt-tracking](./core/technical-debt-tracking.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating systematic approaches to identify and manage technical shortcuts, compromises, and... |
+| [test-data-management](./core/test-data-management.md) | 0.1.0 | This binding implements our testability tenet by ensuring that tests have access to reliable, realistic, and properly managed data throughout their... |
+| [test-pyramid-implementation](./core/test-pyramid-implementation.md) | 0.1.0 | This binding implements our testability tenet by creating a systematic approach to test architecture that maximizes both confidence and development... |
 | [toolchain-selection-criteria](./core/toolchain-selection-criteria.md) | 0.1.0 | This binding implements our simplicity and maintainability tenets by establishing a framework for toolchain decisions that prevents the accumulatio... |
 | [unified-documentation](./core/unified-documentation.md) | 0.1.0 | This binding implements our DRY tenet by ensuring that knowledge about system behavior, APIs, processes, and decisions exists in exactly one place.... |
 | [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding directly implements our automation tenet by transforming system telemetry |
