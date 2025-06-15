@@ -2,12 +2,12 @@
 derived_from: explicit-over-implicit
 enforced_by: mypy --strict & pyright & flake8-annotations
 id: type-hinting
-last_modified: '2025-06-13'
+last_modified: '2025-06-14'
 version: '0.1.0'
 ---
-# Binding: Use Explicit Type Hints for All Public APIs
+# Binding: Use Explicit Type Hints for All Functions
 
-All public functions, methods, and class attributes must include explicit type hints. This includes function parameters, return types, and class variables. Never rely on type inference for public interfaces or leave types implicit where they could be ambiguous.
+All functions, methods, and class attributes must include explicit type hints. This includes function parameters, return types, and class variables for both public and private code. Never rely on type inference or leave types implicit where they could be ambiguous.
 
 ## Rationale
 
@@ -21,20 +21,21 @@ Type hints serve as both documentation and validation. They document your intent
 
 Python's type hint system allows you to specify the expected types for variables, function parameters, and return values. This binding requires explicit type annotations for:
 
-- **All public function parameters and return types**
-- **All public class attributes and instance variables**
+- **All function parameters and return types** (public, private, and internal)
+- **All class attributes and instance variables**
 - **Module-level constants and variables**
-- **Any function that will be called from outside its module**
+- **All methods, regardless of visibility or usage scope**
 
-Exceptions where type hints may be omitted:
-- Private methods (prefixed with `_`) may use type hints at developer discretion
-- Simple lambda functions used as callbacks
-- Dunder methods where the signature is standardized (like `__str__`)
+Limited exceptions where type hints may be omitted:
+- **Simple lambda functions** with obvious single-purpose usage (e.g., `lambda x: x * 2`)
+- **Well-established dunder methods** with standardized signatures (`__str__`, `__repr__`, `__len__`)
+- **Trivial property getters/setters** where the type is immediately obvious from context
 
 You must avoid:
-- Relying on type inference for public APIs
-- Using overly broad types like `Any` or `object` without justification
+- Relying on type inference for any function interface
+- Using overly broad types like `Any` or `object` without documented justification
 - Missing return type annotations (use `-> None` for functions that don't return values)
+- Assuming that "private" functions don't need type hints
 
 ## Practical Implementation
 
@@ -252,6 +253,138 @@ def analyze_sales_data(data: List[Dict[str, Any]]) -> Dict[str, Any]:
         "total_sales": sum(totals.values()),
         "regional_breakdown": dict(sorted_regions)
     }
+```
+
+```python
+# ❌ BAD: Private functions without type hints create maintenance burden
+class UserService:
+    def get_user_profile(self, user_id: int) -> Dict[str, Any]:
+        """Public method with type hints."""
+        raw_data = self._fetch_from_db(user_id)  # What does this return?
+        processed = self._process_user_data(raw_data)  # What does this expect/return?
+        return self._format_response(processed)  # Unclear types throughout
+
+    def _fetch_from_db(self, user_id):  # Missing types
+        # Implementation details...
+        return {"id": user_id, "name": "John", "created_at": "2023-01-01"}
+
+    def _process_user_data(self, data):  # Missing types
+        # What type of data? What's returned?
+        return {
+            "user_id": data["id"],
+            "display_name": data["name"].title(),
+            "member_since": data["created_at"]
+        }
+
+    def _format_response(self, data):  # Missing types
+        # More unclear transformations...
+        return data
+```
+
+```python
+# ✅ GOOD: All functions typed for complete clarity and maintainability
+from typing import Dict, Any
+from datetime import datetime
+
+class UserService:
+    def get_user_profile(self, user_id: int) -> Dict[str, Any]:
+        """Public method with type hints."""
+        raw_data = self._fetch_from_db(user_id)
+        processed = self._process_user_data(raw_data)
+        return self._format_response(processed)
+
+    def _fetch_from_db(self, user_id: int) -> Dict[str, str]:
+        """Private method with explicit types for maintainability."""
+        # Implementation details...
+        return {"id": str(user_id), "name": "John", "created_at": "2023-01-01"}
+
+    def _process_user_data(self, data: Dict[str, str]) -> Dict[str, Any]:
+        """Private method with clear input/output contracts."""
+        return {
+            "user_id": int(data["id"]),
+            "display_name": data["name"].title(),
+            "member_since": datetime.fromisoformat(data["created_at"])
+        }
+
+    def _format_response(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Private method with explicit return type."""
+        return {
+            "user": data["user_id"],
+            "name": data["display_name"],
+            "memberSince": data["member_since"].isoformat()
+        }
+```
+
+```python
+# ❌ BAD: Mixed typing approach creates inconsistency
+def process_orders(orders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Public function with types, but calls untyped helpers."""
+    validated = []
+    for order in orders:
+        if _is_valid_order(order):  # What does this expect/return?
+            enriched = _enrich_order_data(order)  # Unclear interface
+            validated.append(enriched)
+    return validated
+
+def _is_valid_order(order):  # No type hints
+    return "id" in order and "amount" in order and order["amount"] > 0
+
+def _enrich_order_data(order):  # No type hints
+    order["processed_at"] = datetime.now().isoformat()
+    order["status"] = "validated"
+    return order
+```
+
+```python
+# ✅ GOOD: Consistent typing throughout creates reliable interfaces
+from typing import List, Dict, Any
+from datetime import datetime
+
+def process_orders(orders: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Public function with types, calls fully-typed helpers."""
+    validated = []
+    for order in orders:
+        if _is_valid_order(order):
+            enriched = _enrich_order_data(order)
+            validated.append(enriched)
+    return validated
+
+def _is_valid_order(order: Dict[str, Any]) -> bool:
+    """Private function with explicit contract."""
+    return "id" in order and "amount" in order and order["amount"] > 0
+
+def _enrich_order_data(order: Dict[str, Any]) -> Dict[str, Any]:
+    """Private function with clear input/output types."""
+    enriched_order = order.copy()
+    enriched_order["processed_at"] = datetime.now().isoformat()
+    enriched_order["status"] = "validated"
+    return enriched_order
+```
+
+```python
+# ✅ GOOD: Acceptable exceptions with clear justification
+from typing import List, Callable
+
+# Simple lambda with obvious purpose - exception allowed
+numbers = [1, 2, 3, 4, 5]
+doubled = list(map(lambda x: x * 2, numbers))
+
+# Well-established dunder method - exception allowed
+class Product:
+    def __init__(self, name: str, price: float) -> None:
+        self.name = name
+        self.price = price
+
+    def __str__(self) -> str:  # Could omit typing, but including is better
+        return f"{self.name}: ${self.price:.2f}"
+
+    def __len__(self):  # Omitting type hints acceptable for standard dunder methods
+        return len(self.name)
+
+# Complex lambda should be typed or converted to function
+def create_validator(min_value: int) -> Callable[[int], bool]:
+    """Create a validator function with explicit types."""
+    return lambda x: x >= min_value  # Simple lambda in this context is acceptable
 ```
 
 ## Related Bindings

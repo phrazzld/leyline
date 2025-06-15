@@ -141,7 +141,10 @@ _No frontend bindings defined yet._
 |---|---|---|
 | [python-dependency-management](./categories/python/dependency-management.md) | 0.1.0 | This binding implements our automation tenet by transforming manual, error-prone dependency management into automated, reproducible processes. It a... |
 | [python-error-handling](./categories/python/error-handling.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error handling strategies visible and intentional rather than hidden behind catc... |
+| [modern-python-toolchain](./categories/python/modern-python-toolchain.md) | 0.1.0 | This binding directly implements our automation tenet by establishing a unified toolchain that automates all essential development tasks—dependency... |
 | [package-structure](./categories/python/package-structure.md) | 0.1.0 | This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. It also supports... |
+| [pyproject-toml-configuration](./categories/python/pyproject-toml-configuration.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of accidental complexity—scattered configuration files across m... |
+| [ruff-code-quality](./categories/python/ruff-code-quality.md) | 0.1.0 | This binding implements our automation tenet by consolidating multiple manual and fragmented code quality tools into a single, lightning-fast solut... |
 | [testing-patterns](./categories/python/testing-patterns.md) | 0.1.0 | This binding implements our testability tenet by ensuring that tests provide meaningful feedback about system correctness rather than coupling to i... |
 | [type-hinting](./categories/python/type-hinting.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function contracts and data structures visible through the type system rather th... |
 
