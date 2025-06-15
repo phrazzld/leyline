@@ -10,7 +10,7 @@
         1. The document structure clearly prioritizes `uv` over other tools.
     - **Depends-on:** none
 
-- [ ] **T002 · Feature · P2: add uv workflow and ci examples to dependency-management.md**
+- [x] **T002 · Feature · P2: add uv workflow and ci examples to dependency-management.md**
     - **Context:** PLAN.md > Phase 1 > 1.1 & Detailed Implementation Steps > Step 1
     - **Action:**
         1. Add a new section with `uv` installation, configuration, and workflow examples (`init`, `add`, `run`).
