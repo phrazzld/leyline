@@ -402,3 +402,4 @@ def create_validator(min_value: int) -> Callable[[int], bool]:
 ### Related Python Patterns
 - [python-error-handling](./error-handling.md) - Explicit type hints work best with explicit error handling for complete API contracts
 - [testing-patterns](./testing-patterns.md) - Well-typed code enables more effective and targeted testing strategies
+- [modern-python-toolchain](./modern-python-toolchain.md) - mypy provides the type checking foundation for the unified modern Python toolchain

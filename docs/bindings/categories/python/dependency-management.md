@@ -579,3 +579,5 @@ if __name__ == '__main__':
 ### Related Python Patterns
 - [package-structure](./package-structure.md) - Well-organized packages support cleaner dependency management
 - [testing-patterns](./testing-patterns.md) - Isolated dependencies enable more reliable and reproducible testing
+- [modern-python-toolchain](./modern-python-toolchain.md) - uv serves as the foundation for the unified modern Python toolchain approach
+- [pyproject-toml-configuration](./pyproject-toml-configuration.md) - Dependency management should use pyproject.toml as the single configuration source
