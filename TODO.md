@@ -30,7 +30,7 @@
         1. A developer can follow the guide to migrate a simple Poetry-based project to `uv`.
     - **Depends-on:** [T001]
 
-- [ ] **T004 · Refactor · P1: expand type-hinting.md scope to all functions**
+- [x] **T004 · Refactor · P1: expand type-hinting.md scope to all functions**
     - **Context:** PLAN.md > Phase 1 > 1.2 Expand `type-hinting.md`
     - **Action:**
         1. Update the core rule in `type-hinting.md` from "public APIs" to "all functions".
@@ -52,7 +52,7 @@
     - **Depends-on:** [T004]
 
 ## Python Bindings - Phase 2: Create New Bindings
-- [ ] **T006 · Feature · P1: create modern-python-toolchain.md binding**
+- [x] **T006 · Feature · P1: create modern-python-toolchain.md binding**
     - **Context:** PLAN.md > Phase 2 > 2.1 New Binding: `modern-python-toolchain.md`
     - **Action:**
         1. Create a new file `modern-python-toolchain.md` with correct YAML front-matter.
@@ -61,7 +61,7 @@
         1. The new binding exists and serves as a central reference for the modern Python stack.
     - **Depends-on:** none
 
-- [ ] **T007 · Feature · P1: create ruff-code-quality.md binding**
+- [x] **T007 · Feature · P1: create ruff-code-quality.md binding**
     - **Context:** PLAN.md > Phase 2 > 2.2 New Binding: `ruff-code-quality.md`
     - **Action:**
         1. Create a new file `ruff-code-quality.md` with correct YAML front-matter.
@@ -71,7 +71,7 @@
         1. The new binding provides a complete, copy-pasteable `ruff` configuration and integration examples.
     - **Depends-on:** none
 
-- [ ] **T008 · Feature · P1: create pyproject-toml-configuration.md binding**
+- [x] **T008 · Feature · P1: create pyproject-toml-configuration.md binding**
     - **Context:** PLAN.md > Phase 2 > 2.3 New Binding: `pyproject-toml-configuration.md`
     - **Action:**
         1. Create a new file `pyproject-toml-configuration.md` with correct YAML front-matter.
@@ -102,7 +102,7 @@
     - **Depends-on:** [T002, T005, T006, T007, T008]
 
 ## Python Bindings - Phase 3: Integration and Validation
-- [ ] **T011 · Chore · P1: update all cross-references and indexes**
+- [x] **T011 · Chore · P1: update all cross-references and indexes**
     - **Context:** PLAN.md > Phase 3 > 3.1 Cross-Reference Updates
     - **Action:**
         1. Review all existing Python bindings and update internal links to reference the new and updated documents.
@@ -123,7 +123,7 @@
         1. CI build containing these changes passes all documentation-related checks.
     - **Depends-on:** [T011]
 
-- [ ] **T013 · Test · P1: create sample project to validate new bindings**
+- [x] **T013 · Test · P1: create sample project to validate new bindings**
     - **Context:** PLAN.md > Testing Strategy > Test Cases
     - **Action:**
         1. Create a new, minimal Python project from scratch in a test repository.
