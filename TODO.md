@@ -17,7 +17,7 @@
     - **Depends‑on:** none
 
 ## Document Architecture Design
-- [ ] **T002 · Feature · P1: define precise scope and cross-reference matrix for 6 new bindings**
+- [x] **T002 · Feature · P1: define precise scope and cross-reference matrix for 6 new bindings**
     - **Context:** Phase 2: Establish clear boundaries and integration points to prevent content duplication
     - **Action:**
         1. Define precise, non-overlapping scope for each binding: Test Pyramid Implementation, Test Data Management, Performance Testing Standards, Code Review Excellence, Quality Metrics and Monitoring, Test Environment Management
