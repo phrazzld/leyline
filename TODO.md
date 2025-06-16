@@ -272,7 +272,7 @@
     - **Depends‑on:** [T009]
 
 ## Risk Management and Quality Assurance
-- [ ] **T011 · Test · P2: mitigate identified risks and establish measurement framework**
+- [x] **T011 · Test · P2: mitigate identified risks and establish measurement framework**
     - **Context:** Address high-priority risks identified in PLAN.md and establish post-implementation measurement
     - **Action:**
         1. Review new bindings against existing property-based-testing.md and automated-quality-gates.md to confirm no content duplication
