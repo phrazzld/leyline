@@ -221,7 +221,7 @@
         2. Metric definitions align with value-driven prioritization principles
     - **Depends‑on:** [T002]
 
-- [ ] **T008 · Feature · P1: implement test environment management binding**
+- [x] **T008 · Feature · P1: implement test environment management binding**
     - **Context:** Environment consistency, automated provisioning, and test isolation strategies
     - **Action:**
         1. Create docs/bindings/core/test-environment-management.md with content on environment consistency, automated provisioning, and containerization strategies
