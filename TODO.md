@@ -1,7 +1,7 @@
 # Todo
 
 ## URGENT: Document Conciseness Refactoring and Enforcement
-- [ ] **R001 · Chore · P0: implement document length enforcement hooks and CI**
+- [x] **R001 · Chore · P0: implement document length enforcement hooks and CI**
     - **Context:** Prevent future verbose documents by enforcing 400-line limit on all tenets and bindings
     - **Action:**
         1. Add pre-commit hook that fails if any tenet/binding exceeds 400 lines
