@@ -64,18 +64,32 @@ interface Order {
 class TestDataFactory {
   private testId: string;
   private cleanup: (() => Promise<void>)[] = [];
+  private idCounter = 0;
 
-  constructor() {
-    this.testId = `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  constructor(private seed = 'default-test-seed') {
+    // Use seed for deterministic ID generation
+    this.testId = `test_${this.hashSeed(seed)}`;
+  }
+
+  private hashSeed(seed: string): string {
+    // Simple deterministic hash for consistent test IDs
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      const char = seed.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(36);
   }
 
   // Composable factory with sensible defaults
   async createUser(overrides: Partial<User> = {}): Promise<User> {
+    const uniqueId = `${this.testId}_${++this.idCounter}`;
     const user = {
-      id: `user_${this.testId}_${Math.random().toString(36).substr(2, 9)}`,
-      email: `test_${this.testId}@example.com`,
+      id: `user_${uniqueId}`,
+      email: `test_${uniqueId}@example.com`,
       name: 'Test User',
-      createdAt: new Date(),
+      createdAt: new Date('2024-01-01T00:00:00Z'), // Fixed date for determinism
       ...overrides
     };
 
@@ -87,8 +101,9 @@ class TestDataFactory {
 
   // Related data creation with referential integrity
   async createOrder(user: User, overrides: Partial<Order> = {}): Promise<Order> {
+    const uniqueId = `${this.testId}_${++this.idCounter}`;
     const order = {
-      id: `order_${this.testId}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `order_${uniqueId}`,
       userId: user.id,
       amount: 100.00,
       status: 'pending' as const,

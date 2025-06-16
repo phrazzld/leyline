@@ -319,6 +319,24 @@
     - **Context:** Ruby tooling for validation, cross-reference fixing, and index generation confirmed working
     - **Resolution:** All tools validated and functioning correctly
 
+## Critical Pre-Merge Fixes
+
+- [x] **F001 · Bug · P0: fix test data factory determinism contradiction**
+    - **Context:** test-data-management.md example uses Date.now() and Math.random() which contradicts the binding's rule requiring deterministic generation
+    - **Action:**
+        1. Modify TestDataFactory constructor to accept optional seed parameter
+        2. Replace Math.random() with seeded random generation for reproducibility
+        3. Update example to demonstrate deterministic data creation
+        4. Ensure example aligns with stated rule requirements
+    - **Done‑when:**
+        1. Example demonstrates deterministic data generation with consistent seeds
+        2. Code example supports reproducible test runs when seed is provided
+        3. No contradiction between rule definition and implementation example
+    - **Verification:**
+        1. Example code shows seeded random generation
+        2. Documentation clearly explains deterministic approach
+    - **Depends‑on:** none
+
 ---
 
 ## Implementation Philosophy
