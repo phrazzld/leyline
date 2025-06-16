@@ -10,7 +10,7 @@ This file contains an automatically generated list of all bindings with their on
 | [automate-changelog](./core/automate-changelog.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual |
 | [automated-quality-gates](./core/automated-quality-gates.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating automated systems that prevent quality degradation before it begins. Quality gates... |
 | [centralized-configuration](./core/centralized-configuration.md) | 0.1.0 | This binding implements our DRY tenet by creating a single source of truth for all configuration knowledge in your system. When configuration value... |
-| [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. While git hooks provi... |
+| [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. CI/CD pipelines serve... |
 | [code-review-excellence](./core/code-review-excellence.md) | 0.1.0 | While automation can catch formatting issues, syntax errors, and common bugs, human review remains essential for evaluating design decisions, ident... |
 | [code-size](./core/code-size.md) | 0.1.0 | This binding implements our simplicity tenet by addressing the cognitive overhead |
 | [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding directly implements our modularity tenet by establishing a systematic |
@@ -51,7 +51,7 @@ This file contains an automatically generated list of all bindings with their on
 | [test-pyramid-implementation](./core/test-pyramid-implementation.md) | 0.1.0 | The test pyramid creates a systematic approach to test architecture that maximizes both confidence and development velocity. The pyramid shape repr... |
 | [toolchain-selection-criteria](./core/toolchain-selection-criteria.md) | 0.1.0 | This binding implements our simplicity and maintainability tenets by establishing a framework for toolchain decisions that prevents the accumulatio... |
 | [unified-documentation](./core/unified-documentation.md) | 0.1.0 | This binding implements our DRY tenet by ensuring that knowledge about system behavior, APIs, processes, and decisions exists in exactly one place.... |
-| [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding directly implements our automation tenet by transforming system telemetry |
+| [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding directly implements our automation tenet by transforming system telemetry from human-readable outputs into machine-readable data that ... |
 | [value-driven-prioritization](./core/value-driven-prioritization.md) | 0.1.0 | This binding directly implements our product-value-first tenet by establishing concrete criteria for development decisions, preventing the accumula... |
 | [version-control-workflows](./core/version-control-workflows.md) | 0.1.0 | This binding applies our automation tenet to version control collaboration, transforming ad-hoc manual processes into systematic, automated workflo... |
 | [yagni-pattern-enforcement](./core/yagni-pattern-enforcement.md) | 0.1.0 | This binding implements our simplicity tenet by attacking complexity at its source—the temptation to build more than what's actually required. YAGN... |

@@ -49,7 +49,7 @@
         2. Essential data management principles preserved
     - **Depends‑on:** [R001]
 
-- [~] **R004 · Refactor · P0: refactor test-pyramid-implementation.md from 1416 to ~350 lines**
+- [x] **R004 · Refactor · P0: refactor test-pyramid-implementation.md from 1416 to ~350 lines**
     - **Context:** Excessive repetition of 70/20/10 ratio and multi-language examples
     - **Action:**
         1. Keep ONE example showing proper test distribution
