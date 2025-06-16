@@ -26,6 +26,21 @@ All new tenets and bindings should follow this approach. Please refer to our
 [Natural Language Style Guide](docs/STYLE_GUIDE_NATURAL_LANGUAGE.md) for detailed
 writing guidelines and examples.
 
+## Document Conciseness Requirements
+
+Leyline enforces strict length limits to ensure documents remain tight, punchy, and focused on core value:
+
+**Tenets**: Maximum 150 lines
+**Bindings**: Maximum 400 lines
+
+These limits are automatically enforced through pre-commit hooks and CI validation. Documents exceeding these limits will be rejected until they meet conciseness standards.
+
+### The One Example Rule
+
+Show each pattern once, clearly, rather than multiple times in different languages. Choose the most appropriate technology for your audience and provide language-agnostic principles alongside specific examples.
+
+For complete guidance on writing concise, effective documentation, see our [Conciseness Guide](docs/CONCISENESS_GUIDE.md).
+
 ## Proposing Changes
 
 ### Process Overview

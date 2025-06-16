@@ -81,7 +81,7 @@
         2. Core principles remain clear and actionable
     - **Depends‑on:** [R001]
 
-- [~] **R006 · Refactor · P1: refactor verbose tenets (6 documents >150 lines)**
+- [x] **R006 · Refactor · P1: refactor verbose tenets (6 documents >150 lines)**
     - **Context:** maintainability (206), explicit-over-implicit (206), testability (182), no-secret-suppression (176), document-decisions (175), fix-broken-windows (172)
     - **Action:**
         1. Target 100-150 lines maximum for tenets
