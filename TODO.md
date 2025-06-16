@@ -356,7 +356,7 @@
         3. Manual review confirms content quality maintained
     - **Depends‑on:** none
 
-- [ ] **CI002 · Bug · P0: fix 8 worst binding length violations blocking core functionality**
+- [x] **CI002 · Bug · P0: fix 8 worst binding length violations blocking core functionality**
     - **Context:** 54 bindings exceed 400-line limit with some over 1800 lines, focus on worst offenders first
     - **Action:**
         1. Target bindings >1000 lines: secure-coding-checklist (1887→400), secrets-management (1761→400), rust-config-mgmt (1297→400)
@@ -374,7 +374,7 @@
         3. No broken cross-references or missing integration points
     - **Depends‑on:** none
 
-- [ ] **CI003 · Feature · P1: establish systematic refactoring process for remaining 43 bindings**
+- [x] **CI003 · Feature · P1: establish systematic refactoring process for remaining 43 bindings**
     - **Context:** Create sustainable approach for refactoring remaining oversized documents post-merge
     - **Action:**
         1. Create refactoring template with consistent structure approach
