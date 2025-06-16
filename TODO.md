@@ -337,6 +337,60 @@
         2. Documentation clearly explains deterministic approach
     - **Depends‑on:** none
 
+## Critical CI Resolution - Document Length Violations
+
+- [ ] **CI001 · Bug · P0: fix 3 tenet length violations to unblock testing strategy deployment**
+    - **Context:** CI failing due to 3 tenets slightly exceeding 150-line limit, blocking merge of testing strategy
+    - **Action:**
+        1. Reduce simplicity.md from 170 to 150 lines (20 line reduction, 12%)
+        2. Reduce adaptability-and-reversibility.md from 165 to 150 lines (15 line reduction, 9%)
+        3. Reduce dry-dont-repeat-yourself.md from 154 to 150 lines (4 line reduction, 3%)
+        4. Preserve core philosophical content while tightening prose
+    - **Done‑when:**
+        1. All 3 tenets under 150-line limit
+        2. Core principles and practical guidelines preserved
+        3. No loss of essential content or cross-references
+    - **Verification:**
+        1. ruby tools/check_document_length.rb passes for tenets
+        2. YAML front-matter validation continues passing
+        3. Manual review confirms content quality maintained
+    - **Depends‑on:** none
+
+- [ ] **CI002 · Bug · P0: fix 8 worst binding length violations blocking core functionality**
+    - **Context:** 54 bindings exceed 400-line limit with some over 1800 lines, focus on worst offenders first
+    - **Action:**
+        1. Target bindings >1000 lines: secure-coding-checklist (1887→400), secrets-management (1761→400), rust-config-mgmt (1297→400)
+        2. Target critical security/database patterns: authentication-patterns (1258→400), read-replica-patterns (1262→400)
+        3. Apply "one example rule" - single comprehensive example instead of multi-language repetition
+        4. Focus on principles over tool-specific implementation details
+        5. Target functional-composition-patterns (991→400), trait-composition-patterns (737→400), dependency-management (724→400)
+    - **Done‑when:**
+        1. 8 targeted bindings under 400-line limit (80-90% reduction for worst offenders)
+        2. Core binding value preserved with "one example rule" applied
+        3. Cross-references and integration points maintained
+    - **Verification:**
+        1. Document length validation passes for targeted bindings
+        2. Content review confirms essential guidance preserved
+        3. No broken cross-references or missing integration points
+    - **Depends‑on:** none
+
+- [ ] **CI003 · Feature · P1: establish systematic refactoring process for remaining 43 bindings**
+    - **Context:** Create sustainable approach for refactoring remaining oversized documents post-merge
+    - **Action:**
+        1. Create refactoring template with consistent structure approach
+        2. Script to identify common verbosity patterns across remaining documents
+        3. Prioritize by community usage: TypeScript→Python→Go→remaining categories
+        4. Create batch validation and testing workflow
+    - **Done‑when:**
+        1. Refactoring template and automation tools ready
+        2. Priority matrix established for remaining documents
+        3. Systematic workflow documented for future contributors
+    - **Verification:**
+        1. Template successfully reduces sample document by 60%+ while preserving value
+        2. Automation tools correctly identify verbosity patterns
+        3. Priority matrix aligns with community usage data
+    - **Depends‑on:** [CI001, CI002]
+
 ---
 
 ## Implementation Philosophy
