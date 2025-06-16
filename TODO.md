@@ -339,7 +339,7 @@
 
 ## Critical CI Resolution - Document Length Violations
 
-- [ ] **CI001 · Bug · P0: fix 3 tenet length violations to unblock testing strategy deployment**
+- [x] **CI001 · Bug · P0: fix 3 tenet length violations to unblock testing strategy deployment**
     - **Context:** CI failing due to 3 tenets slightly exceeding 150-line limit, blocking merge of testing strategy
     - **Action:**
         1. Reduce simplicity.md from 170 to 150 lines (20 line reduction, 12%)
