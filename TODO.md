@@ -17,7 +17,7 @@
         2. PR with oversized document is blocked by CI
     - **Depends‑on:** none
 
-- [ ] **R002 · Refactor · P0: refactor performance-testing-standards.md from 2008 to ~400 lines**
+- [x] **R002 · Refactor · P0: refactor performance-testing-standards.md from 2008 to ~400 lines**
     - **Context:** Most egregious example with 1924 lines of examples across 4 languages
     - **Action:**
         1. Keep only ONE clear good/bad example pattern (choose JavaScript/k6)

@@ -36,7 +36,7 @@ This file contains an automatically generated list of all bindings with their on
 | [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding directly implements our testability tenet by forcing you to design code |
 | [no-lint-suppression](./core/no-lint-suppression.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by requiring |
 | [normalized-data-design](./core/normalized-data-design.md) | 0.1.0 | This binding implements our DRY tenet at the data layer by ensuring that knowledge represented in data exists in only one location. When the same i... |
-| [performance-testing-standards](./core/performance-testing-standards.md) | 0.1.0 | This binding implements our automation tenet by transforming performance testing from manual, ad-hoc activities into systematic, automated processe... |
+| [performance-testing-standards](./core/performance-testing-standards.md) | 0.1.0 | Performance problems discovered in production are exponentially more expensive to fix than those caught during development. Most teams discover per... |
 | [preferred-technology-patterns](./core/preferred-technology-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by recognizing that every piece of novel technology introduces complexity that extends far beyond its ... |
 | [property-based-testing](./core/property-based-testing.md) | 0.1.0 | This binding implements our testability tenet by dramatically expanding test coverage beyond what's practical with manually written examples. Prope... |
 | [pure-functions](./core/pure-functions.md) | 0.1.0 | This binding implements our simplicity tenet by reducing complexity at its most |
