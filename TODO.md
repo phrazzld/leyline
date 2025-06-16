@@ -65,7 +65,7 @@
         2. Test pyramid concept remains actionable
     - **Depends‑on:** [R001]
 
-- [ ] **R005 · Refactor · P1: refactor remaining verbose bindings (5 documents)**
+- [x] **R005 · Refactor · P1: refactor remaining verbose bindings (5 documents)**
     - **Context:** use-structured-logging (1485), ci-cd-pipeline-standards (918), automated-quality-gates (814), layered-architecture (861), continuous-refactoring (782)
     - **Action:**
         1. Apply "one example rule" - show pattern once, not in multiple languages
@@ -81,7 +81,7 @@
         2. Core principles remain clear and actionable
     - **Depends‑on:** [R001]
 
-- [ ] **R006 · Refactor · P1: refactor verbose tenets (6 documents >150 lines)**
+- [~] **R006 · Refactor · P1: refactor verbose tenets (6 documents >150 lines)**
     - **Context:** maintainability (206), explicit-over-implicit (206), testability (182), no-secret-suppression (176), document-decisions (175), fix-broken-windows (172)
     - **Action:**
         1. Target 100-150 lines maximum for tenets
