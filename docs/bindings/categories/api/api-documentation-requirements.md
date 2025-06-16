@@ -96,6 +96,6 @@ Even with exceptions, maintain enough documentation for safe consumption.
 
 ## Related Bindings
 
-- [rest-api-standards](./rest-api-standards.md): RESTful patterns that documentation should reflect
-- [api-versioning-strategy](./api-versioning-strategy.md): Documenting version differences
+- [rest-api-standards](../../docs/bindings/categories/api/rest-api-standards.md): RESTful patterns that documentation should reflect
+- [api-versioning-strategy](../../docs/bindings/categories/api/api-versioning-strategy.md): Documenting version differences
 - [unified-documentation](../../core/unified-documentation.md): Single source of truth principles

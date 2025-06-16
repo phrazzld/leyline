@@ -100,6 +100,6 @@ Always document exceptions and their security implications.
 
 ## Related Bindings
 
-- [extension-update-strategy](./extension-update-strategy.md): Communicating permission changes during updates
-- [cross-browser-compatibility](./cross-browser-compatibility.md): Permission differences across browsers
+- [extension-update-strategy](../../docs/bindings/categories/browser-extension/extension-update-strategy.md): Communicating permission changes during updates
+- [cross-browser-compatibility](../../docs/bindings/categories/browser-extension/cross-browser-compatibility.md): Permission differences across browsers
 - [secrets-management-practices](../../security/secrets-management-practices.md): Protecting sensitive data in extensions

@@ -103,6 +103,6 @@ Always provide alternative experiences for other browsers when possible.
 
 ## Related Bindings
 
-- [extension-permissions-model](./extension-permissions-model.md): Permission differences across browsers
-- [extension-update-strategy](./extension-update-strategy.md): Update mechanisms across browser stores
+- [extension-permissions-model](../../docs/bindings/categories/browser-extension/extension-permissions-model.md): Permission differences across browsers
+- [extension-update-strategy](../../docs/bindings/categories/browser-extension/extension-update-strategy.md): Update mechanisms across browser stores
 - [preferred-technology-patterns](../../core/preferred-technology-patterns.md): Technology choices for cross-browser development
