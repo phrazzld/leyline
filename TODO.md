@@ -33,7 +33,7 @@
         2. Key concepts remain clear and actionable
     - **Depends‑on:** [R001]
 
-- [ ] **R003 · Refactor · P0: refactor test-data-management.md from 2011 to ~400 lines**
+- [x] **R003 · Refactor · P0: refactor test-data-management.md from 2011 to ~400 lines**
     - **Context:** Second worst offender with 1927 lines of redundant examples
     - **Action:**
         1. Keep ONE factory pattern example (choose TypeScript)
