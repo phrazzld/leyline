@@ -267,9 +267,9 @@ export async function validateTestEnvironment(): Promise<ValidationResult> {
 
 ## Related Standards
 
-- [test-data-management](test-data-management.md): Defines how test data is created and managed within these environments
-- [ci-cd-pipeline-standards](ci-cd-pipeline-standards.md): Pipeline configuration that uses these environment patterns
-- [automated-quality-gates](automated-quality-gates.md): Quality checks that run within these controlled environments
+- [test-data-management](../../docs/bindings/core/test-data-management.md): Defines how test data is created and managed within these environments
+- [ci-cd-pipeline-standards](../../docs/bindings/core/ci-cd-pipeline-standards.md): Pipeline configuration that uses these environment patterns
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Quality checks that run within these controlled environments
 
 ## References
 

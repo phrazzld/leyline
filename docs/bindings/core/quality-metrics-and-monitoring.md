@@ -320,9 +320,9 @@ class QualityRetrospective {
 
 ## Related Standards
 
-- [automated-quality-gates](automated-quality-gates.md): Defines the automated thresholds that trigger alerts and block deployments
-- [performance-testing-standards](performance-testing-standards.md): Establishes performance benchmarks tracked in quality dashboards
-- [ci-cd-pipeline-standards](ci-cd-pipeline-standards.md): Pipeline metrics that feed into overall quality monitoring
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Defines the automated thresholds that trigger alerts and block deployments
+- [performance-testing-standards](../../docs/bindings/core/performance-testing-standards.md): Establishes performance benchmarks tracked in quality dashboards
+- [ci-cd-pipeline-standards](../../docs/bindings/core/ci-cd-pipeline-standards.md): Pipeline metrics that feed into overall quality monitoring
 
 ## References
 
