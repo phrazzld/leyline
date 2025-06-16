@@ -7,37 +7,35 @@ version: '0.1.0'
 ---
 # Binding: Use Isolated Virtual Environments and Pin Dependencies in Lockfiles
 
-All Python projects must use isolated virtual environments and generate lockfiles that pin exact dependency versions. Never install packages globally or rely on system Python for development. Always commit lockfiles to version control to ensure reproducible builds across all environments.
+Use isolated virtual environments and generate lockfiles that pin exact dependency versions. Never install packages globally or rely on system Python. Always commit lockfiles to ensure reproducible builds.
 
 ## Rationale
 
-This binding implements our automation tenet by transforming manual, error-prone dependency management into automated, reproducible processes. It also supports our dependency-management principle by creating explicit, versioned contracts for all external code dependencies.
+This binding implements automation by transforming manual dependency management into automated, reproducible processes. It creates explicit, versioned contracts for all external code dependencies.
 
-Think of virtual environments like clean rooms in manufacturing. Just as semiconductor fabrication requires pristine environments isolated from contamination, Python development requires pristine dependency environments isolated from conflicts. When you install packages globally or use system Python, you're like a manufacturer mixing products from different production lines—contamination is inevitable, and troubleshooting becomes nearly impossible.
+Virtual environments work like clean rooms in manufacturing—pristine environments isolated from contamination. Installing packages globally creates conflicts and makes troubleshooting nearly impossible.
 
-Lockfiles serve as exact recipes for recreating your dependency environment. Without them, saying "install Flask" is like telling a chef to "add some flour"—the results will vary depending on what's available. With lockfiles, you're providing precise measurements that guarantee the same outcome every time. This precision becomes critical when debugging issues, deploying to production, or onboarding new team members.
+Lockfiles serve as exact recipes for recreating dependency environments. Without them, dependency installation varies unpredictably. With lockfiles, you guarantee identical outcomes across environments.
 
 ## Rule Definition
 
-Python's dependency ecosystem requires careful isolation and version management. This binding mandates:
+Python dependency management requires isolation and version pinning:
 
 **Required practices:**
-- Use virtual environments for all projects (via `venv`, `virtualenv`, `conda`, or tool-managed environments)
-- Generate and commit lockfiles that pin exact versions and transitive dependencies
-- Use dependency management tools that separate development and production dependencies
-- Validate lockfile integrity in CI/CD pipelines
+- Use virtual environments for all projects
+- Generate and commit lockfiles pinning exact versions
+- Separate development and production dependencies
+- Validate lockfile integrity in CI/CD
 
 **Prohibited practices:**
-- Installing project dependencies in global Python or system Python
-- Committing loose version specifiers without lockfiles (e.g., `requests>=2.0`)
-- Manual dependency installation without tool-managed environments
-- Ignoring or excluding lockfiles from version control
+- Installing dependencies in global Python
+- Committing loose version specifiers without lockfiles
+- Manual dependency installation
+- Excluding lockfiles from version control
 
-**Primary tool:**
-- **uv** for ultra-fast dependency resolution, automatic virtual environment handling, and seamless CI/CD integration
-
-**Specialized use cases:**
-- **conda** for scientific computing with non-Python dependencies (C/C++ extensions, system libraries)
+**Tools:**
+- **uv** for fast dependency resolution and automatic virtual environments
+- **conda** for scientific computing with non-Python dependencies
 
 ## Practical Implementation
 
@@ -149,369 +147,47 @@ deactivate
 # Update and sync dependencies
 uv add requests==2.31.0  # Pin to specific version
 uv lock  # Update lockfile with new constraints
-uv sync  # Install updated dependencies
-
-# Clean up and troubleshoot
-uv clean  # Remove cached builds
-uv sync --reinstall  # Reinstall all packages
-uv lock --upgrade-package requests  # Upgrade specific package
 ```
 
-**5. Managing Dependency Groups:**
+**Managing dependency groups:**
 
 ```bash
 # Install only production dependencies
 uv sync --no-dev
 
-# Install specific dependency groups
+# Install specific groups
 uv sync --extra dev
-uv sync --extra docs,test
-
-# Add dependencies to specific groups
-uv add --optional test pytest coverage
-uv add --optional docs sphinx sphinx-rtd-theme
+uv add --optional test pytest
 ```
 
-## Alternative Approaches
+## Alternative Tools
 
-While **uv is the recommended primary tool** for new projects due to its speed and simplicity, these alternative approaches may be appropriate for specific scenarios such as existing project constraints, team preferences, or specialized publishing workflows.
+**Poetry**: For existing projects with complex publishing workflows
+**conda**: For scientific computing with non-Python dependencies
+**pip-tools**: For minimal overhead with existing pip workflows
 
-### Poetry Setup
-
-**1. Initialize a new project:**
-
-```bash
-# Create new project
-poetry new my-project
-cd my-project
-
-# Or initialize in existing directory
-poetry init
-```
-
-**2. Configure pyproject.toml:**
-
-```toml
-[tool.poetry]
-name = "my-project"
-version = "0.1.0"
-description = "Project description"
-authors = ["Your Name <email@example.com>"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.28.0"
-pydantic = "^1.10.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-ruff = "^0.1.0"
-mypy = "^0.991"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-```
-
-**3. Install and generate lockfile:**
-
-```bash
-# Install dependencies and create poetry.lock
-poetry install
-
-# Add new dependencies
-poetry add requests
-poetry add --group dev pytest
-
-# Update dependencies
-poetry update
-```
-
-## Migration from Poetry to uv
-
-Teams using Poetry can migrate to uv systematically while maintaining dependency specifications and lockfile benefits.
-
-### Migration Strategy
-
-**1. Audit current Poetry configuration:**
-
-```bash
-# Review current dependencies
-poetry show --tree
-
-# Export current lockfile
-poetry export -f requirements.txt --output requirements-poetry.txt
-poetry export -f requirements.txt --with dev --output requirements-dev-poetry.txt
-```
-
-**2. Convert pyproject.toml structure:**
-
-```toml
-# Before: Poetry configuration
-[tool.poetry]
-name = "my-project"
-version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.28.0"
-pydantic = "^1.10.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-ruff = "^0.1.0"
-mypy = "^0.991"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-```
-
-```toml
-# After: Standard Python configuration
-[project]
-name = "my-project"
-version = "0.1.0"
-description = ""
-authors = [{name = "Your Name", email = "you@example.com"}]
-requires-python = ">=3.9"
-dependencies = [
-    "requests>=2.28.0,<3.0.0",
-    "pydantic>=1.10.0,<2.0.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "ruff>=0.1.0",
-    "mypy>=0.991",
-]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-```
-
-**3. Initialize uv environment:**
-
-```bash
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Initialize project (will detect existing pyproject.toml)
-uv init --no-readme
-
-# Sync dependencies
-uv sync --extra dev
-```
-
-**4. Validate migration:**
-
-```bash
-# Compare installed packages
-poetry show --no-dev > poetry-packages.txt
-uv pip list --format freeze > uv-packages.txt
-
-# Test that project still works
-uv run python -c "import requests, pydantic; print('Migration successful')"
-uv run pytest  # If you have tests
-```
-
-**5. Clean up Poetry artifacts:**
-
-```bash
-# Remove Poetry-specific files
-rm poetry.lock
-rm -rf .venv  # Poetry virtual environment
-
-# Update .gitignore
-echo "uv.lock" >> .gitignore  # Add uv lockfile
-# Remove poetry.lock from .gitignore if present
-```
-
-### Migration Troubleshooting
-
-**Version constraint conversion:**
-
-```bash
-# Poetry caret constraints (^1.2.0 = >=1.2.0,<2.0.0)
-poetry: "requests = '^2.28.0'"
-uv: "requests>=2.28.0,<3.0.0"
-
-# Poetry tilde constraints (~1.2.0 = >=1.2.0,<1.3.0)
-poetry: "requests = '~2.28.0'"
-uv: "requests>=2.28.0,<2.29.0"
-```
-
-**Dependency groups mapping:**
-
-```toml
-# Poetry groups
-[tool.poetry.group.dev.dependencies]
-[tool.poetry.group.test.dependencies]
-[tool.poetry.group.docs.dependencies]
-
-# Standard Python optional dependencies
-[project.optional-dependencies]
-dev = [...]
-test = [...]
-docs = [...]
-```
-
-**Build backend migration:**
-
-Most projects can switch from `poetry-core` to `hatchling` without issues. For complex builds, consider:
-- `setuptools` for maximum compatibility
-- `pdm-backend` for PDM users
-- Keep `poetry-core` temporarily if needed
-
-### pip-tools Setup
-
-**1. Create requirements files:**
-
-```txt
-# requirements.in
-requests>=2.28.0
-pydantic>=1.10.0
-
-# requirements-dev.in
--r requirements.in
-pytest>=7.0.0
-ruff>=0.1.0
-mypy>=0.991
-```
-
-**2. Generate lockfiles:**
-
-```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-
-# Install pip-tools and compile lockfiles
-pip install pip-tools
-pip-compile requirements.in
-pip-compile requirements-dev.in
-
-# Install from lockfiles
-pip-sync requirements.txt requirements-dev.txt
-```
-
-### CI/CD Integration
-
-**GitHub Actions example:**
+## CI/CD Integration
 
 ```yaml
+# GitHub Actions with uv
 name: Test
 on: [push, pull_request]
-
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-
     - name: Install uv
       uses: astral-sh/setup-uv@v3
-      with:
-        version: "latest"
-
-    - name: Cache dependencies
-      uses: actions/cache@v3
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ hashFiles('**/uv.lock') }}
-
     - name: Install dependencies
       run: uv sync
-
-    - name: Verify lockfile is up to date
-      run: uv lock --locked
-
-    - name: Run tests
-      run: uv run pytest
-```
-
-**Matrix testing with multiple Python versions:**
-
-```yaml
-name: Test Matrix
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12']
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-
-    - name: Install dependencies
-      run: uv sync
-
     - name: Verify lockfile integrity
       run: uv lock --locked
-
-    - name: Run linting
-      run: |
-        uv run ruff check .
-        uv run ruff format --check .
-
-    - name: Run type checking
-      run: uv run mypy .
-
-    - name: Run tests with coverage
-      run: uv run pytest --cov=. --cov-report=xml
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
-```
-
-**Production deployment with uv:**
-
-```yaml
-name: Deploy
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-
-    - name: Verify production lockfile
-      run: |
-        uv sync --no-dev --locked
-        uv run python -c "import sys; print(sys.path)"
-
-    - name: Build Docker image
-      run: |
-        docker build -t myapp .
-        docker run --rm myapp uv run python --version
+    - name: Run tests
+      run: uv run pytest
 ```
 
 ## Examples
@@ -695,15 +371,12 @@ if __name__ == '__main__':
     deploy()
 ```
 
-## Tool Comparison
+## Tool Selection
 
-| Tool | Strengths | Best For |
-|------|-----------|----------|
-| **uv** *(Primary Choice)* | Ultra-fast dependency resolution, automatic virtual environments, simple configuration, excellent performance, seamless CI/CD integration | **All new projects** - the recommended standard for modern Python development |
-| **Poetry** *(Alternative)* | Modern dependency resolution, automatic virtual environments, build system integration | Existing Poetry projects, teams with complex publishing workflows |
-| **Pipenv** *(Alternative)* | Simple pip-compatible workflow, automatic .env loading | Legacy projects transitioning from pip, Docker-first workflows |
-| **pip-tools** *(Alternative)* | Minimal overhead, integrates with existing pip workflows | Legacy projects, minimal dependencies, simple requirements |
-| **conda** *(Specialized)* | Non-Python dependencies, scientific computing packages | Data science, packages requiring compiled extensions |
+**uv**: Primary choice for all new projects - ultra-fast, simple configuration, seamless CI/CD
+**Poetry**: Existing projects with complex publishing needs
+**conda**: Scientific computing with non-Python dependencies
+**pip-tools**: Legacy projects requiring minimal changes
 
 ## Related Bindings
 

@@ -88,17 +88,17 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [configuration-management](./categories/rust/configuration-management.md) | 0.1.0 | This binding implements our adaptability-and-reversibility tenet by using Rust's configuration capabilities to make decisions reversible and system... |
+| [configuration-management](./categories/rust/configuration-management.md) | 0.1.0 | This binding implements adaptability-and-reversibility by using Rust's configuration capabilities to make decisions reversible without code changes... |
 | [error-handling](./categories/rust/error-handling.md) | 0.1.0 | This binding directly implements our simplicity and explicit-over-implicit tenets by |
 | [ownership-patterns](./categories/rust/ownership-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by leveraging Rust's ownership system to |
-| [trait-composition-patterns](./categories/rust/trait-composition-patterns.md) | 0.1.0 | This binding implements our orthogonality tenet by leveraging Rust's trait system to create truly independent, composable behaviors. Traits in Rust... |
+| [trait-composition-patterns](./categories/rust/trait-composition-patterns.md) | 0.1.0 | This binding implements orthogonality by leveraging Rust's trait system to create independent, composable behaviors. Traits enable composition that... |
 
 ## TypeScript Bindings
 
 | ID | Version | Summary |
 |---|---|---|
 | [async-patterns](./categories/typescript/async-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by addressing one of the most common |
-| [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | This binding implements our DRY (Don't Repeat Yourself) tenet by using functional composition to create single, authoritative representations of kn... |
+| [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | This binding implements DRY by using functional composition to create single, authoritative representations of knowledge reusable across different ... |
 | [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, |
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
@@ -138,14 +138,14 @@ _No frontend bindings defined yet._
 | [migration-management-strategy](./categories/database/migration-management-strategy.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating the complexity |
 | [orm-usage-patterns](./categories/database/orm-usage-patterns.md) | 0.1.0 | This binding directly implements our simplicity tenet by ensuring that database |
 | [query-optimization-and-indexing](./categories/database/query-optimization-and-indexing.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
-| [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding directly implements our maintainability tenet by ensuring that read |
+| [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding implements maintainability by ensuring that read replica patterns remain comprehensible and manageable as systems scale. Read replicas... |
 | [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding directly implements our modularity tenet by ensuring that database |
 
 ## Python Bindings
 
 | ID | Version | Summary |
 |---|---|---|
-| [python-dependency-management](./categories/python/dependency-management.md) | 0.1.0 | This binding implements our automation tenet by transforming manual, error-prone dependency management into automated, reproducible processes. It a... |
+| [python-dependency-management](./categories/python/dependency-management.md) | 0.1.0 | This binding implements automation by transforming manual dependency management into automated, reproducible processes. It creates explicit, versio... |
 | [python-error-handling](./categories/python/error-handling.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error handling strategies visible and intentional rather than hidden behind catc... |
 | [modern-python-toolchain](./categories/python/modern-python-toolchain.md) | 0.1.0 | This binding directly implements our automation tenet by establishing a unified toolchain that automates all essential development tasks—dependency... |
 | [package-structure](./categories/python/package-structure.md) | 0.1.0 | This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. It also supports... |
@@ -164,11 +164,11 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [authentication-authorization-patterns](./categories/security/authentication-authorization-patterns.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that all authentication and authorization decisions be visible, docu... |
+| [authentication-authorization-patterns](./categories/security/authentication-authorization-patterns.md) | 0.1.0 | This binding implements explicit-over-implicit by requiring that all authentication and authorization decisions be visible, documented, and intenti... |
 | [input-validation-standards](./categories/security/input-validation-standards.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by applying security-focused validation at every trust boundary in your system, b... |
-| [secrets-management-practices](./categories/security/secrets-management-practices.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by preventing the suppression, hardcoding, or improper handling of secrets and cre... |
+| [secrets-management-practices](./categories/security/secrets-management-practices.md) | 0.1.0 | This binding implements no-secret-suppression by preventing hardcoding or improper handling of secrets. It builds upon external-configuration princ... |
 | [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that security concerns be visible, documented, and intentional archi... |
-| [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual security review processes into automated, systematic validation that r... |
+| [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding implements automation by transforming manual security reviews into systematic validation that runs consistently across all development... |
 
 ## Web Bindings
 
