@@ -115,7 +115,7 @@
     - **Verification:** CI status shows all checks passing
     - **Depends‑on:** [CVF007]
 
-- [ ] **CVF009 · Chore · P2: enhance refactoring process based on lessons learned**
+- [~] **CVF009 · Chore · P2: enhance refactoring process based on lessons learned**
     - **Context:** Prevent similar CI failures through improved systematic processes
     - **Action:**
         1. Update `docs/systematic-refactoring-process.md` with lessons learned

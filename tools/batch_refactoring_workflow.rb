@@ -175,7 +175,12 @@ class BatchRefactoringWorkflow
       puts "     Target: ≤400 lines (≤150 for tenets)"
       puts "     Category: #{doc_info[:category]}"
       puts "     Backup created: #{backup_path}"
-      puts "     Template guidance: #{refactoring_notes[:key_strategies].join(', ')}"
+      puts
+      puts "  🎯 Key Strategies:"
+      refactoring_notes[:key_strategies].each { |strategy| puts "     • #{strategy}" }
+      puts
+      puts "  ✅ Proven Techniques (CVF001-CVF010 experience):"
+      refactoring_notes[:proven_techniques].each { |technique| puts "     • #{technique}" }
       puts
       puts "  👉 Apply refactoring manually, then press Enter to continue..."
 
@@ -256,29 +261,47 @@ class BatchRefactoringWorkflow
     # Analyze patterns in the document
     analysis = analyze_document_patterns(content)
 
-    # Generate specific guidance
+    # Generate specific guidance based on CVF001-CVF010 lessons learned
     strategies = []
 
     if analysis[:multiple_languages] > 4
-      strategies << "Apply 'one example rule' - #{analysis[:languages].join(', ')} → choose primary language"
+      strategies << "Apply 'one example rule' - #{analysis[:languages].join(', ')} → choose TypeScript (preferred primary language)"
     end
 
     if analysis[:verbose_sections] > 3
-      strategies << "Consolidate verbose sections and repetitive explanations"
+      strategies << "Condense verbose rationale sections - target 2-3 paragraphs maximum (6-8 lines total)"
     end
 
     if analysis[:tool_configs] > 2
-      strategies << "Remove tool-specific configurations, focus on principles"
+      strategies << "Remove tool-specific configurations - focus on principles over implementation details"
     end
 
     if analysis[:step_by_step] > 5
-      strategies << "Simplify step-by-step content to core implementation patterns"
+      strategies << "Simplify rule definitions to bullet points - avoid prose explanations"
     end
+
+    # Enhanced guidance based on successful refactoring patterns
+    if content.include?('## Examples') && content.scan(/```\w+/).length > 6
+      strategies << "Reduce to single comprehensive example (one bad/good pair maximum, 15-30 lines good example)"
+    end
+
+    if content.scan(/^- .*:.*\..*\..*\./).length > 10
+      strategies << "Streamline related bindings section - focus on essential relationships only"
+    end
+
+    # Common implementation challenges guidance
+    strategies << "EDITING TIP: Use precise string matching for replacements - pay attention to exact formatting and indentation"
 
     {
       key_strategies: strategies,
       target_reduction: estimate_reduction_potential(analysis, doc_info[:current_lines]),
-      focus_areas: analysis[:focus_areas]
+      focus_areas: analysis[:focus_areas],
+      proven_techniques: [
+        "Most effective: Condense verbose rationale sections",
+        "Highly effective: Single comprehensive examples",
+        "Effective: Convert prose rules to bullet points",
+        "Essential: Maintain cross-reference integrity"
+      ]
     }
   end
 
@@ -334,6 +357,30 @@ class BatchRefactoringWorkflow
     return false unless content.include?('## Rationale')
     return false unless content.include?('## Rule Definition') || content.include?('## Implementation')
     return false unless content.include?('## Related')
+
+    # Enhanced validation based on CVF001-CVF010 experience
+    # Check for common formatting issues that cause pre-commit failures
+    lines = content.split("\n")
+
+    # Check for trailing whitespace (common pre-commit hook issue)
+    if lines.any? { |line| line.end_with?(' ') || line.end_with?("\t") }
+      puts "    ⚠️  Warning: Trailing whitespace detected - pre-commit hooks will fix this"
+    end
+
+    # Check that file ends with newline
+    unless content.end_with?("\n")
+      puts "    ⚠️  Warning: File should end with newline - pre-commit hooks will fix this"
+    end
+
+    # Validate that refactoring preserved cross-reference format
+    broken_refs = content.scan(/\[([^\]]+)\]\(([^)]+)\)/).select do |text, url|
+      url.include?('../') && !url.start_with?('http') && url.include?('undefined')
+    end
+
+    if broken_refs.any?
+      puts "    ❌ Broken cross-references detected: #{broken_refs.map(&:first).join(', ')}"
+      return false
+    end
 
     true
   end

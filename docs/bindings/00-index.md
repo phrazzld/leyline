@@ -6,7 +6,7 @@ This file contains an automatically generated list of all bindings with their on
 
 | ID | Version | Summary |
 |---|---|---|
-| [api-design](./core/api-design.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring that the |
+| [api-design](./core/api-design.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by ensuring that component contracts—the most critical communication points in any system—... |
 | [automate-changelog](./core/automate-changelog.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual |
 | [automated-quality-gates](./core/automated-quality-gates.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating automated systems that prevent quality degradation before it begins. Quality gates... |
 | [centralized-configuration](./core/centralized-configuration.md) | 0.1.0 | This binding implements our DRY tenet by creating a single source of truth for all configuration knowledge in your system. Like a master control pa... |
@@ -39,7 +39,7 @@ This file contains an automatically generated list of all bindings with their on
 | [performance-testing-standards](./core/performance-testing-standards.md) | 0.1.0 | Performance problems discovered in production are exponentially more expensive to fix than those caught during development. Most teams discover per... |
 | [preferred-technology-patterns](./core/preferred-technology-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by recognizing that every piece of novel technology introduces complexity that extends far beyond its ... |
 | [property-based-testing](./core/property-based-testing.md) | 0.1.0 | This binding implements our testability tenet by dramatically expanding test coverage beyond what's practical with manually written examples. Prope... |
-| [pure-functions](./core/pure-functions.md) | 0.1.0 | This binding implements our simplicity tenet by reducing complexity at its most |
+| [pure-functions](./core/pure-functions.md) | 0.1.0 | This binding implements our simplicity tenet by reducing complexity at its most fundamental level—predictable code execution. When a function is pu... |
 | [quality-metrics-and-monitoring](./core/quality-metrics-and-monitoring.md) | 0.1.0 | Quality metrics serve as early warning systems and progress indicators, but only when they measure outcomes that teams can act upon. Poorly chosen ... |
 | [require-conventional-commits](./core/require-conventional-commits.md) | 0.1.0 | This binding directly implements our automation tenet by transforming commit messages |
 | [runtime-adaptability](./core/runtime-adaptability.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that can respond intelligently to changing conditions in real-... |
@@ -81,7 +81,7 @@ _No frontend bindings defined yet._
 | [dependency-injection-patterns](./categories/go/dependency-injection-patterns.md) | 0.1.0 | This binding implements our orthogonality tenet by using Go's interface system to create truly independent components that can be developed, tested... |
 | [error-context-propagation](./categories/go/error-context-propagation.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by preventing the decay of error information quality over time. When errors lose context as th... |
 | [error-wrapping](./categories/go/error-wrapping.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error context and |
-| [interface-design](./categories/go/interface-design.md) | 0.1.0 | This binding directly implements our testability tenet by enabling clean, flexible |
+| [interface-design](./categories/go/interface-design.md) | 0.1.0 | This binding directly implements our testability tenet by enabling clean, flexible testing without over-mocking. When interfaces are small and defi... |
 | [package-design](./categories/go/package-design.md) | 0.1.0 | This binding implements our modularity tenet by establishing clear, well-defined boundaries for Go code organization. Package design is the primary... |
 
 ## Rust Bindings
@@ -90,7 +90,7 @@ _No frontend bindings defined yet._
 |---|---|---|
 | [configuration-management](./categories/rust/configuration-management.md) | 0.1.0 | This binding implements adaptability-and-reversibility by using Rust's configuration capabilities to make decisions reversible without code changes... |
 | [error-handling](./categories/rust/error-handling.md) | 0.1.0 | This binding directly implements our simplicity and explicit-over-implicit tenets by |
-| [ownership-patterns](./categories/rust/ownership-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by leveraging Rust's ownership system to |
+| [ownership-patterns](./categories/rust/ownership-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by leveraging Rust's ownership system to prevent entire categories of bugs that would otherwise add tr... |
 | [trait-composition-patterns](./categories/rust/trait-composition-patterns.md) | 0.1.0 | This binding implements orthogonality by leveraging Rust's trait system to create independent, composable behaviors. Traits enable composition that... |
 
 ## TypeScript Bindings
@@ -99,7 +99,7 @@ _No frontend bindings defined yet._
 |---|---|---|
 | [async-patterns](./categories/typescript/async-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by establishing clear patterns for asynchronous code flow in TypeScript. Async programming introduces ... |
 | [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | This binding implements DRY by using functional composition to create single, authoritative representations of knowledge reusable across different ... |
-| [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, |
+| [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, purpose-driven modules in TypeScript projects. Effective modul... |
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 | [use-pnpm-for-nodejs](./categories/typescript/use-pnpm-for-nodejs.md) | 0.1.0 | This binding implements our automation tenet by establishing a consistent, efficient package management foundation that eliminates "works on my mac... |
