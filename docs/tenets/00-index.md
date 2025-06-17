@@ -16,6 +16,7 @@ This file contains an automatically generated list of all tenets with their one-
 | [maintainability](./maintainability.md) | 0.1.0 | Most of a software project's lifetime is spent in maintenance mode. The code you write today will be read, modified, and debugged dozens of times i... |
 | [modularity](./modularity.md) | 0.1.0 | Modularity is the fundamental approach for taming complexity in software systems. When |
 | [no-secret-suppression](./no-secret-suppression.md) | 0.1.0 | Quality tools serve as vigilant guardians of your codebase, continuously scanning for patterns that experience has shown to be problematic. When th... |
+| [observability](./observability.md) | 0.1.0 | Modern distributed systems are too complex for humans to understand through intuition or guesswork. When something goes wrong, you need your system... |
 | [orthogonality](./orthogonality.md) | 0.1.0 | Orthogonality is about isolation and independence—ensuring that unrelated components in |
 | [product-value-first](./product-value-first.md) | 0.1.0 | Code is not an end in itself—it's a means to deliver value to users. When you write code, you're not just creating instructions for computers; you'... |
 | [simplicity](./simplicity.md) | 0.1.0 | Simplicity is a fundamental requirement for building high-quality, maintainable |

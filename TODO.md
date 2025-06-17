@@ -10,7 +10,7 @@
         1. A summary of key patterns, structures, and cross-references is available for the drafting phase.
     - **Depends‑on:** none
 
-- [ ] **T002 · Feature · P1: create observability tenet file with core philosophy**
+- [x] **T002 · Feature · P1: create observability tenet file with core philosophy**
     - **Context:** Content Architecture; Phase 2, Step 3
     - **Action:**
         1. Create `docs/tenets/observability.md` with YAML front-matter (`id`, `last_modified`, `version`).
@@ -20,7 +20,7 @@
         2. The core philosophical content is drafted and adheres to the tenet/binding separation principle.
     - **Depends‑on:** [T001]
 
-- [ ] **T003 · Feature · P1: write practical guidelines for observability**
+- [x] **T003 · Feature · P1: write practical guidelines for observability**
     - **Context:** Phase 2, Step 4
     - **Action:**
         1. Add the "Practical Guidelines" section to `docs/tenets/observability.md`.
@@ -29,7 +29,7 @@
         1. The guidelines section is complete and provides actionable advice without implementation specifics.
     - **Depends‑on:** [T002]
 
-- [ ] **T004 · Feature · P1: write warning signs for observability**
+- [x] **T004 · Feature · P1: write warning signs for observability**
     - **Context:** Phase 2, Step 5
     - **Action:**
         1. Add the "Warning Signs" section to `docs/tenets/observability.md`.
@@ -38,7 +38,7 @@
         1. The warning signs section is complete and lists recognizable anti-patterns.
     - **Depends‑on:** [T003]
 
-- [ ] **T005 · Feature · P1: add cross-references to related tenets and bindings**
+- [x] **T005 · Feature · P1: add cross-references to related tenets and bindings**
     - **Context:** Phase 3, Step 6; Integration Points
     - **Action:**
         1. Add the "Related Tenets" section.
@@ -48,7 +48,7 @@
         1. All specified cross-references are present in the document.
     - **Depends‑on:** [T004]
 
-- [ ] **T006 · Test · P0: validate tenet front-matter and template compliance**
+- [x] **T006 · Test · P0: validate tenet front-matter and template compliance**
     - **Context:** Phase 3, Step 7; Testing Strategy: YAML Validation, Template Compliance
     - **Action:**
         1. Run `ruby tools/validate_front_matter.rb -f docs/tenets/observability.md`.
@@ -58,7 +58,7 @@
         2. The document structure is confirmed to match the template.
     - **Depends‑on:** [T005]
 
-- [ ] **T007 · Test · P0: verify tenet word count is within 200-400 words**
+- [x] **T007 · Test · P0: verify tenet word count is within 200-400 words**
     - **Context:** Architecture Blueprint: Target Length; Risk Assessment: Word Count Violation
     - **Action:**
         1. Use a word count tool to measure the body of `docs/tenets/observability.md`.
