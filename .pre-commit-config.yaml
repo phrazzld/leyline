@@ -27,6 +27,19 @@ repos:
         fail_fast: true
         verbose: true
 
+      # Check document length limits
+      - id: check-document-length
+        name: Check document length limits
+        description: Ensures tenets ≤150 lines and bindings ≤400 lines
+        entry: ruby tools/check_document_length.rb
+        language: system
+        files: ^docs/(tenets|bindings)/.*\.md$
+        exclude: ^docs/(tenets|bindings)/00-index\.md$
+        pass_filenames: true
+        types: [markdown]
+        fail_fast: true
+        verbose: true
+
       # Run reindex.rb in strict mode to ensure all files can be properly indexed
       # This validates YAML parsing and metadata extraction
       - id: check-index-with-yaml-validation

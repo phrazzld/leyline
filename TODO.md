@@ -1,0 +1,533 @@
+# Todo
+
+## CRITICAL: CI Failure Resolution - Document Length Violations
+- [ ] **CVF001 · Bug · P0: verify git state consistency between local and CI**
+    - **Context:** CI detecting 54 oversized documents, but local work suggests some were already fixed
+    - **Action:**
+        1. Run `git status` and `git log --oneline -5` to verify current branch state
+        2. Run `ruby tools/check_document_length.rb` locally to get current baseline
+        3. Compare local results with CI failure list from run 15692907801
+        4. Identify which documents are actually oversized vs CI environment issues
+    - **Done‑when:**
+        1. Accurate count of locally oversized documents established
+        2. Any git synchronization issues identified and resolved
+        3. Clear understanding of actual scope vs CI reported scope
+    - **Verification:** Local document count matches CI expectations or discrepancies explained
+    - **Depends‑on:** none
+
+- [ ] **CVF002 · Bug · P0: establish accurate document refactoring baseline**
+    - **Context:** Need precise understanding of current document status to plan systematic refactoring
+    - **Action:**
+        1. Generate comprehensive report using `ruby tools/analyze_verbosity_patterns.rb`
+        2. Cross-reference with `tools/refactoring-priority-matrix.md` to update priority classification
+        3. Create updated task list organized by tier (critical/moderate/minor violations)
+        4. Validate that refactoring infrastructure from CI003 is ready for batch processing
+    - **Done‑when:**
+        1. Complete list of oversized documents with current line counts
+        2. Updated priority matrix reflecting actual current state
+        3. Systematic refactoring plan ready for execution
+    - **Verification:** Documentation matches actual file state and provides clear execution roadmap
+    - **Depends‑on:** [CVF001]
+
+- [ ] **CVF003 · Refactor · P0: reduce 8 critical security/database documents (>1000 lines)**
+    - **Context:** Highest impact documents blocking CI - focus on worst offenders first
+    - **Action:**
+        1. Apply systematic refactoring to documents >1000 lines (secure-coding-checklist, secrets-management-practices, audit-logging-implementation, database-testing-strategies)
+        2. Use "one example rule" - single comprehensive example instead of multi-language
+        3. Focus on principles over tool-specific implementation details
+        4. Preserve essential security guidance while achieving 70%+ reduction
+    - **Done‑when:**
+        1. All 4 documents under 400-line limit
+        2. Core security/database principles preserved
+        3. Cross-references and integration points maintained
+    - **Verification:** `ruby tools/check_document_length.rb` passes for target documents
+    - **Depends‑on:** [CVF002]
+
+- [ ] **CVF004 · Refactor · P0: reduce 4 critical architecture documents (>1000 lines)**
+    - **Context:** Complete critical tier refactoring for documents blocking CI
+    - **Action:**
+        1. Apply systematic refactoring to remaining >1000 line documents (rust/configuration-management, read-replica-patterns, authentication-authorization-patterns, functional-composition-patterns)
+        2. Apply language-specific "one example rule" (Rust, TypeScript)
+        3. Focus on architectural patterns over implementation specifics
+        4. Maintain cross-references to related bindings
+    - **Done‑when:**
+        1. All 4 documents under 400-line limit
+        2. Architectural guidance preserved with improved conciseness
+        3. Language-specific patterns clearly demonstrated
+    - **Verification:** Document length validation passes and content quality maintained
+    - **Depends‑on:** [CVF003]
+
+- [ ] **CVF005 · Refactor · P1: batch refactor 20 moderate violations (500-999 lines)**
+    - **Context:** Apply systematic process to moderate-sized documents using CI003 infrastructure
+    - **Action:**
+        1. Use `ruby tools/batch_refactoring_workflow.rb 2` for tier 2 documents
+        2. Apply refactoring template consistently across all documents
+        3. Focus on consolidating repetitive content and verbose explanations
+        4. Target 40-60% reduction while preserving essential guidance
+    - **Done‑when:**
+        1. All moderate violation documents under 400-line limit
+        2. Consistent application of refactoring principles across documents
+        3. Quality preserved with improved readability
+    - **Verification:** Batch validation passes and no regressions in document quality
+    - **Depends‑on:** [CVF004]
+
+- [ ] **CVF006 · Refactor · P1: complete minor violations cleanup (26 documents 401-499 lines)**
+    - **Context:** Final phase to achieve complete CI compliance across all documents
+    - **Action:**
+        1. Apply targeted edits to documents with minor violations
+        2. Focus on tightening prose and removing redundant sections
+        3. Ensure minimal disruption to content while achieving compliance
+        4. Use automated validation throughout process
+    - **Done‑when:**
+        1. All 26 remaining documents under 400-line limit
+        2. Complete CI compliance achieved (0 violations)
+        3. Quality maintained with minimal content disruption
+    - **Verification:** `ruby tools/check_document_length.rb` shows 0 violations
+    - **Depends‑on:** [CVF005]
+
+- [ ] **CVF007 · Test · P1: comprehensive validation of all refactored documents**
+    - **Context:** Ensure all refactoring maintains quality standards and system integrity
+    - **Action:**
+        1. Run complete validation suite: `ruby tools/validate_front_matter.rb`
+        2. Verify cross-reference integrity: `ruby tools/fix_cross_references.rb`
+        3. Regenerate indexes: `ruby tools/reindex.rb --strict`
+        4. Spot-check content quality on high-impact refactored documents
+    - **Done‑when:**
+        1. All validation tools pass without errors
+        2. Cross-references resolve correctly
+        3. Indexes regenerate successfully with all content
+        4. Content quality spot-checks confirm value preservation
+    - **Verification:** Clean execution logs from all validation tools
+    - **Depends‑on:** [CVF006]
+
+- [ ] **CVF008 · Test · P1: verify CI compliance and prepare for merge**
+    - **Context:** Final verification that all changes resolve CI failure
+    - **Action:**
+        1. Run local document length validation to confirm 0 violations
+        2. Commit all refactored documents with comprehensive commit message
+        3. Push changes and verify CI status using `gh pr checks`
+        4. Monitor CI run to ensure validation step passes
+    - **Done‑when:**
+        1. Local validation shows 0 document length violations
+        2. All changes committed and pushed successfully
+        3. CI validation step passes without errors
+        4. PR ready for merge with all quality gates satisfied
+    - **Verification:** CI status shows all checks passing
+    - **Depends‑on:** [CVF007]
+
+- [~] **CVF009 · Chore · P2: enhance refactoring process based on lessons learned**
+    - **Context:** Prevent similar CI failures through improved systematic processes
+    - **Action:**
+        1. Update `docs/systematic-refactoring-process.md` with lessons learned
+        2. Enhance `tools/batch_refactoring_workflow.rb` with any needed improvements
+        3. Document recommended cadence for large-scale document maintenance
+        4. Create guidance for verifying CI compliance before PR submission
+    - **Done‑when:**
+        1. Process documentation updated with practical improvements
+        2. Tooling enhanced based on real-world application experience
+        3. Clear guidelines for future large-scale refactoring efforts
+    - **Verification:** Updated documentation provides actionable guidance for future work
+    - **Depends‑on:** [CVF008]
+
+## URGENT: Document Conciseness Refactoring and Enforcement
+- [x] **R001 · Chore · P0: implement document length enforcement hooks and CI**
+    - **Context:** Prevent future verbose documents by enforcing 400-line limit on all tenets and bindings
+    - **Action:**
+        1. Add pre-commit hook that fails if any tenet/binding exceeds 400 lines
+        2. Add GitHub Actions workflow that blocks PRs with oversized documents
+        3. Create tools/check_document_length.rb script for validation
+        4. Update .pre-commit-config.yaml with new length check hook
+    - **Done‑when:**
+        1. Pre-commit hook prevents commits with documents >400 lines
+        2. GitHub Actions workflow validates document length on all PRs
+        3. Clear error messages guide contributors to keep documents concise
+    - **Verification:**
+        1. Attempt to commit a 401-line test document fails with helpful error
+        2. PR with oversized document is blocked by CI
+    - **Depends‑on:** none
+
+- [x] **R002 · Refactor · P0: refactor performance-testing-standards.md from 2008 to ~400 lines**
+    - **Context:** Most egregious example with 1924 lines of examples across 4 languages
+    - **Action:**
+        1. Keep only ONE clear good/bad example pattern (choose JavaScript/k6)
+        2. Remove tool-specific implementation details and configurations
+        3. Consolidate 6 implementation strategies to 3 core principles
+        4. Focus on WHAT and WHY, not HOW with specific tools
+    - **Done‑when:**
+        1. Document ≤400 lines while maintaining core value
+        2. Single, clear example demonstrates the pattern effectively
+        3. Principles clearly stated without tool-specific details
+    - **Verification:**
+        1. Document passes length validation
+        2. Key concepts remain clear and actionable
+    - **Depends‑on:** [R001]
+
+- [x] **R003 · Refactor · P0: refactor test-data-management.md from 2011 to ~400 lines**
+    - **Context:** Second worst offender with 1927 lines of redundant examples
+    - **Action:**
+        1. Keep ONE factory pattern example (choose TypeScript)
+        2. Remove redundant lifecycle explanations and cleanup details
+        3. Merge 6 sections of bullet points into 3 focused sections
+        4. Cut tool-specific configurations and implementation details
+    - **Done‑when:**
+        1. Document ≤400 lines while preserving essential guidance
+        2. Core factory pattern and lifecycle concepts remain clear
+        3. No redundant multi-language implementations
+    - **Verification:**
+        1. Document passes length validation
+        2. Essential data management principles preserved
+    - **Depends‑on:** [R001]
+
+- [x] **R004 · Refactor · P0: refactor test-pyramid-implementation.md from 1416 to ~350 lines**
+    - **Context:** Excessive repetition of 70/20/10 ratio and multi-language examples
+    - **Action:**
+        1. Keep ONE example showing proper test distribution
+        2. Remove repetitive ratio explanations and justifications
+        3. Cut detailed CI/CD configurations and tool specifics
+        4. Focus on the pyramid principle, not implementation details
+    - **Done‑when:**
+        1. Document ≤350 lines with clear pyramid guidance
+        2. 70/20/10 principle explained once, clearly
+        3. Single comprehensive example illustrates the pattern
+    - **Verification:**
+        1. Document passes length validation
+        2. Test pyramid concept remains actionable
+    - **Depends‑on:** [R001]
+
+- [x] **R005 · Refactor · P1: refactor remaining verbose bindings (5 documents)**
+    - **Context:** use-structured-logging (1485), ci-cd-pipeline-standards (918), automated-quality-gates (814), layered-architecture (861), continuous-refactoring (782)
+    - **Action:**
+        1. Apply "one example rule" - show pattern once, not in multiple languages
+        2. Focus on principles over tool-specific implementations
+        3. Consolidate repetitive bullet points and explanations
+        4. Target ~250-300 lines for each document
+    - **Done‑when:**
+        1. All 5 documents under 400 lines
+        2. Each follows consistent structure: brief intro, rationale, rules, example, related
+        3. No multi-language example repetition
+    - **Verification:**
+        1. All documents pass length validation
+        2. Core principles remain clear and actionable
+    - **Depends‑on:** [R001]
+
+- [x] **R006 · Refactor · P1: refactor verbose tenets (6 documents >150 lines)**
+    - **Context:** maintainability (206), explicit-over-implicit (206), testability (182), no-secret-suppression (176), document-decisions (175), fix-broken-windows (172)
+    - **Action:**
+        1. Target 100-150 lines maximum for tenets
+        2. Tighten prose, remove redundant explanations
+        3. Consolidate warning signs and guidelines
+        4. Keep core belief and practical guidelines focused
+    - **Done‑when:**
+        1. All tenets ≤150 lines
+        2. Core principles remain clear and inspiring
+        3. Actionable guidelines preserved
+    - **Verification:**
+        1. All tenets pass length validation
+        2. Essential philosophical points intact
+    - **Depends‑on:** [R001]
+
+- [x] **R007 · Chore · P1: create conciseness style guide for future contributions**
+    - **Context:** Prevent future verbosity by establishing clear writing guidelines
+    - **Action:**
+        1. Create docs/CONCISENESS_GUIDE.md with writing principles
+        2. Document the "one example rule" and target lengths
+        3. Provide good/bad examples of concise vs verbose writing
+        4. Add to CONTRIBUTING.md and PR template
+    - **Done‑when:**
+        1. Clear guide helps contributors write concise documents
+        2. Target structure and lengths documented
+        3. Integrated into contribution workflow
+    - **Verification:**
+        1. New contributors can follow guide to write concise documents
+        2. PR template references conciseness requirements
+    - **Depends‑on:** [R002, R003, R004]
+
+## Research and Foundation
+- [x] **T001 · Chore · P1: analyze leyline standards and multi-language testing landscape**
+    - **Context:** Phase 1: Foundation establishment for comprehensive testing strategy implementation
+    - **Action:**
+        1. Review existing leyline tenet/binding patterns, YAML front-matter requirements, and cross-referencing structure
+        2. Survey industry best practices for testing pyramid, data management, performance testing, code review, and quality metrics
+        3. Identify representative testing tools for JavaScript/TypeScript, Python, Java, and Go with validation of example concepts
+    - **Done‑when:**
+        1. Standards analysis document covers leyline patterns, YAML validation rules, and cross-reference conventions
+        2. Industry research summary documents best practices with tool recommendations for each language
+        3. Multi-language example concepts validated for technical feasibility across all target stacks
+    - **Verification:**
+        1. Summary reviewed against existing property-based-testing.md and automated-quality-gates.md for pattern consistency
+        2. Sample code snippets compile/execute successfully in each target language environment
+    - **Depends‑on:** none
+
+## Document Architecture Design
+- [x] **T002 · Feature · P1: define precise scope and cross-reference matrix for 6 new bindings**
+    - **Context:** Phase 2: Establish clear boundaries and integration points to prevent content duplication
+    - **Action:**
+        1. Define precise, non-overlapping scope for each binding: Test Pyramid Implementation, Test Data Management, Performance Testing Standards, Code Review Excellence, Quality Metrics and Monitoring, Test Environment Management
+        2. Create comprehensive cross-reference matrix mapping relationships between new bindings and existing leyline content
+        3. Establish validation strategy with specific checkpoints for YAML compliance, code example testing, and cross-reference accuracy
+    - **Done‑when:**
+        1. Scope definitions document exists with clear boundaries for each binding and explicit out-of-scope items
+        2. Cross-reference matrix confirms no duplication with property-based-testing.md or automated-quality-gates.md
+        3. Validation strategy document specifies procedures for YAML, code examples, and link validation
+    - **Verification:**
+        1. Peer review confirms scope definitions are unique and comprehensive
+        2. Matrix validation against existing bindings shows proper integration without overlap
+    - **Depends‑on:** [T001]
+
+## Core Implementation Phase
+- [x] **T003 · Feature · P1: implement test pyramid implementation binding**
+    - **Context:** Strategic guidance on test distribution and execution with 70/20/10 unit/integration/e2e ratio
+    - **Action:**
+        1. Create docs/bindings/core/test-pyramid-implementation.md with content on test boundaries, mocking strategies, and isolation principles
+        2. Include multi-language examples demonstrating good vs bad patterns in Jest/TypeScript, pytest/Python, JUnit/Java, Go testing
+        3. Provide specific tool recommendations with configuration examples and measurable success criteria
+    - **Done‑when:**
+        1. Document passes YAML front-matter validation and follows leyline binding structure template
+        2. Contains minimum 2 technology examples per major concept with clear good/bad pattern demonstrations
+        3. Integration points with existing leyline bindings are explicitly documented with valid cross-references
+    - **Verification:**
+        1. Code examples compile and execute without errors in respective language environments
+        2. Manual review confirms alignment with testability and automation tenets
+    - **Depends‑on:** [T002]
+
+- [x] **T004 · Feature · P1: implement test data management binding**
+    - **Context:** Strategies for test data creation, lifecycle management, isolation, and cleanup automation
+    - **Action:**
+        1. Create docs/bindings/core/test-data-management.md with content on data factories, database seeding, test isolation, and cleanup automation
+        2. Include multi-language examples of factory patterns, database test strategies, and data anonymization approaches
+        3. Provide deterministic data generation guidance with realistic data creation patterns
+    - **Done‑when:**
+        1. Document demonstrates test data lifecycle management with specific tool configurations
+        2. Factory pattern examples included for at least 2 languages with database integration examples
+        3. Document passes validation and includes measurable success criteria for data management quality
+    - **Verification:**
+        1. Database factory examples execute successfully with proper cleanup verification
+        2. Content review confirms no duplication with existing data-related bindings
+    - **Depends‑on:** [T002]
+
+- [x] **T005 · Feature · P1: implement performance testing standards binding**
+    - **Context:** Load testing methodology, benchmark establishment, and performance regression detection
+    - **Action:**
+        1. Create docs/bindings/core/performance-testing-standards.md with content on load testing methodology, benchmark establishment, and regression detection
+        2. Include examples for k6/JavaScript, locust/Python, JMeter/Java, and Go benchmarks with quality gate integration
+        3. Provide baseline establishment guidance and monitoring integration patterns
+    - **Done‑when:**
+        1. Document includes performance quality gates configuration and automated regression detection
+        2. Multi-technology examples demonstrate load testing implementation with realistic scenarios
+        3. Integration with automated-quality-gates.md is explicit and non-duplicative
+    - **Verification:**
+        1. Performance testing examples execute without errors and produce valid metrics
+        2. Quality gate configurations integrate properly with CI/CD pipeline examples
+    - **Depends‑on:** [T002]
+
+- [x] **T006 · Feature · P1: implement code review excellence binding**
+    - **Context:** Systematic approaches to effective code review with automation and human focus optimization
+    - **Action:**
+        1. Create docs/bindings/core/code-review-excellence.md with content on review process automation, quality checklists, and feedback optimization
+        2. Include GitHub/GitLab automation examples, review templates, and human review focus area guidance
+        3. Provide automated review assistance configuration and team collaboration patterns
+    - **Done‑when:**
+        1. Document covers systematic review processes with specific automation examples and manual checklist templates
+        2. Tool integration examples for GitHub/GitLab include working configuration snippets
+        3. Human vs automated review boundaries are clearly defined with practical implementation guidance
+    - **Verification:**
+        1. Review automation examples integrate successfully with specified platforms
+        2. Template examples render correctly and provide actionable guidance
+    - **Depends‑on:** [T002]
+
+- [x] **T007 · Feature · P1: implement quality metrics and monitoring binding**
+    - **Context:** KPIs for code quality, testing effectiveness, and continuous quality tracking
+    - **Action:**
+        1. Create docs/bindings/core/quality-metrics-and-monitoring.md with content on quality KPIs, trend analysis, and actionable alerts
+        2. Include SonarQube integration examples, custom quality dashboard configurations, and team retrospective data collection
+        3. Provide metric selection guidance and dashboard design patterns that drive behavior
+    - **Done‑when:**
+        1. Document includes specific KPI definitions with measurement thresholds and behavior-driving guidance
+        2. Dashboard and alerting examples provide working configurations for quality monitoring tools
+        3. Cross-references to automated-quality-gates.md and performance-testing-standards.md are accurate and complementary
+    - **Verification:**
+        1. Quality monitoring configurations integrate successfully with specified tools
+        2. Metric definitions align with value-driven prioritization principles
+    - **Depends‑on:** [T002]
+
+- [x] **T008 · Feature · P1: implement test environment management binding**
+    - **Context:** Environment consistency, automated provisioning, and test isolation strategies
+    - **Action:**
+        1. Create docs/bindings/core/test-environment-management.md with content on environment consistency, automated provisioning, and containerization strategies
+        2. Include Docker test environment examples, CI environment setup configurations, and local development consistency patterns
+        3. Provide infrastructure as code patterns for test environments with automated setup/teardown
+    - **Done‑when:**
+        1. Document covers reproducible test environments with specific IaC and containerization examples
+        2. CI integration examples demonstrate automated environment provisioning and cleanup
+        3. Local development consistency patterns ensure environment parity across team members
+    - **Verification:**
+        1. Docker and IaC examples execute successfully and create consistent environments
+        2. Environment setup procedures integrate properly with CI/CD pipeline configurations
+    - **Depends‑on:** [T002]
+
+## Integration and Validation Phase
+- [x] **T009 · Test · P1: validate implementation standards and integration quality**
+    - **Context:** Comprehensive validation of all binding documents against leyline standards and quality requirements
+    - **Action:**
+        1. Execute `ruby tools/validate_front_matter.rb` against each new binding document and resolve any YAML compliance issues
+        2. Verify all code examples compile/execute successfully in their respective language environments
+        3. Run `ruby tools/fix_cross_references.rb` and `ruby tools/reindex.rb --strict` to ensure proper integration with existing content
+        4. Perform consistency review across all 6 documents for terminology, structure, and integration quality
+    - **Done‑when:**
+        1. All binding documents pass YAML front-matter validation without errors or warnings
+        2. Code examples verified as syntactically valid and executable with documented test results
+        3. Cross-references resolve correctly and indexes regenerate successfully with new content
+        4. Content consistency confirmed across all documents with standardized terminology and structure
+    - **Verification:**
+        1. Validation script output logs confirm zero errors for all documents
+        2. Manual verification of cross-reference accuracy and index generation completeness
+        3. Side-by-side comparison with existing bindings confirms integration quality and no duplication
+    - **Depends‑on:** [T003, T004, T005, T006, T007, T008]
+
+## Documentation and Polish Phase
+- [x] **T010 · Chore · P2: finalize documentation integration and perform comprehensive validation**
+    - **Context:** Final validation and integration of all binding documents with leyline documentation system
+    - **Action:**
+        1. Verify all new bindings appear correctly in generated indexes with proper categorization and cross-referencing
+        2. Execute comprehensive validation sequence: `validate_front_matter.rb`, `reindex.rb --strict`, `fix_cross_references.rb`
+        3. Confirm all success criteria from PLAN.md are met: functional requirements, quality requirements, and integration requirements
+    - **Done‑when:**
+        1. Index files accurately reflect all new bindings with correct categorization and accessible navigation
+        2. All leyline validation tools execute successfully with clean output and no errors or warnings
+        3. Final review confirms all success criteria met and documentation is ready for community use
+    - **Verification:**
+        1. Generated index navigation allows easy discovery of all new binding content
+        2. Clean execution logs from all validation tools demonstrate system integration success
+    - **Depends‑on:** [T009]
+
+## Risk Management and Quality Assurance
+- [x] **T011 · Test · P2: mitigate identified risks and establish measurement framework**
+    - **Context:** Address high-priority risks identified in PLAN.md and establish post-implementation measurement
+    - **Action:**
+        1. Review new bindings against existing property-based-testing.md and automated-quality-gates.md to confirm no content duplication
+        2. Verify each binding concept demonstrates at least 2 technology implementations to prevent technology-specific lock-in
+        3. Establish measurement framework for tracking adoption and effectiveness of new bindings in leyline consumer communities
+        4. Document community feedback integration process for iterative improvement of binding content
+    - **Done‑when:**
+        1. Content duplication review completed with documented confirmation of unique, complementary content
+        2. Multi-language coverage verified across all binding concepts with technology diversity demonstrated
+        3. Measurement and feedback framework established for post-implementation community engagement
+    - **Verification:**
+        1. Explicit comparison notes confirm no overlap with existing content beyond appropriate cross-references
+        2. Technology coverage audit confirms principle-first approach with diverse implementation examples
+        3. Community feedback process ready for activation upon binding publication
+    - **Depends‑on:** [T010]
+
+## Success Criteria Validation
+
+**Functional Requirements:**
+- [x] 6 comprehensive binding documents created and integrated with leyline system
+- [x] All documents pass YAML front-matter validation and integrate with leyline tooling
+- [x] Code examples follow "one example rule" using most appropriate language (primarily TypeScript for comprehensive patterns)
+- [x] Clear cross-references establish proper integration with existing leyline content
+
+**Quality Requirements:**
+- [x] Documents follow established leyline patterns and structure with consistent style and terminology
+- [x] Content provides immediately actionable guidance with specific tool recommendations and configurations
+- [x] Examples demonstrate both good and bad patterns with clear explanatory context
+- [x] Measurement and monitoring guidance included for each binding with specific success metrics
+
+**Integration Requirements:**
+- [x] No content duplication with existing property-based-testing.md or automated-quality-gates.md
+- [x] Proper integration with testability, automation, and maintainability tenets through explicit cross-references
+- [x] Index regeneration successfully incorporates new content with accurate categorization
+- [x] Community feedback and measurement framework established for continuous improvement
+
+## Clarifications & Assumptions
+
+- [x] **Issue: Multi-language testing environment requirements**
+    - **Context:** Resolved by adopting "one example rule" - using single language (TypeScript) for comprehensive examples
+    - **Resolution:** Documents now use TypeScript examples with language-agnostic principles
+
+- [x] **Issue: Leyline tooling environment configuration**
+    - **Context:** Ruby tooling for validation, cross-reference fixing, and index generation confirmed working
+    - **Resolution:** All tools validated and functioning correctly
+
+## Critical Pre-Merge Fixes
+
+- [x] **F001 · Bug · P0: fix test data factory determinism contradiction**
+    - **Context:** test-data-management.md example uses Date.now() and Math.random() which contradicts the binding's rule requiring deterministic generation
+    - **Action:**
+        1. Modify TestDataFactory constructor to accept optional seed parameter
+        2. Replace Math.random() with seeded random generation for reproducibility
+        3. Update example to demonstrate deterministic data creation
+        4. Ensure example aligns with stated rule requirements
+    - **Done‑when:**
+        1. Example demonstrates deterministic data generation with consistent seeds
+        2. Code example supports reproducible test runs when seed is provided
+        3. No contradiction between rule definition and implementation example
+    - **Verification:**
+        1. Example code shows seeded random generation
+        2. Documentation clearly explains deterministic approach
+    - **Depends‑on:** none
+
+## Critical CI Resolution - Document Length Violations
+
+- [x] **CI001 · Bug · P0: fix 3 tenet length violations to unblock testing strategy deployment**
+    - **Context:** CI failing due to 3 tenets slightly exceeding 150-line limit, blocking merge of testing strategy
+    - **Action:**
+        1. Reduce simplicity.md from 170 to 150 lines (20 line reduction, 12%)
+        2. Reduce adaptability-and-reversibility.md from 165 to 150 lines (15 line reduction, 9%)
+        3. Reduce dry-dont-repeat-yourself.md from 154 to 150 lines (4 line reduction, 3%)
+        4. Preserve core philosophical content while tightening prose
+    - **Done‑when:**
+        1. All 3 tenets under 150-line limit
+        2. Core principles and practical guidelines preserved
+        3. No loss of essential content or cross-references
+    - **Verification:**
+        1. ruby tools/check_document_length.rb passes for tenets
+        2. YAML front-matter validation continues passing
+        3. Manual review confirms content quality maintained
+    - **Depends‑on:** none
+
+- [x] **CI002 · Bug · P0: fix 8 worst binding length violations blocking core functionality**
+    - **Context:** 54 bindings exceed 400-line limit with some over 1800 lines, focus on worst offenders first
+    - **Action:**
+        1. Target bindings >1000 lines: secure-coding-checklist (1887→400), secrets-management (1761→400), rust-config-mgmt (1297→400)
+        2. Target critical security/database patterns: authentication-patterns (1258→400), read-replica-patterns (1262→400)
+        3. Apply "one example rule" - single comprehensive example instead of multi-language repetition
+        4. Focus on principles over tool-specific implementation details
+        5. Target functional-composition-patterns (991→400), trait-composition-patterns (737→400), dependency-management (724→400)
+    - **Done‑when:**
+        1. 8 targeted bindings under 400-line limit (80-90% reduction for worst offenders)
+        2. Core binding value preserved with "one example rule" applied
+        3. Cross-references and integration points maintained
+    - **Verification:**
+        1. Document length validation passes for targeted bindings
+        2. Content review confirms essential guidance preserved
+        3. No broken cross-references or missing integration points
+    - **Depends‑on:** none
+
+- [x] **CI003 · Feature · P1: establish systematic refactoring process for remaining 43 bindings**
+    - **Context:** Create sustainable approach for refactoring remaining oversized documents post-merge
+    - **Action:**
+        1. Create refactoring template with consistent structure approach
+        2. Script to identify common verbosity patterns across remaining documents
+        3. Prioritize by community usage: TypeScript→Python→Go→remaining categories
+        4. Create batch validation and testing workflow
+    - **Done‑when:**
+        1. Refactoring template and automation tools ready
+        2. Priority matrix established for remaining documents
+        3. Systematic workflow documented for future contributors
+    - **Verification:**
+        1. Template successfully reduces sample document by 60%+ while preserving value
+        2. Automation tools correctly identify verbosity patterns
+        3. Priority matrix aligns with community usage data
+    - **Depends‑on:** [CI001, CI002]
+
+---
+
+## Implementation Philosophy
+
+This synthesis applies leyline principles throughout:
+
+**Simplicity Above All:** Tasks are organized with minimal complexity while maintaining completeness. Research phases are consolidated to eliminate redundancy, and validation is strategically placed at key checkpoints rather than scattered throughout.
+
+**Document Decisions:** Each task includes explicit context explaining *why* it exists and *how* it connects to the overall goal. Dependencies are clearly documented to preserve decision rationale.
+
+**Value-Driven Prioritization:** All tasks directly serve the user value of creating comprehensive, actionable testing and QA guidance. No speculative or engineering-driven work is included without clear connection to the binding quality and usability outcomes.

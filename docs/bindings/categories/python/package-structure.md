@@ -11,110 +11,70 @@ Structure Python packages by business domain or feature rather than technical la
 
 ## Rationale
 
-This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. It also supports our simplicity tenet by making the codebase's structure immediately apparent to anyone reading it.
-
-Think of package structure like organizing a library. A well-organized library groups books by subject (history, science, literature) rather than by physical characteristics (size, color, publisher). Similarly, a well-structured Python package groups code by business purpose rather than technical implementation details. When someone looks for "user authentication," they should find it in a `users` or `auth` module, not scattered across `models`, `views`, and `controllers` directories.
-
-Good package structure serves as a map for your codebase. Just as city planners design neighborhoods with clear boundaries and logical connections, package designers should create modules with clear responsibilities and minimal coupling. This organization becomes critical as projects grow—what starts as a simple script can evolve into a complex system, and early structural decisions determine whether that evolution is smooth or painful.
+This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. Good package structure serves as a map for your codebase—organizing code by business purpose rather than technical implementation details makes the system immediately comprehensible to anyone reading it. When someone looks for "user authentication," they should find it in a `users` or `auth` module, not scattered across `models`, `views`, and `controllers` directories.
 
 ## Rule Definition
 
-Python's module system allows flexible organization, but this flexibility can lead to chaos without consistent guidelines. This binding requires:
+**Core Requirements:**
 
-**Required practices:**
-- Organize code by business domain/feature, not technical layer
-- Use the `src/` layout for installable packages to prevent import confusion
-- Keep modules focused on a single responsibility
-- Import from higher-level modules to lower-level ones, never the reverse
-- Use `__init__.py` to create clean public APIs for packages
+- **Domain-Based Organization**: Organize code by business domain/feature, not technical layer (avoid models/, views/, controllers/ structure)
+- **src/ Layout**: Use src/ layout for installable packages to prevent import confusion
+- **Single Responsibility**: Keep modules focused on one clear responsibility
+- **Import Hierarchy**: Import from higher-level modules to lower-level ones, never reverse
+- **Clean APIs**: Use __init__.py to create clear public interfaces for packages
+- **No Circular Dependencies**: Prevent circular imports between modules through clear dependency hierarchy
 
-**Prohibited practices:**
-- Circular imports between modules
-- Organizing code primarily by technical layer (models/, views/, controllers/)
-- Mixing business logic with framework-specific code in the same module
-- Deep nesting (more than 3-4 levels) without clear justification
-
-**Package layout principles:**
-- **Top-level**: Business domains or major features
-- **Module-level**: Specific capabilities within domains
-- **Function/class-level**: Individual operations or data structures
+**Key Principles:**
+- Top-level: Business domains or major features
+- Module-level: Specific capabilities within domains
+- Function/class-level: Individual operations or data structures
 
 ## Practical Implementation
 
-### Recommended src/ Layout
+**Recommended Package Structure:**
 
 ```
 my-project/
 ├── src/
 │   └── myproject/
 │       ├── __init__.py
-│       ├── users/
+│       ├── users/                    # Business domain: user management
 │       │   ├── __init__.py
-│       │   ├── models.py
-│       │   ├── services.py
-│       │   └── auth.py
-│       ├── orders/
+│       │   ├── models.py            # User data structures
+│       │   ├── services.py          # User business logic
+│       │   └── auth.py              # Authentication functionality
+│       ├── orders/                   # Business domain: order processing
 │       │   ├── __init__.py
 │       │   ├── models.py
 │       │   ├── services.py
 │       │   └── billing.py
-│       ├── shared/
+│       ├── shared/                   # Cross-cutting concerns
 │       │   ├── __init__.py
 │       │   ├── database.py
 │       │   ├── config.py
 │       │   └── utils.py
-│       └── api/
+│       └── api/                      # HTTP interface layer
 │           ├── __init__.py
-│           ├── main.py
 │           ├── users.py
 │           └── orders.py
 ├── tests/
 │   ├── test_users/
 │   └── test_orders/
-├── pyproject.toml
-└── README.md
+└── pyproject.toml
 ```
 
-### Import Organization with isort
-
-**Configure isort in pyproject.toml:**
+**Import Organization:**
 
 ```toml
+# pyproject.toml - isort configuration
 [tool.isort]
 profile = "black"
-multi_line_output = 3
 line_length = 88
 known_first_party = ["myproject"]
-known_third_party = ["fastapi", "pydantic", "sqlalchemy"]
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 ```
 
-**Example well-organized imports:**
-
-```python
-# Standard library imports
-import datetime
-import logging
-from pathlib import Path
-from typing import List, Optional
-
-# Third-party imports
-import requests
-from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String
-
-# First-party imports
-from myproject.shared.database import Base
-from myproject.shared.config import settings
-
-# Local imports
-from .models import User
-from .services import UserService
-```
-
-### Clean Package APIs
-
-**Use __init__.py to expose clean interfaces:**
+**Clean Package APIs:**
 
 ```python
 # src/myproject/users/__init__.py
@@ -137,30 +97,24 @@ __all__ = [
 ## Examples
 
 ```python
-# ❌ BAD: Layer-based organization mixes concerns
+# ❌ BAD: Layer-based organization mixes concerns across files
 # myproject/
 # ├── models/
 # │   ├── user.py      # User data structure
 # │   ├── order.py     # Order data structure
-# │   └── product.py   # Product data structure
 # ├── views/
 # │   ├── user.py      # User HTTP endpoints
 # │   ├── order.py     # Order HTTP endpoints
-# │   └── product.py   # Product HTTP endpoints
 # └── controllers/
 #     ├── user.py      # User business logic
-#     ├── order.py     # Order business logic
-#     └── product.py   # Product business logic
+#     └── order.py     # Order business logic
 
-# This creates tight coupling across layers
+# This creates tight coupling - changes require editing 3+ files
 from myproject.models.user import User
 from myproject.models.order import Order
 from myproject.controllers.user import UserController
 from myproject.views.order import OrderView
-# Changes to user functionality require editing 3+ files
-```
 
-```python
 # ✅ GOOD: Domain-based organization groups related concerns
 # myproject/
 # ├── users/
@@ -175,14 +129,13 @@ from myproject.views.order import OrderView
 #     ├── database.py   # Shared database utilities
 #     └── config.py     # Shared configuration
 
-# Clean domain imports
+# Clean domain imports - changes stay within feature modules
 from myproject.users import User, UserService
 from myproject.orders import Order, OrderService
-# Changes to user functionality stay within users/ module
 ```
 
 ```python
-# ❌ BAD: Circular import between modules
+# ❌ BAD: Circular imports between modules
 # users/models.py
 from myproject.orders.models import Order
 
@@ -196,23 +149,18 @@ from myproject.users.models import User
 class Order:
     def get_user(self) -> User:
         return User.find_by_id(self.user_id)
+# Creates circular dependency: users -> orders -> users
 
-# This creates circular dependency: users -> orders -> users
-```
-
-```python
 # ✅ GOOD: Clear dependency hierarchy prevents circular imports
 # shared/models.py - Base domain objects
 from abc import ABC
-from typing import Any, Dict
 
 class BaseModel(ABC):
     """Base model with common functionality."""
     id: int
 
     @classmethod
-    def find_by_id(cls, obj_id: int) -> Any:
-        """Find object by ID."""
+    def find_by_id(cls, obj_id: int):
         pass
 
 # users/models.py - Users domain
@@ -244,29 +192,25 @@ from flask import request, jsonify
 from sqlalchemy import Column, Integer, String
 
 class User(Base):
-    # Database model
+    # Database model mixed with...
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    email = Column(String(255), unique=True)
 
 def hash_password(password):
-    # Utility function
+    # Utility function mixed with...
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    # HTTP endpoint
+    # HTTP endpoint mixed with...
     data = request.json
     user = User(email=data['email'])
-    db.session.add(user)
     return jsonify({'id': user.id})
 
 def send_welcome_email(user_email):
-    # Email service
-    # ... email sending logic
-```
+    # Email service - all concerns mixed together
+    pass
 
-```python
 # ✅ GOOD: Clear separation of concerns across modules
 # users/models.py
 from sqlalchemy import Column, Integer, String
@@ -280,26 +224,20 @@ class User(Base):
 
 # users/services.py
 import bcrypt
-from typing import Optional
 from .models import User
-from .notifications import send_welcome_email
 
 class UserService:
     """User business operations."""
 
     @staticmethod
     def hash_password(password: str) -> str:
-        """Hash password securely."""
         return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     @classmethod
     def create_user(cls, email: str, password: str) -> User:
-        """Create new user with welcome email."""
         hashed_pw = cls.hash_password(password)
         user = User(email=email, password_hash=hashed_pw)
-        db.session.add(user)
-        db.session.commit()
-        send_welcome_email(user.email)
+        # Save and send welcome email
         return user
 
 # users/api.py
@@ -312,41 +250,6 @@ def create_user_endpoint():
     data = request.json
     user = UserService.create_user(data['email'], data['password'])
     return jsonify({'id': user.id})
-
-# users/notifications.py
-def send_welcome_email(user_email: str) -> None:
-    """Send welcome email to new user."""
-    # ... email sending logic
-```
-
-```python
-# ❌ BAD: No src/ layout causes import confusion
-# myproject/
-# ├── myproject/
-# │   ├── __init__.py
-# │   └── core.py
-# ├── tests/
-# │   └── test_core.py
-# └── setup.py
-
-# In tests/test_core.py:
-import myproject.core  # This could import from current directory OR installed package!
-```
-
-```
-# ✅ GOOD: src/ layout prevents import ambiguity
-myproject/
-├── src/
-│   └── myproject/
-│       ├── __init__.py
-│       └── core.py
-├── tests/
-│   └── test_core.py
-├── pyproject.toml
-└── setup.py
-
-# In tests/test_core.py:
-import myproject.core  # Unambiguously imports from installed package
 ```
 
 ```python
@@ -355,76 +258,23 @@ import myproject.core  # Unambiguously imports from installed package
 from .models import *
 from .services import *
 from .internal_helpers import *
-from .database_utils import *
-# Exposes everything, including internal details
+# Exposes everything, including internals
 
-# Using the package:
-from myproject.users import UserDatabaseConnection, _internal_cache_helper
-# Users can accidentally depend on internal implementation
-```
-
-```python
 # ✅ GOOD: Clean __init__.py exposes only public API
 # users/__init__.py
-"""User management domain.
-
-This package provides user creation, authentication, and management
-functionality. For most use cases, import User and UserService.
-"""
+"""User management domain."""
 
 from .models import User, UserRole
 from .services import UserService
-from .exceptions import AuthenticationError, UserNotFoundError
+from .exceptions import AuthenticationError
 
-__all__ = [
-    "User",
-    "UserRole",
-    "UserService",
-    "AuthenticationError",
-    "UserNotFoundError",
-]
-
-# Using the package:
-from myproject.users import User, UserService
+__all__ = ["User", "UserRole", "UserService", "AuthenticationError"]
 # Clean, stable API that won't break when internals change
-```
-
-## Tool Configuration
-
-### flake8-import-order
-
-```ini
-# .flake8
-[flake8]
-import-order-style = pycharm
-application-import-names = myproject
-```
-
-### isort Integration
-
-```toml
-# pyproject.toml
-[tool.isort]
-profile = "black"
-src_paths = ["src", "tests"]
-known_first_party = ["myproject"]
-force_sort_within_sections = true
 ```
 
 ## Related Bindings
 
-### Core Tenets & Bindings
-- [modularity](../../../tenets/modularity.md) - Package structure is the primary mechanism for creating modular systems in Python
-- [simplicity](../../../tenets/simplicity.md) - Clear organization reduces cognitive overhead and makes systems easier to understand
-- [dependency-inversion](../../core/dependency-inversion.md) - Proper package structure enables clean dependency management
-- [interface-contracts](../../core/interface-contracts.md) - Package APIs serve as contracts between different parts of the system
-
-### Language-Specific Analogies
-- [package-design](../go/package-design.md) - Go approach to organizing code by business domain with clear package boundaries
-- [module-organization](../typescript/module-organization.md) - TypeScript patterns for organizing modules by feature with clean import hierarchies
-
-### Related Python Patterns
-- [dependency-management](../../docs/bindings/categories/python/dependency-management.md) - Well-structured packages support cleaner dependency management and isolation
-- [testing-patterns](../../docs/bindings/categories/python/testing-patterns.md) - Good package structure enables more effective testing and test organization
-- [pyproject-toml-configuration](../../docs/bindings/categories/python/pyproject-toml-configuration.md) - Package metadata and build configuration should be centralized in pyproject.toml
-- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md) - Unified toolchain approach supports consistent package structure patterns
+- [modularity](../../../tenets/modularity.md): Package structure is the primary mechanism for creating modular systems in Python
+- [dependency-inversion](../../core/dependency-inversion.md): Proper package structure enables clean dependency management through clear interfaces
+- [interface-contracts](../../core/interface-contracts.md): Package APIs serve as contracts between different parts of the system
+- [pyproject-toml-configuration](../../docs/bindings/categories/python/pyproject-toml-configuration.md): Package metadata and configuration should be centralized in pyproject.toml

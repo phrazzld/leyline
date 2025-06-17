@@ -96,6 +96,6 @@ Always document versioning decisions and their rationale.
 
 ## Related Bindings
 
-- [rest-api-standards](./rest-api-standards.md): RESTful design principles that support versioning
-- [api-documentation-requirements](./api-documentation-requirements.md): Documenting version differences
+- [rest-api-standards](../../docs/bindings/categories/api/rest-api-standards.md): RESTful design principles that support versioning
+- [api-documentation-requirements](../../docs/bindings/categories/api/api-documentation-requirements.md): Documenting version differences
 - [preferred-technology-patterns](../../core/preferred-technology-patterns.md): Technology choices for version management

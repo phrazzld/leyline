@@ -140,6 +140,9 @@ jobs:
     - name: Validate index consistency
       run: ruby tools/reindex.rb --strict
 
+    - name: Validate document length limits
+      run: ruby tools/check_document_length.rb -v
+
     # Python code validation disabled - documentation examples don't need strict production validation
     # - name: Validate Python code examples
     #   run: ruby tools/validate_python_examples.rb -v

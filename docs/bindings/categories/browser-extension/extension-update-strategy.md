@@ -102,5 +102,5 @@ Always prioritize user communication even in exceptional circumstances.
 
 ## Related Bindings
 
-- [extension-permissions-model](./extension-permissions-model.md): Managing permission changes during updates
-- [cross-browser-compatibility](./cross-browser-compatibility.md): Update compatibility across browsers
+- [extension-permissions-model](../../docs/bindings/categories/browser-extension/extension-permissions-model.md): Managing permission changes during updates
+- [cross-browser-compatibility](../../docs/bindings/categories/browser-extension/cross-browser-compatibility.md): Update compatibility across browsers

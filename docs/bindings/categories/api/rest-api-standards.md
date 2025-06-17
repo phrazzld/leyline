@@ -95,6 +95,6 @@ Document why REST doesn't fit when deviating.
 
 ## Related Bindings
 
-- [api-versioning-strategy](./api-versioning-strategy.md): Versioning RESTful APIs
-- [api-documentation-requirements](./api-documentation-requirements.md): Documenting resource models
+- [api-versioning-strategy](../../docs/bindings/categories/api/api-versioning-strategy.md): Versioning RESTful APIs
+- [api-documentation-requirements](../../docs/bindings/categories/api/api-documentation-requirements.md): Documenting resource models
 - [toolchain-selection-criteria](../../core/toolchain-selection-criteria.md): Framework selection for API development
