@@ -67,7 +67,7 @@
         1. The final word count is confirmed to be between 200 and 400.
     - **Depends‑on:** [T005]
 
-- [ ] **T008 · Test · P1: review tenet for philosophical consistency and no content duplication**
+- [x] **T008 · Test · P1: review tenet for philosophical consistency and no content duplication**
     - **Context:** Philosophical Consistency Tests; Risk Assessment: Content Duplication
     - **Action:**
         1. Review the tenet to ensure it is understandable without implementation details.
@@ -76,7 +76,7 @@
         1. A peer reviewer confirms the tenet is purely philosophical and does not overlap with binding content.
     - **Depends‑on:** [T006, T007]
 
-- [ ] **T009 · Test · P1: verify cross-reference integrity**
+- [x] **T009 · Test · P1: verify cross-reference integrity**
     - **Context:** Content Quality Tests: Cross-Reference Integrity
     - **Action:**
         1. Manually click each link in a preview of `docs/tenets/observability.md`.
@@ -86,7 +86,7 @@
         1. Navigate through each link to its destination page.
     - **Depends‑on:** [T005]
 
-- [ ] **T010 · Test · P1: verify tenet is included in documentation index**
+- [x] **T010 · Test · P1: verify tenet is included in documentation index**
     - **Context:** Integration Tests: Index Generation
     - **Action:**
         1. Run the `ruby tools/reindex.rb` script.
@@ -97,7 +97,7 @@
         1. Check the git diff for the index file to see the new entry.
     - **Depends‑on:** [T006]
 
-- [ ] **T011 · Chore · P3: document implementation time and key decisions**
+- [x] **T011 · Chore · P3: document implementation time and key decisions**
     - **Context:** Logging & Observability Approach
     - **Action:**
         1. Track total time spent on the implementation.
