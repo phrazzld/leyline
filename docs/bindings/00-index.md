@@ -9,21 +9,21 @@ This file contains an automatically generated list of all bindings with their on
 | [api-design](./core/api-design.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring that the |
 | [automate-changelog](./core/automate-changelog.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual |
 | [automated-quality-gates](./core/automated-quality-gates.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating automated systems that prevent quality degradation before it begins. Quality gates... |
-| [centralized-configuration](./core/centralized-configuration.md) | 0.1.0 | This binding implements our DRY tenet by creating a single source of truth for all configuration knowledge in your system. When configuration value... |
+| [centralized-configuration](./core/centralized-configuration.md) | 0.1.0 | This binding implements our DRY tenet by creating a single source of truth for all configuration knowledge in your system. Like a master control pa... |
 | [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. CI/CD pipelines serve... |
 | [code-review-excellence](./core/code-review-excellence.md) | 0.1.0 | While automation can catch formatting issues, syntax errors, and common bugs, human review remains essential for evaluating design decisions, ident... |
 | [code-size](./core/code-size.md) | 0.1.0 | This binding implements our simplicity tenet by addressing the cognitive overhead |
 | [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding directly implements our modularity tenet by establishing a systematic |
 | [component-isolation](./core/component-isolation.md) | 0.1.0 | This binding directly implements our orthogonality tenet by eliminating unwanted coupling between components. When components are truly isolated, c... |
 | [comprehensive-security-automation](./core/comprehensive-security-automation.md) | 0.1.0 | This binding extends our automation tenet by establishing security as a foundational automation concern that must be woven throughout all platform ... |
-| [context-propagation](./core/context-propagation.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by making |
+| [context-propagation](./core/context-propagation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making cross-service relationships explicit through consistent context metadata. Like a... |
 | [continuous-learning-investment](./core/continuous-learning-investment.md) | 0.1.0 | This binding implements our maintainability tenet by ensuring that the people maintaining code have the knowledge and perspective needed to make go... |
 | [continuous-refactoring](./core/continuous-refactoring.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by establishing systematic practices that prevent code quality from degrading over time. Conti... |
 | [dependency-inversion](./core/dependency-inversion.md) | 0.1.0 | This binding directly implements our testability tenet by making code inherently more |
 | [dependency-management](./core/dependency-management.md) | 0.1.0 | This binding implements our simplicity tenet by addressing a major source of hidden |
 | [development-environment-consistency](./core/development-environment-consistency.md) | 0.1.0 | This binding applies our automation tenet to development environment management, transforming manual setup processes that are error-prone and time-... |
 | [external-configuration](./core/external-configuration.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by preventing one of |
-| [extract-common-logic](./core/extract-common-logic.md) | 0.1.0 | This binding directly implements our DRY tenet by eliminating knowledge duplication at the code level. When the same logic appears in multiple plac... |
+| [extract-common-logic](./core/extract-common-logic.md) | 0.1.0 | This binding implements our DRY tenet by eliminating knowledge duplication at the code level. Like creating a recipe book where each technique is d... |
 | [fail-fast-validation](./core/fail-fast-validation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function assumptions and constraints visible through immediate validation rather... |
 | [feature-flag-management](./core/feature-flag-management.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating software that can change behavior dynamically without requiring code c... |
 | [flexible-architecture-patterns](./core/flexible-architecture-patterns.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that can evolve gracefully over time. Software requirements ch... |
@@ -139,7 +139,7 @@ _No frontend bindings defined yet._
 | [orm-usage-patterns](./categories/database/orm-usage-patterns.md) | 0.1.0 | This binding directly implements our simplicity tenet by ensuring that database |
 | [query-optimization-and-indexing](./categories/database/query-optimization-and-indexing.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
 | [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding implements maintainability by ensuring that read replica patterns remain comprehensible and manageable as systems scale. Read replicas... |
-| [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding directly implements our modularity tenet by ensuring that database |
+| [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding implements our modularity tenet by treating transactions as well-defined, independent units of work with clear boundaries. Like shippi... |
 
 ## Python Bindings
 
@@ -165,7 +165,7 @@ _No frontend bindings defined yet._
 | ID | Version | Summary |
 |---|---|---|
 | [authentication-authorization-patterns](./categories/security/authentication-authorization-patterns.md) | 0.1.0 | This binding implements explicit-over-implicit by requiring that all authentication and authorization decisions be visible, documented, and intenti... |
-| [input-validation-standards](./categories/security/input-validation-standards.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by applying security-focused validation at every trust boundary in your system, b... |
+| [input-validation-standards](./categories/security/input-validation-standards.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by applying security-focused validation at every trust boundary. Like an immune system wit... |
 | [secrets-management-practices](./categories/security/secrets-management-practices.md) | 0.1.0 | This binding implements no-secret-suppression by preventing hardcoding or improper handling of secrets. It builds upon external-configuration princ... |
 | [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that security concerns be visible, documented, and intentional archi... |
 | [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding implements automation by transforming manual security reviews into systematic validation that runs consistently across all development... |

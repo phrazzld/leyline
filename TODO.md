@@ -1,5 +1,134 @@
 # Todo
 
+## CRITICAL: CI Failure Resolution - Document Length Violations
+- [ ] **CVF001 · Bug · P0: verify git state consistency between local and CI**
+    - **Context:** CI detecting 54 oversized documents, but local work suggests some were already fixed
+    - **Action:**
+        1. Run `git status` and `git log --oneline -5` to verify current branch state
+        2. Run `ruby tools/check_document_length.rb` locally to get current baseline
+        3. Compare local results with CI failure list from run 15692907801
+        4. Identify which documents are actually oversized vs CI environment issues
+    - **Done‑when:**
+        1. Accurate count of locally oversized documents established
+        2. Any git synchronization issues identified and resolved
+        3. Clear understanding of actual scope vs CI reported scope
+    - **Verification:** Local document count matches CI expectations or discrepancies explained
+    - **Depends‑on:** none
+
+- [ ] **CVF002 · Bug · P0: establish accurate document refactoring baseline**
+    - **Context:** Need precise understanding of current document status to plan systematic refactoring
+    - **Action:**
+        1. Generate comprehensive report using `ruby tools/analyze_verbosity_patterns.rb`
+        2. Cross-reference with `tools/refactoring-priority-matrix.md` to update priority classification
+        3. Create updated task list organized by tier (critical/moderate/minor violations)
+        4. Validate that refactoring infrastructure from CI003 is ready for batch processing
+    - **Done‑when:**
+        1. Complete list of oversized documents with current line counts
+        2. Updated priority matrix reflecting actual current state
+        3. Systematic refactoring plan ready for execution
+    - **Verification:** Documentation matches actual file state and provides clear execution roadmap
+    - **Depends‑on:** [CVF001]
+
+- [ ] **CVF003 · Refactor · P0: reduce 8 critical security/database documents (>1000 lines)**
+    - **Context:** Highest impact documents blocking CI - focus on worst offenders first
+    - **Action:**
+        1. Apply systematic refactoring to documents >1000 lines (secure-coding-checklist, secrets-management-practices, audit-logging-implementation, database-testing-strategies)
+        2. Use "one example rule" - single comprehensive example instead of multi-language
+        3. Focus on principles over tool-specific implementation details
+        4. Preserve essential security guidance while achieving 70%+ reduction
+    - **Done‑when:**
+        1. All 4 documents under 400-line limit
+        2. Core security/database principles preserved
+        3. Cross-references and integration points maintained
+    - **Verification:** `ruby tools/check_document_length.rb` passes for target documents
+    - **Depends‑on:** [CVF002]
+
+- [ ] **CVF004 · Refactor · P0: reduce 4 critical architecture documents (>1000 lines)**
+    - **Context:** Complete critical tier refactoring for documents blocking CI
+    - **Action:**
+        1. Apply systematic refactoring to remaining >1000 line documents (rust/configuration-management, read-replica-patterns, authentication-authorization-patterns, functional-composition-patterns)
+        2. Apply language-specific "one example rule" (Rust, TypeScript)
+        3. Focus on architectural patterns over implementation specifics
+        4. Maintain cross-references to related bindings
+    - **Done‑when:**
+        1. All 4 documents under 400-line limit
+        2. Architectural guidance preserved with improved conciseness
+        3. Language-specific patterns clearly demonstrated
+    - **Verification:** Document length validation passes and content quality maintained
+    - **Depends‑on:** [CVF003]
+
+- [ ] **CVF005 · Refactor · P1: batch refactor 20 moderate violations (500-999 lines)**
+    - **Context:** Apply systematic process to moderate-sized documents using CI003 infrastructure
+    - **Action:**
+        1. Use `ruby tools/batch_refactoring_workflow.rb 2` for tier 2 documents
+        2. Apply refactoring template consistently across all documents
+        3. Focus on consolidating repetitive content and verbose explanations
+        4. Target 40-60% reduction while preserving essential guidance
+    - **Done‑when:**
+        1. All moderate violation documents under 400-line limit
+        2. Consistent application of refactoring principles across documents
+        3. Quality preserved with improved readability
+    - **Verification:** Batch validation passes and no regressions in document quality
+    - **Depends‑on:** [CVF004]
+
+- [ ] **CVF006 · Refactor · P1: complete minor violations cleanup (26 documents 401-499 lines)**
+    - **Context:** Final phase to achieve complete CI compliance across all documents
+    - **Action:**
+        1. Apply targeted edits to documents with minor violations
+        2. Focus on tightening prose and removing redundant sections
+        3. Ensure minimal disruption to content while achieving compliance
+        4. Use automated validation throughout process
+    - **Done‑when:**
+        1. All 26 remaining documents under 400-line limit
+        2. Complete CI compliance achieved (0 violations)
+        3. Quality maintained with minimal content disruption
+    - **Verification:** `ruby tools/check_document_length.rb` shows 0 violations
+    - **Depends‑on:** [CVF005]
+
+- [ ] **CVF007 · Test · P1: comprehensive validation of all refactored documents**
+    - **Context:** Ensure all refactoring maintains quality standards and system integrity
+    - **Action:**
+        1. Run complete validation suite: `ruby tools/validate_front_matter.rb`
+        2. Verify cross-reference integrity: `ruby tools/fix_cross_references.rb`
+        3. Regenerate indexes: `ruby tools/reindex.rb --strict`
+        4. Spot-check content quality on high-impact refactored documents
+    - **Done‑when:**
+        1. All validation tools pass without errors
+        2. Cross-references resolve correctly
+        3. Indexes regenerate successfully with all content
+        4. Content quality spot-checks confirm value preservation
+    - **Verification:** Clean execution logs from all validation tools
+    - **Depends‑on:** [CVF006]
+
+- [ ] **CVF008 · Test · P1: verify CI compliance and prepare for merge**
+    - **Context:** Final verification that all changes resolve CI failure
+    - **Action:**
+        1. Run local document length validation to confirm 0 violations
+        2. Commit all refactored documents with comprehensive commit message
+        3. Push changes and verify CI status using `gh pr checks`
+        4. Monitor CI run to ensure validation step passes
+    - **Done‑when:**
+        1. Local validation shows 0 document length violations
+        2. All changes committed and pushed successfully
+        3. CI validation step passes without errors
+        4. PR ready for merge with all quality gates satisfied
+    - **Verification:** CI status shows all checks passing
+    - **Depends‑on:** [CVF007]
+
+- [ ] **CVF009 · Chore · P2: enhance refactoring process based on lessons learned**
+    - **Context:** Prevent similar CI failures through improved systematic processes
+    - **Action:**
+        1. Update `docs/systematic-refactoring-process.md` with lessons learned
+        2. Enhance `tools/batch_refactoring_workflow.rb` with any needed improvements
+        3. Document recommended cadence for large-scale document maintenance
+        4. Create guidance for verifying CI compliance before PR submission
+    - **Done‑when:**
+        1. Process documentation updated with practical improvements
+        2. Tooling enhanced based on real-world application experience
+        3. Clear guidelines for future large-scale refactoring efforts
+    - **Verification:** Updated documentation provides actionable guidance for future work
+    - **Depends‑on:** [CVF008]
+
 ## URGENT: Document Conciseness Refactoring and Enforcement
 - [x] **R001 · Chore · P0: implement document length enforcement hooks and CI**
     - **Context:** Prevent future verbose documents by enforcing 400-line limit on all tenets and bindings
