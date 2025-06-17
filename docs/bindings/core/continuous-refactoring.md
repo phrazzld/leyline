@@ -291,9 +291,9 @@ describe('OrderProcessor Refactoring', () => {
 
 ## Related Standards
 
-- [automated-quality-gates](automated-quality-gates.md): Quality gates that identify refactoring opportunities and validate improvements
-- [no-internal-mocking](no-internal-mocking.md): Testing practices that support safe refactoring
-- [technical-debt-tracking](technical-debt-tracking.md): Systematic tracking of code quality issues that drive refactoring priorities
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Quality gates that identify refactoring opportunities and validate improvements
+- [no-internal-mocking](../../docs/bindings/core/no-internal-mocking.md): Testing practices that support safe refactoring
+- [technical-debt-tracking](../../docs/bindings/core/technical-debt-tracking.md): Systematic tracking of code quality issues that drive refactoring priorities
 
 ## References
 

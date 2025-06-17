@@ -270,9 +270,9 @@ metrics.inc('logins'); // No context
 
 ## Related Standards
 
-- [context-propagation](context-propagation.md): Provides context management patterns that support observability correlation
-- [automated-quality-gates](automated-quality-gates.md): Quality gates that validate observability implementation
-- [fail-fast-validation](fail-fast-validation.md): Validation patterns that benefit from comprehensive observability
+- [context-propagation](../../docs/bindings/core/context-propagation.md): Provides context management patterns that support observability correlation
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Quality gates that validate observability implementation
+- [fail-fast-validation](../../docs/bindings/core/fail-fast-validation.md): Validation patterns that benefit from comprehensive observability
 
 ## References
 

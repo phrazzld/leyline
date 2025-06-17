@@ -222,6 +222,6 @@ app.post('/orders', contextMiddleware('order-service'), async (req, res) => {
 
 ## Related Bindings
 
-- [use-structured-logging](./use-structured-logging.md): Context propagation enables structured logs to include consistent correlation IDs, connecting logs across services into coherent distributed transaction narratives.
+- [use-structured-logging](../../docs/bindings/core/use-structured-logging.md): Context propagation enables structured logs to include consistent correlation IDs, connecting logs across services into coherent distributed transaction narratives.
 
-- [dependency-inversion](./dependency-inversion.md): Services should depend on context abstractions rather than specific implementations, allowing different propagation strategies while maintaining consistent behavior.
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Services should depend on context abstractions rather than specific implementations, allowing different propagation strategies while maintaining consistent behavior.

@@ -300,9 +300,9 @@ describe('DatabaseUserRepository', () => {
 
 ## Related Standards
 
-- [dependency-inversion](dependency-inversion.md): Provides dependency management patterns that support layer isolation
-- [interface-contracts](interface-contracts.md): Defines contract design that enables clean layer boundaries
-- [component-isolation](component-isolation.md): Component separation principles that complement layered architecture
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Provides dependency management patterns that support layer isolation
+- [interface-contracts](../../docs/bindings/core/interface-contracts.md): Defines contract design that enables clean layer boundaries
+- [component-isolation](../../docs/bindings/core/component-isolation.md): Component separation principles that complement layered architecture
 
 ## References
 

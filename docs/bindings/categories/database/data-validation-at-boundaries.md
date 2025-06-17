@@ -387,6 +387,6 @@ class UserRepository {
 
 - [input-validation-standards](../../categories/security/input-validation-standards.md): Database boundary validation must coordinate with general input validation to ensure consistent validation approaches across all system entry points.
 
-- [audit-logging-implementation](./audit-logging-implementation.md): Data validation failures should be logged for security monitoring and compliance, especially when validation failures might indicate malicious input attempts.
+- [audit-logging-implementation](../../docs/bindings/categories/database/audit-logging-implementation.md): Data validation failures should be logged for security monitoring and compliance, especially when validation failures might indicate malicious input attempts.
 
-- [transaction-management-patterns](./transaction-management-patterns.md): Validation failures should properly handle transaction rollback to ensure data consistency when validation occurs within database transactions.
+- [transaction-management-patterns](../../docs/bindings/categories/database/transaction-management-patterns.md): Validation failures should properly handle transaction rollback to ensure data consistency when validation occurs within database transactions.

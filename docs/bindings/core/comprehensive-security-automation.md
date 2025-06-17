@@ -342,6 +342,6 @@ jobs:
 
 - [secrets-management-practices](../categories/security/secrets-management-practices.md): Comprehensive security automation must integrate with proper secrets management to ensure credentials are never exposed in code or logs.
 
-- [automated-quality-gates](./automated-quality-gates.md): Security automation should integrate with quality gates to ensure security validation is part of the overall quality assurance process.
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Security automation should integrate with quality gates to ensure security validation is part of the overall quality assurance process.
 
-- [git-hooks-automation](./git-hooks-automation.md): Security automation depends on git hooks to prevent security issues from entering the codebase at the earliest possible stage.
+- [git-hooks-automation](../../docs/bindings/core/git-hooks-automation.md): Security automation depends on git hooks to prevent security issues from entering the codebase at the earliest possible stage.

@@ -333,4 +333,4 @@ async function createPost(req: AuthenticatedRequest, res: Response) {
 
 - [use-structured-logging](../core/use-structured-logging.md): Security event logging requires structured, searchable audit trails that support compliance reporting and security incident investigation.
 
-- [secure-by-design-principles](./secure-by-design-principles.md): Authentication and authorization patterns provide the foundational security controls that enable secure-by-design architecture through explicit identity verification and access control.
+- [secure-by-design-principles](../../docs/bindings/categories/security/secure-by-design-principles.md): Authentication and authorization patterns provide the foundational security controls that enable secure-by-design architecture through explicit identity verification and access control.

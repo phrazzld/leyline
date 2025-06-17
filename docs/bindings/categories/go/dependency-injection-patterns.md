@@ -348,8 +348,8 @@ func TestUserService_CreateUser(t *testing.T) {
 
 ## Related Bindings
 
-- [interface-design](./interface-design.md): Dependency injection requires well-designed interfaces that follow the Interface Segregation Principle and represent single capabilities rather than large, monolithic contracts.
+- [interface-design](../../docs/bindings/categories/go/interface-design.md): Dependency injection requires well-designed interfaces that follow the Interface Segregation Principle and represent single capabilities rather than large, monolithic contracts.
 
-- [package-design](./package-design.md): Effective dependency injection depends on proper package structure that avoids circular dependencies and places interface definitions in appropriate packages.
+- [package-design](../../docs/bindings/categories/go/package-design.md): Effective dependency injection depends on proper package structure that avoids circular dependencies and places interface definitions in appropriate packages.
 
 - [no-internal-mocking](../../core/no-internal-mocking.md): Dependency injection enables testing without internal mocking by making all external dependencies explicit and replaceable through interfaces.

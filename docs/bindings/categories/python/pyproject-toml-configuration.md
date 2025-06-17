@@ -12,43 +12,21 @@ All Python project configuration must be consolidated in pyproject.toml. Elimina
 
 ## Rationale
 
-This binding directly implements our simplicity tenet by eliminating a major source of accidental complexity—scattered configuration files across multiple formats and locations. Instead of managing separate files for dependencies (requirements.txt), package metadata (setup.py), tool configurations (setup.cfg, .flake8, mypy.ini), and build settings, teams get one canonical location that contains everything needed to understand and reproduce the project environment.
-
-Think of pyproject.toml like a project's constitution—a single document that defines all the fundamental rules and structures governing the project. Just as a constitution provides clarity and prevents conflicts between different laws, pyproject.toml prevents configuration conflicts and inconsistencies that arise when settings are scattered across multiple files. When everything is in one place, it's impossible for different configuration files to contain contradictory instructions.
-
-The cost of configuration fragmentation compounds over time. Each additional configuration file creates another place where settings can drift out of sync, another format to learn and remember, and another potential source of subtle bugs. Teams waste significant time debugging issues caused by configuration conflicts, outdated settings in forgotten files, or missing dependencies that weren't properly tracked. Consolidating everything into pyproject.toml eliminates these entire categories of problems while making the project structure immediately comprehensible to new team members.
+This binding implements our simplicity tenet by eliminating scattered configuration files across multiple formats. Instead of managing separate files for dependencies, package metadata, tool configurations, and build settings, teams get one canonical location. Configuration fragmentation creates drift, conflicts, subtle bugs, and wastes time debugging inconsistencies. Consolidating everything into pyproject.toml eliminates these problems while making projects immediately comprehensible.
 
 ## Rule Definition
 
-Modern Python projects must use pyproject.toml as the exclusive configuration mechanism:
+**Core Requirements:**
 
-**Required consolidation:**
-- **Project metadata** (name, version, description, authors) in `[project]` section
-- **Dependencies** in `[project.dependencies]` and `[project.optional-dependencies]`
-- **Build system** configuration in `[build-system]`
-- **All tool configurations** under respective `[tool.*]` sections
-
-**Prohibited legacy files:**
-- **setup.py** (except for complex build requirements that cannot be expressed in pyproject.toml)
-- **setup.cfg** (all settings must move to pyproject.toml)
-- **requirements.txt** and requirements-*.txt files (use pyproject.toml dependencies)
-- **Tool-specific config files** (.flake8, mypy.ini, pytest.ini, tox.ini) when pyproject.toml can handle the configuration
-
-**Migration requirements:**
-- Existing projects must migrate all scattered configuration to pyproject.toml
-- CI/CD pipelines must validate that prohibited files do not exist or contain deprecated configuration
-- Documentation must reflect the unified configuration approach
-
-**Acceptable exceptions:**
-- **Complex C extensions** that require custom setup.py logic (minimize and document)
-- **IDE-specific settings** that cannot be expressed in pyproject.toml
-- **Platform-specific configuration** that requires separate files for technical reasons
+- **Single Configuration File**: All project configuration must be in pyproject.toml exclusively
+- **Required Consolidation**: Project metadata in `[project]`, dependencies in `[project.dependencies]`, build system in `[build-system]`, tools in `[tool.*]`
+- **Prohibited Legacy Files**: No setup.py, setup.cfg, requirements.txt, .flake8, mypy.ini, pytest.ini, or similar tool-specific files
+- **Migration Mandate**: Existing projects must migrate all configuration; CI must validate no legacy files exist
+- **Limited Exceptions**: Only for complex C extensions, IDE-specific settings, or platform-specific technical requirements
 
 ## Practical Implementation
 
-### Complete pyproject.toml Template
-
-**Comprehensive configuration example:**
+**Complete pyproject.toml Configuration:**
 
 ```toml
 # Project metadata (replaces setup.py/setup.cfg)
@@ -58,26 +36,7 @@ version = "1.0.0"
 description = "A comprehensive Python project with modern configuration"
 readme = "README.md"
 license = {text = "MIT"}
-authors = [
-    {name = "Your Name", email = "your.email@example.com"},
-    {name = "Team Member", email = "teammate@example.com"},
-]
-maintainers = [
-    {name = "Lead Maintainer", email = "lead@example.com"},
-]
-keywords = ["python", "example", "modern"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
-
-# Python version requirements
+authors = [{name = "Your Name", email = "your.email@example.com"}]
 requires-python = ">=3.9"
 
 # Production dependencies (replaces requirements.txt)
@@ -85,243 +44,82 @@ dependencies = [
     "requests>=2.31.0",
     "pydantic>=2.0.0",
     "click>=8.1.0",
-    "rich>=13.0.0",
 ]
 
-# Optional dependencies (replaces requirements-dev.txt, etc.)
+# Optional dependencies (replaces requirements-dev.txt)
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "mypy>=1.5.0",
-    "ruff>=0.1.0",
-    "pre-commit>=3.3.0",
-]
+dev = ["pytest>=7.4.0", "mypy>=1.5.0", "ruff>=0.1.0"]
+test = ["pytest>=7.4.0", "pytest-cov>=4.1.0"]
 
-docs = [
-    "sphinx>=7.0.0",
-    "sphinx-rtd-theme>=1.3.0",
-    "myst-parser>=2.0.0",
-]
-
-test = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "pytest-xdist>=3.3.0",
-    "pytest-mock>=3.11.0",
-]
-
-# Project URLs
 [project.urls]
 Homepage = "https://github.com/username/my-awesome-project"
-Documentation = "https://my-awesome-project.readthedocs.io"
 Repository = "https://github.com/username/my-awesome-project.git"
-"Bug Tracker" = "https://github.com/username/my-awesome-project/issues"
-Changelog = "https://github.com/username/my-awesome-project/blob/main/CHANGELOG.md"
 
-# Entry points for CLI scripts
 [project.scripts]
 my-cli = "my_awesome_project.cli:main"
-awesome-tool = "my_awesome_project.tools:cli_entry"
 
 # Build system configuration (replaces setup.py)
 [build-system]
 requires = ["hatchling>=1.17.0"]
 build-backend = "hatchling.build"
 
-# Hatchling-specific configuration
-[tool.hatch.build.targets.wheel]
-packages = ["src/my_awesome_project"]
-
-[tool.hatch.version]
-path = "src/my_awesome_project/__init__.py"
-
-# uv configuration
-[tool.uv]
-dev-dependencies = [
-    "pytest>=7.4.0",
-    "mypy>=1.5.0",
-    "ruff>=0.1.0",
-]
-
-# ruff configuration (replaces .flake8, setup.cfg [flake8])
+# Tool configurations (replaces .flake8, mypy.ini, pytest.ini, etc.)
 [tool.ruff]
 target-version = "py39"
 line-length = 88
-select = ["E", "W", "F", "I", "B", "C4", "UP", "SIM"]
-ignore = ["E501"]
-exclude = [".git", ".venv", "__pycache__", "build", "dist"]
+select = ["E", "W", "F", "I", "B"]
 
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-
-[tool.ruff.isort]
-known-first-party = ["my_awesome_project"]
-
-# mypy configuration (replaces mypy.ini)
 [tool.mypy]
 python_version = "3.9"
 strict = true
-warn_return_any = true
-warn_unused_configs = true
-disallow_any_generics = true
-show_error_codes = true
 files = ["src", "tests"]
 
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-
-# pytest configuration (replaces pytest.ini)
 [tool.pytest.ini_options]
-minversion = "7.0"
 testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
-    "--strict-config",
-    "--verbose",
-    "--tb=short",
-    "--cov=src/my_awesome_project",
-    "--cov-report=term-missing",
-    "--cov-report=html",
+    "--cov=src",
     "--cov-fail-under=85",
 ]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-]
-filterwarnings = [
-    "error",
-    "ignore::UserWarning",
-    "ignore::DeprecationWarning",
-]
 
-# Coverage configuration (replaces .coveragerc)
 [tool.coverage.run]
 source = ["src"]
-omit = ["*/tests/*", "*/test_*.py"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
-
-# Pre-commit configuration (can be here or .pre-commit-config.yaml)
-[tool.pre-commit]
-repos = [
-    {repo = "https://github.com/astral-sh/ruff-pre-commit", rev = "v0.1.0", hooks = [
-        {id = "ruff", args = ["--fix"]},
-        {id = "ruff-format"}
-    ]},
-    {repo = "https://github.com/pre-commit/mirrors-mypy", rev = "v1.5.0", hooks = [
-        {id = "mypy", additional_dependencies = ["types-requests"]}
-    ]},
-]
+omit = ["*/tests/*"]
 ```
 
-### Migration Strategy
-
-**Step-by-step migration from legacy configuration:**
+**Migration Process:**
 
 ```bash
-# 1. Audit existing configuration files
-find . -name "setup.py" -o -name "setup.cfg" -o -name "requirements*.txt" \
-       -o -name ".flake8" -o -name "mypy.ini" -o -name "pytest.ini" \
-       -o -name "tox.ini" -o -name ".coveragerc"
+# 1. Audit existing files
+find . -name "setup.py" -o -name "requirements*.txt" -o -name ".flake8"
 
-# 2. Create comprehensive pyproject.toml
-# Use template above and migrate settings section by section
+# 2. Migrate to pyproject.toml using template above
 
-# 3. Test the migration
-uv sync  # Test dependency resolution
-uv run pytest  # Test pytest configuration
-uv run mypy .  # Test mypy configuration
-uv run ruff check .  # Test ruff configuration
+# 3. Test configuration
+uv sync && uv run pytest && uv run mypy . && uv run ruff check .
 
-# 4. Remove legacy files (after validation)
-rm setup.py setup.cfg requirements*.txt .flake8 mypy.ini pytest.ini .coveragerc
-
-# 5. Update CI/CD to validate pyproject.toml-only approach
+# 4. Remove legacy files after validation
+rm setup.py requirements*.txt .flake8 mypy.ini pytest.ini
 ```
 
-**Migration checklist by file type:**
-
-```yaml
-# Migration mapping reference
-Legacy Files -> pyproject.toml sections:
-
-setup.py -> [project], [build-system], [tool.hatch.*]
-setup.cfg -> [project], [tool.*] sections
-requirements.txt -> [project.dependencies]
-requirements-dev.txt -> [project.optional-dependencies.dev]
-.flake8 -> [tool.ruff]
-mypy.ini -> [tool.mypy]
-pytest.ini -> [tool.pytest.ini_options]
-tox.ini -> [tool.tox] (if using tox)
-.coveragerc -> [tool.coverage.*]
-```
-
-### Validation and Enforcement
-
-**CI validation example:**
+**CI Validation:**
 
 ```yaml
 # .github/workflows/validate-config.yml
 name: Configuration Validation
-on: [push, pull_request]
-
 jobs:
-  validate-config:
+  validate:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
-    - name: Check for prohibited config files
+    - name: Check for prohibited files
       run: |
-        LEGACY_FILES=(
-          "setup.py"
-          "setup.cfg"
-          "requirements.txt"
-          "requirements-dev.txt"
-          ".flake8"
-          "mypy.ini"
-          "pytest.ini"
-          ".coveragerc"
-        )
-
-        for file in "${LEGACY_FILES[@]}"; do
-          if [ -f "$file" ]; then
-            echo "❌ Legacy config file found: $file"
-            echo "All configuration must be in pyproject.toml"
-            exit 1
-          fi
-        done
-
-        echo "✅ No legacy config files found"
-
-    - name: Validate pyproject.toml
-      uses: astral-sh/setup-uv@v3
-    - run: uv sync --locked
-
-    - name: Test all tool configurations
-      run: |
-        uv run ruff check . --no-fix
-        uv run mypy .
-        uv run pytest --co -q  # Collection only, validate config
+        if ls setup.py requirements*.txt .flake8 2>/dev/null; then
+          echo "❌ Legacy config files found. Use pyproject.toml only."
+          exit 1
+        fi
+    - uses: astral-sh/setup-uv@v3
+    - run: uv sync --locked && uv run ruff check . && uv run mypy .
 ```
 
 ## Examples
@@ -329,46 +127,34 @@ jobs:
 ```bash
 # ❌ BAD: Fragmented configuration across multiple files
 my-project/
-├── setup.py              # Package metadata and dependencies
-├── setup.cfg              # Tool configurations
-├── requirements.txt       # Production dependencies
-├── requirements-dev.txt   # Development dependencies
-├── .flake8               # Linting configuration
-├── mypy.ini              # Type checking configuration
-├── pytest.ini            # Testing configuration
-├── .coveragerc           # Coverage configuration
-└── tox.ini               # Testing environments
+├── setup.py              # Package metadata
+├── requirements.txt       # Dependencies
+├── requirements-dev.txt   # Dev dependencies
+├── .flake8               # Linting config
+├── mypy.ini              # Type checking config
+└── pytest.ini            # Testing config
 
-# Developer needs to understand 9+ different file formats
+# Developer needs to understand 6+ different file formats
 # Risk of configuration conflicts and inconsistencies
-# Difficult to get complete picture of project setup
 ```
 
 ```bash
 # ✅ GOOD: Unified configuration in single file
 my-project/
 ├── pyproject.toml        # ALL configuration in one place
-├── src/
-│   └── my_project/
+├── src/my_project/
 └── tests/
 
-# Single source of truth for all project configuration
-# No configuration conflicts possible
-# Easy to understand complete project setup at a glance
+# Single source of truth, no conflicts possible
 ```
 
 ```toml
-# ❌ BAD: Mixed configuration approach (partial consolidation)
-# pyproject.toml (incomplete)
+# ❌ BAD: Partial consolidation with remaining separate files
 [project]
 name = "my-project"
 dependencies = ["requests"]
 
-# Plus these separate files still exist:
-# setup.cfg - tool configurations
-# requirements-dev.txt - dev dependencies
-# .flake8 - linting rules
-# mypy.ini - type checking
+# Plus: setup.cfg, requirements-dev.txt, .flake8, mypy.ini still exist
 ```
 
 ```toml
@@ -389,52 +175,13 @@ strict = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = ["--cov=src", "--strict-markers"]
-
-# Everything in one file, complete and consistent
-```
-
-```python
-# ❌ BAD: setup.py with complex dependency management
-from setuptools import setup, find_packages
-
-# Dependencies scattered and hard to manage
-setup(
-    name="my-project",
-    version="1.0.0",
-    packages=find_packages(),
-    install_requires=[
-        "requests",  # No version constraints
-        "click",     # Scattered across multiple files
-    ],
-    extras_require={
-        "dev": ["pytest", "mypy"],  # Incomplete specifications
-    }
-)
-```
-
-```toml
-# ✅ GOOD: Complete pyproject.toml specification
-[project]
-name = "my-project"
-version = "1.0.0"
-dependencies = [
-    "requests>=2.31.0,<3.0.0",
-    "click>=8.1.0",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.4.0",
-    "mypy>=1.5.0",
-    "ruff>=0.1.0",
-]
+addopts = ["--cov=src"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-# Clear, explicit, and complete
+# Everything in one file, complete and consistent
 ```
 
 ## Related Bindings

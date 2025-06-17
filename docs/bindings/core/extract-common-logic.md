@@ -130,6 +130,6 @@ class UserRegistrationForm {
 
 ## Related Bindings
 
-- [centralized-configuration](./centralized-configuration.md): Common logic extraction focuses on behavioral duplication while centralized configuration addresses data and settings duplication—together they create comprehensive DRY adherence.
+- [centralized-configuration](../../docs/bindings/core/centralized-configuration.md): Common logic extraction focuses on behavioral duplication while centralized configuration addresses data and settings duplication—together they create comprehensive DRY adherence.
 
-- [pure-functions](./pure-functions.md): Pure functions are ideal candidates for extraction because they have no side effects and can be safely reused across different contexts.
+- [pure-functions](../../docs/bindings/core/pure-functions.md): Pure functions are ideal candidates for extraction because they have no side effects and can be safely reused across different contexts.

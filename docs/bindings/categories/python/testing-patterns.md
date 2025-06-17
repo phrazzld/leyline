@@ -11,61 +11,47 @@ Write tests that verify behavior and outcomes, not internal implementation. Focu
 
 ## Rationale
 
-This binding implements our testability tenet by ensuring that tests provide meaningful feedback about system correctness rather than coupling to implementation details. It also supports our automation tenet by creating reliable automated verification that enables confident refactoring and continuous delivery.
-
-Think of testing like quality control in manufacturing. A good quality inspector doesn't check whether workers use specific tools or follow particular motions—they verify that the final product meets specifications. Similarly, good tests verify that your code produces correct outputs for given inputs, regardless of the internal algorithms used. When you test implementation details, you're like an inspector who rejects products because workers used a different wrench, even when the product works perfectly.
-
-Behavior-focused tests serve as living documentation for your system. When someone reads a test called `test_user_receives_welcome_email_after_registration()`, they immediately understand what the system should do. When they read `test_email_service_send_method_called_once()`, they only understand internal mechanics that might change. Tests should tell the story of what your system does for users, not the story of how your classes collaborate.
+This binding implements our testability tenet by ensuring that tests provide meaningful feedback about system correctness rather than coupling to implementation details. Good tests verify that your code produces correct outputs for given inputs, regardless of internal algorithms used. Behavior-focused tests serve as living documentation that tells the story of what your system does for users, not how classes collaborate internally.
 
 ## Rule Definition
 
-pytest provides powerful tools for writing expressive, maintainable tests. This binding requires:
+**Core Requirements:**
 
-**Required practices:**
-- Test behavior and outcomes, not method calls or internal state
-- Use descriptive test names that explain the expected behavior
-- Organize tests to mirror your package structure
-- Use fixtures for test setup and dependency injection
-- Achieve meaningful test coverage (focus on critical paths, not percentage targets)
+- **Test Behavior, Not Implementation**: Verify outcomes and external behavior, not method calls or internal state
+- **Descriptive Test Names**: Use names that explain expected behavior clearly
+- **Arrange-Act-Assert Structure**: Set up test data, perform action, verify outcome
+- **Test Independence**: Tests should not depend on each other or shared state
+- **One Behavior Per Test**: Each test verifies one specific behavior
+- **Use pytest Features**: Leverage fixtures, parametrization, and marks for maintainable tests
 
-**Prohibited practices:**
+**Prohibited Practices:**
 - Testing private methods directly
 - Asserting on internal state that users don't care about
 - Brittle tests that break when implementation changes but behavior doesn't
-- Massive test functions that test multiple behaviors
-
-**Testing principles:**
-- **Arrange-Act-Assert**: Set up test data, perform the action, verify the outcome
-- **One behavior per test**: Each test should verify one specific behavior
-- **Independence**: Tests should not depend on each other or shared state
+- Massive test functions testing multiple behaviors
 
 ## Practical Implementation
 
-### pytest Configuration
-
-**Configure pytest in pyproject.toml:**
+**pytest Configuration:**
 
 ```toml
+# pyproject.toml
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
-    "--strict-config",
     "--cov=src/myproject",
     "--cov-report=term-missing",
-    "--cov-report=html",
     "--cov-fail-under=85"
 ]
 markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "slow: marks tests as slow",
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests"
 ]
 ```
 
-### Test Organization
+**Test Organization:**
 
 ```
 tests/
@@ -74,22 +60,16 @@ tests/
 │   ├── test_user_models.py
 │   ├── test_user_services.py
 │   └── test_user_api.py
-├── test_orders/
-│   ├── test_order_models.py
-│   └── test_order_services.py
 └── integration/
-    ├── test_user_registration_flow.py
-    └── test_order_processing_flow.py
+    └── test_user_registration_flow.py
 ```
 
-### Fixture Patterns
-
-**Shared fixtures in conftest.py:**
+**Fixture Patterns:**
 
 ```python
+# conftest.py
 import pytest
 from unittest.mock import Mock
-from myproject.shared.database import create_test_db
 from myproject.users.models import User
 
 @pytest.fixture
@@ -103,11 +83,7 @@ def db_session():
 @pytest.fixture
 def sample_user():
     """Provide a sample user for testing."""
-    return User(
-        id=1,
-        email="test@example.com",
-        name="Test User"
-    )
+    return User(id=1, email="test@example.com", name="Test User")
 
 @pytest.fixture
 def mock_email_service():
@@ -140,9 +116,7 @@ def test_user_repository_save_method_called():
 
     # Testing that a method was called, not what the user experiences
     repo.save.assert_called_once()
-```
 
-```python
 # ✅ GOOD: Testing behavior and outcomes users care about
 def test_user_registration_creates_active_user_account(db_session, mock_email_service):
     """User registration should create an active account and send welcome email."""
@@ -178,15 +152,11 @@ def test_user_registration_fails_with_duplicate_email(db_session):
 def test_user_service_internal_validation():
     service = UserService()
 
-    # Testing internal private method
+    # Testing internal private methods
     assert service._validate_email_format("test@example.com") is True
     assert service._hash_password("password") != "password"
     assert len(service._generate_user_id()) == 36  # UUID length
 
-    # These tests break if we change internal implementation
-```
-
-```python
 # ✅ GOOD: Robust test focused on public behavior
 def test_user_service_email_validation():
     """User service should accept valid emails and reject invalid ones."""
@@ -207,29 +177,16 @@ def test_user_service_email_validation():
 ```python
 # ❌ BAD: Massive test function testing multiple behaviors
 def test_order_processing():
-    # This test does too much and is hard to debug when it fails
     order_service = OrderService()
 
-    # Creating order
+    # Creating order, processing payment, sending confirmation, updating inventory
     order = order_service.create_order(user_id=1, items=[{"id": 1, "qty": 2}])
     assert order.total == 20.00
 
-    # Processing payment
     payment_result = order_service.process_payment(order.id, "credit_card")
     assert payment_result.success is True
+    # ... more assertions - if any step fails, we don't know which behavior broke
 
-    # Sending confirmation
-    confirmation = order_service.send_confirmation(order.id)
-    assert confirmation.sent is True
-
-    # Updating inventory
-    inventory = order_service.update_inventory(order.id)
-    assert inventory.updated is True
-
-    # If any step fails, we don't know which behavior broke
-```
-
-```python
 # ✅ GOOD: Focused tests for individual behaviors
 def test_order_creation_calculates_correct_total():
     """Order creation should calculate total based on item prices and quantities."""
@@ -258,39 +215,10 @@ def test_payment_processing_succeeds_with_valid_card():
 
     assert result.success is True
     assert result.transaction_id is not None
-
-def test_order_confirmation_email_contains_order_details():
-    """Order confirmation should include order details in email."""
-    order_service = OrderService(mock_email_service)
-    order = create_sample_order()
-
-    order_service.send_confirmation(order.id)
-
-    # Verify email was sent with order details
-    sent_emails = mock_email_service.get_sent_emails()
-    assert len(sent_emails) == 1
-    assert order.id in sent_emails[0].body
-    assert str(order.total) in sent_emails[0].body
 ```
 
 ```python
-# ❌ BAD: Testing framework internals instead of business logic
-@pytest.mark.parametrize("input_value", [1, 2, 3])
-def test_pytest_parametrize_works(input_value):
-    # This tests pytest, not our code
-    assert isinstance(input_value, int)
-
-def test_mock_framework_functionality():
-    mock = Mock()
-    mock.some_method.return_value = "test"
-
-    # This tests the mock framework, not our business logic
-    assert mock.some_method() == "test"
-    assert mock.some_method.called is True
-```
-
-```python
-# ✅ GOOD: Using pytest features to test business logic comprehensively
+# Using pytest features effectively for business logic
 @pytest.mark.parametrize("email,password,should_succeed", [
     ("valid@example.com", "strong_password123", True),
     ("", "strong_password123", False),  # Empty email
@@ -329,24 +257,10 @@ def test_user_total_spent_calculation(user_with_orders):
 ```
 
 ```python
-# ❌ BAD: Integration test that's actually testing implementation
-def test_database_integration():
-    # This tests the database, not our business logic
-    session = create_db_session()
-    user = User(email="test@example.com")
-    session.add(user)
-    session.commit()
-
-    retrieved = session.query(User).filter_by(email="test@example.com").first()
-    assert retrieved.email == "test@example.com"
-    # This is testing SQLAlchemy, not our domain logic
-```
-
-```python
 # ✅ GOOD: Integration test focused on business workflows
+@pytest.mark.integration
 def test_complete_user_registration_workflow(db_session):
     """Complete user registration workflow should create user and send welcome email."""
-    # This tests the entire business process from end to end
     email_service = EmailService()
     user_service = UserService(db_session, email_service)
 
@@ -370,41 +284,15 @@ def test_complete_user_registration_workflow(db_session):
     assert authenticated_user.id == saved_user.id
 ```
 
-## Test Categories and Strategies
+## Test Categories
 
-### Unit Tests
-- Test individual functions and methods in isolation
-- Use mocks for external dependencies
-- Fast execution (< 100ms per test)
-- Focus on edge cases and error conditions
-
-### Integration Tests
-- Test interactions between components
-- Use real implementations where possible
-- Test complete business workflows
-- Verify data flows correctly through system boundaries
-
-### End-to-End Tests
-- Test complete user journeys
-- Use minimal mocking
-- Test critical business scenarios
-- Slower but provide highest confidence
+- **Unit Tests**: Test individual functions in isolation, use mocks for external dependencies, fast execution
+- **Integration Tests**: Test interactions between components, use real implementations, verify data flows
+- **End-to-End Tests**: Test complete user journeys with minimal mocking, slower but highest confidence
 
 ## Related Bindings
 
-### Core Tenets & Bindings
-- [testability](../../../tenets/testability.md) - Code should be designed to make testing straightforward and meaningful
-- [automation](../../../tenets/automation.md) - Testing should be automated to provide continuous feedback and enable confident refactoring
-- [no-internal-mocking](../../core/no-internal-mocking.md) - Avoid mocking internal collaborators; refactor for testability instead
-- [dependency-inversion](../../core/dependency-inversion.md) - Proper dependency injection enables effective testing without tight coupling
-
-### Language-Specific Analogies
-- [interface-design](../go/interface-design.md) - Go testing approaches that leverage interfaces for clean, testable code
-- [functional-composition-patterns](../typescript/functional-composition-patterns.md) - TypeScript patterns for composable, testable functions
-
-### Related Python Patterns
-- [type-hinting](../../docs/bindings/categories/python/type-hinting.md) - Explicit type hints enable more effective testing by catching errors at development time
-- [error-handling](../../docs/bindings/categories/rust/error-handling.md) - Explicit error handling enables comprehensive testing of both success and failure scenarios
-- [package-structure](../../docs/bindings/categories/python/package-structure.md) - Well-organized packages enable focused, maintainable test suites
-- [modern-python-toolchain](../../docs/bindings/categories/python/modern-python-toolchain.md) - pytest configuration and test automation are integral parts of the unified Python toolchain
-- [ruff-code-quality](../../docs/bindings/categories/python/ruff-code-quality.md) - Code quality standards apply to test code to ensure maintainable and reliable test suites
+- [testability](../../../tenets/testability.md): Code should be designed to make testing straightforward and meaningful
+- [no-internal-mocking](../../core/no-internal-mocking.md): Avoid mocking internal collaborators; refactor for testability instead
+- [type-hinting](../../docs/bindings/categories/python/type-hinting.md): Explicit type hints enable more effective testing by catching errors at development time
+- [package-structure](../../docs/bindings/categories/python/package-structure.md): Well-organized packages enable focused, maintainable test suites

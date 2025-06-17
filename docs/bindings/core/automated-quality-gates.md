@@ -300,9 +300,9 @@ jobs:
 
 ## Related Standards
 
-- [ci-cd-pipeline-standards](ci-cd-pipeline-standards.md): Pipeline architecture that implements these quality gates
-- [git-hooks-automation](git-hooks-automation.md): Pre-commit validation that provides immediate quality feedback
-- [use-structured-logging](use-structured-logging.md): Observability practices that support quality gate monitoring
+- [ci-cd-pipeline-standards](../../docs/bindings/core/ci-cd-pipeline-standards.md): Pipeline architecture that implements these quality gates
+- [git-hooks-automation](../../docs/bindings/core/git-hooks-automation.md): Pre-commit validation that provides immediate quality feedback
+- [use-structured-logging](../../docs/bindings/core/use-structured-logging.md): Observability practices that support quality gate monitoring
 
 ## References
 

@@ -393,8 +393,8 @@ echo "✅ Security checklist passed!"
 
 - [fix-broken-windows](../../tenets/fix-broken-windows.md): Security checklist automation prevents security "broken windows" by catching security issues immediately when they're introduced and requiring immediate resolution rather than allowing them to accumulate as technical debt.
 
-- [input-validation-standards](./input-validation-standards.md): Security checklist automation includes comprehensive validation of input security standards through automated testing and static analysis.
+- [input-validation-standards](../../docs/bindings/categories/security/input-validation-standards.md): Security checklist automation includes comprehensive validation of input security standards through automated testing and static analysis.
 
-- [secrets-management-practices](./secrets-management-practices.md): Security checklist automation includes comprehensive secret detection and validation as core checklist items that must be satisfied before code changes are accepted.
+- [secrets-management-practices](../../docs/bindings/categories/security/secrets-management-practices.md): Security checklist automation includes comprehensive secret detection and validation as core checklist items that must be satisfied before code changes are accepted.
 
 - [no-secret-suppression](../../tenets/no-secret-suppression.md): Security checklist automation never allows bypassing or suppressing security controls, ensuring that all security validation must be completed successfully before code changes are accepted.

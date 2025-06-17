@@ -229,9 +229,9 @@ test('with transactional isolation', async () => {
 
 ## Related Standards
 
-- [test-environment-management](test-environment-management.md): Defines the infrastructure setup that supports isolated test data management
-- [test-pyramid-implementation](test-pyramid-implementation.md): Establishes testing strategy that determines appropriate data management approaches
-- [automated-quality-gates](automated-quality-gates.md): Quality gates that validate test data management practices
+- [test-environment-management](../../docs/bindings/core/test-environment-management.md): Defines the infrastructure setup that supports isolated test data management
+- [test-pyramid-implementation](../../docs/bindings/core/test-pyramid-implementation.md): Establishes testing strategy that determines appropriate data management approaches
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Quality gates that validate test data management practices
 
 ## References
 

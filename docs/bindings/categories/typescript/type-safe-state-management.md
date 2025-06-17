@@ -213,4 +213,4 @@ function userReducer(state: UserState, action: UserAction): UserState {
 
 - [component-isolation](../../core/component-isolation.md): Type-safe state management implements component isolation by creating clear boundaries between state domains, preventing coupling and enabling independent evolution.
 
-- [async-patterns](./async-patterns.md): Async state management requires type-safe patterns for handling loading, success, and error states that complement this binding's state modeling approach.
+- [async-patterns](../../docs/bindings/categories/typescript/async-patterns.md): Async state management requires type-safe patterns for handling loading, success, and error states that complement this binding's state modeling approach.

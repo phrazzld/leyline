@@ -13,7 +13,7 @@ This file contains an automatically generated list of all bindings with their on
 | [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. CI/CD pipelines serve... |
 | [code-review-excellence](./core/code-review-excellence.md) | 0.1.0 | While automation can catch formatting issues, syntax errors, and common bugs, human review remains essential for evaluating design decisions, ident... |
 | [code-size](./core/code-size.md) | 0.1.0 | This binding implements our simplicity tenet by addressing the cognitive overhead |
-| [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding directly implements our modularity tenet by establishing a systematic |
+| [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding implements our modularity tenet by establishing systematic frontend component organization. User interfaces combine hundreds of intera... |
 | [component-isolation](./core/component-isolation.md) | 0.1.0 | This binding directly implements our orthogonality tenet by eliminating unwanted coupling between components. When components are truly isolated, c... |
 | [comprehensive-security-automation](./core/comprehensive-security-automation.md) | 0.1.0 | This binding extends our automation tenet by establishing security as a foundational automation concern that must be woven throughout all platform ... |
 | [context-propagation](./core/context-propagation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making cross-service relationships explicit through consistent context metadata. Like a... |
@@ -26,14 +26,14 @@ This file contains an automatically generated list of all bindings with their on
 | [extract-common-logic](./core/extract-common-logic.md) | 0.1.0 | This binding implements our DRY tenet by eliminating knowledge duplication at the code level. Like creating a recipe book where each technique is d... |
 | [fail-fast-validation](./core/fail-fast-validation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function assumptions and constraints visible through immediate validation rather... |
 | [feature-flag-management](./core/feature-flag-management.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating software that can change behavior dynamically without requiring code c... |
-| [flexible-architecture-patterns](./core/flexible-architecture-patterns.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that can evolve gracefully over time. Software requirements ch... |
+| [flexible-architecture-patterns](./core/flexible-architecture-patterns.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that evolve gracefully over time. Software requirements change... |
 | [git-hooks-automation](./core/git-hooks-automation.md) | 0.1.0 | This binding directly implements our automation tenet by eliminating manual quality checks that are prone to human error and inconsistent applicati... |
-| [hex-domain-purity](./core/hex-domain-purity.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
+| [hex-domain-purity](./core/hex-domain-purity.md) | 0.1.0 | This binding implements our simplicity tenet by eliminating entanglement between business rules and technical implementations. Mixed concerns creat... |
 | [immutable-by-default](./core/immutable-by-default.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
 | [incremental-delivery](./core/incremental-delivery.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating a delivery process that prioritizes safety, speed, and adaptability ov... |
-| [interface-contracts](./core/interface-contracts.md) | 0.1.0 | This binding implements our orthogonality tenet by creating clear boundaries and expectations between components. Well-defined interface contracts ... |
+| [interface-contracts](./core/interface-contracts.md) | 0.1.0 | This binding implements our orthogonality tenet by creating clear boundaries between components. Well-defined interface contracts enable components... |
 | [layered-architecture](./core/layered-architecture.md) | 0.1.0 | This binding implements our orthogonality tenet by creating structured separation between different levels of abstraction and responsibility. Layer... |
-| [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding directly implements our testability tenet by forcing you to design code |
+| [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding implements our testability tenet by ensuring tests verify real system behavior rather than mock behavior. Internal mocking creates dan... |
 | [no-lint-suppression](./core/no-lint-suppression.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by requiring |
 | [normalized-data-design](./core/normalized-data-design.md) | 0.1.0 | This binding implements our DRY tenet at the data layer by ensuring that knowledge represented in data exists in only one location. When the same i... |
 | [performance-testing-standards](./core/performance-testing-standards.md) | 0.1.0 | Performance problems discovered in production are exponentially more expensive to fix than those caught during development. Most teams discover per... |
@@ -77,12 +77,12 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [concurrency-patterns](./categories/go/concurrency-patterns.md) | 0.1.0 | This binding directly implements our simplicity tenet by protecting against one of the |
+| [concurrency-patterns](./categories/go/concurrency-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by preventing uncontrolled concurrency complexity. Each `go` statement creates potential non-determini... |
 | [dependency-injection-patterns](./categories/go/dependency-injection-patterns.md) | 0.1.0 | This binding implements our orthogonality tenet by using Go's interface system to create truly independent components that can be developed, tested... |
 | [error-context-propagation](./categories/go/error-context-propagation.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by preventing the decay of error information quality over time. When errors lose context as th... |
 | [error-wrapping](./categories/go/error-wrapping.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error context and |
 | [interface-design](./categories/go/interface-design.md) | 0.1.0 | This binding directly implements our testability tenet by enabling clean, flexible |
-| [package-design](./categories/go/package-design.md) | 0.1.0 | This binding directly implements our modularity tenet by establishing clear, |
+| [package-design](./categories/go/package-design.md) | 0.1.0 | This binding implements our modularity tenet by establishing clear, well-defined boundaries for Go code organization. Package design is the primary... |
 
 ## Rust Bindings
 
@@ -97,7 +97,7 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [async-patterns](./categories/typescript/async-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by addressing one of the most common |
+| [async-patterns](./categories/typescript/async-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by establishing clear patterns for asynchronous code flow in TypeScript. Async programming introduces ... |
 | [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | This binding implements DRY by using functional composition to create single, authoritative representations of knowledge reusable across different ... |
 | [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, |
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
@@ -132,12 +132,12 @@ _No frontend bindings defined yet._
 | ID | Version | Summary |
 |---|---|---|
 | [audit-logging-implementation](./categories/database/audit-logging-implementation.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
-| [connection-pooling-standards](./categories/database/connection-pooling-standards.md) | 0.1.0 | This binding directly implements our simplicity tenet by ensuring that database |
+| [connection-pooling-standards](./categories/database/connection-pooling-standards.md) | 0.1.0 | This binding implements our simplicity tenet by ensuring database connection management remains predictable and maintainable. Database connections ... |
 | [data-validation-at-boundaries](./categories/database/data-validation-at-boundaries.md) | 0.1.0 | This binding directly implements our modularity tenet by ensuring that each |
 | [database-testing-strategies](./categories/database/database-testing-strategies.md) | 0.1.0 | This binding directly implements our testability tenet by ensuring that database |
 | [migration-management-strategy](./categories/database/migration-management-strategy.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating the complexity |
-| [orm-usage-patterns](./categories/database/orm-usage-patterns.md) | 0.1.0 | This binding directly implements our simplicity tenet by ensuring that database |
-| [query-optimization-and-indexing](./categories/database/query-optimization-and-indexing.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
+| [orm-usage-patterns](./categories/database/orm-usage-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by ensuring that database interactions remain predictable and performant. ORMs promise to simplify dat... |
+| [query-optimization-and-indexing](./categories/database/query-optimization-and-indexing.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by ensuring database performance decisions are visible and intentional. Database optimizer... |
 | [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding implements maintainability by ensuring that read replica patterns remain comprehensible and manageable as systems scale. Read replicas... |
 | [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding implements our modularity tenet by treating transactions as well-defined, independent units of work with clear boundaries. Like shippi... |
 
@@ -148,8 +148,8 @@ _No frontend bindings defined yet._
 | [python-dependency-management](./categories/python/dependency-management.md) | 0.1.0 | This binding implements automation by transforming manual dependency management into automated, reproducible processes. It creates explicit, versio... |
 | [python-error-handling](./categories/python/error-handling.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error handling strategies visible and intentional rather than hidden behind catc... |
 | [modern-python-toolchain](./categories/python/modern-python-toolchain.md) | 0.1.0 | This binding directly implements our automation tenet by establishing a unified toolchain that automates all essential development tasks—dependency... |
-| [package-structure](./categories/python/package-structure.md) | 0.1.0 | This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. It also supports... |
-| [pyproject-toml-configuration](./categories/python/pyproject-toml-configuration.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of accidental complexity—scattered configuration files across m... |
+| [package-structure](./categories/python/package-structure.md) | 0.1.0 | This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. Good package str... |
+| [pyproject-toml-configuration](./categories/python/pyproject-toml-configuration.md) | 0.1.0 | This binding implements our simplicity tenet by eliminating scattered configuration files across multiple formats. Instead of managing separate fil... |
 | [ruff-code-quality](./categories/python/ruff-code-quality.md) | 0.1.0 | This binding implements our automation tenet by consolidating multiple manual and fragmented code quality tools into a single, lightning-fast solut... |
 | [testing-patterns](./categories/python/testing-patterns.md) | 0.1.0 | This binding implements our testability tenet by ensuring that tests provide meaningful feedback about system correctness rather than coupling to i... |
 | [type-hinting](./categories/python/type-hinting.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function contracts and data structures visible through the type system rather th... |
@@ -158,7 +158,7 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [state-management](./categories/react/state-management.md) | 0.1.0 | This binding directly implements our simplicity tenet by addressing one of the most |
+| [state-management](./categories/react/state-management.md) | 0.1.0 | This binding implements our simplicity tenet by preventing state management over-engineering. Global stores for all state create complexity, unpred... |
 
 ## Security Bindings
 
@@ -174,4 +174,4 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [web-accessibility](./categories/web/web-accessibility.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring |
+| [web-accessibility](./categories/web/web-accessibility.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring developers to make accessibility considerations explicit rather than assuming... |

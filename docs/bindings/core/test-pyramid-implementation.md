@@ -191,9 +191,9 @@ Track and maintain pyramid health with these metrics:
 
 ## Related Standards
 
-- [test-data-management](test-data-management.md): Provides data creation strategies that support pyramid isolation requirements
-- [test-environment-management](test-environment-management.md): Defines infrastructure supporting different test layers
-- [automated-quality-gates](automated-quality-gates.md): Quality gates that enforce pyramid distribution and performance requirements
+- [test-data-management](../../docs/bindings/core/test-data-management.md): Provides data creation strategies that support pyramid isolation requirements
+- [test-environment-management](../../docs/bindings/core/test-environment-management.md): Defines infrastructure supporting different test layers
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Quality gates that enforce pyramid distribution and performance requirements
 
 ## References
 

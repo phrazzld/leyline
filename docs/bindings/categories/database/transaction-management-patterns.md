@@ -242,6 +242,6 @@ async function processOrderPayment(orderId: number, amount: number) {
 
 ## Related Bindings
 
-- [migration-management-strategy](./migration-management-strategy.md): Transaction management patterns complement migration strategies by ensuring both schema changes and data operations maintain proper boundaries.
+- [migration-management-strategy](../../docs/bindings/categories/database/migration-management-strategy.md): Transaction management patterns complement migration strategies by ensuring both schema changes and data operations maintain proper boundaries.
 
 - [fail-fast-validation](../../core/fail-fast-validation.md): Transaction boundaries should include input validation to fail fast when preconditions aren't met, preventing invalid operations from beginning transactions.

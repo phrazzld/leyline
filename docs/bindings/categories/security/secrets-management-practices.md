@@ -279,7 +279,7 @@ class SecureConfigurationManager {
 
 - [external-configuration](../core/external-configuration.md): Secrets management builds upon external configuration by ensuring sensitive data is not only externalized but properly secured and managed.
 
-- [secure-by-design-principles](./secure-by-design-principles.md): Secrets management provides the secure credential handling foundation that enables other security controls.
+- [secure-by-design-principles](../../docs/bindings/categories/security/secure-by-design-principles.md): Secrets management provides the secure credential handling foundation that enables other security controls.
 
 - [comprehensive-security-automation](../core/comprehensive-security-automation.md): Secrets management practices are enforced through automated detection, scanning, and monitoring systems.
 

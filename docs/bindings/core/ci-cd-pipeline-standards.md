@@ -258,9 +258,9 @@ jobs:
 
 ## Related Standards
 
-- [git-hooks-automation](git-hooks-automation.md): Pre-commit validation that complements CI/CD pipeline checks
-- [automated-quality-gates](automated-quality-gates.md): Quality enforcement mechanisms integrated into pipeline stages
-- [comprehensive-security-automation](comprehensive-security-automation.md): Security automation patterns for pipeline integration
+- [git-hooks-automation](../../docs/bindings/core/git-hooks-automation.md): Pre-commit validation that complements CI/CD pipeline checks
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Quality enforcement mechanisms integrated into pipeline stages
+- [comprehensive-security-automation](../../docs/bindings/core/comprehensive-security-automation.md): Security automation patterns for pipeline integration
 
 ## References
 

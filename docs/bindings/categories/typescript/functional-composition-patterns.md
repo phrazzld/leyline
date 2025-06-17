@@ -393,7 +393,7 @@ class UserService {
 
 - [extract-common-logic](../../core/extract-common-logic.md): Functional composition is TypeScript's primary mechanism for extracting common logic into reusable utilities that eliminate duplication while maintaining type safety.
 
-- [no-any](./no-any.md): Type-safe functional composition depends on avoiding `any` types to maintain compile-time guarantees through generic functions and proper type constraints.
+- [no-any](../../docs/bindings/categories/typescript/no-any.md): Type-safe functional composition depends on avoiding `any` types to maintain compile-time guarantees through generic functions and proper type constraints.
 
 - [component-isolation](../../core/component-isolation.md): Functional composition supports component isolation by creating reusable logic that doesn't depend on specific implementations.
 

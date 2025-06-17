@@ -155,9 +155,9 @@ jobs:
 
 ## Related Standards
 
-- [automated-quality-gates](automated-quality-gates.md): Defines quality gate implementation that includes performance thresholds
-- [quality-metrics-and-monitoring](quality-metrics-and-monitoring.md): Establishes performance metrics tracked in quality dashboards
-- [ci-cd-pipeline-standards](ci-cd-pipeline-standards.md): Pipeline integration for automated performance validation
+- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Defines quality gate implementation that includes performance thresholds
+- [quality-metrics-and-monitoring](../../docs/bindings/core/quality-metrics-and-monitoring.md): Establishes performance metrics tracked in quality dashboards
+- [ci-cd-pipeline-standards](../../docs/bindings/core/ci-cd-pipeline-standards.md): Pipeline integration for automated performance validation
 
 ## References
 

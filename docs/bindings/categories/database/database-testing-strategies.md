@@ -344,6 +344,6 @@ class UserController {
   requires systematic test data creation, cleanup, and isolation strategies to
   ensure tests are predictable and don't interfere with each other.
 
-- [transaction-management-patterns](./transaction-management-patterns.md): Database
+- [transaction-management-patterns](../../docs/bindings/categories/database/transaction-management-patterns.md): Database
   testing must understand and properly handle transaction boundaries to ensure
   test isolation and accurate testing of rollback scenarios.

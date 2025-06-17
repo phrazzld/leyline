@@ -393,7 +393,7 @@ where
 
 - [component-isolation](../../core/component-isolation.md): Trait composition enables component isolation by creating behavior boundaries that prevent coupling, allowing independent development and testing.
 
-- [ownership-patterns](./ownership-patterns.md): Rust's ownership system and trait composition work together to ensure memory safety while enabling flexible composition.
+- [ownership-patterns](../../docs/bindings/categories/rust/ownership-patterns.md): Rust's ownership system and trait composition work together to ensure memory safety while enabling flexible composition.
 
 - [extract-common-logic](../../core/extract-common-logic.md): Trait composition provides Rust's primary mechanism for extracting and reusing common logic across types through blanket implementations and associated types.
 

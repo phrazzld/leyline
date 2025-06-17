@@ -189,4 +189,4 @@ app.post('/users', async (req, res) => {
 
 - [fail-fast-validation](../../core/fail-fast-validation.md): Input validation standards build upon fail-fast validation principles by adding security-specific validation rules and threat detection.
 
-- [secure-by-design-principles](./secure-by-design-principles.md): Input validation is a foundational component of secure-by-design architecture, providing the first line of defense against external threats.
+- [secure-by-design-principles](../../docs/bindings/categories/security/secure-by-design-principles.md): Input validation is a foundational component of secure-by-design architecture, providing the first line of defense against external threats.
