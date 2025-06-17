@@ -1,0 +1,557 @@
+{"time":"2025-06-17T14:53:25.954302-07:00","level":"INFO","msg":"Starting thinktank - AI-assisted content generation tool","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.95462-07:00","level":"INFO","msg":"Initializing registry","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.954652-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955325-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955601-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955606-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955611-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955614-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955618-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955621-07:00","level":"INFO","msg":"Available API keys: openrouter (OPENROUTER_API_KEY), openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955624-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955627-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955629-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955632-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955635-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955638-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955641-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955643-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955646-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955649-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955651-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955654-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955657-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955664-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955666-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955668-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.95567-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955672-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955674-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955681-07:00","level":"INFO","msg":"Models configuration loaded: 3 providers, 12 models","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955684-07:00","level":"INFO","msg":"Provider 'gemini' has 2 registered models","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955687-07:00","level":"INFO","msg":"Provider 'openai' has 3 registered models","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955689-07:00","level":"INFO","msg":"Provider 'openrouter' has 7 registered models","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955694-07:00","level":"INFO","msg":"Registry initialized successfully","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955696-07:00","level":"INFO","msg":"Registry initialized successfully","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955716-07:00","level":"INFO","msg":"Generated output directory: /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955762-07:00","level":"INFO","msg":"Using output directory: /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955787-07:00","level":"INFO","msg":"Successfully read instructions from /var/folders/jr/0kj0xfdd4s1ggs921sr2d7f80000gn/T/thinktank-template-f5gicd66.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955797-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.955812-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956001-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956004-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956006-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956008-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.95601-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956016-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956018-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.95602-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956022-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956025-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956027-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956029-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956031-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956033-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956035-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956037-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956039-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956041-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956043-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956045-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956047-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956049-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956051-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956053-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956055-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.956102-07:00","level":"INFO","msg":"Starting processing","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.95611-07:00","level":"INFO","msg":"Gathering project context from 25 paths...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.964591-07:00","level":"INFO","msg":"Verbose: Processing file (1/1): /Users/phaedrus/Development/leyline/PLAN.md (size: 6543 bytes)\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.972626-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/announcements/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.979992-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/bindings/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.987012-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/data/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:25.993882-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/decisions/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.001003-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/design/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.008002-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.017201-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/integration/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.024504-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/templates/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.031457-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/docs/tenets/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.038318-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/consumer-direct-copy/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.045154-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/consumer-git-submodule/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.051936-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/consumer-workflows/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.058547-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/github-workflows/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.065327-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.071946-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/platform-integration/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.078626-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/pre-commit/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.085398-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/examples/renovate/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.092202-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.099146-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/lib/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.105926-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/process/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.113419-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/research/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.121289-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/spec/fixtures/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.129095-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/spec/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136474-07:00","level":"INFO","msg":"Verbose: Git ignored: /Users/phaedrus/Development/leyline/tools/glance.md\n","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136508-07:00","level":"INFO","msg":"Calculating statistics for 1 processed files...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136523-07:00","level":"INFO","msg":"Context gathered: 1 files, 157 lines, 6544 chars","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136551-07:00","level":"INFO","msg":"Prompt constructed successfully","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136555-07:00","level":"INFO","msg":"Beginning model processing","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136558-07:00","level":"INFO","msg":"Concurrency limited to 5 simultaneous requests","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13656-07:00","level":"INFO","msg":"Rate limited to 60 requests per minute per model","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136563-07:00","level":"INFO","msg":"Processing 12 models concurrently...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136706-07:00","level":"INFO","msg":"Processing model: openrouter/x-ai/grok-3-mini-beta","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13668-07:00","level":"INFO","msg":"Processing model: openrouter/deepseek/deepseek-chat-v3-0324","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136694-07:00","level":"INFO","msg":"Processing model: openrouter/x-ai/grok-3-beta","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136858-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136757-07:00","level":"INFO","msg":"Processing model: openrouter/meta-llama/llama-4-scout","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136893-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.1369-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136765-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136833-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136915-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136771-07:00","level":"INFO","msg":"Processing model: openrouter/deepseek/deepseek-r1-0528","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.136942-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.137061-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.137109-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138332-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13834-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138348-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138353-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138358-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138361-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138366-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138369-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138372-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138375-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138378-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138381-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138386-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138388-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138391-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138394-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138398-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138401-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138411-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138414-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13842-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138425-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138427-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13843-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138433-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138435-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.138457-07:00","level":"INFO","msg":"Generating output with model openrouter/deepseek/deepseek-chat-v3-0324...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139112-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139116-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13912-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139124-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139127-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139132-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139134-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139146-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13915-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139152-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139154-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139157-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139159-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139168-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139171-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139174-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139177-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139179-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139186-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139182-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139203-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139207-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139306-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13931-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139314-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139315-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139322-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139326-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139329-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139317-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13934-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139345-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139209-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13938-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139386-07:00","level":"INFO","msg":"Available API keys: openrouter (OPENROUTER_API_KEY), openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139405-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139408-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139333-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139352-07:00","level":"INFO","msg":"Generating output with model openrouter/x-ai/grok-3-beta...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139411-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139448-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139459-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139464-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139468-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13945-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139476-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13948-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139431-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139491-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139495-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139499-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139503-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139506-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139511-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139513-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139516-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139472-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139527-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139537-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139541-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139484-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139552-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139555-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139558-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139562-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139565-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139568-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139571-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139519-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139586-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139591-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139544-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139602-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139604-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139607-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13961-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139612-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139614-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139574-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139621-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139598-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139632-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139636-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139639-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139642-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139645-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139648-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139651-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13966-07:00","level":"INFO","msg":"Generating output with model openrouter/deepseek/deepseek-r1-0528...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139617-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139669-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139673-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139628-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13968-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139683-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139675-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13969-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139693-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139688-07:00","level":"INFO","msg":"Generating output with model openrouter/meta-llama/llama-4-scout...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139695-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139713-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139717-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.13972-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:26.139725-07:00","level":"INFO","msg":"Generating output with model openrouter/x-ai/grok-3-mini-beta...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616426-07:00","level":"INFO","msg":"Output generated successfully with model openrouter/deepseek/deepseek-chat-v3-0324 (content length: 3285 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616486-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-chat-v3-0324.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616509-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-chat-v3-0324.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616718-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-chat-v3-0324.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616725-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-chat-v3-0324.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616729-07:00","level":"INFO","msg":"Successfully processed model: openrouter/deepseek/deepseek-chat-v3-0324","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616766-07:00","level":"INFO","msg":"Processing model: openrouter/deepseek/deepseek-prover-v2","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.61678-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.616814-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617077-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617085-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.61709-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617093-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617097-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.6171-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617104-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617116-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617119-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617121-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617123-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617126-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617129-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617131-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617133-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617135-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617138-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.61714-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617142-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617146-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617148-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.61715-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617152-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617155-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617157-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:37.617163-07:00","level":"INFO","msg":"Generating output with model openrouter/deepseek/deepseek-prover-v2...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.709345-07:00","level":"INFO","msg":"Output generated successfully with model openrouter/meta-llama/llama-4-scout (content length: 4153 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.709677-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-scout.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.709834-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-scout.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.710359-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-scout.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.710394-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-scout.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.710415-07:00","level":"INFO","msg":"Successfully processed model: openrouter/meta-llama/llama-4-scout","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.710516-07:00","level":"INFO","msg":"Processing model: openrouter/meta-llama/llama-4-maverick","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.710562-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.710688-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711311-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711349-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711368-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711384-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711398-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.71141-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711422-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711435-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711446-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711456-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711465-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711477-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711487-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711497-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711508-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711541-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711554-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711565-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711576-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711606-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.71162-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.71163-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711642-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711655-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711667-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:44.711686-07:00","level":"INFO","msg":"Generating output with model openrouter/meta-llama/llama-4-maverick...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067119-07:00","level":"INFO","msg":"Output generated successfully with model openrouter/x-ai/grok-3-mini-beta (content length: 10272 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067148-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-mini-beta.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067174-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-mini-beta.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067343-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-mini-beta.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067348-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-mini-beta.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067351-07:00","level":"INFO","msg":"Successfully processed model: openrouter/x-ai/grok-3-mini-beta","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067382-07:00","level":"INFO","msg":"Processing model: o4-mini","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067394-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067424-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067683-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067686-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.06769-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067693-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067696-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067698-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067701-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067703-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067705-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067707-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.06771-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067712-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067715-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067717-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067719-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067721-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067724-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067726-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067728-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067731-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067733-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067735-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067744-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067747-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067749-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:46.067758-07:00","level":"INFO","msg":"Generating output with model o4-mini...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.727218-07:00","level":"INFO","msg":"Output generated successfully with model openrouter/x-ai/grok-3-beta (content length: 7048 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.727346-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-beta.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.727479-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-beta.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.72808-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-beta.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.728104-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-x-ai-grok-3-beta.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.728115-07:00","level":"INFO","msg":"Successfully processed model: openrouter/x-ai/grok-3-beta","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.728214-07:00","level":"INFO","msg":"Processing model: gpt-4.1","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.728255-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.728373-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729065-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729099-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729116-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729125-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729137-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729146-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729152-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729179-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729186-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729191-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729197-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729206-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729212-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729219-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729225-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729232-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729238-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729245-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729251-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729258-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729265-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729271-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729277-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.729284-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.72929-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:48.72932-07:00","level":"INFO","msg":"Generating output with model gpt-4.1...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.438067-07:00","level":"INFO","msg":"Output generated successfully with model openrouter/meta-llama/llama-4-maverick (content length: 4623 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.438152-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-maverick.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.438253-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-maverick.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.438843-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-maverick.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.438873-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-meta-llama-llama-4-maverick.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.438889-07:00","level":"INFO","msg":"Successfully processed model: openrouter/meta-llama/llama-4-maverick","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.438991-07:00","level":"INFO","msg":"Processing model: o3","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.439046-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.439173-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440097-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440131-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440153-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440174-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440193-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.44021-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440226-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440241-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440256-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.44027-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440284-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440301-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440317-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440331-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440345-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440358-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440372-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440387-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440402-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.44042-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440435-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440448-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440462-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440476-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440489-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:53:54.440522-07:00","level":"INFO","msg":"Generating output with model o3...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499009-07:00","level":"INFO","msg":"Output generated successfully with model openrouter/deepseek/deepseek-r1-0528 (content length: 4768 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499037-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-r1-0528.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499053-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-r1-0528.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499173-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-r1-0528.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499178-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-r1-0528.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499183-07:00","level":"INFO","msg":"Successfully processed model: openrouter/deepseek/deepseek-r1-0528","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499217-07:00","level":"INFO","msg":"Processing model: gemini-2.5-pro","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.49923-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499259-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499507-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499511-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499516-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499521-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499524-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499529-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499532-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499536-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.49954-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499543-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499546-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.49955-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499553-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499556-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.49956-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499563-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499566-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499569-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499572-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499576-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499579-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499582-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499585-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499589-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.499592-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.504427-07:00","level":"INFO","msg":"Generating output with model gemini-2.5-pro...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835633-07:00","level":"INFO","msg":"Output generated successfully with model gpt-4.1 (content length: 6773 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835662-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gpt-4.1.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835679-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gpt-4.1.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835829-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gpt-4.1.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835835-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gpt-4.1.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835841-07:00","level":"INFO","msg":"Successfully processed model: gpt-4.1","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835875-07:00","level":"INFO","msg":"Processing model: gemini-2.5-flash","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835888-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.835921-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836169-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836175-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.83618-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836186-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.83619-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836194-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836197-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.8362-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836203-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836207-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.83621-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836214-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836219-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836223-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836226-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.83623-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836234-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836237-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.83624-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836244-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836247-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.83625-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836253-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836257-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.83626-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:06.836599-07:00","level":"INFO","msg":"Generating output with model gemini-2.5-flash...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:20.681362-07:00","level":"INFO","msg":"Output generated successfully with model o4-mini (content length: 10387 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:20.681586-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o4-mini.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:20.681608-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o4-mini.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:20.681777-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o4-mini.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:20.681783-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o4-mini.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:20.681788-07:00","level":"INFO","msg":"Successfully processed model: o4-mini","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:34.095392-07:00","level":"INFO","msg":"Output generated successfully with model gemini-2.5-pro (content length: 3992 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:34.095426-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:34.095446-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:34.095581-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:34.095587-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:34.095592-07:00","level":"INFO","msg":"Successfully processed model: gemini-2.5-pro","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:36.515752-07:00","level":"INFO","msg":"Output generated successfully with model gemini-2.5-flash (content length: 8892 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:36.515985-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-flash.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:36.51601-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-flash.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:36.516144-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-flash.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:36.516381-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-flash.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:36.516389-07:00","level":"INFO","msg":"Successfully processed model: gemini-2.5-flash","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:45.529509-07:00","level":"INFO","msg":"Output generated successfully with model openrouter/deepseek/deepseek-prover-v2 (content length: 8786 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:45.529666-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-prover-v2.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:45.529693-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-prover-v2.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:45.529845-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-prover-v2.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:45.529852-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/openrouter-deepseek-deepseek-prover-v2.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:45.529856-07:00","level":"INFO","msg":"Successfully processed model: openrouter/deepseek/deepseek-prover-v2","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119395-07:00","level":"INFO","msg":"Output generated successfully with model o3 (content length: 5273 characters)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119439-07:00","level":"INFO","msg":"Writing output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o3.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119469-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o3.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119697-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o3.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119703-07:00","level":"INFO","msg":"Output successfully generated and saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/o3.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119707-07:00","level":"INFO","msg":"Successfully processed model: o3","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119803-07:00","level":"INFO","msg":"Processing completed, synthesizing results with model: gemini-2.5-pro","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.119811-07:00","level":"INFO","msg":"Starting synthesis with model: gemini-2.5-pro","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120115-07:00","level":"INFO","msg":"Attempting to load model configuration from: /Users/phaedrus/.config/thinktank/models.yaml","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120332-07:00","level":"INFO","msg":"Read configuration file (5250 bytes)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120828-07:00","level":"INFO","msg":"Successfully parsed YAML configuration","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120834-07:00","level":"INFO","msg":"Validated API key sources: 3 sources defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120839-07:00","level":"INFO","msg":"✓ API key for provider 'openai' found in environment variable OPENAI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120844-07:00","level":"INFO","msg":"✓ API key for provider 'gemini' found in environment variable GEMINI_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120848-07:00","level":"INFO","msg":"✓ API key for provider 'openrouter' found in environment variable OPENROUTER_API_KEY","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120852-07:00","level":"INFO","msg":"Available API keys: openai (OPENAI_API_KEY), gemini (GEMINI_API_KEY), openrouter (OPENROUTER_API_KEY)","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120855-07:00","level":"INFO","msg":"Validating 3 providers...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120859-07:00","level":"INFO","msg":"Provider 'openai' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120863-07:00","level":"INFO","msg":"Provider 'gemini' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120866-07:00","level":"INFO","msg":"Provider 'openrouter' configured with default base URL","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120869-07:00","level":"INFO","msg":"Validating 12 models...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120873-07:00","level":"INFO","msg":"✓ Validated model 'gpt-4.1' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120877-07:00","level":"INFO","msg":"✓ Validated model 'o4-mini' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120881-07:00","level":"INFO","msg":"✓ Validated model 'o3' (provider: 'openai')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120884-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-pro' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120887-07:00","level":"INFO","msg":"✓ Validated model 'gemini-2.5-flash' (provider: 'gemini')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.12089-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-chat-v3-0324' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120893-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-prover-v2' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120896-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/deepseek/deepseek-r1-0528' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.1209-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120903-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/x-ai/grok-3-mini-beta' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120906-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-maverick' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.12091-07:00","level":"INFO","msg":"✓ Validated model 'openrouter/meta-llama/llama-4-scout' (provider: 'openrouter')","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120913-07:00","level":"INFO","msg":"Configuration validated successfully: 3 providers, 12 models defined","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.120916-07:00","level":"INFO","msg":"✅ Configuration loaded successfully from file","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:54:47.121365-07:00","level":"INFO","msg":"Calling synthesis model API: gemini-2.5-pro","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.658812-07:00","level":"INFO","msg":"Successfully synthesized results from 12 model outputs","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.659107-07:00","level":"INFO","msg":"Writing to file /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro-synthesis.md...","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.659269-07:00","level":"INFO","msg":"Successfully saved to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro-synthesis.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.659282-07:00","level":"INFO","msg":"Successfully saved synthesis output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro-synthesis.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.65929-07:00","level":"INFO","msg":"Successfully saved synthesis output to /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro-synthesis.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.659329-07:00","level":"INFO","msg":"Execution summary: 12 total models, 12 successful, 0 failed","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.659338-07:00","level":"INFO","msg":"Synthesis output saved to: /Users/phaedrus/Development/leyline/thinktank_20250617_145325_000459001/gemini-2.5-pro-synthesis.md","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
+{"time":"2025-06-17T14:55:28.65935-07:00","level":"INFO","msg":"Processing completed successfully","correlation_id":"e3910943-6873-4a41-aec6-cd61a7f20361"}
