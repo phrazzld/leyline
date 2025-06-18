@@ -13,6 +13,7 @@ This file contains an automatically generated list of all tenets with their one-
 | [empathize-with-your-user](./empathize-with-your-user.md) | 0.1.0 | Think of the difference between an architect and a construction worker. Both are skilled professionals, but an architect must understand how people... |
 | [explicit-over-implicit](./explicit-over-implicit.md) | 0.1.0 | Every implicit assumption in your code is cognitive debt waiting to be paid. When behavior is hidden behind magic methods, global state, or clever ... |
 | [fix-broken-windows](./fix-broken-windows.md) | 0.1.0 | Just as a broken window in a building signals neglect and invites further vandalism, unfixed bugs, TODO comments, suppressed warnings, and quality ... |
+| [humble-confidence](./humble-confidence.md) | 0.1.0 | Software development is fundamentally about managing complexity in the face of incomplete knowledge. Yet our industry often rewards the appearance ... |
 | [maintainability](./maintainability.md) | 0.1.0 | Most of a software project's lifetime is spent in maintenance mode. The code you write today will be read, modified, and debugged dozens of times i... |
 | [modularity](./modularity.md) | 0.1.0 | Modularity is the fundamental approach for taming complexity in software systems. When |
 | [no-secret-suppression](./no-secret-suppression.md) | 0.1.0 | Quality tools serve as vigilant guardians of your codebase, continuously scanning for patterns that experience has shown to be problematic. When th... |
