@@ -64,7 +64,7 @@
     - **Depends-on:** [T001]
     - **COMPLETED:** Vitest testing framework binding created in `docs/bindings/categories/typescript/vitest-testing-framework.md` - Implements unified test pyramid with 70% unit, 20% integration, 10% e2e distribution. Includes coverage thresholds (≥80% overall, ≥90% core), behavior-focused testing patterns, no internal mocking principle, and CI integration. Derived from testability tenet.
 
-- [ ] **T003 · Feature · P1: establish build system binding**
+- [x] **T003 · Feature · P1: establish build system binding**
     - **Context:** Phase 3 - Essential for distribution
     - **Action:**
         1. Create `tsup-build-system.md` for library builds
@@ -77,6 +77,7 @@
         3. Build pipeline integration examples
     - **Verification:** Sample project builds successfully with templates
     - **Depends-on:** [T001]
+    - **COMPLETED:** tsup build system binding created in `docs/bindings/categories/typescript/tsup-build-system.md` - Establishes zero-configuration TypeScript builds with ESM/CJS output, type definitions, source maps, and CI validation. Includes library and application configurations, bundle optimization, and automated quality gates. Derived from simplicity tenet.
 
 - [ ] **T004 · Feature · P1: standardize dependency management**
     - **Context:** Phase 4 - Package ecosystem integration
