@@ -15,7 +15,7 @@
         3. Clear rationale for each new addition documented
     - **Depends-on:** none
 
-- [ ] **G002 · Chore · P1: research developer psychology literature**
+- [x] **G002 · Chore · P1: research developer psychology literature**
     - **Context:** The "Fear of Looking Dumb" concept needs academic grounding for credibility
     - **Action:**
         1. Search for research on impostor syndrome in software engineering
