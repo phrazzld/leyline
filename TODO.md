@@ -43,7 +43,7 @@
         3. Title reflects both humility and confidence aspects
     - **Depends-on:** [G001, G002]
 
-- [ ] **G004 · Feature · P1: write core belief section for humble-confidence**
+- [x] **G004 · Feature · P1: write core belief section for humble-confidence**
     - **Context:** Philosophical foundation explaining why admitting ignorance improves code
     - **Action:**
         1. Explain the "Fear of Looking Dumb" (FOLD) concept
@@ -57,7 +57,7 @@
         3. Compelling case for intellectual humility made
     - **Depends-on:** [G003]
 
-- [ ] **G005 · Feature · P1: write practical guidelines for humble-confidence**
+- [x] **G005 · Feature · P1: write practical guidelines for humble-confidence**
     - **Context:** Actionable advice for practicing intellectual humility
     - **Action:**
         1. "Ask questions early and often" - normalize not knowing
@@ -72,7 +72,7 @@
         3. Guidelines feel practical, not preachy
     - **Depends-on:** [G004]
 
-- [ ] **G006 · Feature · P1: write warning signs for humble-confidence violations**
+- [x] **G006 · Feature · P1: write warning signs for humble-confidence violations**
     - **Context:** Red flags indicating ego-driven development
     - **Action:**
         1. "Overengineering to appear sophisticated"
@@ -88,7 +88,7 @@
         3. Each sign is observable and concrete
     - **Depends-on:** [G005]
 
-- [ ] **G007 · Feature · P2: add cross-references for humble-confidence**
+- [x] **G007 · Feature · P2: add cross-references for humble-confidence**
     - **Context:** Connect to existing tenets and future bindings
     - **Action:**
         1. Link to simplicity.md (simple solutions require confidence)
@@ -104,7 +104,7 @@
 
 ## Phase 3: Testing Philosophy Bindings
 
-- [ ] **G008 · Feature · P1: create integration-first-testing binding**
+- [x] **G008 · Feature · P1: create integration-first-testing binding**
     - **Context:** Grug's "test middle" philosophy as concrete binding
     - **Action:**
         1. Create `docs/bindings/core/integration-first-testing.md`

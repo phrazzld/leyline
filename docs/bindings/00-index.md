@@ -31,6 +31,7 @@ This file contains an automatically generated list of all bindings with their on
 | [hex-domain-purity](./core/hex-domain-purity.md) | 0.1.0 | This binding implements our simplicity tenet by eliminating entanglement between business rules and technical implementations. Mixed concerns creat... |
 | [immutable-by-default](./core/immutable-by-default.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
 | [incremental-delivery](./core/incremental-delivery.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating a delivery process that prioritizes safety, speed, and adaptability ov... |
+| [integration-first-testing](./core/integration-first-testing.md) | 0.1.0 | Most real-world bugs occur at the boundaries between components, not within individual functions. Grug's wisdom teaches that integration tests prov... |
 | [interface-contracts](./core/interface-contracts.md) | 0.1.0 | This binding implements our orthogonality tenet by creating clear boundaries between components. Well-defined interface contracts enable components... |
 | [layered-architecture](./core/layered-architecture.md) | 0.1.0 | This binding implements our orthogonality tenet by creating structured separation between different levels of abstraction and responsibility. Layer... |
 | [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding implements our testability tenet by ensuring tests verify real system behavior rather than mock behavior. Internal mocking creates dan... |
