@@ -34,6 +34,7 @@ This file contains an automatically generated list of all bindings with their on
 | [integration-first-testing](./core/integration-first-testing.md) | 0.1.0 | Most real-world bugs occur at the boundaries between components, not within individual functions. Grug's wisdom teaches that integration tests prov... |
 | [interface-contracts](./core/interface-contracts.md) | 0.1.0 | This binding implements our orthogonality tenet by creating clear boundaries between components. Well-defined interface contracts enable components... |
 | [layered-architecture](./core/layered-architecture.md) | 0.1.0 | This binding implements our orthogonality tenet by creating structured separation between different levels of abstraction and responsibility. Layer... |
+| [natural-refactoring-points](./core/natural-refactoring-points.md) | 0.1.0 | Premature abstraction is one of the most expensive mistakes in software development. Grug's wisdom teaches that code needs time to "settle" and rev... |
 | [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding implements our testability tenet by ensuring tests verify real system behavior rather than mock behavior. Internal mocking creates dan... |
 | [no-lint-suppression](./core/no-lint-suppression.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by requiring |
 | [normalized-data-design](./core/normalized-data-design.md) | 0.1.0 | This binding implements our DRY tenet at the data layer by ensuring that knowledge represented in data exists in only one location. When the same i... |

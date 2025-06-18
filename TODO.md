@@ -117,7 +117,7 @@
         3. Enforcement mechanisms identified
     - **Depends-on:** [G001]
 
-- [ ] **G009 · Feature · P1: write integration-first-testing implementation**
+- [x] **G009 · Feature · P1: write integration-first-testing implementation**
     - **Context:** Concrete guidance on the "test middle" approach
     - **Action:**
         1. Define integration test scope (service boundaries, not UI)
@@ -149,7 +149,7 @@
 
 ## Phase 4: Refactoring Wisdom Bindings
 
-- [ ] **G011 · Feature · P1: create natural-refactoring-points binding**
+- [x] **G011 · Feature · P1: create natural-refactoring-points binding**
     - **Context:** Grug's wisdom on waiting for "cut points" to emerge
     - **Action:**
         1. Create `docs/bindings/core/natural-refactoring-points.md`
