@@ -109,6 +109,7 @@ _No frontend bindings defined yet._
 |---|---|---|
 | [async-patterns](./categories/typescript/async-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by establishing clear patterns for asynchronous code flow in TypeScript. Async programming introduces ... |
 | [avoid-type-gymnastics](./categories/typescript/avoid-type-gymnastics.md) | 0.1.0 | Grug teaches that type systems should make development easier, not harder. TypeScript's main benefits are IDE support (autocomplete, navigation), c... |
+| [eslint-prettier-setup](./categories/typescript/eslint-prettier-setup.md) | 0.1.0 | This binding implements our automation tenet by eliminating manual code quality decisions and creating systematic barriers that enforce consistent ... |
 | [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | This binding implements DRY by using functional composition to create single, authoritative representations of knowledge reusable across different ... |
 | [modern-typescript-toolchain](./categories/typescript/modern-typescript-toolchain.md) | 0.1.0 | This binding implements our automation tenet by eliminating the cognitive overhead and friction of tool selection, configuration, and integration d... |
 | [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, purpose-driven modules in TypeScript projects. Effective modul... |

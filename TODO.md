@@ -109,7 +109,7 @@
     - **Depends-on:** [T001, T002]
     - **COMPLETED:** TanStack Query state management binding created in `docs/bindings/categories/typescript/tanstack-query-state.md` - Establishes type-safe server state management with comprehensive query patterns, error handling, caching strategies, optimistic updates, and testing approaches. Includes observable query states and DevTools integration. Derived from explicit-over-implicit tenet.
 
-- [ ] **T006 · Feature · P1: automate code quality binding**
+- [x] **T006 · Feature · P1: automate code quality binding**
     - **Context:** Phase 6 - Quality gates and automation
     - **Action:**
         1. Create `eslint-prettier-setup.md` with zero-suppression policy
@@ -122,6 +122,7 @@
         3. CI gates enforce rules automatically
     - **Verification:** Sample project enforces rules without manual intervention
     - **Depends-on:** [T001, T002, T003, T004, T005]
+    - **COMPLETED:** ESLint/Prettier automation binding created in `docs/bindings/categories/typescript/eslint-prettier-setup.md` - Establishes zero-suppression policy with comprehensive quality enforcement through pre-commit hooks, CI validation, and IDE integration. Includes tiered configuration, performance optimization, and root cause resolution approaches. Implements fast feedback loops with automatic remediation. Derived from automation tenet.
 
 ## Validation & Quality Assurance
 > **Philosophy**: Automate validation, measure success objectively
