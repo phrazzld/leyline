@@ -7,6 +7,10 @@
 # 2. Tenet references are valid (point to existing tenet files)
 # 3. Inter-binding links are valid (point to existing binding files)
 # 4. No broken relative or absolute paths
+#
+# Requirements:
+# - Ruby 2.1+ (for Time.now.iso8601 and JSON support)
+# - Standard library: fileutils, json, pathname, time
 
 require 'fileutils'
 require 'json'

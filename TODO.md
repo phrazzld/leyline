@@ -163,7 +163,7 @@
     - **Verification:** CI pipeline passes, structured logging produces valid JSON
     - **Depends-on:** [V002]
 
-- [ ] **F002 · Fix · P0: implement defensive programming for validation tools**
+- [x] **F002 · Fix · P0: implement defensive programming for validation tools**
     - **Context:** Prevent similar Ruby standard library issues in validation infrastructure
     - **Action:**
         1. Audit all validation tools for missing standard library requires

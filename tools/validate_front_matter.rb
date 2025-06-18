@@ -29,9 +29,15 @@
 # Usage examples:
 # - Validate all files: ruby tools/validate_front_matter.rb
 # - Validate a specific file: ruby tools/validate_front_matter.rb -f docs/tenets/example.md
+#
+# Requirements:
+# - Ruby 2.1+ (for Time.now.iso8601 and JSON support)
+# - Standard library: yaml, date, time, json
 
 require 'yaml'
 require 'date'
+require 'time'
+require 'json'
 
 # Load enhanced validation components
 require_relative '../lib/yaml_line_tracker'
@@ -707,14 +713,19 @@ end
 
 # Log validation start with correlation ID
 if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
-  start_log = {
-    event: 'validation_start',
-    correlation_id: $error_collector.correlation_id,
-    timestamp: Time.now.iso8601,
-    mode: $single_file ? 'single_file' : 'full_validation',
-    target: $single_file || 'all_files'
-  }
-  $stderr.puts JSON.generate(start_log)
+  begin
+    start_log = {
+      event: 'validation_start',
+      correlation_id: $error_collector.correlation_id,
+      timestamp: Time.now.iso8601,
+      mode: $single_file ? 'single_file' : 'full_validation',
+      target: $single_file || 'all_files'
+    }
+    $stderr.puts JSON.generate(start_log)
+  rescue => e
+    # Graceful degradation if structured logging fails
+    $stderr.puts "Warning: Structured logging failed: #{e.message}"
+  end
 end
 
 # Run the validation process

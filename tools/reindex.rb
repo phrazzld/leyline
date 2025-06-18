@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 # tools/reindex.rb - Regenerates index files for tenets and bindings
+#
+# Requirements:
+# - Ruby 2.1+ (standard library compatibility)
+# - Standard library: yaml, optparse, fileutils
 
 require 'yaml'
 require 'optparse'

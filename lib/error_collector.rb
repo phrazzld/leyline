@@ -2,9 +2,14 @@
 # lib/error_collector.rb - Structured error aggregation for validation tools
 # Provides centralized collection of validation errors with full context
 # for enhanced error reporting and debugging.
+#
+# Requirements:
+# - Ruby 2.1+ (for Time.now.iso8601 and JSON support)
+# - Standard library: json, securerandom, time
 
 require 'json'
 require 'securerandom'
+require 'time'
 
 class ErrorCollector
   def initialize
@@ -100,7 +105,12 @@ class ErrorCollector
       files_with_errors: @errors.map { |e| e[:file] }.uniq.count
     }
 
-    STDERR.puts JSON.generate(summary)
+    begin
+      STDERR.puts JSON.generate(summary)
+    rescue => e
+      # Graceful degradation if structured logging fails
+      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    end
   end
 
   private
@@ -112,11 +122,16 @@ class ErrorCollector
 
   # Log a single error as structured JSON to STDERR
   def log_structured_error(error_record)
-    log_entry = {
-      event: 'validation_error',
-      **error_record
-    }
+    begin
+      log_entry = {
+        event: 'validation_error',
+        **error_record
+      }
 
-    STDERR.puts JSON.generate(log_entry)
+      STDERR.puts JSON.generate(log_entry)
+    rescue => e
+      # Graceful degradation if structured logging fails
+      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    end
   end
 end
