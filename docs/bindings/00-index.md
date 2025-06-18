@@ -9,6 +9,7 @@ This file contains an automatically generated list of all bindings with their on
 | [api-design](./core/api-design.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by ensuring that component contracts—the most critical communication points in any system—... |
 | [automate-changelog](./core/automate-changelog.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual |
 | [automated-quality-gates](./core/automated-quality-gates.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating automated systems that prevent quality degradation before it begins. Quality gates... |
+| [avoid-premature-abstraction](./core/avoid-premature-abstraction.md) | 0.1.0 | Premature abstraction is often worse than code duplication because the wrong abstraction is harder to fix than duplicated code. When you abstract t... |
 | [centralized-configuration](./core/centralized-configuration.md) | 0.1.0 | This binding implements our DRY tenet by creating a single source of truth for all configuration knowledge in your system. Like a master control pa... |
 | [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. CI/CD pipelines serve... |
 | [code-review-excellence](./core/code-review-excellence.md) | 0.1.0 | While automation can catch formatting issues, syntax errors, and common bugs, human review remains essential for evaluating design decisions, ident... |

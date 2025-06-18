@@ -163,7 +163,7 @@
         3. Anti-patterns of premature refactoring documented
     - **Depends-on:** [G001]
 
-- [ ] **G012 · Feature · P1: create avoid-premature-abstraction binding**
+- [x] **G012 · Feature · P1: create avoid-premature-abstraction binding**
     - **Context:** Specific guidance on when NOT to abstract
     - **Action:**
         1. Create `docs/bindings/core/avoid-premature-abstraction.md`
