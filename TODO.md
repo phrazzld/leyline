@@ -94,7 +94,7 @@
     - **Depends-on:** [T001, D001]
     - **COMPLETED:** Package.json standards binding created in `docs/bindings/categories/typescript/package-json-standards.md` - Establishes comprehensive dependency management with pnpm enforcement, security automation, supply chain validation, and CI integration. Includes package.json linting, dependency scanning, license compliance, and lockfile verification. Derived from automation tenet.
 
-- [ ] **T005 · Feature · P2: implement state management binding**
+- [x] **T005 · Feature · P2: implement state management binding**
     - **Context:** Phase 5 - Application architecture patterns
     - **Action:**
         1. Create `tanstack-query-state.md` for server state patterns
@@ -107,6 +107,7 @@
         3. Testing patterns documented
     - **Verification:** Sample implementation integrates without errors
     - **Depends-on:** [T001, T002]
+    - **COMPLETED:** TanStack Query state management binding created in `docs/bindings/categories/typescript/tanstack-query-state.md` - Establishes type-safe server state management with comprehensive query patterns, error handling, caching strategies, optimistic updates, and testing approaches. Includes observable query states and DevTools integration. Derived from explicit-over-implicit tenet.
 
 - [ ] **T006 · Feature · P1: automate code quality binding**
     - **Context:** Phase 6 - Quality gates and automation
