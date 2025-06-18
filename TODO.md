@@ -34,7 +34,7 @@
 ## Core Implementation (Value-Driven Priority)
 > **Philosophy**: Build foundation first, then layer specifics
 
-- [ ] **T001 · Feature · P0: create modern-typescript-toolchain.md foundation**
+- [x] **T001 · Feature · P0: create modern-typescript-toolchain.md foundation**
     - **Context:** Phase 1 - Establishes unified philosophy and decision criteria
     - **Action:**
         1. Create `docs/bindings/categories/typescript/modern-typescript-toolchain.md`
@@ -47,6 +47,7 @@
         3. Migration guidance included for existing projects
     - **Verification:** `ruby tools/validate_front_matter.rb` passes
     - **Depends-on:** [D001, D002, D003]
+    - **COMPLETED:** Foundation binding created in `docs/bindings/categories/typescript/modern-typescript-toolchain.md` - Establishes unified toolchain with pnpm, Vitest, tsup, ESLint/Prettier, TanStack Query. Integrates all strategic decisions D001-D003 with tiered enforcement, workspace configuration, and migration guidance. Derived from automation tenet.
 
 - [ ] **T002 · Feature · P1: implement testing framework binding**
     - **Context:** Phase 2 - Critical for development workflow
