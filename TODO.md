@@ -13,13 +13,14 @@
     - **Depends-on:** none
     - **COMPLETED:** Policy documented in `docs/decisions/2025-06-18-typescript-version-specification-policy.md` - Use semantic version ranges with exact pinning only for security/compliance requirements
 
-- [ ] **D002 · Decision · P0: define configuration file locations**
+- [x] **D002 · Decision · P0: define configuration file locations**
     - **Context:** Architecture pattern for toolchain setup
     - **Options:** Workspace root vs package-specific vs hybrid
     - **Decision Framework:** Monorepo compatibility vs simplicity
     - **Recommended:** Workspace root with package-specific overrides
     - **Done-when:** Standard documented with examples
     - **Depends-on:** none
+    - **COMPLETED:** Standard documented in `docs/decisions/2025-06-18-typescript-configuration-file-locations.md` - Use workspace root for shared tooling with package-specific overrides only when domain requirements justify complexity
 
 - [ ] **D003 · Decision · P0: establish enforcement strictness**
     - **Context:** Development workflow integration philosophy
