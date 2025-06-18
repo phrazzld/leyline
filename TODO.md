@@ -239,7 +239,7 @@
 
 ## Phase 7: Pragmatic Decision Making Bindings
 
-- [ ] **G017 · Feature · P1: create saying-no-effectively binding**
+- [x] **G017 · Feature · P1: create saying-no-effectively binding**
     - **Context:** Grug's wisdom on pushing back against complexity
     - **Action:**
         1. Create `docs/bindings/core/saying-no-effectively.md`

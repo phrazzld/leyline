@@ -46,6 +46,7 @@ This file contains an automatically generated list of all bindings with their on
 | [quality-metrics-and-monitoring](./core/quality-metrics-and-monitoring.md) | 0.1.0 | Quality metrics serve as early warning systems and progress indicators, but only when they measure outcomes that teams can act upon. Poorly chosen ... |
 | [require-conventional-commits](./core/require-conventional-commits.md) | 0.1.0 | This binding directly implements our automation tenet by transforming commit messages |
 | [runtime-adaptability](./core/runtime-adaptability.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that can respond intelligently to changing conditions in real-... |
+| [saying-no-effectively](./core/saying-no-effectively.md) | 0.1.0 | Grug's wisdom teaches that most complexity enters systems through human decisions, not technical limitations. The ability to say "no" effectively i... |
 | [semantic-versioning](./core/semantic-versioning.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by bringing clarity to |
 | [system-boundaries](./core/system-boundaries.md) | 0.1.0 | This binding implements our orthogonality tenet by creating architectural separation that prevents components from becoming entangled across differ... |
 | [technical-debt-tracking](./core/technical-debt-tracking.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating systematic approaches to identify and manage technical shortcuts, compromises, and... |
