@@ -115,6 +115,7 @@ _No frontend bindings defined yet._
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 | [use-pnpm-for-nodejs](./categories/typescript/use-pnpm-for-nodejs.md) | 0.1.0 | This binding implements our automation tenet by establishing a consistent, efficient package management foundation that eliminates "works on my mac... |
+| [vitest-testing-framework](./categories/typescript/vitest-testing-framework.md) | 0.1.0 | This binding implements our testability tenet by establishing a consistent, behavior-focused testing approach that enables confident refactoring an... |
 
 ## Api Bindings
 

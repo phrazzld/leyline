@@ -49,7 +49,7 @@
     - **Depends-on:** [D001, D002, D003]
     - **COMPLETED:** Foundation binding created in `docs/bindings/categories/typescript/modern-typescript-toolchain.md` - Establishes unified toolchain with pnpm, Vitest, tsup, ESLint/Prettier, TanStack Query. Integrates all strategic decisions D001-D003 with tiered enforcement, workspace configuration, and migration guidance. Derived from automation tenet.
 
-- [ ] **T002 · Feature · P1: implement testing framework binding**
+- [x] **T002 · Feature · P1: implement testing framework binding**
     - **Context:** Phase 2 - Critical for development workflow
     - **Action:**
         1. Create `vitest-testing-framework.md` with test pyramid implementation
@@ -62,6 +62,7 @@
         3. CI integration documented
     - **Verification:** Sample project executes all test types successfully
     - **Depends-on:** [T001]
+    - **COMPLETED:** Vitest testing framework binding created in `docs/bindings/categories/typescript/vitest-testing-framework.md` - Implements unified test pyramid with 70% unit, 20% integration, 10% e2e distribution. Includes coverage thresholds (≥80% overall, ≥90% core), behavior-focused testing patterns, no internal mocking principle, and CI integration. Derived from testability tenet.
 
 - [ ] **T003 · Feature · P1: establish build system binding**
     - **Context:** Phase 3 - Essential for distribution
