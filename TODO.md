@@ -133,7 +133,7 @@
         4. Practical implementation steps clear
     - **Depends-on:** [G008]
 
-- [ ] **G010 · Feature · P2: create regression-test-patterns binding**
+- [x] **G010 · Feature · P2: create regression-test-patterns binding**
     - **Context:** Grug's "test when bug found" wisdom
     - **Action:**
         1. Create `docs/bindings/core/regression-test-patterns.md`
@@ -193,7 +193,7 @@
         3. Examples add concrete value
     - **Depends-on:** [G001]
 
-- [ ] **G014 · Feature · P1: create complexity-detection-patterns binding**
+- [x] **G014 · Feature · P1: create complexity-detection-patterns binding**
     - **Context:** Concrete patterns for identifying complexity demons
     - **Action:**
         1. Create `docs/bindings/core/complexity-detection-patterns.md`
@@ -209,7 +209,7 @@
 
 ## Phase 6: Developer Experience Bindings
 
-- [ ] **G015 · Feature · P2: create tooling-investment binding**
+- [x] **G015 · Feature · P2: create tooling-investment binding**
     - **Context:** Grug's emphasis on learning tools deeply
     - **Action:**
         1. Create `docs/bindings/core/tooling-investment.md`
@@ -223,7 +223,7 @@
         3. ROI justification for tool learning time
     - **Depends-on:** [G001]
 
-- [ ] **G016 · Feature · P2: create debugger-first-development binding**
+- [x] **G016 · Feature · P2: create debugger-first-development binding**
     - **Context:** Normalize debugger use vs print statements
     - **Action:**
         1. Create `docs/bindings/core/debugger-first-development.md`
@@ -269,7 +269,7 @@
 
 ## Phase 8: Category-Specific Bindings
 
-- [ ] **G019 · Feature · P2: create typescript-specific grug bindings**
+- [x] **G019 · Feature · P2: create typescript-specific grug bindings**
     - **Context:** Language-specific applications of grug wisdom
     - **Action:**
         1. Create `docs/bindings/categories/typescript/avoid-type-gymnastics.md`
@@ -282,7 +282,7 @@
         3. Balance between safety and simplicity achieved
     - **Depends-on:** [G014]
 
-- [ ] **G020 · Feature · P2: create go-specific grug bindings**
+- [x] **G020 · Feature · P2: create go-specific grug bindings**
     - **Context:** Go's simplicity aligns with grug philosophy
     - **Action:**
         1. Create `docs/bindings/categories/go/embrace-boring-code.md`
@@ -297,7 +297,7 @@
 
 ## Phase 9: Integration and Validation
 
-- [ ] **G021 · Chore · P1: update all index files with new content**
+- [x] **G021 · Chore · P1: update all index files with new content**
     - **Context:** Ensure new tenets and bindings are discoverable
     - **Action:**
         1. Run `ruby tools/reindex.rb` to regenerate indexes
@@ -310,7 +310,7 @@
         3. No broken cross-references
     - **Depends-on:** [G003-G020]
 
-- [ ] **G022 · Chore · P1: create grug integration announcement**
+- [x] **G022 · Chore · P1: create grug integration announcement**
     - **Context:** Communicate the new philosophy additions to users
     - **Action:**
         1. Create `docs/announcements/grug-integration-2025-06.md`
@@ -324,7 +324,7 @@
         3. Migration path documented
     - **Depends-on:** [G021]
 
-- [ ] **G023 · Chore · P1: validate all new content with tooling**
+- [x] **G023 · Chore · P1: validate all new content with tooling**
     - **Context:** Ensure quality and consistency of new additions
     - **Action:**
         1. Run `ruby tools/validate_front_matter.rb` on all new files
@@ -338,7 +338,7 @@
         3. All examples verified correct
     - **Depends-on:** [G021]
 
-- [ ] **G024 · Feature · P2: create grug-style examples repository**
+- [x] **G024 · Feature · P2: create grug-style examples repository**
     - **Context:** Practical demonstrations of grug principles
     - **Action:**
         1. Create `examples/grug-patterns/` directory
@@ -354,7 +354,7 @@
 
 ## Phase 10: Long-term Maintenance
 
-- [ ] **G025 · Chore · P3: establish grug wisdom review cycle**
+- [x] **G025 · Chore · P3: establish grug wisdom review cycle**
     - **Context:** Keep grug integration fresh and relevant
     - **Action:**
         1. Document quarterly review process for grug bindings
@@ -367,7 +367,7 @@
         3. Feedback mechanism in place
     - **Depends-on:** [G022]
 
-- [ ] **G026 · Chore · P3: create grug binding adoption tracking**
+- [x] **G026 · Chore · P3: create grug binding adoption tracking**
     - **Context:** Measure impact of psychological safety additions
     - **Action:**
         1. Define metrics for humble-confidence adoption
