@@ -30,6 +30,15 @@ ruby tools/reindex.rb --strict
 
 # Fix cross-references in documentation
 ruby tools/fix_cross_references.rb
+
+# Run local CI simulation (catches issues before remote CI)
+ruby tools/run_ci_checks.rb
+
+# Run local CI simulation with verbose output
+ruby tools/run_ci_checks.rb --verbose
+
+# Skip external link checking for faster execution
+ruby tools/run_ci_checks.rb --skip-external-links
 ```
 
 
@@ -51,7 +60,8 @@ tools/
 ├── *.rb                  # Ruby maintenance scripts
 │   ├── validate_front_matter.rb  # Validates YAML front-matter
 │   ├── reindex.rb                # Rebuilds document indexes
-│   └── fix_cross_references.rb   # Fixes internal cross-references
+│   ├── fix_cross_references.rb   # Fixes internal cross-references
+│   └── run_ci_checks.rb          # Local CI simulation for pre-push validation
 ```
 
 ### Repository Architecture

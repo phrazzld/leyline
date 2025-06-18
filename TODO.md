@@ -174,7 +174,7 @@
     - **Verification:** Tools work with and without optional features enabled
     - **Depends-on:** [F001]
 
-- [ ] **F003 · Fix · P1: create local CI simulation script**
+- [x] **F003 · Fix · P1: create local CI simulation script**
     - **Context:** Enable pre-push validation to catch CI issues before remote execution
     - **Action:**
         1. Create `tools/run_ci_checks.rb` that executes all CI validation steps locally
