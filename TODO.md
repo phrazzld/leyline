@@ -79,7 +79,7 @@
     - **Depends-on:** [T001]
     - **COMPLETED:** tsup build system binding created in `docs/bindings/categories/typescript/tsup-build-system.md` - Establishes zero-configuration TypeScript builds with ESM/CJS output, type definitions, source maps, and CI validation. Includes library and application configurations, bundle optimization, and automated quality gates. Derived from simplicity tenet.
 
-- [ ] **T004 · Feature · P1: standardize dependency management**
+- [x] **T004 · Feature · P1: standardize dependency management**
     - **Context:** Phase 4 - Package ecosystem integration
     - **Action:**
         1. Create `package-json-standards.md` enforcing pnpm exclusively
@@ -92,6 +92,7 @@
         3. Supply chain security guidance included
     - **Verification:** Sample project passes validation rules
     - **Depends-on:** [T001, D001]
+    - **COMPLETED:** Package.json standards binding created in `docs/bindings/categories/typescript/package-json-standards.md` - Establishes comprehensive dependency management with pnpm enforcement, security automation, supply chain validation, and CI integration. Includes package.json linting, dependency scanning, license compliance, and lockfile verification. Derived from automation tenet.
 
 - [ ] **T005 · Feature · P2: implement state management binding**
     - **Context:** Phase 5 - Application architecture patterns
