@@ -185,7 +185,7 @@
     - **Verification:** Script catches same issues as CI, provides actionable feedback
     - **Depends-on:** [F002]
 
-- [ ] **V003 · Test · P1: validate configuration examples through automation**
+- [x] **V003 · Test · P1: validate configuration examples through automation**
     - **Context:** Practical usability verification
     - **Action:**
         1. Create automated sample project setup for each binding

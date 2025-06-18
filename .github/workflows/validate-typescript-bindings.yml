@@ -1,0 +1,85 @@
+name: Validate TypeScript Binding Configurations
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'docs/bindings/categories/typescript/**.md'
+      - 'tools/validate_typescript_bindings.rb'
+      - '.github/workflows/validate-typescript-bindings.yml'
+  pull_request:
+    paths:
+      - 'docs/bindings/categories/typescript/**.md'
+      - 'tools/validate_typescript_bindings.rb'
+      - '.github/workflows/validate-typescript-bindings.yml'
+
+jobs:
+  validate-configurations:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test against LTS and current Node.js versions
+        node-version: ['18.x', '20.x', '22.x']
+
+    name: Validate on Node.js ${{ matrix.node-version }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Cache pnpm Store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-
+
+      - name: Validate TypeScript Binding Configurations
+        run: |
+          echo "🚀 Validating TypeScript binding configurations on Node.js ${{ matrix.node-version }}"
+          export LEYLINE_STRUCTURED_LOGGING=true
+          ruby tools/validate_typescript_bindings.rb --verbose
+        env:
+          # Ensure consistent environment for validation
+          NODE_ENV: test
+          CI: true
+
+      - name: Report Validation Results
+        if: failure()
+        run: |
+          echo "❌ TypeScript binding configuration validation failed"
+          echo "Please check the configuration examples in the binding documents"
+          echo "and ensure they work correctly with Node.js ${{ matrix.node-version }}"
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: validate-configurations
+    if: always()
+    steps:
+      - name: Validation Summary
+        run: |
+          if [ "${{ needs.validate-configurations.result }}" == "success" ]; then
+            echo "✅ All TypeScript binding configurations validated successfully across all Node.js versions!"
+            echo "🎉 Configuration examples are working correctly and ready for production use"
+          else
+            echo "❌ TypeScript binding configuration validation failed"
+            echo "Please review the failed jobs above and fix any configuration issues"
+            exit 1
+          fi

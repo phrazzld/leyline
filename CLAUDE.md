@@ -39,6 +39,12 @@ ruby tools/run_ci_checks.rb --verbose
 
 # Skip external link checking for faster execution
 ruby tools/run_ci_checks.rb --skip-external-links
+
+# Validate TypeScript binding configurations
+ruby tools/validate_typescript_bindings.rb
+
+# Validate TypeScript bindings with verbose output
+ruby tools/validate_typescript_bindings.rb --verbose
 ```
 
 
@@ -61,7 +67,8 @@ tools/
 │   ├── validate_front_matter.rb  # Validates YAML front-matter
 │   ├── reindex.rb                # Rebuilds document indexes
 │   ├── fix_cross_references.rb   # Fixes internal cross-references
-│   └── run_ci_checks.rb          # Local CI simulation for pre-push validation
+│   ├── run_ci_checks.rb          # Local CI simulation for pre-push validation
+│   └── validate_typescript_bindings.rb  # Validates TypeScript binding configurations
 ```
 
 ### Repository Architecture
