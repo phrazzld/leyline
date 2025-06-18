@@ -149,6 +149,42 @@
     - **Depends-on:** [V001]
     - **COMPLETED:** Cross-reference validation infrastructure implemented. Created `tools/validate_cross_references.rb` with structured logging and correlation tracking. Fixed cross-references in all TypeScript binding files. Integrated validation into CI pipeline with automated failure reporting. Note: Legacy binding files contain broken links that require systematic remediation in future maintenance cycles.
 
+## CI Resolution Tasks (Urgent - PR #126)
+> **Philosophy**: Fix broken windows immediately to maintain automation trust
+
+- [x] **F001 · Fix · P0: resolve Ruby dependency error in cross-reference validation**
+    - **Context:** CI failing on PR #126 due to missing `require 'time'` in validation tool
+    - **Action:**
+        1. Add `require 'time'` to top of `tools/validate_cross_references.rb`
+        2. Add comprehensive error handling around structured logging calls
+        3. Test script locally to verify Ruby compatibility
+        4. Verify structured logging functions correctly with correlation IDs
+    - **Done-when:** Cross-reference validation tool runs without Ruby errors
+    - **Verification:** CI pipeline passes, structured logging produces valid JSON
+    - **Depends-on:** [V002]
+
+- [ ] **F002 · Fix · P0: implement defensive programming for validation tools**
+    - **Context:** Prevent similar Ruby standard library issues in validation infrastructure
+    - **Action:**
+        1. Audit all validation tools for missing standard library requires
+        2. Add graceful degradation for optional features (structured logging)
+        3. Wrap external library calls in error boundaries
+        4. Document Ruby version requirements in tool headers
+    - **Done-when:** All validation tools handle missing dependencies gracefully
+    - **Verification:** Tools work with and without optional features enabled
+    - **Depends-on:** [F001]
+
+- [ ] **F003 · Fix · P1: create local CI simulation script**
+    - **Context:** Enable pre-push validation to catch CI issues before remote execution
+    - **Action:**
+        1. Create `tools/run_ci_checks.rb` that executes all CI validation steps locally
+        2. Include YAML validation, cross-reference validation, and index consistency
+        3. Add structured logging and correlation ID tracking
+        4. Document usage in CLAUDE.md for development workflow
+    - **Done-when:** Local script successfully replicates CI validation pipeline
+    - **Verification:** Script catches same issues as CI, provides actionable feedback
+    - **Depends-on:** [F002]
+
 - [ ] **V003 · Test · P1: validate configuration examples through automation**
     - **Context:** Practical usability verification
     - **Action:**

@@ -11,6 +11,7 @@
 require 'fileutils'
 require 'json'
 require 'pathname'
+require 'time'
 
 # Configuration for structured logging
 $structured_logging = ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
@@ -20,14 +21,19 @@ $errors = []
 def log_structured(event, data = {})
   return unless $structured_logging
 
-  log_entry = {
-    event: event,
-    correlation_id: $correlation_id,
-    timestamp: Time.now.iso8601,
-    **data
-  }
+  begin
+    log_entry = {
+      event: event,
+      correlation_id: $correlation_id,
+      timestamp: Time.now.iso8601,
+      **data
+    }
 
-  STDERR.puts JSON.generate(log_entry)
+    STDERR.puts JSON.generate(log_entry)
+  rescue => e
+    # Graceful degradation if structured logging fails
+    STDERR.puts "Warning: Structured logging failed: #{e.message}"
+  end
 end
 
 def add_error(file, link, issue, suggestion = nil)
