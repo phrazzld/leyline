@@ -352,7 +352,7 @@ jobs:
 
 ## Related Bindings
 
-- [use-pnpm-for-nodejs.md](use-pnpm-for-nodejs.md): This standards binding extends the foundational pnpm binding by adding comprehensive package.json structure requirements, security validation, and CI enforcement mechanisms that build upon the basic pnpm usage patterns.
+- [use-pnpm-for-nodejs.md](../../docs/bindings/categories/typescript/use-pnpm-for-nodejs.md): This standards binding extends the foundational pnpm binding by adding comprehensive package.json structure requirements, security validation, and CI enforcement mechanisms that build upon the basic pnpm usage patterns.
 
 - [comprehensive-security-automation.md](../core/comprehensive-security-automation.md): The security validation and dependency scanning aspects of this binding implement the comprehensive security automation principles specifically for the Node.js dependency management domain.
 
@@ -360,4 +360,4 @@ jobs:
 
 - [automated-quality-gates.md](../core/automated-quality-gates.md): The CI validation and package.json linting implement automated quality gates specifically for dependency management, ensuring consistent dependency practices across all TypeScript projects.
 
-- [modern-typescript-toolchain.md](modern-typescript-toolchain.md): This standards binding provides the dependency management foundation for the unified toolchain, ensuring all tools work together through consistent package.json configuration and dependency management practices.
+- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This standards binding provides the dependency management foundation for the unified toolchain, ensuring all tools work together through consistent package.json configuration and dependency management practices.

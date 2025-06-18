@@ -262,10 +262,10 @@ function UserProfile({ userId }: { userId: string }) {
 
 ## Related Bindings
 
-- [type-safe-state-management.md](type-safe-state-management.md): This TanStack Query binding specializes the type-safe state management principles specifically for server state, providing concrete patterns for API interactions while the general binding covers all state management types.
+- [type-safe-state-management.md](../../docs/bindings/categories/typescript/type-safe-state-management.md): This TanStack Query binding specializes the type-safe state management principles specifically for server state, providing concrete patterns for API interactions while the general binding covers all state management types.
 
-- [vitest-testing-framework.md](vitest-testing-framework.md): The testing patterns in this binding integrate with the Vitest testing framework, providing specific guidance for testing query hooks, mutations, and server state interactions within the unified testing approach.
+- [vitest-testing-framework.md](../../docs/bindings/categories/typescript/vitest-testing-framework.md): The testing patterns in this binding integrate with the Vitest testing framework, providing specific guidance for testing query hooks, mutations, and server state interactions within the unified testing approach.
 
-- [modern-typescript-toolchain.md](modern-typescript-toolchain.md): This binding implements the server state management component of the unified toolchain, integrating TanStack Query with TypeScript, Vitest, and other tools to provide a cohesive development experience.
+- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This binding implements the server state management component of the unified toolchain, integrating TanStack Query with TypeScript, Vitest, and other tools to provide a cohesive development experience.
 
 - [use-structured-logging.md](../core/use-structured-logging.md): The observability aspects of this binding complement structured logging by providing visibility into server state interactions, query performance, and cache behavior through TanStack Query DevTools and explicit error tracking.

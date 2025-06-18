@@ -52,3 +52,17 @@ jobs:
         else
           echo "✅ Index file is up-to-date and all documents use valid YAML front-matter"
         fi
+
+    - name: Validate cross-references
+      run: |
+        echo "Validating cross-references in documentation"
+        export LEYLINE_STRUCTURED_LOGGING=true
+        ruby tools/validate_cross_references.rb -v
+        if [ $? -ne 0 ]; then
+          echo "::error::Cross-reference validation failed. Some links point to non-existent files."
+          echo "::error::Run 'ruby tools/fix_cross_references.rb' to automatically fix common issues."
+          echo "::error::Then run 'ruby tools/validate_cross_references.rb' to verify all links are valid."
+          exit 1
+        else
+          echo "✅ All cross-references validated successfully"
+        fi

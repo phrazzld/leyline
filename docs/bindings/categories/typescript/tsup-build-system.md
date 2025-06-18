@@ -378,7 +378,7 @@ export default defineConfig({
 
 ## Related Bindings
 
-- [modern-typescript-toolchain.md](modern-typescript-toolchain.md): This build binding implements the build component of the unified toolchain, providing consistent tsup integration with TypeScript, Vitest, and other tools in the standardized development environment.
+- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This build binding implements the build component of the unified toolchain, providing consistent tsup integration with TypeScript, Vitest, and other tools in the standardized development environment.
 
 - [automated-quality-gates.md](../core/automated-quality-gates.md): The build validation and CI integration aspects of this binding implement automated quality gates specifically for build verification, ensuring consistent artifact quality across all TypeScript projects.
 

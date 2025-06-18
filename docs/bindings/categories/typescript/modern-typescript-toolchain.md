@@ -181,7 +181,7 @@ pnpm install && pnpm test && pnpm build
 
 - [tooling-investment.md](../core/tooling-investment.md): This toolchain binding implements the principle of mastering a small set of high-impact tools rather than constantly switching. The standardized toolchain reduces learning overhead and maximizes the compound returns from tool mastery across team members.
 
-- [use-pnpm-for-nodejs.md](use-pnpm-for-nodejs.md): The package management component of this toolchain builds directly on the pnpm binding, extending its consistency benefits to the entire development experience rather than just dependency management.
+- [use-pnpm-for-nodejs.md](../../docs/bindings/categories/typescript/use-pnpm-for-nodejs.md): The package management component of this toolchain builds directly on the pnpm binding, extending its consistency benefits to the entire development experience rather than just dependency management.
 
 - [preferred-technology-patterns.md](../core/preferred-technology-patterns.md): This binding applies the "choose boring technology" principle by selecting proven, stable tools (TypeScript, ESLint, Prettier) while incorporating modern capabilities (Vitest, tsup) that provide clear value without excessive complexity.
 

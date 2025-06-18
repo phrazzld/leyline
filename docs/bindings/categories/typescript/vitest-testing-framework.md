@@ -325,7 +325,7 @@ describe('User operations', () => {
 
 ## Related Bindings
 
-- [modern-typescript-toolchain.md](modern-typescript-toolchain.md): This testing binding implements the testing component of the unified toolchain, providing consistent Vitest integration with the broader TypeScript ecosystem established in the foundation binding.
+- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This testing binding implements the testing component of the unified toolchain, providing consistent Vitest integration with the broader TypeScript ecosystem established in the foundation binding.
 
 - [no-internal-mocking.md](../core/no-internal-mocking.md): The testing patterns in this binding enforce the principle of only mocking external dependencies, ensuring tests accurately reflect real system behavior rather than creating false confidence through internal mocks.
 

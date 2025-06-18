@@ -384,6 +384,6 @@ repos:
 
 - [no-lint-suppression.md](../../core/no-lint-suppression.md): The zero-suppression policy directly implements the no-lint-suppression binding's principles by requiring documented justification for any quality check bypasses and encouraging root cause resolution over suppression.
 
-- [modern-typescript-toolchain.md](modern-typescript-toolchain.md): This binding implements the code quality component of the unified TypeScript toolchain, providing the ESLint/Prettier automation that complements Vitest testing, tsup building, and pnpm package management.
+- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This binding implements the code quality component of the unified TypeScript toolchain, providing the ESLint/Prettier automation that complements Vitest testing, tsup building, and pnpm package management.
 
 - [automated-quality-gates.md](../../core/automated-quality-gates.md): ESLint/Prettier automation serves as a foundational quality gate that prevents style and basic correctness issues from entering the development pipeline, supporting the tiered enforcement strategy with fast feedback and automatic remediation.
