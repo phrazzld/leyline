@@ -273,8 +273,8 @@ def process_tenets_files
   dir_base = 'tenets'
   puts "Validating #{dir_base}..."
 
-  # Skip index files
-  Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.each do |file|
+  # Skip index and overview files
+  Dir.glob("#{dir}/*.md").reject { |f| f =~ /(00-index|glance)\.md$/ }.each do |file|
     process_single_file(file, dir_base)
   end
 end
@@ -284,14 +284,14 @@ def get_binding_files
 
   # Core bindings
   core_glob = "docs/bindings/core/*.md"
-  files.concat(Dir.glob(core_glob).reject { |f| f =~ /00-index\.md$/ })
+  files.concat(Dir.glob(core_glob).reject { |f| f =~ /(00-index|glance)\.md$/ })
 
   # Category bindings
   categories_glob = "docs/bindings/categories/*/*.md"
-  files.concat(Dir.glob(categories_glob).reject { |f| f =~ /00-index\.md$/ })
+  files.concat(Dir.glob(categories_glob).reject { |f| f =~ /(00-index|glance)\.md$/ })
 
   # Check for misplaced files in the root - these should be warned about
-  root_files = Dir.glob("docs/bindings/*.md").reject { |f| f =~ /00-index\.md$/ }
+  root_files = Dir.glob("docs/bindings/*.md").reject { |f| f =~ /(00-index|glance)\.md$/ }
   if root_files.any?
     puts "  [WARNING] Found #{root_files.size} binding file(s) directly in docs/bindings/ directory."
     puts "  These should be moved to either docs/bindings/core/ or docs/bindings/categories/<category>/:"
@@ -705,6 +705,18 @@ def process_single_file(file, dir_base)
   end
 end
 
+# Log validation start with correlation ID
+if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+  start_log = {
+    event: 'validation_start',
+    correlation_id: $error_collector.correlation_id,
+    timestamp: Time.now.iso8601,
+    mode: $single_file ? 'single_file' : 'full_validation',
+    target: $single_file || 'all_files'
+  }
+  $stderr.puts JSON.generate(start_log)
+end
+
 # Run the validation process
 if $single_file
   # If a specific file is specified, just validate that one
@@ -758,7 +770,9 @@ else
   end
 end
 
-# Summarize results
+# Summarize results with structured logging
+$error_collector.log_validation_summary
+
 if $error_collector.any?
   # Use ErrorFormatter for enhanced error output
   formatter = ErrorFormatter.new

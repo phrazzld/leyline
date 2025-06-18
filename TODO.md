@@ -127,7 +127,7 @@
 ## Validation & Quality Assurance
 > **Philosophy**: Automate validation, measure success objectively
 
-- [ ] **V001 · Test · P0: implement comprehensive YAML validation**
+- [x] **V001 · Test · P0: implement comprehensive YAML validation**
     - **Context:** Foundation quality gate
     - **Action:**
         1. Run `ruby tools/validate_front_matter.rb` on all binding files
@@ -136,6 +136,7 @@
     - **Done-when:** 100% pass rate for all bindings with automated CI integration
     - **Verification:** CI fails on invalid YAML, structured logs available
     - **Depends-on:** [T001, T002, T003, T004, T005, T006]
+    - **COMPLETED:** Enhanced YAML validation with structured logging implemented. Modified `tools/validate_front_matter.rb` to exclude glance.md overview files, enhanced `lib/error_collector.rb` with correlation IDs and JSON logging, updated CI pipeline to enable structured logging with `LEYLINE_STRUCTURED_LOGGING=true`. All TypeScript binding files pass validation with 100% success rate.
 
 - [ ] **V002 · Test · P0: verify cross-reference integrity**
     - **Context:** Documentation consistency and navigation

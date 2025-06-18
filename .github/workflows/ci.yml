@@ -24,6 +24,7 @@ jobs:
     - name: Validate metadata (YAML-only format)
       run: |
         echo "Validating YAML front-matter in markdown files (YAML-only mode)"
+        export LEYLINE_STRUCTURED_LOGGING=true
         ruby tools/validate_front_matter.rb -v
         if [ $? -ne 0 ]; then
           echo "::error::YAML validation failed. All files must use YAML front-matter format only."
@@ -35,6 +36,7 @@ jobs:
       run: |
         echo "Running reindex.rb to check if docs/bindings/00-index.md is up-to-date (with YAML-only validation)"
         # Run reindex with strict mode to fail on any YAML or format errors
+        export LEYLINE_STRUCTURED_LOGGING=true
         ruby tools/reindex.rb --strict
         if [ $? -ne 0 ]; then
           echo "::error::Failed to generate index due to YAML format errors."
