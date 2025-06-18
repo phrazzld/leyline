@@ -22,13 +22,14 @@
     - **Depends-on:** none
     - **COMPLETED:** Standard documented in `docs/decisions/2025-06-18-typescript-configuration-file-locations.md` - Use workspace root for shared tooling with package-specific overrides only when domain requirements justify complexity
 
-- [ ] **D003 · Decision · P0: establish enforcement strictness**
+- [x] **D003 · Decision · P0: establish enforcement strictness**
     - **Context:** Development workflow integration philosophy
     - **Options:** Hard CI failures vs warnings vs progressive enhancement
     - **Decision Framework:** Developer experience vs compliance guarantee
     - **Recommended:** Hard failures with clear remediation guidance
     - **Done-when:** Policy applied across all bindings
     - **Depends-on:** none
+    - **COMPLETED:** Policy documented in `docs/decisions/2025-06-18-typescript-enforcement-strictness.md` - Use tiered enforcement with hard failures for essential quality gates (security, correctness) and progressive enhancement for developer experience
 
 ## Core Implementation (Value-Driven Priority)
 > **Philosophy**: Build foundation first, then layer specifics
