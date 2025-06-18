@@ -253,7 +253,7 @@
         3. Alternative proposal strategies documented
     - **Depends-on:** [G007]
 
-- [ ] **G018 · Feature · P1: create 80-20-solution-patterns binding**
+- [x] **G018 · Feature · P1: create 80-20-solution-patterns binding**
     - **Context:** Finding pragmatic solutions that deliver most value
     - **Action:**
         1. Create `docs/bindings/core/80-20-solution-patterns.md`

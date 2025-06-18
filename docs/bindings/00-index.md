@@ -6,6 +6,7 @@ This file contains an automatically generated list of all bindings with their on
 
 | ID | Version | Summary |
 |---|---|---|
+| [80-20-solution-patterns](./core/80-20-solution-patterns.md) | 0.1.0 | Grug's wisdom teaches that most software projects fail not from technical limitations but from attempting to solve too much at once. The 80/20 prin... |
 | [api-design](./core/api-design.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by ensuring that component contracts—the most critical communication points in any system—... |
 | [automate-changelog](./core/automate-changelog.md) | 0.1.0 | This binding directly implements our automation tenet by transforming manual |
 | [automated-quality-gates](./core/automated-quality-gates.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by creating automated systems that prevent quality degradation before it begins. Quality gates... |
