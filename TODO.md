@@ -179,7 +179,7 @@
 
 ## Phase 5: Complexity Fighting Enhancements
 
-- [ ] **G013 · Feature · P2: enhance simplicity tenet with grug metaphors**
+- [x] **G013 · Feature · P2: enhance simplicity tenet with grug metaphors**
     - **Context:** Add memorable "complexity demon" metaphor to existing tenet
     - **Action:**
         1. Edit `docs/tenets/simplicity.md`

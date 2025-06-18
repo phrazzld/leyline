@@ -1,6 +1,6 @@
 ---
 id: simplicity
-last_modified: '2025-06-16'
+last_modified: '2025-06-17'
 version: '0.1.0'
 ---
 # Tenet: Simplicity Above All
@@ -22,12 +22,27 @@ might seem efficient in the short term, but you'll pay for it many times over th
 increased maintenance costs, onboarding challenges, and cognitive overload. Each additional
 layer of complexity creates exponential growth in mental overhead needed to work with the code.
 
+But complexity is more than just technical debt—it's a spirit demon that haunts your codebase.
+Like a malevolent entity, complexity feeds on itself, growing stronger with each "small" addition.
+What starts as an innocent "let me just add this one configuration option" becomes a web of
+interdependent settings. A simple function gains "just one more parameter" until it requires
+a reference manual to use. A straightforward class accepts "just this one special case" until
+it's riddled with conditional logic.
+
 The pursuit of simplicity isn't about cutting corners or avoiding sophisticated
 solutions when they're truly needed. Rather, it's about recognizing that there's
 elegance in simplicity—finding the solution that solves the problem completely with the
 least moving parts. It's about distinguishing between essential complexity (inherent in
 the problem domain) and accidental complexity (introduced by our implementation
 choices).
+
+The complexity demon whispers seductive lies: "This abstraction will make future changes easier."
+"This configuration option adds flexibility." "This framework will handle all our edge cases."
+But these promises are hollow. The demon thrives on your desire to appear sophisticated, to
+build "enterprise-grade" solutions that impress other developers. Fight back with ruthless
+simplicity. When you feel the urge to add "just one more layer," stop and ask: "Am I feeding
+the complexity demon, or am I solving a real problem?" Choose the boring, obvious solution
+over the clever one. Your future self—and your teammates—will thank you.
 
 ## Practical Guidelines
 
@@ -68,24 +83,20 @@ choices).
 
 1. **Ship Good-Enough Software**: Perfect software is the enemy of useful software.
    Focus on meeting actual user needs rather than pursuing theoretical perfection.
-   Deliver value early and iterate based on real feedback rather than speculation.
-   Ask yourself: "Is this good enough for our users, future maintainers, and business
-   needs?" Quality has a cost, and over-engineering wastes resources that could be
-   better spent on features users actually need. Know when to stop polishing and
-   start delivering.
+   Ask yourself: "Is this good enough for our users and business needs?" Know when
+   to stop polishing and start delivering value.
 
-1. **Use Tracer Bullets for Early Validation**: When building new functionality,
-   create a minimal end-to-end implementation first—a "tracer bullet" that touches
-   all architectural layers but implements only core functionality. This simple
-   approach validates assumptions about integration points, data flow, and user
-   interaction early, when changes are cheap. Like actual tracer rounds that help
-   gunners adjust their aim, tracer code helps you adjust your architecture before
-   investing heavily in detailed implementation.
+1. **Use Tracer Bullets for Early Validation**: Create a minimal end-to-end
+   implementation first that touches all architectural layers but implements only
+   core functionality. This validates assumptions about integration points early,
+   when changes are cheap, before investing in detailed implementation.
 
 ## Warning Signs
 
 - **Over-engineering solutions** by creating elaborate frameworks for simple problems.
-  Watch for solutions that feel disproportionate to the problem they solve.
+  Watch for solutions that feel disproportionate to the problem they solve. The complexity
+  demon loves when you build a "flexible event system" to handle three button clicks, or
+  a "configuration abstraction layer" for two environment variables.
 
 - **Designing for imagined future requirements** rather than actual needs. Phrases like
   "We might need to..." without concrete use cases signal YAGNI violations. Focus on
@@ -97,6 +108,8 @@ choices).
 
 - **Implementing overly clever or obscure code** that requires significant mental effort
   to understand. If you find yourself thinking "this is clever," that's often a warning sign.
+  The complexity demon feeds on your ego—it wants you to write code that makes you feel smart,
+  not code that makes the next developer's job easier.
 
 - **Deep nesting (> 2-3 levels)** of conditionals, loops, or functions, creating code
   that requires keeping multiple contexts in mind simultaneously. Consider refactoring
@@ -112,30 +125,25 @@ choices).
 
 - **Hearing justifications like "I'll make it generic so we can reuse it later"**
   without immediate demonstrated need. Generalization adds complexity and should be
-  driven by actual requirements, not speculation.
+  driven by actual requirements, not speculation. This is the complexity demon's favorite
+  trick—it convinces you that building for imaginary future use cases is "good engineering."
 
 ## Related Tenets
 
-- [Modularity](modularity.md): While Simplicity focuses on avoiding unnecessary
-  complexity, Modularity guides how to break systems into focused, small components.
-  Together, they help create systems that are both simple and well-structured.
+- [Modularity](modularity.md): Guides breaking systems into focused, small components
+  that work together to create simple, well-structured architectures.
 
-- [Explicit over Implicit](explicit-over-implicit.md): Explicitness enhances simplicity
-  by making code behavior clear and obvious, reducing mental overhead needed to
-  understand what's happening.
+- [Explicit over Implicit](explicit-over-implicit.md): Explicitness reduces mental
+  overhead by making code behavior clear and obvious.
 
-- [Testability](testability.md): Simple code is inherently more testable. By keeping
-  components focused and minimizing dependencies, you make them easier to test in
-  isolation.
+- [Testability](testability.md): Simple code is inherently more testable through
+  focused components and minimal dependencies.
 
-- [Maintainability](maintainability.md): Simplicity is a key contributor to
-  maintainability. Simple systems are easier to understand, modify, and extend.
+- [Maintainability](maintainability.md): Simple systems are easier to understand,
+  modify, and extend over time.
 
-- [Empathize With Your User](empathize-with-your-user.md): User empathy naturally
-  leads to simpler solutions because complex interfaces and interactions are harder
-  for users to understand and navigate.
+- [Empathize With Your User](empathize-with-your-user.md): User empathy drives
+  simpler solutions that are easier to understand and navigate.
 
-- [Product Value First](product-value-first.md): Product value focus naturally drives
-  simplicity because unnecessary complexity doesn't serve users. When you consistently
-  ask "How does this complexity benefit users?", you eliminate technical sophistication
-  that exists purely for its own sake.
+- [Product Value First](product-value-first.md): Value focus eliminates complexity
+  that doesn't serve users or business needs.
