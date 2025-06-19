@@ -123,3 +123,76 @@ The project uses a detailed TODO.md with task dependencies:
    - Run all tests and linting before marking complete
    - Update TODO.md to mark task as [x]
    - Commit with descriptive conventional commit message
+
+## CI Failure Prevention
+
+### Recommended Pre-Push Workflow
+
+**Essential Pre-Push Command:**
+```bash
+# Run complete local CI simulation before pushing
+ruby tools/run_ci_checks.rb
+```
+
+**For faster iteration during development:**
+```bash
+# Skip external link checking for quicker feedback
+ruby tools/run_ci_checks.rb --skip-external-links
+
+# Get detailed output for debugging failures
+ruby tools/run_ci_checks.rb --verbose
+```
+
+### Common CI Failure Types & Prevention
+
+**YAML Front-matter Issues:**
+```bash
+# Validate specific file
+ruby tools/validate_front_matter.rb -f docs/bindings/categories/typescript/your-binding.md
+
+# Validate all files
+ruby tools/validate_front_matter.rb
+```
+
+**TypeScript Configuration Issues:**
+```bash
+# Validate TypeScript binding configurations
+ruby tools/validate_typescript_bindings.rb --verbose
+```
+
+**Security Scan False Positives:**
+```bash
+# Test security scanning locally
+gitleaks detect --source=. --no-git --verbose
+
+# For documentation: use [REDACTED] or [EXAMPLE] markers instead of realistic secrets
+```
+
+**Dependency Security Issues:**
+```bash
+# Audit TypeScript project dependencies
+cd examples/typescript-full-toolchain && pnpm audit --audit-level=moderate
+```
+
+**Cross-reference Link Issues:**
+```bash
+# Check and fix broken internal links
+ruby tools/validate_cross_references.rb
+ruby tools/fix_cross_references.rb
+```
+
+### Pre-commit Integration (Optional)
+
+Add to your local `.git/hooks/pre-push` for automatic validation:
+```bash
+#!/bin/bash
+echo "🔄 Running local CI validation before push..."
+ruby tools/run_ci_checks.rb --skip-external-links
+if [ $? -ne 0 ]; then
+    echo "❌ Local CI validation failed. Fix issues before pushing."
+    exit 1
+fi
+echo "✅ Local CI validation passed. Proceeding with push."
+```
+
+Make executable: `chmod +x .git/hooks/pre-push`

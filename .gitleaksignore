@@ -1,0 +1,10 @@
+# Test files and fixtures containing intentional test secrets for security validation
+spec/fixtures/bindings/potential-secrets.md:generic-api-key:8
+tools/test_security_scan.rb:generic-api-key:48
+tools/test_security_scan.rb:generic-api-key:49
+tools/test_security_scan.rb:github-pat:49
+tools/test_secret_redaction_security.rb:generic-api-key:12
+tools/test_secret_redaction_security.rb:generic-api-key:13
+tools/test_secret_redaction_security.rb:generic-api-key:18
+tools/test_secret_redaction_security.rb:generic-api-key:23
+tools/test_secret_redaction_security.rb:generic-api-key:24

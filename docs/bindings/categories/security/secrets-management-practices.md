@@ -250,9 +250,9 @@ const apiConfig = {
 
 // ❌ BAD: Realistic-looking secrets that trigger scanners
 const badConfig = {
-  apiKey: 'sk_live_abc123xyz789',        // Looks like real Stripe key
-  token: 'ghp_1a2b3c4d5e6f7g8h',        // Looks like real GitHub token
-  secret: 'sk-proj-abc123'               // Looks like real OpenAI key
+  apiKey: 'sk_live_[EXAMPLE_ONLY]',      // Use redaction markers instead
+  token: 'ghp_[REDACTED]',               // Clear placeholder format
+  secret: 'sk-proj-[PLACEHOLDER]'        // Template-style indicator
 };
 ```
 
@@ -268,8 +268,8 @@ const badConfig = {
 ```python
 # ❌ BAD: Hardcoded secrets with suppressed detection
 # GitLeaks:ignore - "temporary" suppression that becomes permanent
-API_KEY = "sk-1a2b3c4d5e6f7g8h9i0j"  # Real API key hardcoded!
-DATABASE_URL = "postgresql://admin:password@db.production.com:5432/app"
+API_KEY = "sk-[REDACTED]"  # Never hardcode real API keys!
+DATABASE_URL = "postgresql://admin:[PASSWORD]@db.production.com:5432/app"
 ```
 
 ```typescript

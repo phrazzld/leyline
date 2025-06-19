@@ -35,3 +35,6 @@ T*-summary.md
 
 **/*.log
 thinktank*.log
+
+# Validation metrics (operational data)
+metrics/
