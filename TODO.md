@@ -65,7 +65,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Alternative:** Keep .gitleaksignore for local development but remove from CI
     - **Done-when:** Security scanning removed from CI pipeline
 
-- [ ] **R004 · Remove · P1: eliminate dependency security auditing of example projects**
+- [x] **R004 · Remove · P1: eliminate dependency security auditing of example projects**
     - **Context:** Running `pnpm audit` on example/demo projects in documentation repo
     - **Problem:** Example projects are for education, not production deployment
     - **Current behavior:** CI fails if example projects have dependency vulnerabilities

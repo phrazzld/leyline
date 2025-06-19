@@ -276,21 +276,30 @@ def main
     })
   end
 
-  # Step 6: Security audit for TypeScript projects
-  if File.exist?("examples/typescript-full-toolchain/package.json")
-    puts ""
-    puts "🔐 Security audit..."
-    Dir.chdir("examples/typescript-full-toolchain") do
-      command = "pnpm audit --audit-level=moderate"
-      unless run_command(command, "Security audit (pnpm)", required: false)
-        failed_validations << "Security audit"
+  # Step 6: Security audit for TypeScript projects (full mode only, advisory)
+  if $validation_mode == :full
+    if File.exist?("examples/typescript-full-toolchain/package.json")
+      puts ""
+      puts "🔐 Security audit (advisory)..."
+      Dir.chdir("examples/typescript-full-toolchain") do
+        command = "pnpm audit --audit-level=moderate"
+        unless run_command(command, "Security audit (pnpm) - advisory", required: false)
+          puts "   ⚠️  Dependency security issues found, but continuing (advisory only)"
+          puts "   💡 Example projects are for education, not production deployment"
+        end
       end
+    else
+      puts "⏭️  Skipping security audit (no TypeScript example project found)"
+      log_structured('validation_step_skipped', {
+        step: "Security audit",
+        reason: "no_typescript_example"
+      })
     end
   else
-    puts "⏭️  Skipping security audit (no TypeScript example project found)"
+    puts "⏭️  Skipping dependency security audit (essential mode)"
     log_structured('validation_step_skipped', {
       step: "Security audit",
-      reason: "no_typescript_example"
+      reason: "essential_mode"
     })
   end
 
@@ -353,8 +362,8 @@ def main
       validations_count = 3  # YAML, cross-reference, index (full mode)
       validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
       validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan (full mode only)
+      validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit (full mode only)
     end
-    validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
     validations_count += 1 unless $skip_external_links  # External links
 
     log_structured('ci_simulation_success', {
@@ -378,8 +387,8 @@ def main
       validations_count = 3  # YAML, cross-reference, index (full mode)
       validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
       validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan (full mode only)
+      validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit (full mode only)
     end
-    validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
     validations_count += 1 unless $skip_external_links  # External links
 
     log_structured('ci_simulation_failure', {
