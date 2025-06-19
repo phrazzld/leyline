@@ -2,11 +2,19 @@
 # tools/run_ci_checks.rb - Local CI simulation script
 # Replicates CI validation pipeline locally to catch issues before remote execution
 #
-# This script executes the same validation steps as the CI pipeline:
+# This script supports two validation modes:
+# Essential mode: Fast validation for daily development (YAML + Index)
+# Full mode: Comprehensive validation including advisory checks
+#
+# Essential validation steps:
 # 1. YAML front-matter validation
-# 2. Cross-reference validation
-# 3. Index consistency check
-# 4. Optional external link checking (if markdown-link-check available)
+# 2. Index consistency check
+#
+# Full validation steps (additional):
+# 3. Cross-reference validation (advisory)
+# 4. TypeScript binding validation (advisory)
+# 5. Security scanning (advisory)
+# 6. Optional external link checking (if markdown-link-check available)
 #
 # Requirements:
 # - Ruby 2.1+ (for Time.now.iso8601 and JSON support)
@@ -28,14 +36,27 @@ $structured_logging = ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
 $correlation_id = "ci-simulation-#{Time.now.strftime('%Y%m%d%H%M%S')}-#{rand(1000)}"
 $verbose = false
 $skip_external_links = false
+$validation_mode = :full  # :essential or :full
 
 # Parse command line options
 OptionParser.new do |opts|
   opts.banner = "Usage: run_ci_checks.rb [options]"
   opts.separator ""
-  opts.separator "Local CI simulation script that replicates CI validation pipeline"
+  opts.separator "Local CI simulation script with essential and full validation modes"
+  opts.separator ""
+  opts.separator "Validation Modes:"
+  opts.separator "  --essential  Fast validation for daily development (YAML + Index only)"
+  opts.separator "  --full       Comprehensive validation including advisory checks (default)"
   opts.separator ""
   opts.separator "Options:"
+
+  opts.on("--essential", "Run essential validation only (YAML + Index, ~10 seconds)") do
+    $validation_mode = :essential
+  end
+
+  opts.on("--full", "Run full validation including advisory checks (default)") do
+    $validation_mode = :full
+  end
 
   opts.on("--skip-external-links", "Skip external link checking (faster execution)") do
     $skip_external_links = true
@@ -138,12 +159,14 @@ end
 def main
   log_structured('ci_simulation_start', {
     tool: 'run_ci_checks',
+    validation_mode: $validation_mode,
     verbose: $verbose,
     skip_external_links: $skip_external_links
   })
 
   puts "🚀 Local CI Validation Pipeline"
   puts "================================"
+  puts "Mode: #{$validation_mode.to_s.capitalize} validation"
   puts "Correlation ID: #{$correlation_id}"
   puts "Structured Logging: #{$structured_logging ? 'enabled' : 'disabled'}"
   puts ""
@@ -157,10 +180,21 @@ def main
     failed_validations << "YAML validation"
   end
 
-  # Step 2: Cross-reference validation
-  command = "ruby tools/validate_cross_references.rb#{$verbose ? ' -v' : ''}"
-  unless run_command(command, "Cross-reference validation")
-    failed_validations << "Cross-reference validation"
+  # Step 2: Cross-reference validation (full mode only, advisory)
+  if $validation_mode == :full
+    puts ""
+    puts "📋 Advisory validation (non-blocking)..."
+    command = "ruby tools/validate_cross_references.rb#{$verbose ? ' -v' : ''}"
+    unless run_command(command, "Cross-reference validation (advisory)", required: false)
+      puts "   ⚠️  Cross-reference issues found, but continuing (advisory only)"
+      puts "   💡 Run 'ruby tools/fix_cross_references.rb' to fix common issues"
+    end
+  else
+    puts "⏭️  Skipping cross-reference validation (essential mode)"
+    log_structured('validation_step_skipped', {
+      step: "Cross-reference validation",
+      reason: "essential_mode"
+    })
   end
 
   # Step 3: Index consistency check
@@ -294,8 +328,12 @@ def main
     puts "🎉 Your changes are ready for CI"
     puts "⏱️  Total time: #{total_duration}s"
 
-    # Calculate validations run: 3 core + optional ones
-    validations_count = 3  # YAML, cross-reference, index (always run)
+    # Calculate validations run based on mode
+    if $validation_mode == :essential
+      validations_count = 2  # YAML, index (essential mode)
+    else
+      validations_count = 3  # YAML, cross-reference, index (full mode)
+    end
     validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation
     validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
     validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
@@ -315,8 +353,12 @@ def main
     puts "💡 Fix the issues above before pushing to remote"
     puts "⏱️  Total time: #{total_duration}s"
 
-    # Calculate validations run (same logic as success case)
-    validations_count = 3  # YAML, cross-reference, index (always run)
+    # Calculate validations run based on mode (same logic as success case)
+    if $validation_mode == :essential
+      validations_count = 2  # YAML, index (essential mode)
+    else
+      validations_count = 3  # YAML, cross-reference, index (full mode)
+    end
     validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation
     validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
     validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit

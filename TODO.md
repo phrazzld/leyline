@@ -38,7 +38,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
 ## Overengineered Validation (Remove/Simplify)
 > **Philosophy**: Remove friction that doesn't serve repository purpose
 
-- [ ] **R001 · Remove · P0: eliminate blocking cross-reference validation**
+- [x] **R001 · Remove · P0: eliminate blocking cross-reference validation**
     - **Context:** Currently blocks ALL PRs due to hundreds of pre-existing broken links
     - **Problem:** New work cannot proceed due to old, unrelated documentation debt
     - **Current behavior:** `ruby tools/validate_cross_references.rb` fails CI if ANY link is broken
