@@ -43,6 +43,7 @@ require 'json'
 require_relative '../lib/yaml_line_tracker'
 require_relative '../lib/error_collector'
 require_relative '../lib/error_formatter'
+require_relative '../lib/metrics_collector'
 
 # Configuration
 REQUIRED_KEYS = {
@@ -135,13 +136,54 @@ $warnings_found = []     # Track warnings (non-fatal issues)
 $single_file = options[:file]
 $verbose = options[:verbose]
 $error_collector = ErrorCollector.new  # Enhanced error collection
+$metrics_collector = MetricsCollector.new(tool_name: 'validate_front_matter', tool_version: '1.0.0')  # Metrics collection
 $file_contents = {}      # Store file contents for context snippets
 
-# Helper to print styled error messages
+# Structured logging helper
+def log_structured_start
+  return unless ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+
+  begin
+    start_log = {
+      event: 'validation_start',
+      correlation_id: $metrics_collector.correlation_id,
+      timestamp: Time.now.iso8601,
+      tool: 'validate_front_matter',
+      single_file: $single_file,
+      verbose: $verbose
+    }
+    STDERR.puts JSON.generate(start_log)
+  rescue => e
+    STDERR.puts "Warning: Structured logging failed: #{e.message}"
+  end
+end
+
+# Helper to print styled error messages with metrics tracking
 def print_error(file, message, details = nil, exit_code = 1)
   puts "  [ERROR] #{file}: #{message}"
   puts "  #{details}" if details
   $files_with_issues << file
+
+  # Track error pattern for metrics
+  error_type = case message
+  when /Missing required field/
+    'missing_field'
+  when /Invalid field format/
+    'invalid_format'
+  when /Duplicate ID/
+    'duplicate_id'
+  when /YAML syntax error/
+    'yaml_syntax_error'
+  else
+    'front_matter_validation_error'
+  end
+
+  $metrics_collector.record_error_pattern(
+    error_type: error_type,
+    component: 'front_matter_validator',
+    context: { file: file, message: message }
+  )
+
   exit exit_code unless $single_file.nil?
 end
 
@@ -728,6 +770,9 @@ if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
   end
 end
 
+# Log structured validation start
+log_structured_start
+
 # Run the validation process
 if $single_file
   # If a specific file is specified, just validate that one
@@ -781,8 +826,17 @@ else
   end
 end
 
-# Summarize results with structured logging
+# Summarize results with structured logging and metrics
 $error_collector.log_validation_summary
+$metrics_collector.log_completion_summary
+
+# Save metrics for aggregation
+begin
+  metrics_file = $metrics_collector.save_metrics
+  puts "📊 Metrics saved to #{metrics_file}" if $verbose
+rescue => e
+  puts "⚠️ Failed to save metrics: #{e.message}" if $verbose
+end
 
 if $error_collector.any?
   # Use ErrorFormatter for enhanced error output

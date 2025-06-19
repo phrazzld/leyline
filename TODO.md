@@ -319,7 +319,7 @@
 ## Observability & Monitoring
 > **Philosophy**: Measure what matters, improve continuously
 
-- [ ] **O001 · Observability · P2: implement structured logging and metrics**
+- [x] **O001 · Observability · P2: implement structured logging and metrics**
     - **Context:** Validation process monitoring and improvement
     - **Action:**
         1. Add JSON-structured logging to all validation scripts
