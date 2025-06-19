@@ -192,7 +192,57 @@ def main
     failed_validations << "Index generation"
   end
 
-  # Step 4: External link checking (optional)
+  # Step 4: TypeScript binding configuration validation
+  if Dir.exist?("docs/bindings/categories/typescript")
+    command = "ruby tools/validate_typescript_bindings.rb#{$verbose ? ' --verbose' : ''}"
+    unless run_command(command, "TypeScript binding validation", required: false)
+      failed_validations << "TypeScript binding validation"
+    end
+  else
+    puts "⏭️  Skipping TypeScript binding validation (no TypeScript bindings found)"
+    log_structured('validation_step_skipped', {
+      step: "TypeScript binding validation",
+      reason: "no_typescript_bindings"
+    })
+  end
+
+  # Step 5: Security scanning (gitleaks)
+  puts ""
+  puts "🔒 Security scanning..."
+
+  if check_tool_availability("gitleaks", "Install gitleaks from https://github.com/gitleaks/gitleaks")
+    # Scan current working directory files (not git history to avoid false positives)
+    command = "gitleaks detect --source=. --no-git"
+    unless run_command(command, "Security scan (gitleaks)")
+      failed_validations << "Security scan"
+    end
+  else
+    puts "   Skipping security scan (gitleaks not available)"
+    log_structured('validation_step_skipped', {
+      step: "Security scan",
+      reason: "gitleaks_not_available"
+    })
+  end
+
+  # Step 6: Security audit for TypeScript projects
+  if File.exist?("examples/typescript-full-toolchain/package.json")
+    puts ""
+    puts "🔐 Security audit..."
+    Dir.chdir("examples/typescript-full-toolchain") do
+      command = "pnpm audit --audit-level=moderate"
+      unless run_command(command, "Security audit (pnpm)", required: false)
+        failed_validations << "Security audit"
+      end
+    end
+  else
+    puts "⏭️  Skipping security audit (no TypeScript example project found)"
+    log_structured('validation_step_skipped', {
+      step: "Security audit",
+      reason: "no_typescript_example"
+    })
+  end
+
+  # Step 7: External link checking (optional)
   unless $skip_external_links
     puts ""
     puts "📡 Checking external link validation tool availability..."
@@ -244,9 +294,16 @@ def main
     puts "🎉 Your changes are ready for CI"
     puts "⏱️  Total time: #{total_duration}s"
 
+    # Calculate validations run: 3 core + optional ones
+    validations_count = 3  # YAML, cross-reference, index (always run)
+    validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation
+    validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
+    validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
+    validations_count += 1 unless $skip_external_links  # External links
+
     log_structured('ci_simulation_success', {
       duration_seconds: total_duration,
-      validations_run: 4 - ($skip_external_links ? 1 : 0),
+      validations_run: validations_count,
       failed_validations: []
     })
 
@@ -258,9 +315,16 @@ def main
     puts "💡 Fix the issues above before pushing to remote"
     puts "⏱️  Total time: #{total_duration}s"
 
+    # Calculate validations run (same logic as success case)
+    validations_count = 3  # YAML, cross-reference, index (always run)
+    validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation
+    validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
+    validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
+    validations_count += 1 unless $skip_external_links  # External links
+
     log_structured('ci_simulation_failure', {
       duration_seconds: total_duration,
-      validations_run: 4 - ($skip_external_links ? 1 : 0),
+      validations_run: validations_count,
       failed_validations: failed_validations,
       failed_count: failed_validations.length
     })

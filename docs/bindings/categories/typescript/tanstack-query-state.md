@@ -290,7 +290,7 @@ if (!apiConfig.baseUrl) {
 // ❌ BAD: Hardcoded API endpoints
 const apiConfig = {
   baseUrl: 'https://api.mycompany.com', // Hardcoded - insecure
-  apiKey: 'sk_live_abc123xyz', // Hardcoded secret - major security violation
+  apiKey: 'sk_live_[REDACTED]', // Hardcoded secret - major security violation
 };
 ```
 

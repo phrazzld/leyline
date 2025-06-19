@@ -226,7 +226,7 @@ def create_project_scaffold(dir, binding_name)
         "name": "#{binding_name}-validation",
         "version": "0.1.0",
         "type": "module",
-        "packageManager": "pnpm@^10.0.0",
+        "packageManager": "pnpm@10.12.1",
         "engines": {
           "node": ">=18.0.0"
         },

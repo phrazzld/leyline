@@ -228,6 +228,38 @@ rm pnpm-lock.yaml && pnpm install
 pnpm run security:check
 ```
 
+#### Security Overrides for Transitive Dependencies
+
+When vulnerable packages are included as transitive dependencies, use pnpm overrides to force secure versions:
+
+```json
+{
+  "pnpm": {
+    "overrides": {
+      "esbuild": ">=0.25.0"
+    }
+  }
+}
+```
+
+**Example: Resolving esbuild GHSA-67mh-4wv8-2f99 vulnerability**
+
+This project includes an override for esbuild to address [GHSA-67mh-4wv8-2f99](https://github.com/advisories/GHSA-67mh-4wv8-2f99), where esbuild <=0.24.2 could allow any website to send requests to the development server. The override forces all esbuild versions to >=0.25.0:
+
+```bash
+# Before override: esbuild 0.21.5 (vulnerable)
+pnpm why esbuild  # Shows vite -> esbuild@0.21.5
+
+# After override: esbuild 0.25.5 (secure)
+pnpm why esbuild  # Shows vite -> esbuild@0.25.5
+```
+
+**Best Practices for Security Overrides:**
+- Document each override with the specific CVE or security advisory
+- Use minimum required version (e.g., `>=0.25.0`) rather than exact pinning
+- Monitor for official updates that make overrides unnecessary
+- Test thoroughly when adding overrides to ensure compatibility
+
 ## Best Practices Summary
 
 1. **Automate Everything**: Security scanning, license validation, and vulnerability monitoring should be automatic

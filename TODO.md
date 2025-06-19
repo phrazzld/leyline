@@ -249,6 +249,73 @@
     - **Depends-on:** [T004, S001]
     - **COMPLETED:** Comprehensive supply chain security guidance implemented across TypeScript ecosystem. (1) Enhanced package-json-standards.md with 200+ lines of supply chain security best practices including version pinning strategy (exact for security-critical, semantic for others), dependency integrity verification, SBOM generation, provenance verification, and compliance automation. (2) Added supply chain security integration to modern-typescript-toolchain.md with security principles and CI integration. (3) Updated typescript-full-toolchain example project with security scripts (security:check, security:licenses, security:sbom), .npmrc security configuration, license-checker dependency, and comprehensive SUPPLY_CHAIN_SECURITY.md documentation. (4) Implemented automated license compliance checking, dependency vulnerability scanning, and package integrity verification. All sample projects now demonstrate production-ready supply chain security practices with automated enforcement and comprehensive documentation.
 
+## CI Failure Resolution (Urgent - Blocking PR #126)
+> **Philosophy**: Fix broken windows immediately, address root causes systematically
+
+- [ ] **CI001 · Fix · P0: resolve TypeScript ESLint configuration conflicts**
+    - **Context:** Critical - All TypeScript validation jobs failing due to parser errors
+    - **Root Cause:** ESLint trying to parse TypeScript files without proper parser configuration
+    - **Action:**
+        1. Investigate ESLint configuration in `tools/validate_typescript_bindings.rb`
+        2. Update generated ESLint config to use `@typescript-eslint/parser` for .ts/.tsx files
+        3. Add `dist/` directory to ESLint ignore patterns to exclude generated files
+        4. Test configuration locally with `ruby tools/validate_typescript_bindings.rb --verbose`
+        5. Verify all TypeScript syntax parsing works without "Unexpected token" errors
+    - **Done-when:** All Node.js 18.x, 20.x, 22.x TypeScript validation jobs pass
+    - **Verification:** `gh pr checks` shows TypeScript validation success
+    - **Depends-on:** none
+
+- [ ] **CI002 · Fix · P0: resolve security scan false positives**
+    - **Context:** Critical - Content validation failing due to gitleaks detecting example secrets
+    - **Root Cause:** Documentation examples formatted as real API keys triggering detection
+    - **Action:**
+        1. Change `apiKey: 'sk_live_abc123xyz'` to `apiKey: 'sk_live_[REDACTED]'` in tanstack-query-state.md:293
+        2. Update other example secrets to use `[REDACTED]` or `[EXAMPLE]` format
+        3. Test with local gitleaks: `gitleaks detect --source=docs/bindings/categories/typescript/ --verbose`
+        4. Document secure example patterns in SECURITY.md for future reference
+        5. Consider .gitleaksignore if needed for confirmed false positives
+    - **Done-when:** Gitleaks scan passes with zero false positive detections
+    - **Verification:** Content validation workflow passes without security failures
+    - **Depends-on:** none
+
+- [ ] **CI003 · Fix · P1: correct package manager version specifications**
+    - **Context:** Medium - pnpm warnings about invalid version format across all validation jobs
+    - **Root Cause:** packageManager field using semver range instead of exact version
+    - **Action:**
+        1. Find all package.json files with `"packageManager": "pnpm@^10.0.0"`
+        2. Change to exact version: `"packageManager": "pnpm@10.12.1"`
+        3. Update examples/typescript-full-toolchain/package.json with correct format
+        4. Update package-json-standards.md to clarify exact version requirement
+        5. Test that pnpm commands run without version warnings
+    - **Done-when:** Zero pnpm version warnings in CI logs
+    - **Verification:** TypeScript validation runs without "Cannot switch to pnpm" warnings
+    - **Depends-on:** [CI001]
+
+- [ ] **CI004 · Fix · P1: resolve esbuild security vulnerability**
+    - **Context:** Medium - Moderate security vulnerability in esbuild <=0.24.2
+    - **Root Cause:** Transitive dependency vulnerability requiring esbuild >=0.25.0
+    - **Action:**
+        1. Add overrides section to examples/typescript-full-toolchain/package.json
+        2. Force esbuild to latest secure version: `"overrides": {"esbuild": ">=0.25.0"}`
+        3. Run `pnpm audit --audit-level=moderate` to verify vulnerability resolution
+        4. Update SUPPLY_CHAIN_SECURITY.md with esbuild vulnerability remediation example
+        5. Document security override decisions in package comments
+    - **Done-when:** Security audit passes with no moderate+ vulnerabilities
+    - **Verification:** `pnpm audit` returns clean results
+    - **Depends-on:** [CI003]
+
+- [ ] **CI005 · Prevention · P2: implement local CI failure prevention**
+    - **Context:** Medium - Prevent similar CI failures through enhanced local validation
+    - **Action:**
+        1. Update `tools/run_ci_checks.rb` to include gitleaks scanning
+        2. Add ESLint configuration validation to local CI simulation
+        3. Add security audit checks to pre-commit workflow recommendation
+        4. Update CLAUDE.md with enhanced local validation commands
+        5. Create developer guide for CI failure prevention
+    - **Done-when:** Local CI simulation catches the same issues as remote CI
+    - **Verification:** Local script identifies configuration issues before push
+    - **Depends-on:** [CI001, CI002, CI003, CI004]
+
 ## Observability & Monitoring
 > **Philosophy**: Measure what matters, improve continuously
 

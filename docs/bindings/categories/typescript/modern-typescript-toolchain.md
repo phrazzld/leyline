@@ -46,7 +46,7 @@ The rule prohibits mixing incompatible tools within projects (e.g., Jest + Vites
 1. **New Project Initialization**: Start every TypeScript project with the standardized toolchain template:
    ```json
    {
-     "packageManager": "pnpm@^10.0.0",
+     "packageManager": "pnpm@10.12.1",
      "engines": {
        "node": ">=18.0.0",
        "pnpm": ">=10.0.0"
@@ -122,7 +122,7 @@ The rule prohibits mixing incompatible tools within projects (e.g., Jest + Vites
 6. **Supply Chain Security Integration**: Establish secure dependency management as a foundational component of the unified toolchain:
    ```json
    {
-     "packageManager": "pnpm@^10.0.0",
+     "packageManager": "pnpm@10.12.1",
      "engines": {
        "node": ">=18.18.0",        // Minimum version with security features
        "pnpm": ">=10.0.0"
@@ -164,7 +164,7 @@ The rule prohibits mixing incompatible tools within projects (e.g., Jest + Vites
 
 // ✅ GOOD: Unified toolchain with consistent patterns
 {
-  "packageManager": "pnpm@^10.0.0",
+  "packageManager": "pnpm@10.12.1",
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=10.0.0"

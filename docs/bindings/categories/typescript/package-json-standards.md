@@ -48,7 +48,7 @@ The rule prohibits missing packageManager declarations, undocumented dependency 
    {
      "name": "@company/project-name",
      "version": "1.0.0",
-     "packageManager": "pnpm@^10.0.0",
+     "packageManager": "pnpm@10.12.1",
      "engines": {
        "node": ">=18.0.0",
        "pnpm": ">=10.0.0"
