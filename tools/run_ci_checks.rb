@@ -249,21 +249,30 @@ def main
     })
   end
 
-  # Step 5: Security scanning (gitleaks)
-  puts ""
-  puts "🔒 Security scanning..."
+  # Step 5: Security scanning (gitleaks, full mode only, advisory)
+  if $validation_mode == :full
+    puts ""
+    puts "🔒 Security scanning (advisory)..."
 
-  if check_tool_availability("gitleaks", "Install gitleaks from https://github.com/gitleaks/gitleaks")
-    # Scan current working directory files (not git history to avoid false positives)
-    command = "gitleaks detect --source=. --no-git"
-    unless run_command(command, "Security scan (gitleaks)")
-      failed_validations << "Security scan"
+    if check_tool_availability("gitleaks", "Install gitleaks from https://github.com/gitleaks/gitleaks")
+      # Scan current working directory files (not git history to avoid false positives)
+      command = "gitleaks detect --source=. --no-git"
+      unless run_command(command, "Security scan (gitleaks) - advisory", required: false)
+        puts "   ⚠️  Security scanning found issues, but continuing (advisory only)"
+        puts "   💡 Educational examples may contain patterns that trigger false positives"
+      end
+    else
+      puts "   ⏭️ Skipping security scan (gitleaks not available)"
+      log_structured('validation_step_skipped', {
+        step: "Security scan",
+        reason: "gitleaks_not_available"
+      })
     end
   else
-    puts "   Skipping security scan (gitleaks not available)"
+    puts "⏭️  Skipping security scanning (essential mode)"
     log_structured('validation_step_skipped', {
       step: "Security scan",
-      reason: "gitleaks_not_available"
+      reason: "essential_mode"
     })
   end
 
@@ -343,8 +352,8 @@ def main
     else
       validations_count = 3  # YAML, cross-reference, index (full mode)
       validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
+      validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan (full mode only)
     end
-    validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
     validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
     validations_count += 1 unless $skip_external_links  # External links
 
@@ -368,8 +377,8 @@ def main
     else
       validations_count = 3  # YAML, cross-reference, index (full mode)
       validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
+      validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan (full mode only)
     end
-    validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
     validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
     validations_count += 1 unless $skip_external_links  # External links
 

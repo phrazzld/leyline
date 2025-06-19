@@ -56,7 +56,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Alternative:** Keep tool available for authors who want to test examples locally
     - **Done-when:** TypeScript binding validation removed from CI, still available locally
 
-- [ ] **R003 · Remove · P0: eliminate security scanning of documentation examples**
+- [x] **R003 · Remove · P0: eliminate security scanning of documentation examples**
     - **Context:** Enterprise-grade secret detection on educational examples
     - **Problem:** Educational "bad examples" need realistic patterns to be effective
     - **Current behavior:** Gitleaks scanning fails on examples that demonstrate what NOT to do
