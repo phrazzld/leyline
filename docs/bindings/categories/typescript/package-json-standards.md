@@ -302,7 +302,7 @@ For comprehensive supply chain security guidance including SBOM generation, vuln
 {
   "name": "@company/secure-app",
   "version": "1.0.0",
-  "packageManager": "pnpm@^10.0.0",
+  "packageManager": "pnpm@10.12.1",
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=10.0.0"

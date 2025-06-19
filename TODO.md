@@ -278,7 +278,7 @@
     - **Verification:** Content validation workflow passes without security failures
     - **Depends-on:** none
 
-- [ ] **CI003 · Fix · P1: correct package manager version specifications**
+- [x] **CI003 · Fix · P1: correct package manager version specifications**
     - **Context:** Medium - pnpm warnings about invalid version format across all validation jobs
     - **Root Cause:** packageManager field using semver range instead of exact version
     - **Action:**
