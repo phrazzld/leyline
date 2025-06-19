@@ -26,7 +26,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Rationale:** Prevents broken documentation rendering
     - **Done-when:** Pre-commit hooks remain active for basic syntax checks
 
-- [ ] **E003 · Keep · P1: maintain index consistency validation**
+- [x] **E003 · Keep · P1: maintain index consistency validation**
     - **Context:** Ensures generated indexes stay synchronized with content
     - **Current state:** Working correctly via `ruby tools/reindex.rb --strict`
     - **Action:** Keep index consistency check in CI pipeline
