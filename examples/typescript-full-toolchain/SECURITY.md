@@ -39,7 +39,9 @@ function validateEnvironment(): EnvironmentConfig {
   // Validate required variables
   const apiBaseUrl = process.env.VITE_API_BASE_URL || process.env.API_BASE_URL;
   if (!apiBaseUrl) {
-    errors.push('API_BASE_URL is required. Set VITE_API_BASE_URL for client-side or API_BASE_URL for server-side.');
+    errors.push(
+      'API_BASE_URL is required. Set VITE_API_BASE_URL for client-side or API_BASE_URL for server-side.'
+    );
   }
 
   // Validate URL format
@@ -50,7 +52,9 @@ function validateEnvironment(): EnvironmentConfig {
   // Validate numeric values
   const timeout = parseInt(process.env.VITE_API_TIMEOUT || '5000');
   if (isNaN(timeout) || timeout < 1000 || timeout > 30000) {
-    errors.push('API_TIMEOUT must be a number between 1000 and 30000 milliseconds');
+    errors.push(
+      'API_TIMEOUT must be a number between 1000 and 30000 milliseconds'
+    );
   }
 
   // Validate boolean values
@@ -58,11 +62,15 @@ function validateEnvironment(): EnvironmentConfig {
   const authTokenKey = process.env.VITE_AUTH_TOKEN_KEY || 'app_auth_token';
 
   if (requiresAuth && !authTokenKey.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
-    errors.push('AUTH_TOKEN_KEY must be a valid identifier (alphanumeric and underscores only)');
+    errors.push(
+      'AUTH_TOKEN_KEY must be a valid identifier (alphanumeric and underscores only)'
+    );
   }
 
   if (errors.length > 0) {
-    throw new Error(`Environment validation failed:\n${errors.map(e => `  - ${e}`).join('\n')}`);
+    throw new Error(
+      `Environment validation failed:\n${errors.map((e) => `  - ${e}`).join('\n')}`
+    );
   }
 
   return {
@@ -75,7 +83,9 @@ function validateEnvironment(): EnvironmentConfig {
       tokenKey: authTokenKey,
       refreshUrl: process.env.VITE_AUTH_REFRESH_URL || '/auth/refresh',
       requiresAuth,
-      sessionTimeoutMinutes: parseInt(process.env.VITE_SESSION_TIMEOUT_MINUTES || '60'),
+      sessionTimeoutMinutes: parseInt(
+        process.env.VITE_SESSION_TIMEOUT_MINUTES || '60'
+      ),
     },
     security: {
       enableCsrf: process.env.VITE_ENABLE_CSRF_PROTECTION !== 'false',
@@ -148,7 +158,8 @@ function getSecurityConfig(env: Environment): SecurityConfig {
   }
 }
 
-const currentEnv = (process.env.VITE_ENVIRONMENT || 'development') as Environment;
+const currentEnv = (process.env.VITE_ENVIRONMENT ||
+  'development') as Environment;
 export const securityConfig = getSecurityConfig(currentEnv);
 ```
 
@@ -194,11 +205,19 @@ class SecureApiClient implements ApiClient {
     return this.request<T>('GET', path, undefined, options);
   }
 
-  async post<T>(path: string, data: unknown, options?: RequestOptions): Promise<T> {
+  async post<T>(
+    path: string,
+    data: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
     return this.request<T>('POST', path, data, options);
   }
 
-  async put<T>(path: string, data: unknown, options?: RequestOptions): Promise<T> {
+  async put<T>(
+    path: string,
+    data: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
     return this.request<T>('PUT', path, data, options);
   }
 
@@ -259,10 +278,12 @@ class SecureApiClient implements ApiClient {
     return `${this.baseUrl}${safePath}`;
   }
 
-  private async buildHeaders(options?: RequestOptions): Promise<Record<string, string>> {
+  private async buildHeaders(
+    options?: RequestOptions
+  ): Promise<Record<string, string>> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Accept: 'application/json',
       ...options?.headers,
     };
 
@@ -393,14 +414,18 @@ export interface ValidationResult<T> {
 export type Validator<T> = (value: unknown) => ValidationResult<T>;
 
 // Base validators
-export const isString: Validator<string> = (value): ValidationResult<string> => {
+export const isString: Validator<string> = (
+  value
+): ValidationResult<string> => {
   if (typeof value === 'string') {
     return { success: true, data: value, errors: [] };
   }
   return { success: false, errors: ['Must be a string'] };
 };
 
-export const isNumber: Validator<number> = (value): ValidationResult<number> => {
+export const isNumber: Validator<number> = (
+  value
+): ValidationResult<number> => {
   if (typeof value === 'number' && !isNaN(value)) {
     return { success: true, data: value, errors: [] };
   }
@@ -497,7 +522,9 @@ describe('Security - Secret Detection', () => {
       for (const pattern of urlPatterns) {
         const matches = content.match(pattern);
         if (matches) {
-          violations.push(`Hardcoded URL found in ${file}: ${matches.join(', ')}`);
+          violations.push(
+            `Hardcoded URL found in ${file}: ${matches.join(', ')}`
+          );
         }
       }
     }
@@ -514,6 +541,7 @@ Security scanning and validation are integrated into the development workflow th
 ## Security Checklist
 
 ### Development
+
 - [ ] All secrets use environment variables
 - [ ] Environment variables are validated at startup
 - [ ] API URLs are configurable and validated
@@ -522,12 +550,14 @@ Security scanning and validation are integrated into the development workflow th
 - [ ] HTTPS is enforced in production environments
 
 ### Testing
+
 - [ ] Secret detection tests pass
 - [ ] Input validation tests cover edge cases
 - [ ] Error handling tests verify sanitized messages
 - [ ] Security integration tests validate authentication
 
 ### Deployment
+
 - [ ] Environment-specific configurations are properly isolated
 - [ ] Production secrets are stored in secure systems
 - [ ] Security headers are configured
