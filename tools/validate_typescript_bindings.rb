@@ -244,6 +244,8 @@ def create_project_scaffold(dir, binding_name)
           "vitest": "^1.0.0",
           "@vitest/coverage-v8": "^1.0.0",
           "eslint": "^8.57.0",
+          "@typescript-eslint/parser": "^7.0.0",
+          "@typescript-eslint/eslint-plugin": "^7.0.0",
           "prettier": "^3.2.0"
         }
       }
@@ -319,9 +321,13 @@ def add_default_tool_configs(dir)
   # Default ESLint config if not present
   unless File.exist?(File.join(dir, 'eslint.config.js'))
     File.write(File.join(dir, 'eslint.config.js'), <<~JS)
+      import tseslint from '@typescript-eslint/eslint-plugin';
+      import tsparser from '@typescript-eslint/parser';
+
       export default [
         {
-          files: ['**/*.{js,ts}'],
+          // JavaScript files
+          files: ['**/*.{js,mjs,cjs}'],
           languageOptions: {
             ecmaVersion: 'latest',
             sourceType: 'module'
@@ -330,6 +336,48 @@ def add_default_tool_configs(dir)
             'no-unused-vars': 'error',
             'no-console': 'warn'
           }
+        },
+        {
+          // TypeScript source and test files with type-aware linting
+          files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
+          languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+            parser: tsparser,
+            parserOptions: {
+              project: './tsconfig.json'
+            }
+          },
+          plugins: {
+            '@typescript-eslint': tseslint
+          },
+          rules: {
+            // Disable base ESLint rules that conflict with TypeScript
+            'no-unused-vars': 'off',
+            '@typescript-eslint/no-unused-vars': 'error',
+            'no-console': 'warn'
+          }
+        },
+        {
+          // TypeScript config files without project-based typing
+          files: ['*.{ts,tsx}', '**/*.config.{ts,tsx}'],
+          languageOptions: {
+            ecmaVersion: 'latest',
+            sourceType: 'module',
+            parser: tsparser
+          },
+          plugins: {
+            '@typescript-eslint': tseslint
+          },
+          rules: {
+            'no-unused-vars': 'off',
+            '@typescript-eslint/no-unused-vars': 'error',
+            'no-console': 'warn'
+          }
+        },
+        {
+          // Ignore patterns
+          ignores: ['dist/', 'node_modules/', '*.d.ts']
         }
       ];
     JS
