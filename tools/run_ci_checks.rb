@@ -226,17 +226,26 @@ def main
     failed_validations << "Index generation"
   end
 
-  # Step 4: TypeScript binding configuration validation
-  if Dir.exist?("docs/bindings/categories/typescript")
-    command = "ruby tools/validate_typescript_bindings.rb#{$verbose ? ' --verbose' : ''}"
-    unless run_command(command, "TypeScript binding validation", required: false)
-      failed_validations << "TypeScript binding validation"
+  # Step 4: TypeScript binding configuration validation (full mode only, advisory)
+  if $validation_mode == :full
+    if Dir.exist?("docs/bindings/categories/typescript")
+      command = "ruby tools/validate_typescript_bindings.rb#{$verbose ? ' --verbose' : ''}"
+      unless run_command(command, "TypeScript binding validation (advisory)", required: false)
+        puts "   ⚠️  TypeScript binding issues found, but continuing (advisory only)"
+        puts "   💡 Educational examples prioritize clarity over compilation perfection"
+      end
+    else
+      puts "⏭️  Skipping TypeScript binding validation (no TypeScript bindings found)"
+      log_structured('validation_step_skipped', {
+        step: "TypeScript binding validation",
+        reason: "no_typescript_bindings"
+      })
     end
   else
-    puts "⏭️  Skipping TypeScript binding validation (no TypeScript bindings found)"
+    puts "⏭️  Skipping TypeScript binding validation (essential mode)"
     log_structured('validation_step_skipped', {
       step: "TypeScript binding validation",
-      reason: "no_typescript_bindings"
+      reason: "essential_mode"
     })
   end
 
@@ -333,8 +342,8 @@ def main
       validations_count = 2  # YAML, index (essential mode)
     else
       validations_count = 3  # YAML, cross-reference, index (full mode)
+      validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
     end
-    validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation
     validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
     validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
     validations_count += 1 unless $skip_external_links  # External links
@@ -358,8 +367,8 @@ def main
       validations_count = 2  # YAML, index (essential mode)
     else
       validations_count = 3  # YAML, cross-reference, index (full mode)
+      validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
     end
-    validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation
     validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan
     validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit
     validations_count += 1 unless $skip_external_links  # External links

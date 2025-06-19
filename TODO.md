@@ -47,7 +47,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Alternative:** Convert to optional/advisory check in local tools only
     - **Done-when:** Cross-reference validation removed from CI, still available locally
 
-- [ ] **R002 · Remove · P0: eliminate production-grade TypeScript binding validation**
+- [x] **R002 · Remove · P0: eliminate production-grade TypeScript binding validation**
     - **Context:** Extracts code snippets from docs and runs full TypeScript compilation
     - **Problem:** Documentation examples should teach concepts, not be production-ready
     - **Current behavior:** `ruby tools/validate_typescript_bindings.rb` treats educational examples like production code
