@@ -66,5 +66,8 @@
       "esbuild": ">=0.25.0"
     }
   },
+  "_comments": {
+    "pnpm.overrides.esbuild": "Security override for GHSA-67mh-4wv8-2f99 - esbuild <=0.24.2 vulnerability allows unauthorized requests to dev server. Forces secure version >=0.25.0."
+  },
   "license": "MIT"
 }

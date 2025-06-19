@@ -291,7 +291,7 @@
     - **Verification:** TypeScript validation runs without "Cannot switch to pnpm" warnings
     - **Depends-on:** [CI001]
 
-- [ ] **CI004 · Fix · P1: resolve esbuild security vulnerability**
+- [x] **CI004 · Fix · P1: resolve esbuild security vulnerability**
     - **Context:** Medium - Moderate security vulnerability in esbuild <=0.24.2
     - **Root Cause:** Transitive dependency vulnerability requiring esbuild >=0.25.0
     - **Action:**
