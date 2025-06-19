@@ -260,12 +260,100 @@ function UserProfile({ userId }: { userId: string }) {
 }
 ```
 
-## Related Bindings
+## Security Considerations
 
-- [type-safe-state-management.md](../../docs/bindings/categories/typescript/type-safe-state-management.md): This TanStack Query binding specializes the type-safe state management principles specifically for server state, providing concrete patterns for API interactions while the general binding covers all state management types.
+### Environment Variable Patterns
 
-- [vitest-testing-framework.md](../../docs/bindings/categories/typescript/vitest-testing-framework.md): The testing patterns in this binding integrate with the Vitest testing framework, providing specific guidance for testing query hooks, mutations, and server state interactions within the unified testing approach.
+All API configurations must use environment variables, never hardcoded values:
 
-- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This binding implements the server state management component of the unified toolchain, integrating TanStack Query with TypeScript, Vitest, and other tools to provide a cohesive development experience.
+```typescript
+// ✅ GOOD: Environment-based API configuration
+interface ApiConfig {
+  readonly baseUrl: string;
+  readonly timeout: number;
+  readonly retryAttempts: number;
+}
 
-- [use-structured-logging.md](../core/use-structured-logging.md): The observability aspects of this binding complement structured logging by providing visibility into server state interactions, query performance, and cache behavior through TanStack Query DevTools and explicit error tracking.
+const apiConfig: ApiConfig = {
+  baseUrl: process.env.VITE_API_BASE_URL || process.env.API_BASE_URL || '',
+  timeout: parseInt(process.env.VITE_API_TIMEOUT || process.env.API_TIMEOUT || '5000'),
+  retryAttempts: parseInt(process.env.VITE_API_RETRY_ATTEMPTS || process.env.API_RETRY_ATTEMPTS || '3'),
+};
+
+// Validate required environment variables at startup
+if (!apiConfig.baseUrl) {
+  throw new Error(
+    'API_BASE_URL environment variable is required. Set VITE_API_BASE_URL for development or API_BASE_URL for production.'
+  );
+}
+
+// ❌ BAD: Hardcoded API endpoints
+const apiConfig = {
+  baseUrl: 'https://api.mycompany.com', // Hardcoded - insecure
+  apiKey: 'sk_live_abc123xyz', // Hardcoded secret - major security violation
+};
+```
+
+### Authentication Token Management
+
+Handle authentication tokens securely with proper validation:
+
+```typescript
+// ✅ GOOD: Secure token handling with environment variables
+interface AuthConfig {
+  readonly tokenStorageKey: string;
+  readonly refreshEndpoint: string;
+  readonly requiresAuth: boolean;
+}
+
+const authConfig: AuthConfig = {
+  tokenStorageKey: process.env.VITE_AUTH_TOKEN_KEY || 'app_token',
+  refreshEndpoint: process.env.VITE_AUTH_REFRESH_URL || '/auth/refresh',
+  requiresAuth: process.env.VITE_REQUIRE_AUTH !== 'false',
+};
+
+// Secure query client configuration
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryFn: async ({ queryKey }) => {
+        const token = getStoredToken();
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+
+        if (token && authConfig.requiresAuth) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${apiConfig.baseUrl}${queryKey[0]}`, {
+          headers,
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Clear invalid token and redirect to login
+            clearStoredToken();
+            throw new ApiError('UNAUTHORIZED', 'Authentication required');
+          }
+          throw new ApiError('API_ERROR', `HTTP ${response.status}`);
+        }
+
+        return response.json();
+      },
+    },
+  },
+});
+
+
+```
+
+## Security Integration
+
+This binding integrates with security-first development practices:
+- **Environment Variables**: All API configuration uses environment variables
+- **Error Sanitization**: Production builds sanitize error messages
+- **Token Management**: Secure authentication token handling patterns
+- **Input Validation**: Type-safe query parameters and response validation
+
+See `examples/typescript-full-toolchain/SECURITY.md` for complete security implementation.

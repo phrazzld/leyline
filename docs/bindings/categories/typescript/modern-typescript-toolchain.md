@@ -119,6 +119,37 @@ The rule prohibits mixing incompatible tools within projects (e.g., Jest + Vites
    - **Phase 3**: Build system (tsup) and quality tools (ESLint/Prettier)
    - **Phase 4**: State management patterns (TanStack Query) for applicable projects
 
+6. **Supply Chain Security Integration**: Establish secure dependency management as a foundational component of the unified toolchain:
+   ```json
+   {
+     "packageManager": "pnpm@^10.0.0",
+     "engines": {
+       "node": ">=18.18.0",        // Minimum version with security features
+       "pnpm": ">=10.0.0"
+     },
+     "scripts": {
+       "build": "tsup",
+       "test": "vitest",
+       "security:audit": "pnpm audit --audit-level=moderate",
+       "security:licenses": "license-checker --onlyAllow 'MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause'",
+       "security:check": "pnpm run security:audit && pnpm run security:licenses",
+       "deps:update": "pnpm update --interactive --latest"
+     },
+     "devDependencies": {
+       "license-checker": "^25.0.1"
+     }
+   }
+   ```
+
+   **Supply Chain Security Principles:**
+   - **Automated Scanning**: All projects include `security:check` script for CI integration
+   - **License Compliance**: Standardized license validation across all toolchain projects
+   - **Version Strategy**: Semantic ranges for most dependencies, exact pinning for security-critical components
+   - **Audit Integration**: Regular dependency vulnerability scanning as part of quality gates
+   - **Update Process**: Controlled dependency updates with security validation
+
+   See [package-json-standards.md](../../docs/bindings/categories/typescript/package-json-standards.md) for comprehensive supply chain security guidance.
+
 ## Examples
 
 ```json

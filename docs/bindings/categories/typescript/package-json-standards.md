@@ -250,6 +250,38 @@ The rule prohibits missing packageManager declarations, undocumented dependency 
    }
    ```
 
+## Supply Chain Security Integration
+
+This binding integrates with comprehensive supply chain security practices to ensure dependency integrity and prevent security vulnerabilities.
+
+**Security Scripts** (Required):
+```json
+{
+  "scripts": {
+    "security:check": "pnpm audit --audit-level=moderate && license-checker --onlyAllow 'MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause'",
+    "security:audit": "pnpm audit --audit-level=moderate",
+    "security:licenses": "license-checker --production --onlyAllow 'MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause'"
+  },
+  "devDependencies": {
+    "license-checker": "^25.0.1"
+  }
+}
+```
+
+**Version Strategy**:
+- **Security-Critical**: Exact versions (`"jsonwebtoken": "9.0.2"`)
+- **Development Tools**: Semantic ranges (`"typescript": "^5.4.5"`)
+
+**Security Configuration** (.npmrc):
+```bash
+audit-level=moderate
+verify-store-integrity=true
+verify-signatures=true
+engine-strict=true
+```
+
+For comprehensive supply chain security guidance including SBOM generation, vulnerability scanning, license compliance automation, and CI integration, see the reference implementation in `examples/typescript-full-toolchain/SUPPLY_CHAIN_SECURITY.md`.
+
 ## Examples
 
 ```json
@@ -296,68 +328,12 @@ The rule prohibits missing packageManager declarations, undocumented dependency 
 }
 ```
 
-```json
-// ❌ BAD: No security validation or dependency management
-{
-  "scripts": {
-    "start": "node index.js",
-    "build": "tsc"
-  }
-}
+## Enforcement
 
-// ✅ GOOD: Comprehensive security automation
-{
-  "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "postinstall": "pnpm run security:check",
-    "build": "tsup",
-    "test": "vitest",
-    "security:audit": "pnpm audit --audit-level=moderate",
-    "security:licenses": "license-checker --onlyAllow 'MIT;ISC;Apache-2.0;BSD-2-Clause'",
-    "security:check": "pnpm run security:audit && pnpm run security:licenses",
-    "security:outdated": "pnpm outdated",
-    "deps:update": "pnpm update --interactive --latest"
-  }
-}
-```
+This binding is enforced through:
+1. **Pre-commit hooks**: Validate package.json structure and dependency security
+2. **CI pipeline**: Automated security scanning and license compliance checks
+3. **Package.json linting**: Structural validation of required fields
+4. **Dependency scanning**: Continuous monitoring for vulnerabilities
 
-```yaml
-# ❌ BAD: CI pipeline without dependency security validation
-jobs:
-  build:
-    steps:
-      - run: npm install
-      - run: npm run build
-
-# ✅ GOOD: Comprehensive dependency security pipeline
-jobs:
-  security-validation:
-    steps:
-      - name: Validate package.json structure
-        run: |
-          required_fields=("packageManager" "engines" "license")
-          for field in "${required_fields[@]}"; do
-            jq -e ".$field" package.json || exit 1
-          done
-
-      - name: Security audit
-        run: pnpm audit --audit-level=moderate
-
-      - name: License compliance
-        run: pnpm run security:licenses
-
-      - name: Lockfile verification
-        run: pnpm install --frozen-lockfile --verify-store-integrity
-```
-
-## Related Bindings
-
-- [use-pnpm-for-nodejs.md](../../docs/bindings/categories/typescript/use-pnpm-for-nodejs.md): This standards binding extends the foundational pnpm binding by adding comprehensive package.json structure requirements, security validation, and CI enforcement mechanisms that build upon the basic pnpm usage patterns.
-
-- [comprehensive-security-automation.md](../core/comprehensive-security-automation.md): The security validation and dependency scanning aspects of this binding implement the comprehensive security automation principles specifically for the Node.js dependency management domain.
-
-- [dependency-management.md](../core/dependency-management.md): This binding applies the core dependency management principles specifically to TypeScript projects with pnpm, adding concrete implementation patterns for evaluation, minimization, and maintenance of dependencies.
-
-- [automated-quality-gates.md](../core/automated-quality-gates.md): The CI validation and package.json linting implement automated quality gates specifically for dependency management, ensuring consistent dependency practices across all TypeScript projects.
-
-- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This standards binding provides the dependency management foundation for the unified toolchain, ensuring all tools work together through consistent package.json configuration and dependency management practices.
+See `examples/typescript-full-toolchain/` for complete implementation example.
