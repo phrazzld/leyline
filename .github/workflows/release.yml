@@ -72,30 +72,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate YAML front-matter
+      - name: Essential CI Validation
         run: |
-          echo "📋 Running YAML front-matter validation..."
+          echo "🚀 Running essential CI validation (fast mode)"
+          echo "This validates only essential quality gates: YAML front-matter + Index consistency"
+          export LEYLINE_STRUCTURED_LOGGING=true
 
-          if ! ruby tools/validate_front_matter.rb; then
-            echo "❌ YAML front-matter validation failed"
-            echo "   All tenet and binding files must have valid YAML metadata"
+          if ! ruby tools/run_ci_checks.rb --essential; then
+            echo "❌ Essential validation failed"
+            echo "   All tenet and binding files must have valid YAML metadata and consistent indexes"
             exit 1
           fi
 
-          echo "✅ YAML front-matter validation passed"
-
-      - name: Validate documentation consistency
-        run: |
-          echo "📚 Running documentation reindexing validation..."
-
-          # Run reindex in strict mode
-          if ! ruby tools/reindex.rb --strict; then
-            echo "❌ Documentation reindexing failed"
-            echo "   Generated indexes must be consistent with metadata"
-            exit 1
-          fi
-
-          echo "✅ Documentation consistency validation passed"
+          echo "✅ Essential validation passed"
 
       - name: Check breaking changes vs version bump
         run: |
@@ -294,7 +283,7 @@ jobs:
 
           # Verify all required tools exist
           tools="tools/calculate_version.rb tools/prepare_release.rb"
-          tools="$tools tools/validate_front_matter.rb tools/reindex.rb"
+          tools="$tools tools/run_ci_checks.rb tools/validate_front_matter.rb tools/reindex.rb"
           for tool in $tools; do
             if [ ! -f "$tool" ]; then
               echo "❌ Required tool not found: $tool"
@@ -595,10 +584,10 @@ jobs:
           fi
 
           # Run validation one more time
-          if ruby tools/validate_front_matter.rb; then
-            echo "✅ Post-release YAML validation passed"
+          if ruby tools/run_ci_checks.rb --essential; then
+            echo "✅ Post-release essential validation passed"
           else
-            echo "❌ Post-release YAML validation failed"
+            echo "❌ Post-release essential validation failed"
             exit 1
           fi
 

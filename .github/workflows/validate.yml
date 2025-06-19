@@ -134,14 +134,28 @@ jobs:
     #     python -m pip install --upgrade pip
     #     pip install flake8 mypy
 
-    - name: Validate YAML front-matter
-      run: ruby tools/validate_front_matter.rb
+    - name: Essential CI Validation
+      run: |
+        echo "🚀 Running essential CI validation (fast mode)"
+        echo "This validates only essential quality gates: YAML front-matter + Index consistency"
+        export LEYLINE_STRUCTURED_LOGGING=true
+        ruby tools/run_ci_checks.rb --essential
+        if [ $? -ne 0 ]; then
+          echo "::error::Essential validation failed!"
+          echo "::error::Run 'ruby tools/run_ci_checks.rb --essential' locally to debug"
+          exit 1
+        fi
+        echo "✅ Essential validation completed successfully"
 
-    - name: Validate index consistency
-      run: ruby tools/reindex.rb --strict
-
-    - name: Validate document length limits
-      run: ruby tools/check_document_length.rb -v
+    - name: Document length validation
+      run: |
+        echo "📏 Validating document length limits"
+        ruby tools/check_document_length.rb -v
+        if [ $? -ne 0 ]; then
+          echo "::error::Document length validation failed!"
+          exit 1
+        fi
+        echo "✅ Document length validation completed successfully"
 
     # Python code validation disabled - documentation examples don't need strict production validation
     # - name: Validate Python code examples

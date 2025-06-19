@@ -89,7 +89,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Expected time:** Essential mode should complete in <10 seconds
     - **Done-when:** CI uses essential-only validation, fast feedback loop established
 
-- [ ] **S002 · Simplify · P0: update CI workflow to use essential validation only**
+- [x] **S002 · Simplify · P0: update CI workflow to use essential validation only**
     - **Context:** Current CI workflow calls comprehensive validation
     - **Problem:** Long CI times block development velocity
     - **Action:**
