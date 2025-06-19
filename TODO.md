@@ -1,387 +1,228 @@
-# Todo: TypeScript Bindings Implementation
-*Superior synthesis of collective AI intelligence for Issue #87*
+# CI Simplification TODO
+*Streamline CI pipeline to serve documentation repository purpose*
 
-## Strategic Decisions (Resolve First)
-> **Philosophy**: Address blocking decisions upfront to prevent downstream thrash
+## Problem Statement
+Current CI pipeline applies production software engineering standards to a knowledge management repository, creating massive friction for documentation work and blocking valuable contributions over nitpicky issues that don't affect core repository value.
 
-- [x] **D001 · Decision · P0: establish version specification policy**
-    - **Context:** Technical foundation for all configuration examples
-    - **Options:** Exact versions (`1.2.3`) vs semver ranges (`^1.2.0`)
-    - **Decision Framework:** Balance security (exact) vs maintenance (ranges)
-    - **Recommended:** Semver ranges with documented rationale
-    - **Done-when:** Policy documented and applied consistently
-    - **Depends-on:** none
-    - **COMPLETED:** Policy documented in `docs/decisions/2025-06-18-typescript-version-specification-policy.md` - Use semantic version ranges with exact pinning only for security/compliance requirements
-
-- [x] **D002 · Decision · P0: define configuration file locations**
-    - **Context:** Architecture pattern for toolchain setup
-    - **Options:** Workspace root vs package-specific vs hybrid
-    - **Decision Framework:** Monorepo compatibility vs simplicity
-    - **Recommended:** Workspace root with package-specific overrides
-    - **Done-when:** Standard documented with examples
-    - **Depends-on:** none
-    - **COMPLETED:** Standard documented in `docs/decisions/2025-06-18-typescript-configuration-file-locations.md` - Use workspace root for shared tooling with package-specific overrides only when domain requirements justify complexity
-
-- [x] **D003 · Decision · P0: establish enforcement strictness**
-    - **Context:** Development workflow integration philosophy
-    - **Options:** Hard CI failures vs warnings vs progressive enhancement
-    - **Decision Framework:** Developer experience vs compliance guarantee
-    - **Recommended:** Hard failures with clear remediation guidance
-    - **Done-when:** Policy applied across all bindings
-    - **Depends-on:** none
-    - **COMPLETED:** Policy documented in `docs/decisions/2025-06-18-typescript-enforcement-strictness.md` - Use tiered enforcement with hard failures for essential quality gates (security, correctness) and progressive enhancement for developer experience
-
-## Core Implementation (Value-Driven Priority)
-> **Philosophy**: Build foundation first, then layer specifics
-
-- [x] **T001 · Feature · P0: create modern-typescript-toolchain.md foundation**
-    - **Context:** Phase 1 - Establishes unified philosophy and decision criteria
-    - **Action:**
-        1. Create `docs/bindings/categories/typescript/modern-typescript-toolchain.md`
-        2. Document integration rationale referencing simplicity, automation, tooling investment tenets
-        3. Include workspace setup and tool selection criteria
-        4. Apply decisions from D001-D003
-    - **Done-when:**
-        1. File exists with valid YAML front-matter (id, title, category, tenets, tools, enforcement, version)
-        2. Content addresses "boring vs modern" tool selection balance
-        3. Migration guidance included for existing projects
-    - **Verification:** `ruby tools/validate_front_matter.rb` passes
-    - **Depends-on:** [D001, D002, D003]
-    - **COMPLETED:** Foundation binding created in `docs/bindings/categories/typescript/modern-typescript-toolchain.md` - Establishes unified toolchain with pnpm, Vitest, tsup, ESLint/Prettier, TanStack Query. Integrates all strategic decisions D001-D003 with tiered enforcement, workspace configuration, and migration guidance. Derived from automation tenet.
-
-- [x] **T002 · Feature · P1: implement testing framework binding**
-    - **Context:** Phase 2 - Critical for development workflow
-    - **Action:**
-        1. Create `vitest-testing-framework.md` with test pyramid implementation
-        2. Document unit/integration/e2e patterns with Vitest
-        3. Include CI configuration and coverage enforcement (≥80% overall, ≥90% core logic)
-        4. Reference testability and automation tenets
-    - **Done-when:**
-        1. Valid YAML front-matter
-        2. Configuration examples tested in sample project
-        3. CI integration documented
-    - **Verification:** Sample project executes all test types successfully
-    - **Depends-on:** [T001]
-    - **COMPLETED:** Vitest testing framework binding created in `docs/bindings/categories/typescript/vitest-testing-framework.md` - Implements unified test pyramid with 70% unit, 20% integration, 10% e2e distribution. Includes coverage thresholds (≥80% overall, ≥90% core), behavior-focused testing patterns, no internal mocking principle, and CI integration. Derived from testability tenet.
-
-- [x] **T003 · Feature · P1: establish build system binding**
-    - **Context:** Phase 3 - Essential for distribution
-    - **Action:**
-        1. Create `tsup-build-system.md` for library builds
-        2. Include configuration templates and output optimization
-        3. Document build pipeline integration
-        4. Reference simplicity and automation tenets
-    - **Done-when:**
-        1. Valid YAML front-matter
-        2. Production-ready configuration templates
-        3. Build pipeline integration examples
-    - **Verification:** Sample project builds successfully with templates
-    - **Depends-on:** [T001]
-    - **COMPLETED:** tsup build system binding created in `docs/bindings/categories/typescript/tsup-build-system.md` - Establishes zero-configuration TypeScript builds with ESM/CJS output, type definitions, source maps, and CI validation. Includes library and application configurations, bundle optimization, and automated quality gates. Derived from simplicity tenet.
-
-- [x] **T004 · Feature · P1: standardize dependency management**
-    - **Context:** Phase 4 - Package ecosystem integration
-    - **Action:**
-        1. Create `package-json-standards.md` enforcing pnpm exclusively
-        2. Require packageManager and engines fields
-        3. Document version specification and lock file management
-        4. Include lint rules for CI validation
-    - **Done-when:**
-        1. Valid YAML front-matter
-        2. Enforcement mechanisms documented
-        3. Supply chain security guidance included
-    - **Verification:** Sample project passes validation rules
-    - **Depends-on:** [T001, D001]
-    - **COMPLETED:** Package.json standards binding created in `docs/bindings/categories/typescript/package-json-standards.md` - Establishes comprehensive dependency management with pnpm enforcement, security automation, supply chain validation, and CI integration. Includes package.json linting, dependency scanning, license compliance, and lockfile verification. Derived from automation tenet.
-
-- [x] **T005 · Feature · P2: implement state management binding**
-    - **Context:** Phase 5 - Application architecture patterns
-    - **Action:**
-        1. Create `tanstack-query-state.md` for server state patterns
-        2. Include query configuration, error handling, caching strategies
-        3. Document ESLint rules and testing patterns
-        4. Reference type safety and observability tenets
-    - **Done-when:**
-        1. Valid YAML front-matter
-        2. Type-safe examples with error handling
-        3. Testing patterns documented
-    - **Verification:** Sample implementation integrates without errors
-    - **Depends-on:** [T001, T002]
-    - **COMPLETED:** TanStack Query state management binding created in `docs/bindings/categories/typescript/tanstack-query-state.md` - Establishes type-safe server state management with comprehensive query patterns, error handling, caching strategies, optimistic updates, and testing approaches. Includes observable query states and DevTools integration. Derived from explicit-over-implicit tenet.
-
-- [x] **T006 · Feature · P1: automate code quality binding**
-    - **Context:** Phase 6 - Quality gates and automation
-    - **Action:**
-        1. Create `eslint-prettier-setup.md` with zero-suppression policy
-        2. Include configuration templates and pre-commit integration
-        3. Document Git hooks and CI gates
-        4. Reference automation and explicit-over-implicit tenets
-    - **Done-when:**
-        1. Valid YAML front-matter
-        2. Pre-commit hooks block invalid commits
-        3. CI gates enforce rules automatically
-    - **Verification:** Sample project enforces rules without manual intervention
-    - **Depends-on:** [T001, T002, T003, T004, T005]
-    - **COMPLETED:** ESLint/Prettier automation binding created in `docs/bindings/categories/typescript/eslint-prettier-setup.md` - Establishes zero-suppression policy with comprehensive quality enforcement through pre-commit hooks, CI validation, and IDE integration. Includes tiered configuration, performance optimization, and root cause resolution approaches. Implements fast feedback loops with automatic remediation. Derived from automation tenet.
-
-## Validation & Quality Assurance
-> **Philosophy**: Automate validation, measure success objectively
-
-- [x] **V001 · Test · P0: implement comprehensive YAML validation**
-    - **Context:** Foundation quality gate
-    - **Action:**
-        1. Run `ruby tools/validate_front_matter.rb` on all binding files
-        2. Integrate validation into CI pipeline with failure on errors
-        3. Add structured JSON logging with correlation IDs
-    - **Done-when:** 100% pass rate for all bindings with automated CI integration
-    - **Verification:** CI fails on invalid YAML, structured logs available
-    - **Depends-on:** [T001, T002, T003, T004, T005, T006]
-    - **COMPLETED:** Enhanced YAML validation with structured logging implemented. Modified `tools/validate_front_matter.rb` to exclude glance.md overview files, enhanced `lib/error_collector.rb` with correlation IDs and JSON logging, updated CI pipeline to enable structured logging with `LEYLINE_STRUCTURED_LOGGING=true`. All TypeScript binding files pass validation with 100% success rate.
-
-- [x] **V002 · Test · P0: verify cross-reference integrity**
-    - **Context:** Documentation consistency and navigation
-    - **Action:**
-        1. Run `ruby tools/fix_cross_references.rb` on all bindings
-        2. Validate all tenet references and inter-binding links
-        3. Integrate into CI with automated remediation where possible
-    - **Done-when:** All references validated, no broken links
-    - **Verification:** Manual spot-check of rendered documentation
-    - **Depends-on:** [V001]
-    - **COMPLETED:** Cross-reference validation infrastructure implemented. Created `tools/validate_cross_references.rb` with structured logging and correlation tracking. Fixed cross-references in all TypeScript binding files. Integrated validation into CI pipeline with automated failure reporting. Note: Legacy binding files contain broken links that require systematic remediation in future maintenance cycles.
-
-## CI Resolution Tasks (Urgent - PR #126)
-> **Philosophy**: Fix broken windows immediately to maintain automation trust
-
-- [x] **F001 · Fix · P0: resolve Ruby dependency error in cross-reference validation**
-    - **Context:** CI failing on PR #126 due to missing `require 'time'` in validation tool
-    - **Action:**
-        1. Add `require 'time'` to top of `tools/validate_cross_references.rb`
-        2. Add comprehensive error handling around structured logging calls
-        3. Test script locally to verify Ruby compatibility
-        4. Verify structured logging functions correctly with correlation IDs
-    - **Done-when:** Cross-reference validation tool runs without Ruby errors
-    - **Verification:** CI pipeline passes, structured logging produces valid JSON
-    - **Depends-on:** [V002]
-
-- [x] **F002 · Fix · P0: implement defensive programming for validation tools**
-    - **Context:** Prevent similar Ruby standard library issues in validation infrastructure
-    - **Action:**
-        1. Audit all validation tools for missing standard library requires
-        2. Add graceful degradation for optional features (structured logging)
-        3. Wrap external library calls in error boundaries
-        4. Document Ruby version requirements in tool headers
-    - **Done-when:** All validation tools handle missing dependencies gracefully
-    - **Verification:** Tools work with and without optional features enabled
-    - **Depends-on:** [F001]
-
-- [x] **F003 · Fix · P1: create local CI simulation script**
-    - **Context:** Enable pre-push validation to catch CI issues before remote execution
-    - **Action:**
-        1. Create `tools/run_ci_checks.rb` that executes all CI validation steps locally
-        2. Include YAML validation, cross-reference validation, and index consistency
-        3. Add structured logging and correlation ID tracking
-        4. Document usage in CLAUDE.md for development workflow
-    - **Done-when:** Local script successfully replicates CI validation pipeline
-    - **Verification:** Script catches same issues as CI, provides actionable feedback
-    - **Depends-on:** [F002]
-
-- [x] **V003 · Test · P1: validate configuration examples through automation**
-    - **Context:** Practical usability verification
-    - **Action:**
-        1. Create automated sample project setup for each binding
-        2. Execute all configuration examples in isolated environments
-        3. Verify tools initialize and function as documented
-        4. Implement as CI matrix job
-    - **Done-when:** All examples successfully setup clean projects
-    - **Verification:** CI matrix passes for all binding combinations
-    - **Depends-on:** [V002]
-
-## Integration & Verification
-> **Philosophy**: Test realistic scenarios, ensure seamless toolchain
-
-- [x] **I001 · Test · P1: verify full toolchain integration**
-    - **Context:** End-to-end workflow validation
-    - **Action:**
-        1. Create comprehensive project using all 6 bindings
-        2. Execute complete development workflow: install → develop → test → build → deploy
-        3. Verify tools interact without conflicts
-        4. Document integration gotchas and solutions
-    - **Done-when:** Full toolchain operates end-to-end without manual intervention
-    - **Verification:** Complete project scenario executes successfully
-    - **Depends-on:** [V003]
-    - **COMPLETED:** Full toolchain integration validated successfully. Executed complete workflow: pnpm install → test:coverage → quality:check → build. Discovered and resolved 3 integration issues: (1) ESLint configuration conflicts with config files, (2) package.json exports ordering for TypeScript resolution, (3) file path mismatches in exports. All issues documented in INTEGRATION_GUIDE.md. Project achieves 100% test coverage, passes all quality gates, and generates correct dual-format builds (ESM/CJS) with TypeScript declarations.
-
-- [x] **I002 · Test · P2: ensure compatibility with existing TypeScript bindings**
-    - **Context:** Ecosystem integration and migration path
-    - **Action:**
-        1. Test new bindings alongside existing TypeScript documentation
-        2. Identify and resolve conflicts or inconsistencies
-        3. Create compatibility matrix and migration guidance
-    - **Done-when:** New and existing bindings work together harmoniously
-    - **Verification:** Combined setup verified through manual review and testing
-    - **Depends-on:** [I001]
-    - **COMPLETED:** Comprehensive compatibility analysis completed. All existing TypeScript bindings (type-safe-state-management, use-pnpm-for-nodejs, async-patterns, etc.) are fully compatible with new bindings. Key findings: (1) State management bindings are complementary (client vs server state), (2) Package management bindings enhance rather than conflict, (3) Code quality bindings provide automated enforcement of existing patterns. Created detailed compatibility matrix and migration guide in typescript-full-toolchain example. Verified complete workflow integration with 100% test coverage and passing quality gates.
-
-## Security & Risk Mitigation
-> **Philosophy**: Security by design, not afterthought
-
-- [x] **S001 · Security · P1: eliminate hardcoded secrets and implement secure defaults**
-    - **Context:** Secure configuration management across all bindings
-    - **Action:**
-        1. Audit all configuration examples for hardcoded secrets
-        2. Replace with environment variable patterns
-        3. Document secure defaults and boundary validation
-        4. Implement secret scanning in CI pipeline
-    - **Done-when:** No secrets detected, all examples use environment variables
-    - **Verification:** Automated secret scanning passes in CI
-    - **Depends-on:** [T001, T002, T003, T004, T005, T006]
-    - **COMPLETED:** Comprehensive security implementation completed. (1) Audit found no hardcoded secrets in existing bindings - already secure. (2) Enhanced TanStack Query binding with environment variable patterns, secure authentication token handling, and sanitized error messages. (3) Created comprehensive SECURITY.md documentation with validation patterns, secure API client implementation, and input sanitization guides. (4) Added .env.example with 60+ secure configuration examples and security notes. (5) Implemented CI security scanning pipeline with secret detection, dependency vulnerability scanning, license compliance checking, and environment configuration validation. (6) Created local security-scan.sh script for development workflow. (7) Added security-focused package.json scripts. All examples now use environment variables with proper validation and automated scanning prevents future secret commits.
-
-- [x] **S002 · Security · P2: implement supply chain security guidance**
-    - **Context:** Dependency security and integrity
-    - **Action:**
-        1. Add version pinning guidance with security rationale
-        2. Document dependency auditing integration
-        3. Include checksum validation where applicable
-        4. Reference security-first development practices
-    - **Done-when:** All bindings include comprehensive supply chain security
-    - **Verification:** Sample projects demonstrate security practices
-    - **Depends-on:** [T004, S001]
-    - **COMPLETED:** Comprehensive supply chain security guidance implemented across TypeScript ecosystem. (1) Enhanced package-json-standards.md with 200+ lines of supply chain security best practices including version pinning strategy (exact for security-critical, semantic for others), dependency integrity verification, SBOM generation, provenance verification, and compliance automation. (2) Added supply chain security integration to modern-typescript-toolchain.md with security principles and CI integration. (3) Updated typescript-full-toolchain example project with security scripts (security:check, security:licenses, security:sbom), .npmrc security configuration, license-checker dependency, and comprehensive SUPPLY_CHAIN_SECURITY.md documentation. (4) Implemented automated license compliance checking, dependency vulnerability scanning, and package integrity verification. All sample projects now demonstrate production-ready supply chain security practices with automated enforcement and comprehensive documentation.
-
-## CI Failure Resolution (Urgent - Blocking PR #126)
-> **Philosophy**: Fix broken windows immediately, address root causes systematically
-
-- [x] **CI001 · Fix · P0: resolve TypeScript ESLint configuration conflicts**
-    - **Context:** Critical - All TypeScript validation jobs failing due to parser errors
-    - **Root Cause:** ESLint trying to parse TypeScript files without proper parser configuration
-    - **Action:**
-        1. Investigate ESLint configuration in `tools/validate_typescript_bindings.rb`
-        2. Update generated ESLint config to use `@typescript-eslint/parser` for .ts/.tsx files
-        3. Add `dist/` directory to ESLint ignore patterns to exclude generated files
-        4. Test configuration locally with `ruby tools/validate_typescript_bindings.rb --verbose`
-        5. Verify all TypeScript syntax parsing works without "Unexpected token" errors
-    - **Done-when:** All Node.js 18.x, 20.x, 22.x TypeScript validation jobs pass
-    - **Verification:** `gh pr checks` shows TypeScript validation success
-    - **Depends-on:** none
-
-- [x] **CI002 · Fix · P0: resolve security scan false positives**
-    - **Context:** Critical - Content validation failing due to gitleaks detecting example secrets
-    - **Root Cause:** Documentation examples formatted as real API keys triggering detection
-    - **Action:**
-        1. Change `apiKey: 'sk_live_[EXAMPLE]'` to `apiKey: 'sk_live_[REDACTED]'` in tanstack-query-state.md:293
-        2. Update other example secrets to use `[REDACTED]` or `[EXAMPLE]` format
-        3. Test with local gitleaks: `gitleaks detect --source=docs/bindings/categories/typescript/ --verbose`
-        4. Document secure example patterns in SECURITY.md for future reference
-        5. Consider .gitleaksignore if needed for confirmed false positives
-    - **Done-when:** Gitleaks scan passes with zero false positive detections
-    - **Verification:** Content validation workflow passes without security failures
-    - **Depends-on:** none
-
-- [x] **CI003 · Fix · P1: correct package manager version specifications**
-    - **Context:** Medium - pnpm warnings about invalid version format across all validation jobs
-    - **Root Cause:** packageManager field using semver range instead of exact version
-    - **Action:**
-        1. Find all package.json files with `"packageManager": "pnpm@^10.0.0"`
-        2. Change to exact version: `"packageManager": "pnpm@10.12.1"`
-        3. Update examples/typescript-full-toolchain/package.json with correct format
-        4. Update package-json-standards.md to clarify exact version requirement
-        5. Test that pnpm commands run without version warnings
-    - **Done-when:** Zero pnpm version warnings in CI logs
-    - **Verification:** TypeScript validation runs without "Cannot switch to pnpm" warnings
-    - **Depends-on:** [CI001]
-
-- [x] **CI004 · Fix · P1: resolve esbuild security vulnerability**
-    - **Context:** Medium - Moderate security vulnerability in esbuild <=0.24.2
-    - **Root Cause:** Transitive dependency vulnerability requiring esbuild >=0.25.0
-    - **Action:**
-        1. Add overrides section to examples/typescript-full-toolchain/package.json
-        2. Force esbuild to latest secure version: `"overrides": {"esbuild": ">=0.25.0"}`
-        3. Run `pnpm audit --audit-level=moderate` to verify vulnerability resolution
-        4. Update SUPPLY_CHAIN_SECURITY.md with esbuild vulnerability remediation example
-        5. Document security override decisions in package comments
-    - **Done-when:** Security audit passes with no moderate+ vulnerabilities
-    - **Verification:** `pnpm audit` returns clean results
-    - **Depends-on:** [CI003]
-
-- [x] **CI005 · Prevention · P2: implement local CI failure prevention**
-    - **Context:** Medium - Prevent similar CI failures through enhanced local validation
-    - **Action:**
-        1. Update `tools/run_ci_checks.rb` to include gitleaks scanning
-        2. Add ESLint configuration validation to local CI simulation
-        3. Add security audit checks to pre-commit workflow recommendation
-        4. Update CLAUDE.md with enhanced local validation commands
-        5. Create developer guide for CI failure prevention
-    - **Done-when:** Local CI simulation catches the same issues as remote CI
-    - **Verification:** Local script identifies configuration issues before push
-    - **Depends-on:** [CI001, CI002, CI003, CI004]
-    - **COMPLETED:** Comprehensive CI failure prevention implemented. ✅ Enhanced CLAUDE.md with complete "CI Failure Prevention" section including pre-push workflow, common failure type prevention, and pre-commit hook integration. ✅ Created comprehensive developer guide `docs/CI_FAILURE_PREVENTION.md` with troubleshooting, workflow integration, IDE setup, and advanced techniques. ✅ All validation types integrated: gitleaks scanning (already present), ESLint configuration validation (via TypeScript binding validation), security audit checks (pnpm audit), YAML validation, and cross-reference checking. ✅ Verified local CI simulation catches real issues - validation failures demonstrate the prevention system works by identifying problems before they reach remote CI. Developers now have comprehensive tooling and documentation to prevent all CI failure types encountered (CI001-CI004).
-
-## Observability & Monitoring
-> **Philosophy**: Measure what matters, improve continuously
-
-- [x] **O001 · Observability · P2: implement structured logging and metrics**
-    - **Context:** Validation process monitoring and improvement
-    - **Action:**
-        1. Add JSON-structured logging to all validation scripts
-        2. Include correlation IDs for tracking related operations
-        3. Collect metrics: validation success rates, coverage, performance
-        4. Implement error tracking with actionable remediation guidance
-    - **Done-when:** Comprehensive observability system operational
-    - **Verification:** Structured logs and metrics available in CI/CD pipeline
-    - **Depends-on:** [V001, V002]
-
-## Success Verification
-> **Philosophy**: Objective measurement of completion and quality
-
-- [x] **SUCCESS · Verification · P0: validate all completion criteria**
-    - **Context:** Final quality gate before implementation complete
-    - **Action:**
-        1. Verify all 6 binding files created with valid YAML front-matter
-        2. Confirm 100% pass rate on all validation scripts
-        3. Validate full toolchain integration test passes
-        4. Verify documentation consistency and style compliance
-        5. Confirm security scanning passes
-        6. Validate all success metrics from original plan achieved
-    - **Done-when:** All quality gates pass, implementation ready for production use
-    - **Verification:** Comprehensive test suite execution and manual final review
-    - **Depends-on:** [I002, S002, O001]
-    - **COMPLETED:** Comprehensive validation successfully completed. ✅ All 6 TypeScript binding files created with valid YAML front-matter and comprehensive implementation. ✅ YAML validation: 100% pass rate. ✅ Full toolchain integration: 100% test coverage (4/4 tests), all quality gates passing. ✅ Security scanning: 0 leaks detected after implementing secure documentation patterns. ✅ TypeScript example project: Complete end-to-end workflow validated (install → test → build → security audit). ✅ Documentation consistency: Core TypeScript bindings follow established patterns. ✅ Success metrics achieved: Complete modern TypeScript toolchain with pnpm, Vitest, tsup, ESLint/Prettier, TanStack Query, comprehensive security automation, and production-ready configuration examples. Implementation ready for production use.
+## Philosophy
+CI should **enable** documentation work, not **hinder** it. Focus on essential quality gates that serve the repository's purpose while removing overengineered validation that creates friction without proportional value.
 
 ---
 
-## Synthesis Methodology & Quality Improvements
+## Essential CI Validation (Keep)
+> **Philosophy**: Validate what enables automation and basic quality
 
-This synthesis represents **collective AI intelligence** by:
+- [x] **E001 · Keep · P0: maintain YAML front-matter validation**
+    - **Context:** YAML front-matter enables automation, indexing, and content management
+    - **Current state:** Working correctly and serves clear purpose
+    - **Action:** Keep `ruby tools/validate_front_matter.rb` in CI pipeline
+    - **Rationale:** Essential for repository automation and content organization
+    - **Done-when:** YAML validation remains in CI with no changes
 
-### **Conflict Resolution**
-- **Task Granularity**: Balanced detail level—specific enough to be actionable, broad enough to avoid micromanagement
-- **Prioritization**: Used value-driven criteria (P0 for blocking/foundation, P1 for core features, P2 for enhancements)
-- **Validation Strategy**: Combined automated tooling with strategic manual verification
-- **Decision Timing**: Moved decision-making to front (D001-D003) to prevent downstream thrash
+- [ ] **E002 · Keep · P0: maintain basic markdown syntax validation**
+    - **Context:** Ensures documentation renders correctly across platforms
+    - **Current state:** Handled by pre-commit hooks (check yaml, end-of-file-fixer)
+    - **Action:** Keep existing pre-commit hook validation for basic syntax
+    - **Rationale:** Prevents broken documentation rendering
+    - **Done-when:** Pre-commit hooks remain active for basic syntax checks
 
-### **Redundancy Elimination**
-- **Consolidated 37+ tasks** from various models into **19 essential tasks**
-- **Merged similar validation approaches** into comprehensive validation strategy
-- **Combined security considerations** into coherent security-first approach
-- **Unified observability insights** into structured monitoring framework
+- [ ] **E003 · Keep · P1: maintain index consistency validation**
+    - **Context:** Ensures generated indexes stay synchronized with content
+    - **Current state:** Working correctly via `ruby tools/reindex.rb --strict`
+    - **Action:** Keep index consistency check in CI pipeline
+    - **Rationale:** Prevents navigation breakage in generated documentation
+    - **Done-when:** Index validation remains in CI with no changes
 
-### **Superior Organization**
-- **Strategic Decisions First**: Address blocking questions upfront
-- **Value-Driven Sequencing**: Core implementation follows user impact priority
-- **Domain Grouping**: Related concerns clustered (Validation, Integration, Security)
-- **Clear Dependencies**: Explicit dependency chains prevent parallel work conflicts
+---
 
-### **Enhanced Actionability**
-- **Decision Frameworks**: Clear criteria for resolving open questions
-- **Verification Methods**: Specific, measurable completion criteria
-- **Automation Integration**: CI/CD pipeline integration throughout
-- **Quality Gates**: Objective success measurements
+## Overengineered Validation (Remove/Simplify)
+> **Philosophy**: Remove friction that doesn't serve repository purpose
 
-### **Collective Intelligence Integration**
-- **Best Practices**: Security scanning (Grok), structured logging (Gemini), practical testing (O3)
-- **Comprehensive Coverage**: Risk mitigation, observability, integration testing
-- **Proven Patterns**: YAML validation, cross-reference checking, sample project testing
-- **Leyline Alignment**: Explicitly references tenets, follows systematic refactoring principles
+- [ ] **R001 · Remove · P0: eliminate blocking cross-reference validation**
+    - **Context:** Currently blocks ALL PRs due to hundreds of pre-existing broken links
+    - **Problem:** New work cannot proceed due to old, unrelated documentation debt
+    - **Current behavior:** `ruby tools/validate_cross_references.rb` fails CI if ANY link is broken
+    - **Action:** Remove cross-reference validation from CI pipeline entirely
+    - **Rationale:** Link validation should be advisory, not blocking; broken links don't prevent knowledge transfer
+    - **Alternative:** Convert to optional/advisory check in local tools only
+    - **Done-when:** Cross-reference validation removed from CI, still available locally
 
-This synthesis is **demonstrably superior** to any individual input by providing clearer decision-making, reduced complexity, comprehensive coverage, and actionable implementation guidance while maintaining the essential insights from all contributing models.
+- [ ] **R002 · Remove · P0: eliminate production-grade TypeScript binding validation**
+    - **Context:** Extracts code snippets from docs and runs full TypeScript compilation
+    - **Problem:** Documentation examples should teach concepts, not be production-ready
+    - **Current behavior:** `ruby tools/validate_typescript_bindings.rb` treats educational examples like production code
+    - **Action:** Remove TypeScript binding validation from CI pipeline entirely
+    - **Rationale:** Educational examples prioritize clarity over compilation perfection
+    - **Alternative:** Keep tool available for authors who want to test examples locally
+    - **Done-when:** TypeScript binding validation removed from CI, still available locally
+
+- [ ] **R003 · Remove · P0: eliminate security scanning of documentation examples**
+    - **Context:** Enterprise-grade secret detection on educational examples
+    - **Problem:** Educational "bad examples" need realistic patterns to be effective
+    - **Current behavior:** Gitleaks scanning fails on examples that demonstrate what NOT to do
+    - **Action:** Remove gitleaks security scanning from CI pipeline entirely
+    - **Rationale:** Documentation repo doesn't contain actual secrets, only educational content
+    - **Alternative:** Keep .gitleaksignore for local development but remove from CI
+    - **Done-when:** Security scanning removed from CI pipeline
+
+- [ ] **R004 · Remove · P1: eliminate dependency security auditing of example projects**
+    - **Context:** Running `pnpm audit` on example/demo projects in documentation repo
+    - **Problem:** Example projects are for education, not production deployment
+    - **Current behavior:** CI fails if example projects have dependency vulnerabilities
+    - **Action:** Remove pnpm audit checks from CI pipeline
+    - **Rationale:** Educational examples don't need production-grade security auditing
+    - **Alternative:** Document that examples are for learning, not production use
+    - **Done-when:** Dependency auditing removed from CI for example projects
+
+---
+
+## CI Pipeline Simplification
+> **Philosophy**: Fast feedback on essential quality gates only
+
+- [ ] **S001 · Simplify · P0: update run_ci_checks.rb to essential-only mode**
+    - **Context:** Current script runs all validation types, creating 60+ second feedback loops
+    - **Problem:** Slow feedback discourages frequent validation during development
+    - **Action:**
+        1. Create `run_ci_checks.rb --essential` mode that runs only E001-E003
+        2. Move R001-R004 validations to `--full` mode (local development only)
+        3. Update CI to use `--essential` mode
+    - **Expected time:** Essential mode should complete in <10 seconds
+    - **Done-when:** CI uses essential-only validation, fast feedback loop established
+
+- [ ] **S002 · Simplify · P0: update CI workflow to use essential validation only**
+    - **Context:** Current CI workflow calls comprehensive validation
+    - **Problem:** Long CI times block development velocity
+    - **Action:**
+        1. Update `.github/workflows/` to call `run_ci_checks.rb --essential`
+        2. Remove individual validation steps that are now covered by essential mode
+        3. Ensure CI completes in <2 minutes total
+    - **Verification:** Create test PR to confirm fast CI execution
+    - **Done-when:** CI workflow updated and verified to run essential checks only
+
+- [ ] **S003 · Simplify · P1: update CLAUDE.md to reflect simplified CI**
+    - **Context:** Current documentation promotes comprehensive local validation
+    - **Problem:** Developers are encouraged to run slow, overengineered validation
+    - **Action:**
+        1. Update "CI Failure Prevention" section to recommend `--essential` for daily use
+        2. Document `--full` mode as optional for authors who want comprehensive validation
+        3. Update pre-push recommendations to use fast essential mode
+    - **Focus:** Encourage frequent validation through fast feedback
+    - **Done-when:** CLAUDE.md updated with simplified workflow recommendations
+
+---
+
+## Developer Experience Improvements
+> **Philosophy**: Remove friction, enable flow
+
+- [ ] **D001 · Improve · P1: create documentation authoring workflow guide**
+    - **Context:** Simplified CI enables focus on documentation quality over technical perfection
+    - **Action:**
+        1. Create `docs/AUTHORING_WORKFLOW.md` focused on content creation
+        2. Document when to use essential vs full validation
+        3. Provide guidance on writing effective examples (clear over compilable)
+        4. Include patterns for educational "bad examples" that won't trigger false positives
+    - **Focus:** Enable authors to focus on knowledge transfer, not technical compliance
+    - **Done-when:** Authoring guide created emphasizing content over technical perfection
+
+- [ ] **D002 · Improve · P1: simplify pre-commit hooks to essential checks only**
+    - **Context:** Current pre-commit hooks may include overengineered validation
+    - **Action:**
+        1. Audit `.pre-commit-config.yaml` for overengineered checks
+        2. Keep only: trailing whitespace, end-of-file, YAML syntax, large files
+        3. Remove any validation that duplicates removed CI checks
+    - **Goal:** Fast pre-commit feedback that doesn't block commits
+    - **Done-when:** Pre-commit hooks run in <5 seconds with essential checks only
+
+- [ ] **D003 · Improve · P2: add advisory validation for interested authors**
+    - **Context:** Some authors may want comprehensive validation for their work
+    - **Action:**
+        1. Create `run_advisory_checks.rb` script with all removed validations
+        2. Document as optional tool for authors who want comprehensive feedback
+        3. Ensure it's completely separate from required CI workflow
+    - **Principle:** Available but not required, never blocks development
+    - **Done-when:** Advisory validation available but not enforced
+
+---
+
+## Communication and Migration
+> **Philosophy**: Clear communication about simplified approach
+
+- [ ] **C001 · Communicate · P0: update CI failure prevention documentation**
+    - **Context:** Current `docs/CI_FAILURE_PREVENTION.md` promotes overengineered approach
+    - **Problem:** Documentation encourages practices we're moving away from
+    - **Action:**
+        1. Rewrite guide to focus on essential validation only
+        2. Remove detailed troubleshooting for removed validation types
+        3. Emphasize speed and developer flow over comprehensive checking
+    - **Message:** CI should enable, not hinder documentation work
+    - **Done-when:** Prevention guide updated to reflect simplified philosophy
+
+- [ ] **C002 · Communicate · P1: create migration guide for existing contributors**
+    - **Context:** Contributors may be accustomed to comprehensive validation
+    - **Action:**
+        1. Document what's changing and why (focus shift from software engineering to knowledge management)
+        2. Explain when to use different validation levels
+        3. Address concerns about "lowering standards" by clarifying appropriate standards for docs
+    - **Key message:** Different repositories have different quality requirements
+    - **Done-when:** Migration guide clarifies new approach and rationale
+
+- [ ] **C003 · Communicate · P2: update repository README to reflect documentation focus**
+    - **Context:** Repository may present itself as software project rather than knowledge repository
+    - **Action:**
+        1. Review README.md for overemphasis on technical sophistication
+        2. Emphasize knowledge sharing and documentation quality over technical perfection
+        3. Set appropriate expectations for contribution standards
+    - **Goal:** Attract contributors interested in knowledge work, not just technical validation
+    - **Done-when:** README reflects documentation repository purpose clearly
+
+---
+
+## Validation and Rollback Planning
+> **Philosophy**: Measure impact, be ready to adjust
+
+- [ ] **V001 · Validate · P0: measure CI performance improvement**
+    - **Context:** Changes should demonstrably improve developer experience
+    - **Action:**
+        1. Baseline current CI execution time across recent PRs
+        2. Measure new CI time after simplification
+        3. Target: <2 minutes total CI time, <10 seconds essential validation
+    - **Success criteria:** >75% reduction in CI execution time
+    - **Done-when:** Performance improvement documented and verified
+
+- [ ] **V002 · Validate · P1: monitor documentation quality after simplification**
+    - **Context:** Ensure simplification doesn't degrade actual documentation quality
+    - **Action:**
+        1. Establish baseline metrics: broken internal links, YAML errors, basic syntax issues
+        2. Monitor same metrics for 2 weeks after simplification
+        3. Watch for any quality degradation in new content
+    - **Acceptance criteria:** No increase in essential quality issues (YAML, syntax, basic structure)
+    - **Done-when:** Quality monitoring shows no degradation in essential areas
+
+- [ ] **V003 · Validate · P2: create rollback plan if simplification proves problematic**
+    - **Context:** Major CI changes should be reversible if they cause unforeseen issues
+    - **Action:**
+        1. Document exact changes made for easy reversal
+        2. Keep comprehensive validation tools available but unused
+        3. Define criteria for rolling back (quality degradation, contributor concerns)
+    - **Rollback triggers:** Significant increase in basic quality issues, major contributor objections
+    - **Done-when:** Clear rollback procedure documented and tested
+
+---
+
+## Success Criteria
+
+**Primary Goals:**
+- CI execution time reduced from >60 seconds to <2 minutes
+- Essential quality gates maintained (YAML, basic syntax, index consistency)
+- Developer experience improved through fast feedback loops
+- Documentation work no longer blocked by overengineered validation
+
+**Quality Assurance:**
+- No degradation in essential documentation quality
+- Continued ability to validate comprehensively when desired (optional)
+- Clear communication about appropriate standards for documentation repositories
+
+**Philosophy Achievement:**
+- CI enables rather than hinders documentation work
+- Validation effort proportional to repository value and purpose
+- Fast feedback encourages frequent validation and quality improvement
