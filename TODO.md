@@ -19,7 +19,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Rationale:** Essential for repository automation and content organization
     - **Done-when:** YAML validation remains in CI with no changes
 
-- [ ] **E002 · Keep · P0: maintain basic markdown syntax validation**
+- [x] **E002 · Keep · P0: maintain basic markdown syntax validation**
     - **Context:** Ensures documentation renders correctly across platforms
     - **Current state:** Handled by pre-commit hooks (check yaml, end-of-file-fixer)
     - **Action:** Keep existing pre-commit hook validation for basic syntax
