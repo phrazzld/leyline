@@ -265,11 +265,11 @@
     - **Verification:** `gh pr checks` shows TypeScript validation success
     - **Depends-on:** none
 
-- [ ] **CI002 · Fix · P0: resolve security scan false positives**
+- [x] **CI002 · Fix · P0: resolve security scan false positives**
     - **Context:** Critical - Content validation failing due to gitleaks detecting example secrets
     - **Root Cause:** Documentation examples formatted as real API keys triggering detection
     - **Action:**
-        1. Change `apiKey: 'sk_live_abc123xyz'` to `apiKey: 'sk_live_[REDACTED]'` in tanstack-query-state.md:293
+        1. Change `apiKey: 'sk_live_[EXAMPLE]'` to `apiKey: 'sk_live_[REDACTED]'` in tanstack-query-state.md:293
         2. Update other example secrets to use `[REDACTED]` or `[EXAMPLE]` format
         3. Test with local gitleaks: `gitleaks detect --source=docs/bindings/categories/typescript/ --verbose`
         4. Document secure example patterns in SECURITY.md for future reference

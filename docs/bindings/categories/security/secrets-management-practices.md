@@ -225,6 +225,44 @@ Secrets management must implement comprehensive protection with zero tolerance f
    });
    ```
 
+## Documentation Security Patterns
+
+When creating documentation, code examples, and tutorials, follow secure patterns to prevent accidental secret exposure and false positives in security scanning:
+
+**Secure Example Patterns:**
+- Use explicit redaction markers: `[REDACTED]`, `[EXAMPLE]`, `[PLACEHOLDER]`
+- Avoid realistic-looking secrets that trigger detection tools
+- Include security context in comments explaining why values are redacted
+
+```typescript
+// ✅ GOOD: Secure documentation examples
+const config = {
+  apiKey: process.env.API_KEY,           // Retrieved from environment
+  endpoint: 'https://api.example.com'    // Public endpoint
+};
+
+// ✅ GOOD: Clear redaction in examples
+const apiConfig = {
+  apiKey: 'sk_live_[REDACTED]',          // Use explicit redaction markers
+  webhookSecret: 'whsec_[EXAMPLE]',      // Clear example indicator
+  token: '[YOUR_API_TOKEN_HERE]'         // Template-style placeholder
+};
+
+// ❌ BAD: Realistic-looking secrets that trigger scanners
+const badConfig = {
+  apiKey: 'sk_live_abc123xyz789',        // Looks like real Stripe key
+  token: 'ghp_1a2b3c4d5e6f7g8h',        // Looks like real GitHub token
+  secret: 'sk-proj-abc123'               // Looks like real OpenAI key
+};
+```
+
+**Documentation Review Checklist:**
+- [ ] All example secrets use `[REDACTED]` or `[EXAMPLE]` markers
+- [ ] No realistic key patterns (`sk_live_*`, `ghp_*`, `pk_*`, etc.)
+- [ ] Environment variable usage demonstrated in examples
+- [ ] Security context explained in surrounding text
+- [ ] Gitleaks scan passes without false positives
+
 ## Examples
 
 ```python
