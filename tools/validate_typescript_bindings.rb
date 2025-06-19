@@ -326,6 +326,19 @@ def add_default_tool_configs(dir)
 
       export default [
         {
+          // Global ignore patterns - must be first
+          ignores: [
+            'dist/**/*',
+            'build/**/*',
+            'coverage/**/*',
+            'node_modules/**/*',
+            '*.d.ts',
+            '**/*.d.ts',
+            '.pnpm-lock.yaml',
+            'pnpm-lock.yaml'
+          ]
+        },
+        {
           // JavaScript files
           files: ['**/*.{js,mjs,cjs}'],
           languageOptions: {
@@ -345,7 +358,8 @@ def add_default_tool_configs(dir)
             sourceType: 'module',
             parser: tsparser,
             parserOptions: {
-              project: './tsconfig.json'
+              project: './tsconfig.json',
+              tsconfigRootDir: '.'
             }
           },
           plugins: {
@@ -374,10 +388,6 @@ def add_default_tool_configs(dir)
             '@typescript-eslint/no-unused-vars': 'error',
             'no-console': 'warn'
           }
-        },
-        {
-          // Ignore patterns
-          ignores: ['dist/', 'node_modules/', '*.d.ts']
         }
       ];
     JS
