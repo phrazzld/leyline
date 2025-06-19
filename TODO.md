@@ -79,7 +79,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
 ## CI Pipeline Simplification
 > **Philosophy**: Fast feedback on essential quality gates only
 
-- [ ] **S001 · Simplify · P0: update run_ci_checks.rb to essential-only mode**
+- [x] **S001 · Simplify · P0: update run_ci_checks.rb to essential-only mode**
     - **Context:** Current script runs all validation types, creating 60+ second feedback loops
     - **Problem:** Slow feedback discourages frequent validation during development
     - **Action:**

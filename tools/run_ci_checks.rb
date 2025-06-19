@@ -303,8 +303,8 @@ def main
     })
   end
 
-  # Step 7: External link checking (optional)
-  unless $skip_external_links
+  # Step 7: External link checking (full mode only)
+  if $validation_mode == :full && !$skip_external_links
     puts ""
     puts "📡 Checking external link validation tool availability..."
 
@@ -337,11 +337,19 @@ def main
       })
     end
   else
-    puts "⏭️  Skipping external link validation (--skip-external-links)"
-    log_structured('validation_step_skipped', {
-      step: "External link validation",
-      reason: "user_requested_skip"
-    })
+    if $validation_mode == :essential
+      puts "⏭️  Skipping external link validation (essential mode)"
+      log_structured('validation_step_skipped', {
+        step: "External link validation",
+        reason: "essential_mode"
+      })
+    else
+      puts "⏭️  Skipping external link validation (--skip-external-links)"
+      log_structured('validation_step_skipped', {
+        step: "External link validation",
+        reason: "user_requested_skip"
+      })
+    end
   end
 
   # Summary
@@ -363,8 +371,8 @@ def main
       validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
       validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan (full mode only)
       validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit (full mode only)
+      validations_count += 1 unless $skip_external_links  # External links (full mode only)
     end
-    validations_count += 1 unless $skip_external_links  # External links
 
     log_structured('ci_simulation_success', {
       duration_seconds: total_duration,
@@ -388,8 +396,8 @@ def main
       validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
       validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan (full mode only)
       validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit (full mode only)
+      validations_count += 1 unless $skip_external_links  # External links (full mode only)
     end
-    validations_count += 1 unless $skip_external_links  # External links
 
     log_structured('ci_simulation_failure', {
       duration_seconds: total_duration,
