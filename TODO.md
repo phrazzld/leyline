@@ -3,7 +3,7 @@
 ## Phase 1: Foundation Setup
 
 - [x] Create `lib/leyline/` directory structure for Ruby CLI implementation with subdirectories for `cli/`, `sync/`, `detection/`, and `reconciliation/`
-- [ ] Create `lib/leyline/version.rb` file that reads VERSION file and defines `Leyline::VERSION` constant for use in CLI version output
+- [x] Create `lib/leyline/version.rb` file that reads VERSION file and defines `Leyline::VERSION` constant for use in CLI version output
 - [ ] Create `lib/leyline/cli.rb` base class with Thor gem integration, defining main command structure with `sync` as primary command
 - [ ] Create `bin/leyline` executable script with proper shebang (`#!/usr/bin/env ruby`), loading path setup, and CLI invocation
 - [ ] Add Thor gem dependency to Gemfile with version constraint (~> 1.3) and run bundle install to update Gemfile.lock
