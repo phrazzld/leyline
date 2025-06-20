@@ -1,228 +1,118 @@
-# CI Simplification TODO
-*Streamline CI pipeline to serve documentation repository purpose*
+# CLI Sync Implementation TODO
 
-## Problem Statement
-Current CI pipeline applies production software engineering standards to a knowledge management repository, creating massive friction for documentation work and blocking valuable contributions over nitpicky issues that don't affect core repository value.
+## Phase 1: Foundation Setup
 
-## Philosophy
-CI should **enable** documentation work, not **hinder** it. Focus on essential quality gates that serve the repository's purpose while removing overengineered validation that creates friction without proportional value.
+- [x] Create `lib/leyline/` directory structure for Ruby CLI implementation with subdirectories for `cli/`, `sync/`, `detection/`, and `reconciliation/`
+- [ ] Create `lib/leyline/version.rb` file that reads VERSION file and defines `Leyline::VERSION` constant for use in CLI version output
+- [ ] Create `lib/leyline/cli.rb` base class with Thor gem integration, defining main command structure with `sync` as primary command
+- [ ] Create `bin/leyline` executable script with proper shebang (`#!/usr/bin/env ruby`), loading path setup, and CLI invocation
+- [ ] Add Thor gem dependency to Gemfile with version constraint (~> 1.3) and run bundle install to update Gemfile.lock
+- [ ] Create `lib/leyline/cli/options.rb` module to define and validate all CLI options (--categories, --force, --path, --version, --dry-run) with proper type checking
+- [ ] Write comprehensive `spec/lib/leyline/cli_spec.rb` test file covering CLI initialization, option parsing, and command routing
+- [ ] Update `.gitignore` to exclude `tmp/leyline-sync-*` temporary directories used during sparse-checkout operations
 
----
+## Phase 2: Git Operations
 
-## Essential CI Validation (Keep)
-> **Philosophy**: Validate what enables automation and basic quality
+- [ ] Create `lib/leyline/sync/git_client.rb` class implementing git sparse-checkout initialization with proper error handling for missing git binary
+- [ ] Implement `GitClient#setup_sparse_checkout` method that creates temp directory, initializes git repo, and configures sparse-checkout mode
+- [ ] Implement `GitClient#add_sparse_paths` method that accepts array of paths (e.g., ["docs/tenets", "docs/bindings/core"]) and adds them to sparse-checkout config
+- [ ] Implement `GitClient#fetch_version` method supporting branch names, tags, and commit SHAs with validation of remote existence
+- [ ] Create `GitClient#cleanup` method to safely remove temporary directories after sync completion or on error
+- [ ] Write `spec/lib/leyline/sync/git_client_spec.rb` tests covering all git operations including error cases (network failures, invalid versions)
+- [ ] Add integration test `spec/integration/git_sparse_checkout_spec.rb` that verifies actual git sparse-checkout behavior with real repository
 
-- [x] **E001 · Keep · P0: maintain YAML front-matter validation**
-    - **Context:** YAML front-matter enables automation, indexing, and content management
-    - **Current state:** Working correctly and serves clear purpose
-    - **Action:** Keep `ruby tools/validate_front_matter.rb` in CI pipeline
-    - **Rationale:** Essential for repository automation and content organization
-    - **Done-when:** YAML validation remains in CI with no changes
+## Phase 3: Language Detection
 
-- [x] **E002 · Keep · P0: maintain basic markdown syntax validation**
-    - **Context:** Ensures documentation renders correctly across platforms
-    - **Current state:** Handled by pre-commit hooks (check yaml, end-of-file-fixer)
-    - **Action:** Keep existing pre-commit hook validation for basic syntax
-    - **Rationale:** Prevents broken documentation rendering
-    - **Done-when:** Pre-commit hooks remain active for basic syntax checks
+- [ ] Create `lib/leyline/detection/language_detector.rb` base class with abstract `detect` method returning array of detected languages
+- [ ] Implement `lib/leyline/detection/node_detector.rb` checking for package.json, parsing it for typescript/react dependencies, returning ["typescript", "web"] categories
+- [ ] Implement `lib/leyline/detection/go_detector.rb` checking for go.mod/go.sum files, returning ["go", "backend"] categories
+- [ ] Implement `lib/leyline/detection/rust_detector.rb` checking for Cargo.toml, parsing for web frameworks (actix, rocket), returning appropriate categories
+- [ ] Implement `lib/leyline/detection/python_detector.rb` checking for pyproject.toml, requirements.txt, setup.py, detecting frameworks (django, fastapi)
+- [ ] Create `lib/leyline/detection/detector_registry.rb` that runs all detectors and merges results, removing duplicates
+- [ ] Write comprehensive tests in `spec/lib/leyline/detection/` for each detector with fixture files representing real project structures
+- [ ] Add `--verbose` flag support to output detected languages and reasoning to help users understand category selection
 
-- [x] **E003 · Keep · P1: maintain index consistency validation**
-    - **Context:** Ensures generated indexes stay synchronized with content
-    - **Current state:** Working correctly via `ruby tools/reindex.rb --strict`
-    - **Action:** Keep index consistency check in CI pipeline
-    - **Rationale:** Prevents navigation breakage in generated documentation
-    - **Done-when:** Index validation remains in CI with no changes
+## Phase 4: File Synchronization
 
----
+- [ ] Create `lib/leyline/sync/file_syncer.rb` class responsible for copying files from sparse-checkout temp directory to target location
+- [ ] Implement `FileSyncer#calculate_checksum` method using SHA256 for consistent file comparison across platforms
+- [ ] Create `lib/leyline/sync/sync_state.rb` class to read/write `.leyline-sync.yml` tracking file with version, checksums, and last sync timestamp
+- [ ] Implement `FileSyncer#compare_files` method that returns status (:unchanged, :modified, :new, :deleted) for each file
+- [ ] Implement `FileSyncer#sync_file` method with conflict resolution logic: preserve local changes by default, overwrite with --force
+- [ ] Create `FileSyncer#generate_sync_report` returning structured data about added/modified/skipped files for user feedback
+- [ ] Write tests in `spec/lib/leyline/sync/file_syncer_spec.rb` covering all sync scenarios including permission errors
+- [ ] Add Windows-specific path handling tests to ensure cross-platform compatibility
 
-## Overengineered Validation (Remove/Simplify)
-> **Philosophy**: Remove friction that doesn't serve repository purpose
+## Phase 5: Integration with Existing Tools
 
-- [x] **R001 · Remove · P0: eliminate blocking cross-reference validation**
-    - **Context:** Currently blocks ALL PRs due to hundreds of pre-existing broken links
-    - **Problem:** New work cannot proceed due to old, unrelated documentation debt
-    - **Current behavior:** `ruby tools/validate_cross_references.rb` fails CI if ANY link is broken
-    - **Action:** Remove cross-reference validation from CI pipeline entirely
-    - **Rationale:** Link validation should be advisory, not blocking; broken links don't prevent knowledge transfer
-    - **Alternative:** Convert to optional/advisory check in local tools only
-    - **Done-when:** Cross-reference validation removed from CI, still available locally
+- [ ] Create `lib/leyline/sync/reindexer.rb` wrapper class that safely invokes `tools/reindex.rb` with proper error handling
+- [ ] Implement `Reindexer#run` method that captures stdout/stderr, handles non-zero exit codes, and provides meaningful error messages
+- [ ] Create `lib/leyline/sync/validator.rb` wrapper for `tools/validate_front_matter.rb` to verify synced files are valid
+- [ ] Add `--skip-validation` flag to bypass validation for faster syncing in trusted environments
+- [ ] Implement progress reporting that shows "Validating front matter..." and "Regenerating indexes..." during these operations
+- [ ] Write integration tests verifying reindex.rb is called correctly and indexes are properly updated after sync
+- [ ] Add error recovery logic to restore previous state if reindexing fails after file sync
 
-- [x] **R002 · Remove · P0: eliminate production-grade TypeScript binding validation**
-    - **Context:** Extracts code snippets from docs and runs full TypeScript compilation
-    - **Problem:** Documentation examples should teach concepts, not be production-ready
-    - **Current behavior:** `ruby tools/validate_typescript_bindings.rb` treats educational examples like production code
-    - **Action:** Remove TypeScript binding validation from CI pipeline entirely
-    - **Rationale:** Educational examples prioritize clarity over compilation perfection
-    - **Alternative:** Keep tool available for authors who want to test examples locally
-    - **Done-when:** TypeScript binding validation removed from CI, still available locally
+## Phase 6: User Experience
 
-- [x] **R003 · Remove · P0: eliminate security scanning of documentation examples**
-    - **Context:** Enterprise-grade secret detection on educational examples
-    - **Problem:** Educational "bad examples" need realistic patterns to be effective
-    - **Current behavior:** Gitleaks scanning fails on examples that demonstrate what NOT to do
-    - **Action:** Remove gitleaks security scanning from CI pipeline entirely
-    - **Rationale:** Documentation repo doesn't contain actual secrets, only educational content
-    - **Alternative:** Keep .gitleaksignore for local development but remove from CI
-    - **Done-when:** Security scanning removed from CI pipeline
+- [ ] Implement colorized output using Rainbow gem for success (green), warnings (yellow), and errors (red) messages
+- [ ] Create `lib/leyline/cli/reporter.rb` class formatting sync results in human-readable table showing file counts by category
+- [ ] Add spinner/progress indicator for long-running operations (git fetch, file sync) using TTY::Spinner gem
+- [ ] Implement `--json` flag for machine-readable output containing sync report data for CI integration
+- [ ] Create detailed error messages with actionable suggestions (e.g., "Network error: Check internet connection and try again")
+- [ ] Add `--quiet` flag that suppresses all output except errors, useful for cron jobs and CI
+- [ ] Implement confirmation prompt for destructive operations when --force is used: "This will overwrite 3 local modifications. Continue? (y/N)"
+- [ ] Write end-to-end tests in `spec/e2e/user_experience_spec.rb` verifying all output scenarios
 
-- [x] **R004 · Remove · P1: eliminate dependency security auditing of example projects**
-    - **Context:** Running `pnpm audit` on example/demo projects in documentation repo
-    - **Problem:** Example projects are for education, not production deployment
-    - **Current behavior:** CI fails if example projects have dependency vulnerabilities
-    - **Action:** Remove pnpm audit checks from CI pipeline
-    - **Rationale:** Educational examples don't need production-grade security auditing
-    - **Alternative:** Document that examples are for learning, not production use
-    - **Done-when:** Dependency auditing removed from CI for example projects
+## Phase 7: Advanced Features
 
----
+- [ ] Implement `leyline sync --dry-run` that shows what would be synced without making changes, including diff preview
+- [ ] Add `leyline sync --categories list` subcommand that shows all available categories with descriptions
+- [ ] Implement offline caching in `~/.leyline/cache/` storing last successful sync for offline development
+- [ ] Add `leyline sync --from-cache` flag to use cached content when offline or for faster repeated syncs
+- [ ] Create `leyline sync status` subcommand showing current sync state, version, last sync time, and modification status
+- [ ] Implement `leyline sync --exclude` option accepting glob patterns to skip specific files (e.g., --exclude "**/experimental-*")
+- [ ] Add telemetry collection (opt-in) to understand usage patterns and improve auto-detection accuracy
+- [ ] Create `leyline config` subcommand for managing persistent settings like default categories and sync path
 
-## CI Pipeline Simplification
-> **Philosophy**: Fast feedback on essential quality gates only
+## Phase 8: Documentation
 
-- [x] **S001 · Simplify · P0: update run_ci_checks.rb to essential-only mode**
-    - **Context:** Current script runs all validation types, creating 60+ second feedback loops
-    - **Problem:** Slow feedback discourages frequent validation during development
-    - **Action:**
-        1. Create `run_ci_checks.rb --essential` mode that runs only E001-E003
-        2. Move R001-R004 validations to `--full` mode (local development only)
-        3. Update CI to use `--essential` mode
-    - **Expected time:** Essential mode should complete in <10 seconds
-    - **Done-when:** CI uses essential-only validation, fast feedback loop established
+- [ ] Write comprehensive `docs/cli/sync-command.md` documenting all flags, options, and usage examples
+- [ ] Create `docs/cli/migration-from-workflow.md` guide for users transitioning from GitHub workflow approach
+- [ ] Add troubleshooting section to documentation covering common issues (git not found, network errors, permission denied)
+- [ ] Update main README.md with new "Quick Start" section showcasing `leyline sync` as primary integration method
+- [ ] Create `examples/cli-integration/` directory with example scripts for various CI systems (GitHub Actions, GitLab CI, Jenkins)
+- [ ] Write `docs/cli/architecture.md` explaining internal design for contributors with sequence diagrams
+- [ ] Add inline code comments throughout implementation explaining design decisions and edge cases
+- [ ] Create man page `man/leyline.1` for Unix systems with proper formatting and sections
 
-- [x] **S002 · Simplify · P0: update CI workflow to use essential validation only**
-    - **Context:** Current CI workflow calls comprehensive validation
-    - **Problem:** Long CI times block development velocity
-    - **Action:**
-        1. Update `.github/workflows/` to call `run_ci_checks.rb --essential`
-        2. Remove individual validation steps that are now covered by essential mode
-        3. Ensure CI completes in <2 minutes total
-    - **Verification:** Create test PR to confirm fast CI execution
-    - **Done-when:** CI workflow updated and verified to run essential checks only
+## Phase 9: Testing & Quality
 
-- [x] **S003 · Simplify · P1: update CLAUDE.md to reflect simplified CI**
-    - **Context:** Current documentation promotes comprehensive local validation
-    - **Problem:** Developers are encouraged to run slow, overengineered validation
-    - **Action:**
-        1. Update "CI Failure Prevention" section to recommend `--essential` for daily use
-        2. Document `--full` mode as optional for authors who want comprehensive validation
-        3. Update pre-push recommendations to use fast essential mode
-    - **Focus:** Encourage frequent validation through fast feedback
-    - **Done-when:** CLAUDE.md updated with simplified workflow recommendations
+- [ ] Achieve 90%+ test coverage for all new code, verified by SimpleCov with detailed HTML reports
+- [ ] Add performance benchmarks in `spec/benchmarks/sync_performance_spec.rb` ensuring sync completes in < 5 seconds for typical projects
+- [ ] Create fixture repositories in `spec/fixtures/test-repos/` representing different project types for integration testing
+- [ ] Implement mutation testing using Mutant gem to verify test effectiveness and catch missing edge cases
+- [ ] Add memory profiling tests to ensure no memory leaks during large sync operations
+- [ ] Create stress tests syncing hundreds of files to verify scalability and proper resource cleanup
+- [ ] Write compatibility tests for Ruby 2.7, 3.0, 3.1, and 3.2 ensuring broad version support
+- [ ] Add CI matrix testing across macOS, Linux, and Windows with different git versions
 
----
+## Phase 10: Release Preparation
 
-## Developer Experience Improvements
-> **Philosophy**: Remove friction, enable flow
+- [ ] Update `VERSION` file following semantic versioning for new minor version (e.g., 1.3.0)
+- [ ] Write detailed CHANGELOG.md entry documenting new CLI sync feature with migration notes
+- [ ] Create GitHub release PR template specifically for CLI feature releases with checklist
+- [ ] Add announcement template in `docs/announcements/cli-sync-launch-YYYY-MM.md` for user communication
+- [ ] Update all example repositories to demonstrate both workflow and CLI approaches during transition
+- [ ] Create feature flag `LEYLINE_ENABLE_CLI_SYNC` for gradual rollout and easy rollback if needed
+- [ ] Plan deprecation timeline for workflow approach with 6-month transition period
+- [ ] Prepare user survey to gather feedback on CLI experience after 1-month usage period
 
-- [x] **D001 · Improve · P1: create documentation authoring workflow guide**
-    - **Context:** Simplified CI enables focus on documentation quality over technical perfection
-    - **Action:**
-        1. Create `docs/AUTHORING_WORKFLOW.md` focused on content creation
-        2. Document when to use essential vs full validation
-        3. Provide guidance on writing effective examples (clear over compilable)
-        4. Include patterns for educational "bad examples" that won't trigger false positives
-    - **Focus:** Enable authors to focus on knowledge transfer, not technical compliance
-    - **Done-when:** Authoring guide created emphasizing content over technical perfection
+## Phase 11: Post-Launch
 
-- [x] **D002 · Improve · P1: simplify pre-commit hooks to essential checks only**
-    - **Context:** Current pre-commit hooks may include overengineered validation
-    - **Action:**
-        1. Audit `.pre-commit-config.yaml` for overengineered checks
-        2. Keep only: trailing whitespace, end-of-file, YAML syntax, large files
-        3. Remove any validation that duplicates removed CI checks
-    - **Goal:** Fast pre-commit feedback that doesn't block commits
-    - **Done-when:** Pre-commit hooks run in <5 seconds with essential checks only
-
-- [x] **D003 · Improve · P2: add advisory validation for interested authors**
-    - **Context:** Some authors may want comprehensive validation for their work
-    - **Action:**
-        1. Create `run_advisory_checks.rb` script with all removed validations
-        2. Document as optional tool for authors who want comprehensive feedback
-        3. Ensure it's completely separate from required CI workflow
-    - **Principle:** Available but not required, never blocks development
-    - **Done-when:** Advisory validation available but not enforced
-
----
-
-## Communication and Migration
-> **Philosophy**: Clear communication about simplified approach
-
-- [x] **C001 · Communicate · P0: update CI failure prevention documentation**
-    - **Context:** Current `docs/CI_FAILURE_PREVENTION.md` promotes overengineered approach
-    - **Problem:** Documentation encourages practices we're moving away from
-    - **Action:**
-        1. Rewrite guide to focus on essential validation only
-        2. Remove detailed troubleshooting for removed validation types
-        3. Emphasize speed and developer flow over comprehensive checking
-    - **Message:** CI should enable, not hinder documentation work
-    - **Done-when:** Prevention guide updated to reflect simplified philosophy
-
-- [x] **C002 · Communicate · P1: create migration guide for existing contributors**
-    - **Context:** Contributors may be accustomed to comprehensive validation
-    - **Action:**
-        1. Document what's changing and why (focus shift from software engineering to knowledge management)
-        2. Explain when to use different validation levels
-        3. Address concerns about "lowering standards" by clarifying appropriate standards for docs
-    - **Key message:** Different repositories have different quality requirements
-    - **Done-when:** Migration guide clarifies new approach and rationale
-
-- [x] **C003 · Communicate · P2: update repository README to reflect documentation focus**
-    - **Context:** Repository may present itself as software project rather than knowledge repository
-    - **Action:**
-        1. Review README.md for overemphasis on technical sophistication
-        2. Emphasize knowledge sharing and documentation quality over technical perfection
-        3. Set appropriate expectations for contribution standards
-    - **Goal:** Attract contributors interested in knowledge work, not just technical validation
-    - **Done-when:** README reflects documentation repository purpose clearly
-
----
-
-## Validation and Rollback Planning
-> **Philosophy**: Measure impact, be ready to adjust
-
-- [ ] **V001 · Validate · P0: measure CI performance improvement**
-    - **Context:** Changes should demonstrably improve developer experience
-    - **Action:**
-        1. Baseline current CI execution time across recent PRs
-        2. Measure new CI time after simplification
-        3. Target: <2 minutes total CI time, <10 seconds essential validation
-    - **Success criteria:** >75% reduction in CI execution time
-    - **Done-when:** Performance improvement documented and verified
-
-- [ ] **V002 · Validate · P1: monitor documentation quality after simplification**
-    - **Context:** Ensure simplification doesn't degrade actual documentation quality
-    - **Action:**
-        1. Establish baseline metrics: broken internal links, YAML errors, basic syntax issues
-        2. Monitor same metrics for 2 weeks after simplification
-        3. Watch for any quality degradation in new content
-    - **Acceptance criteria:** No increase in essential quality issues (YAML, syntax, basic structure)
-    - **Done-when:** Quality monitoring shows no degradation in essential areas
-
-- [ ] **V003 · Validate · P2: create rollback plan if simplification proves problematic**
-    - **Context:** Major CI changes should be reversible if they cause unforeseen issues
-    - **Action:**
-        1. Document exact changes made for easy reversal
-        2. Keep comprehensive validation tools available but unused
-        3. Define criteria for rolling back (quality degradation, contributor concerns)
-    - **Rollback triggers:** Significant increase in basic quality issues, major contributor objections
-    - **Done-when:** Clear rollback procedure documented and tested
-
----
-
-## Success Criteria
-
-**Primary Goals:**
-- CI execution time reduced from >60 seconds to <2 minutes
-- Essential quality gates maintained (YAML, basic syntax, index consistency)
-- Developer experience improved through fast feedback loops
-- Documentation work no longer blocked by overengineered validation
-
-**Quality Assurance:**
-- No degradation in essential documentation quality
-- Continued ability to validate comprehensively when desired (optional)
-- Clear communication about appropriate standards for documentation repositories
-
-**Philosophy Achievement:**
-- CI enables rather than hinders documentation work
-- Validation effort proportional to repository value and purpose
-- Fast feedback encourages frequent validation and quality improvement
+- [ ] Monitor GitHub issues for bug reports and feature requests related to CLI sync
+- [ ] Create `leyline doctor` diagnostic command to help users troubleshoot sync issues
+- [ ] Implement analytics dashboard to track adoption rate of CLI vs workflow approach
+- [ ] Plan v2 features based on user feedback (parallel syncing, partial updates, conflict UI)
+- [ ] Create automated migration tool to convert workflow configurations to CLI commands
+- [ ] Document lessons learned and update contribution guidelines based on implementation experience
