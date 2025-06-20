@@ -181,6 +181,108 @@ RSpec.describe Leyline::Sync::GitClient do
     end
   end
 
+  describe '#fetch_version' do
+    let(:remote_url) { 'https://github.com/example/repo.git' }
+    let(:version_ref) { 'main' }
+
+    context 'when working directory is not set' do
+      it 'raises an error' do
+        expect { git_client.fetch_version(remote_url, version_ref) }.to raise_error(
+          described_class::GitCommandError,
+          'No working directory set. Call setup_sparse_checkout first.'
+        )
+      end
+    end
+
+    context 'when working directory is set' do
+      before do
+        git_client.instance_variable_set(:@working_directory, temp_dir)
+        allow(git_client).to receive(:run_git_command)
+      end
+
+      it 'adds remote and fetches the specified version' do
+        expect(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}")
+        expect(git_client).to receive(:run_git_command).with("fetch origin #{version_ref}")
+        expect(git_client).to receive(:run_git_command).with("checkout FETCH_HEAD")
+
+        git_client.fetch_version(remote_url, version_ref)
+      end
+
+      it 'handles branch names' do
+        expect(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}")
+        expect(git_client).to receive(:run_git_command).with("fetch origin feature-branch")
+        expect(git_client).to receive(:run_git_command).with("checkout FETCH_HEAD")
+
+        git_client.fetch_version(remote_url, 'feature-branch')
+      end
+
+      it 'handles tag names' do
+        expect(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}")
+        expect(git_client).to receive(:run_git_command).with("fetch origin v1.0.0")
+        expect(git_client).to receive(:run_git_command).with("checkout FETCH_HEAD")
+
+        git_client.fetch_version(remote_url, 'v1.0.0')
+      end
+
+      it 'handles commit SHAs' do
+        commit_sha = 'a1b2c3d4e5f6'
+        expect(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}")
+        expect(git_client).to receive(:run_git_command).with("fetch origin #{commit_sha}")
+        expect(git_client).to receive(:run_git_command).with("checkout FETCH_HEAD")
+
+        git_client.fetch_version(remote_url, commit_sha)
+      end
+
+      it 'validates URL format' do
+        invalid_url = 'not-a-valid-url'
+
+        expect { git_client.fetch_version(invalid_url, version_ref) }.to raise_error(
+          described_class::GitCommandError,
+          /Invalid remote URL format/
+        )
+      end
+
+      it 'validates version reference format' do
+        invalid_ref = '../invalid-ref'
+
+        expect { git_client.fetch_version(remote_url, invalid_ref) }.to raise_error(
+          described_class::GitCommandError,
+          /Invalid version reference/
+        )
+      end
+
+      it 'handles git fetch failures' do
+        allow(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}")
+        allow(git_client).to receive(:run_git_command).with("fetch origin #{version_ref}")
+          .and_raise(described_class::GitCommandError.new('fetch failed', 'git fetch', 128))
+
+        expect { git_client.fetch_version(remote_url, version_ref) }.to raise_error(
+          described_class::GitCommandError,
+          'fetch failed'
+        )
+      end
+
+      it 'handles existing remote by removing it first' do
+        expect(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}")
+          .and_raise(described_class::GitCommandError.new('remote origin already exists')).ordered
+        expect(git_client).to receive(:run_git_command).with("remote remove origin").ordered
+        expect(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}").ordered
+        expect(git_client).to receive(:run_git_command).with("fetch origin #{version_ref}").ordered
+        expect(git_client).to receive(:run_git_command).with("checkout FETCH_HEAD").ordered
+
+        git_client.fetch_version(remote_url, version_ref)
+      end
+
+      it 'accepts nil version and defaults to HEAD' do
+        expect(git_client).to receive(:run_git_command).with("remote add origin #{remote_url}")
+        expect(git_client).to receive(:run_git_command).with("fetch origin HEAD")
+        expect(git_client).to receive(:run_git_command).with("checkout FETCH_HEAD")
+
+        git_client.fetch_version(remote_url, nil)
+      end
+    end
+  end
+
   describe 'error handling' do
     describe 'GitNotAvailableError' do
       it 'is a subclass of StandardError' do

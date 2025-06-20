@@ -72,6 +72,28 @@ module Leyline
         end
       end
 
+      def fetch_version(remote_url, version_ref)
+        if @working_directory.nil?
+          raise GitCommandError, 'No working directory set. Call setup_sparse_checkout first.'
+        end
+
+        # Validate inputs
+        validate_remote_url(remote_url)
+        validate_version_reference(version_ref) unless version_ref.nil?
+
+        # Default to HEAD if no version specified
+        version_ref ||= 'HEAD'
+
+        # Add remote (handle existing remote)
+        add_remote_origin(remote_url)
+
+        # Fetch the specified version
+        run_git_command("fetch origin #{version_ref}")
+
+        # Checkout the fetched version
+        run_git_command("checkout FETCH_HEAD")
+      end
+
       def cleanup
         return if @working_directory.nil?
 
@@ -96,6 +118,39 @@ module Leyline
 
         if path.include?('../')
           raise GitCommandError, "Invalid sparse-checkout path '#{path}': parent directory traversal not allowed"
+        end
+      end
+
+      def validate_remote_url(url)
+        # Basic URL format validation
+        unless url.match?(/\A(https?:\/\/|git@)[\w\-\.]+[\w\-]+(\/[\w\-\.]+)*\.git\z/)
+          raise GitCommandError, "Invalid remote URL format: #{url}"
+        end
+      end
+
+      def validate_version_reference(ref)
+        # Check for path traversal and other invalid patterns
+        if ref.include?('../') || ref.include?('..\\')
+          raise GitCommandError, "Invalid version reference: #{ref}"
+        end
+
+        # Check for other potentially dangerous patterns
+        if ref.include?(' ') || ref.start_with?('-')
+          raise GitCommandError, "Invalid version reference: #{ref}"
+        end
+      end
+
+      def add_remote_origin(remote_url)
+        begin
+          run_git_command("remote add origin #{remote_url}")
+        rescue GitCommandError => e
+          # If remote already exists, remove it and try again
+          if e.message.include?('already exists') || e.message.include?('remote origin')
+            run_git_command("remote remove origin")
+            run_git_command("remote add origin #{remote_url}")
+          else
+            raise e
+          end
         end
       end
 
