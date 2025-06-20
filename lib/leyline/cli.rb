@@ -34,9 +34,17 @@ module Leyline
                   desc: 'Show detailed output',
                   aliases: '-v'
     def sync(path = '.')
+      # Pre-process categories to handle comma-separated values
+      processed_options = options.dup
+      if processed_options[:categories].is_a?(Array) &&
+         processed_options[:categories].length == 1 &&
+         processed_options[:categories].first.include?(',')
+        processed_options[:categories] = processed_options[:categories].first.split(',').map(&:strip)
+      end
+
       # Validate options before proceeding
       begin
-        CliOptions.validate_sync_options(options, path)
+        CliOptions.validate_sync_options(processed_options, path)
       rescue CliOptions::ValidationError => e
         puts "Error: #{e.message}"
         exit 1
@@ -46,7 +54,7 @@ module Leyline
       puts "Synchronizing leyline standards to: #{File.join(target_path, 'docs', 'leyline')}"
 
       # Use explicit categories or default to 'core'
-      categories = options[:categories] || ['core']
+      categories = processed_options[:categories] || ['core']
       normalized_categories = CliOptions.normalize_categories(categories) || ['core']
 
       puts "Categories: #{normalized_categories.join(', ')}" unless normalized_categories.empty?

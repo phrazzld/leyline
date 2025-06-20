@@ -144,6 +144,12 @@ RSpec.describe Leyline::CLI do
         cli.options = { categories: ['typescript', 'go', 'python'] }
         expect { capture_stdout { cli.sync } }.not_to raise_error
       end
+
+      it 'accepts comma-separated categories in a single string' do
+        cli.options = { categories: ['typescript,go,python'] }
+        output = capture_stdout { cli.sync }
+        expect(output).to include('Categories: go, python, typescript')
+      end
     end
   end
 
