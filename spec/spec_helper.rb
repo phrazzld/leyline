@@ -10,6 +10,9 @@ $LOAD_PATH.unshift(lib_path) unless $LOAD_PATH.include?(lib_path)
 require 'leyline/cli'
 require 'leyline/cli/options'
 
+# Require sync components
+require 'leyline/sync/git_client'
+
 RSpec.configure do |config|
   # Use the expect syntax (not should)
   config.expect_with :rspec do |expectations|
@@ -20,6 +23,7 @@ RSpec.configure do |config|
   # Mock framework configuration
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
+    mocks.allow_message_expectations_on_nil = false
   end
 
   # Enable flags like --only-failures and --next-failure
