@@ -7,7 +7,7 @@
 - [x] Create `lib/leyline/cli.rb` base class with Thor gem integration, defining main command structure with `sync` as primary command
 - [x] Create `bin/leyline` executable script with proper shebang (`#!/usr/bin/env ruby`), loading path setup, and CLI invocation
 - [x] Add Thor gem dependency to Gemfile with version constraint (~> 1.3) and run bundle install to update Gemfile.lock
-- [ ] Create `lib/leyline/cli/options.rb` module to define and validate all CLI options (--categories, --force, --path, --version, --dry-run) with proper type checking
+- [x] Create `lib/leyline/cli/options.rb` module to define and validate all CLI options (--categories, --force, --path, --version, --dry-run) with proper type checking
 - [ ] Write comprehensive `spec/lib/leyline/cli_spec.rb` test file covering CLI initialization, option parsing, and command routing
 - [ ] Update `.gitignore` to exclude `tmp/leyline-sync-*` temporary directories used during sparse-checkout operations
 

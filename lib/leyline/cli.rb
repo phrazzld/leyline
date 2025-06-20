@@ -2,6 +2,7 @@
 
 require 'thor'
 require_relative 'version'
+require_relative 'cli/options'
 
 module Leyline
   class CLI < Thor
@@ -30,6 +31,14 @@ module Leyline
                   desc: 'Show detailed output',
                   aliases: '-v'
     def sync(path = '.')
+      # Validate options before proceeding
+      begin
+        CliOptions.validate_sync_options(options, path)
+      rescue CliOptions::ValidationError => e
+        puts "Error: #{e.message}"
+        exit 1
+      end
+
       puts "Synchronizing leyline standards to: #{File.expand_path(path)}"
       puts "Categories: #{options[:categories]&.join(', ') || 'auto-detected'}"
       puts "Options: #{options.select { |k, v| v }.keys.join(', ')}" if options.any? { |_, v| v }
