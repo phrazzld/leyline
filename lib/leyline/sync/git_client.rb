@@ -122,8 +122,13 @@ module Leyline
       end
 
       def validate_remote_url(url)
-        # Basic URL format validation
-        unless url.match?(/\A(https?:\/\/|git@)[\w\-\.]+[\w\-]+(\/[\w\-\.]+)*\.git\z/)
+        # Basic URL format validation - support https, http, git@, and file:// URLs
+        valid_patterns = [
+          /\A(https?:\/\/|git@)[\w\-\.]+[\w\-]+(\/[\w\-\.]+)*\.git\z/,  # Remote URLs
+          /\Afile:\/\/.*\z/  # Local file URLs
+        ]
+
+        unless valid_patterns.any? { |pattern| url.match?(pattern) }
           raise GitCommandError, "Invalid remote URL format: #{url}"
         end
       end
