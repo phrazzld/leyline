@@ -91,7 +91,9 @@ module Leyline
 
         # Sync files to target directory under docs/leyline
         leyline_target = File.join(target_path, 'docs', 'leyline')
-        file_syncer = Sync::FileSyncer.new(temp_dir, leyline_target)
+        # Point to the docs subdirectory in temp_dir to avoid double nesting
+        source_docs_dir = File.join(temp_dir, 'docs')
+        file_syncer = Sync::FileSyncer.new(source_docs_dir, leyline_target)
         results = file_syncer.sync(force: force)
 
         # Report results
