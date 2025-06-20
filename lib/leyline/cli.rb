@@ -108,13 +108,13 @@ module Leyline
     def build_sparse_paths(categories)
       paths = []
 
-      # Always include tenets
+      # Always include tenets and core bindings
       paths << 'docs/tenets/'
+      paths << 'docs/bindings/core/'
 
+      # Add category-specific bindings
       categories.each do |category|
-        if category == 'core'
-          paths << 'docs/bindings/core/'
-        else
+        unless category == 'core'  # Skip core since we always include it above
           paths << "docs/bindings/categories/#{category}/"
         end
       end
