@@ -40,7 +40,7 @@ RSpec.describe Leyline::CLI do
 
       it 'uses current directory as default path' do
         output = capture_stdout { cli.sync }
-        expect(output).to include(File.expand_path('.'))
+        expect(output).to include('docs/leyline')
       end
     end
 

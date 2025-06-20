@@ -43,7 +43,7 @@ module Leyline
       end
 
       target_path = File.expand_path(path)
-      puts "Synchronizing leyline standards to: #{target_path}"
+      puts "Synchronizing leyline standards to: #{File.join(target_path, 'docs', 'leyline')}"
 
       # Use explicit categories or default to 'core'
       categories = options[:categories] || ['core']
@@ -87,10 +87,11 @@ module Leyline
         remote_url = 'https://github.com/phrazzld/leyline.git'
         git_client.fetch_version(remote_url, 'master')
 
-        puts "Copying files to #{target_path}..." if verbose
+        puts "Copying files to #{File.join(target_path, 'docs', 'leyline')}..." if verbose
 
-        # Sync files to target directory
-        file_syncer = Sync::FileSyncer.new(temp_dir, target_path)
+        # Sync files to target directory under docs/leyline
+        leyline_target = File.join(target_path, 'docs', 'leyline')
+        file_syncer = Sync::FileSyncer.new(temp_dir, leyline_target)
         results = file_syncer.sync(force: force)
 
         # Report results

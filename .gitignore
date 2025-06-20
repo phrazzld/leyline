@@ -39,3 +39,6 @@ thinktank*.log
 
 # Validation metrics (operational data)
 metrics/
+
+# Ruby gems
+*.gem

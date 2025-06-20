@@ -20,7 +20,7 @@ The new `leyline sync` command offers:
 # Install the gem
 gem install leyline
 
-# Sync TypeScript standards
+# Sync TypeScript standards to docs/leyline/
 leyline sync --categories typescript
 
 # Sync multiple categories

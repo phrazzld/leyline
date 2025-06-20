@@ -79,7 +79,7 @@ leyline sync --categories typescript --force
 
 The CLI will:
 - Fetch the latest Leyline standards from GitHub
-- Copy relevant tenets and bindings to your project
+- Copy relevant tenets and bindings to `docs/leyline/` in your project
 - Skip files you've already modified (unless using --force)
 - Show clear output about what was synced
 
