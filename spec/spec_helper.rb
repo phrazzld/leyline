@@ -13,6 +13,9 @@ require 'leyline/cli/options'
 # Require sync components
 require 'leyline/sync/git_client'
 
+# Require detection components
+require 'leyline/detection/language_detector'
+
 RSpec.configure do |config|
   # Use the expect syntax (not should)
   config.expect_with :rspec do |expectations|
