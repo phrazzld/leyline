@@ -31,14 +31,14 @@ ruby tools/reindex.rb --strict
 # Fix cross-references in documentation
 ruby tools/fix_cross_references.rb
 
-# Run local CI simulation (catches issues before remote CI)
-ruby tools/run_ci_checks.rb
+# Essential CI validation (fast mode for daily development)
+ruby tools/run_ci_checks.rb --essential
 
-# Run local CI simulation with verbose output
-ruby tools/run_ci_checks.rb --verbose
+# Full CI validation (comprehensive mode including advisory checks)
+ruby tools/run_ci_checks.rb --full
 
-# Skip external link checking for faster execution
-ruby tools/run_ci_checks.rb --skip-external-links
+# Essential validation with verbose output for debugging
+ruby tools/run_ci_checks.rb --essential --verbose
 
 # Validate TypeScript binding configurations
 ruby tools/validate_typescript_bindings.rb
@@ -126,22 +126,26 @@ The project uses a detailed TODO.md with task dependencies:
 
 ## CI Failure Prevention
 
-### Recommended Pre-Push Workflow
+### Recommended Daily Development Workflow
 
-**Essential Pre-Push Command:**
+**Essential Validation (Recommended for Daily Use):**
 ```bash
-# Run complete local CI simulation before pushing
-ruby tools/run_ci_checks.rb
+# Fast essential validation (~0.3 seconds) - YAML + Index only
+ruby tools/run_ci_checks.rb --essential
 ```
 
-**For faster iteration during development:**
+**Comprehensive Validation (Optional for Thorough Checking):**
 ```bash
-# Skip external link checking for quicker feedback
-ruby tools/run_ci_checks.rb --skip-external-links
+# Full validation with advisory checks (20-60 seconds)
+ruby tools/run_ci_checks.rb --full
 
-# Get detailed output for debugging failures
-ruby tools/run_ci_checks.rb --verbose
+# Full validation with verbose output for debugging
+ruby tools/run_ci_checks.rb --full --verbose
 ```
+
+**Validation Modes Explained:**
+- `--essential`: Fast validation of critical quality gates (YAML front-matter, Index consistency)
+- `--full`: Comprehensive validation including advisory checks (cross-references, TypeScript, security)
 
 ### Common CI Failure Types & Prevention
 
@@ -154,45 +158,44 @@ ruby tools/validate_front_matter.rb -f docs/bindings/categories/typescript/your-
 ruby tools/validate_front_matter.rb
 ```
 
-**TypeScript Configuration Issues:**
+**Advisory Validation (Available in Full Mode):**
 ```bash
-# Validate TypeScript binding configurations
+# TypeScript binding configurations (advisory only - educational examples)
 ruby tools/validate_typescript_bindings.rb --verbose
-```
 
-**Security Scan False Positives:**
-```bash
-# Test security scanning locally
+# Cross-reference validation (advisory only - not blocking)
+ruby tools/validate_cross_references.rb
+ruby tools/fix_cross_references.rb
+
+# Security scanning (advisory only - educational content may trigger false positives)
 gitleaks detect --source=. --no-git --verbose
 
-# For documentation: use [REDACTED] or [EXAMPLE] markers instead of realistic secrets
-```
-
-**Dependency Security Issues:**
-```bash
-# Audit TypeScript project dependencies
+# Dependency auditing (advisory only - example projects are educational)
 cd examples/typescript-full-toolchain && pnpm audit --audit-level=moderate
 ```
 
-**Cross-reference Link Issues:**
-```bash
-# Check and fix broken internal links
-ruby tools/validate_cross_references.rb
-ruby tools/fix_cross_references.rb
-```
+**Note:** Advisory validations are available in `--full` mode but do not block CI builds.
+Educational documentation prioritizes clarity and knowledge transfer over production-grade validation.
 
-### Pre-commit Integration (Optional)
+### Pre-Push Integration (Recommended)
 
-Add to your local `.git/hooks/pre-push` for automatic validation:
+Add to your local `.git/hooks/pre-push` for automatic fast validation:
 ```bash
 #!/bin/bash
-echo "🔄 Running local CI validation before push..."
-ruby tools/run_ci_checks.rb --skip-external-links
+echo "🚀 Running essential validation before push..."
+ruby tools/run_ci_checks.rb --essential
 if [ $? -ne 0 ]; then
-    echo "❌ Local CI validation failed. Fix issues before pushing."
+    echo "❌ Essential validation failed. Fix issues before pushing."
+    echo "💡 Run 'ruby tools/run_ci_checks.rb --essential --verbose' for details"
     exit 1
 fi
-echo "✅ Local CI validation passed. Proceeding with push."
+echo "✅ Essential validation passed (~0.3s). Proceeding with push."
 ```
 
 Make executable: `chmod +x .git/hooks/pre-push`
+
+**Alternative for comprehensive checking:**
+```bash
+# For authors who want thorough validation (slower)
+ruby tools/run_ci_checks.rb --full
+```

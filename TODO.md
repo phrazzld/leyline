@@ -99,7 +99,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Verification:** Create test PR to confirm fast CI execution
     - **Done-when:** CI workflow updated and verified to run essential checks only
 
-- [ ] **S003 · Simplify · P1: update CLAUDE.md to reflect simplified CI**
+- [x] **S003 · Simplify · P1: update CLAUDE.md to reflect simplified CI**
     - **Context:** Current documentation promotes comprehensive local validation
     - **Problem:** Developers are encouraged to run slow, overengineered validation
     - **Action:**
