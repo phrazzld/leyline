@@ -114,6 +114,73 @@ RSpec.describe Leyline::Sync::GitClient do
     end
   end
 
+  describe '#add_sparse_paths' do
+    let(:test_paths) { ['docs/tenets', 'docs/bindings/core'] }
+
+    context 'when working directory is not set' do
+      it 'raises an error' do
+        expect { git_client.add_sparse_paths(test_paths) }.to raise_error(
+          described_class::GitCommandError,
+          'No working directory set. Call setup_sparse_checkout first.'
+        )
+      end
+    end
+
+    context 'when working directory is set' do
+      before do
+        git_client.instance_variable_set(:@working_directory, temp_dir)
+        FileUtils.mkdir_p(File.join(temp_dir, '.git', 'info'))
+      end
+
+      it 'writes paths to sparse-checkout file' do
+        git_client.add_sparse_paths(test_paths)
+
+        sparse_checkout_file = File.join(temp_dir, '.git', 'info', 'sparse-checkout')
+        expect(File.exist?(sparse_checkout_file)).to be true
+
+        content = File.read(sparse_checkout_file)
+        expect(content).to include('docs/tenets')
+        expect(content).to include('docs/bindings/core')
+      end
+
+      it 'creates .git/info directory if it does not exist' do
+        FileUtils.rm_rf(File.join(temp_dir, '.git'))
+
+        git_client.add_sparse_paths(test_paths)
+
+        expect(Dir.exist?(File.join(temp_dir, '.git', 'info'))).to be true
+      end
+
+      it 'accepts empty array' do
+        expect { git_client.add_sparse_paths([]) }.not_to raise_error
+      end
+
+      it 'accepts nil and treats as empty array' do
+        expect { git_client.add_sparse_paths(nil) }.not_to raise_error
+      end
+
+      it 'validates path format' do
+        invalid_paths = ['../outside', '/absolute/path', 'path with spaces']
+
+        expect { git_client.add_sparse_paths(invalid_paths) }.to raise_error(
+          described_class::GitCommandError,
+          /Invalid sparse-checkout path/
+        )
+      end
+
+      it 'appends to existing sparse-checkout file' do
+        sparse_checkout_file = File.join(temp_dir, '.git', 'info', 'sparse-checkout')
+        File.write(sparse_checkout_file, "existing/path\n")
+
+        git_client.add_sparse_paths(['new/path'])
+
+        content = File.read(sparse_checkout_file)
+        expect(content).to include('existing/path')
+        expect(content).to include('new/path')
+      end
+    end
+  end
+
   describe 'error handling' do
     describe 'GitNotAvailableError' do
       it 'is a subclass of StandardError' do

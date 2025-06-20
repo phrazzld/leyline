@@ -14,10 +14,10 @@
 ## Phase 2: Git Operations
 
 - [x] Create `lib/leyline/sync/git_client.rb` class implementing git sparse-checkout initialization with proper error handling for missing git binary
-- [ ] Implement `GitClient#setup_sparse_checkout` method that creates temp directory, initializes git repo, and configures sparse-checkout mode
-- [ ] Implement `GitClient#add_sparse_paths` method that accepts array of paths (e.g., ["docs/tenets", "docs/bindings/core"]) and adds them to sparse-checkout config
+- [x] Implement `GitClient#setup_sparse_checkout` method that creates temp directory, initializes git repo, and configures sparse-checkout mode
+- [x] Implement `GitClient#add_sparse_paths` method that accepts array of paths (e.g., ["docs/tenets", "docs/bindings/core"]) and adds them to sparse-checkout config
 - [ ] Implement `GitClient#fetch_version` method supporting branch names, tags, and commit SHAs with validation of remote existence
-- [ ] Create `GitClient#cleanup` method to safely remove temporary directories after sync completion or on error
+- [x] Create `GitClient#cleanup` method to safely remove temporary directories after sync completion or on error
 - [ ] Write `spec/lib/leyline/sync/git_client_spec.rb` tests covering all git operations including error cases (network failures, invalid versions)
 - [ ] Add integration test `spec/integration/git_sparse_checkout_spec.rb` that verifies actual git sparse-checkout behavior with real repository
 

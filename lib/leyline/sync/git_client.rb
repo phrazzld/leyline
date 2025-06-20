@@ -44,6 +44,34 @@ module Leyline
         run_git_command('config core.sparseCheckout true')
       end
 
+      def add_sparse_paths(paths)
+        if @working_directory.nil?
+          raise GitCommandError, 'No working directory set. Call setup_sparse_checkout first.'
+        end
+
+        # Handle nil/empty arrays
+        paths = Array(paths)
+        return if paths.empty?
+
+        # Validate paths
+        paths.each do |path|
+          validate_sparse_path(path)
+        end
+
+        # Ensure .git/info directory exists
+        git_info_dir = File.join(@working_directory, '.git', 'info')
+        FileUtils.mkdir_p(git_info_dir) unless Dir.exist?(git_info_dir)
+
+        # Write paths to sparse-checkout file
+        sparse_checkout_file = File.join(git_info_dir, 'sparse-checkout')
+
+        File.open(sparse_checkout_file, 'a') do |file|
+          paths.each do |path|
+            file.puts(path)
+          end
+        end
+      end
+
       def cleanup
         return if @working_directory.nil?
 
@@ -55,6 +83,21 @@ module Leyline
       end
 
       private
+
+      def validate_sparse_path(path)
+        # Check for invalid characters/patterns
+        if path.include?(' ')
+          raise GitCommandError, "Invalid sparse-checkout path '#{path}': paths cannot contain spaces"
+        end
+
+        if path.start_with?('/')
+          raise GitCommandError, "Invalid sparse-checkout path '#{path}': absolute paths not allowed"
+        end
+
+        if path.include?('../')
+          raise GitCommandError, "Invalid sparse-checkout path '#{path}': parent directory traversal not allowed"
+        end
+      end
 
       def run_git_command(command, chdir: nil)
         work_dir = chdir || @working_directory
