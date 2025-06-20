@@ -1,20 +1,20 @@
 # Leyline
 
-Tenets & Bindings for consistent development standards across repositories.
+A knowledge repository for sharing development principles and practical wisdom across teams.
 
 ## Overview
 
-Leyline provides a centralized system for defining, documenting, and enforcing
-development principles through two core concepts:
+Leyline is a **knowledge management system** that helps teams share and adopt proven development principles through structured documentation:
 
-- **Tenets**: Immutable truths and principles that guide our development philosophy
-- **Bindings**: Enforceable rules derived from tenets, with specific implementation
-  guidance
+- **Tenets**: Foundational principles and wisdom that guide effective development
+- **Bindings**: Practical guidance for implementing principles in specific contexts
 
-Our philosophy is built on twelve foundational tenets, enhanced with insights from
-"The Pragmatic Programmer" and modern software engineering best practices. These tenets
+Our knowledge base contains twelve foundational tenets, enhanced with insights from
+"The Pragmatic Programmer" and real-world software engineering experience. These principles
 cover essential areas including simplicity, testability, maintainability, modularity,
 automation, and adaptability.
+
+**Focus:** Knowledge sharing and learning effectiveness over technical compliance.
 
 For example, the [simplicity](./docs/tenets/simplicity.md) tenet establishes the
 principle that we should "prefer the simplest design that works," while the
@@ -167,34 +167,41 @@ pull Go bindings), Leyline provides category-specific integration options:
 
 ## Contributing
 
-We welcome contributions to both tenets and bindings:
+We welcome contributions that share valuable development knowledge and wisdom:
 
-1. **For tenets**: Focus on fundamental principles that stand the test of time
-1. **For bindings**: Create specific, enforceable rules that implement tenets
+1. **For tenets**: Share fundamental principles and insights that help teams build better software
+1. **For bindings**: Provide practical, actionable guidance for implementing principles in real projects
+1. **Focus on learning**: Prioritize clarity and knowledge transfer over technical perfection
 
-See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for detailed guidelines on proposing
-changes.
+**What we value in contributions:**
+- Clear explanations that help others learn
+- Practical examples and real-world guidance
+- Insights from experience that benefit the community
+- Content that enables teams to make better development decisions
 
-## Development Setup
+See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for detailed guidelines, and [AUTHORING_WORKFLOW.md](./docs/AUTHORING_WORKFLOW.md) for content creation guidance.
 
-For developers working on Leyline itself, we use automated validation to ensure content quality and consistency. The repository includes:
+## Contributing to Knowledge Sharing
 
-- **Pre-commit hooks** for immediate validation feedback
-- **CI pipeline** that validates all changes before merging
-- **YAML front-matter validation** for all tenets and bindings
-- **Index consistency checking** to maintain up-to-date documentation
+Leyline prioritizes **knowledge sharing** over technical complexity. Our streamlined approach focuses on content quality and learning effectiveness rather than comprehensive technical validation.
 
-**Quick setup for contributors:**
+**Getting started as a contributor:**
+- **Focus on content:** Share valuable development wisdom and practical insights
+- **Simple validation:** Essential checks ensure basic quality without blocking contributions
+- **Fast feedback:** Quick validation enables rapid iteration and improvement
+
+**For content creators:**
 ```bash
-# Install pre-commit hooks (recommended)
-pip install pre-commit
-pre-commit install
+# Essential validation for knowledge contributors (fast feedback)
+ruby tools/run_ci_checks.rb --essential
 
-# Validate changes manually
-ruby tools/validate_front_matter.rb
+# Optional comprehensive feedback when desired
+ruby tools/run_advisory_checks.rb
 ```
 
-For detailed setup instructions, troubleshooting guides, and validation requirements, see [CONTRIBUTING.md](./docs/CONTRIBUTING.md).
+**Our philosophy:** CI should **enable** documentation work, not hinder it. We provide fast, essential validation that maintains automation while allowing you to focus on knowledge transfer.
+
+For detailed authoring guidance, see [AUTHORING_WORKFLOW.md](./docs/AUTHORING_WORKFLOW.md) and [CONTRIBUTING.md](./docs/CONTRIBUTING.md).
 
 ## Examples
 
@@ -219,15 +226,18 @@ Here are some example tenets and their derived bindings:
 
 ## Documentation
 
-Leyline documentation is designed primarily for LLM consumption, with all tenets and bindings
-available as structured Markdown files with YAML front-matter. Human readers can browse the
-complete documentation directly in this GitHub repository.
+Leyline documentation focuses on **knowledge sharing and learning**. All tenets and bindings
+are written as clear, practical guidance that teams can understand and adopt. The content
+is structured for both human learning and programmatic integration.
 
-**Navigate the documentation:**
-- **[Tenets](./docs/tenets/)** - Foundational principles and philosophy
-- **[Bindings](./docs/bindings/)** - Enforceable rules organized by category
-- **[Integration guides](./docs/integration/)** - Implementation instructions
-- **[Examples](./examples/)** - Practical integration templates
+**Explore the knowledge base:**
+- **[Tenets](./docs/tenets/)** - Foundational principles and development wisdom
+- **[Bindings](./docs/bindings/)** - Practical implementation guidance by technology
+- **[Integration guides](./docs/integration/)** - How to adopt these principles in your projects
+- **[Examples](./examples/)** - Real-world integration patterns and templates
 
-The repository structure is optimized for both programmatic access and GitHub's native
-Markdown rendering, ensuring excellent readability without requiring additional tooling.
+**For contributors and authors:**
+- **[Authoring Workflow](./docs/AUTHORING_WORKFLOW.md)** - How to create effective knowledge content
+- **[Migration Guide](./docs/MIGRATION_GUIDE.md)** - Understanding our knowledge-focused approach
+
+The repository prioritizes **readability and learning effectiveness** over technical complexity, making development wisdom accessible to teams of all experience levels.

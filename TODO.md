@@ -114,7 +114,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
 ## Developer Experience Improvements
 > **Philosophy**: Remove friction, enable flow
 
-- [ ] **D001 · Improve · P1: create documentation authoring workflow guide**
+- [x] **D001 · Improve · P1: create documentation authoring workflow guide**
     - **Context:** Simplified CI enables focus on documentation quality over technical perfection
     - **Action:**
         1. Create `docs/AUTHORING_WORKFLOW.md` focused on content creation
@@ -124,7 +124,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Focus:** Enable authors to focus on knowledge transfer, not technical compliance
     - **Done-when:** Authoring guide created emphasizing content over technical perfection
 
-- [ ] **D002 · Improve · P1: simplify pre-commit hooks to essential checks only**
+- [x] **D002 · Improve · P1: simplify pre-commit hooks to essential checks only**
     - **Context:** Current pre-commit hooks may include overengineered validation
     - **Action:**
         1. Audit `.pre-commit-config.yaml` for overengineered checks
@@ -133,7 +133,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Goal:** Fast pre-commit feedback that doesn't block commits
     - **Done-when:** Pre-commit hooks run in <5 seconds with essential checks only
 
-- [ ] **D003 · Improve · P2: add advisory validation for interested authors**
+- [x] **D003 · Improve · P2: add advisory validation for interested authors**
     - **Context:** Some authors may want comprehensive validation for their work
     - **Action:**
         1. Create `run_advisory_checks.rb` script with all removed validations
@@ -147,7 +147,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
 ## Communication and Migration
 > **Philosophy**: Clear communication about simplified approach
 
-- [ ] **C001 · Communicate · P0: update CI failure prevention documentation**
+- [x] **C001 · Communicate · P0: update CI failure prevention documentation**
     - **Context:** Current `docs/CI_FAILURE_PREVENTION.md` promotes overengineered approach
     - **Problem:** Documentation encourages practices we're moving away from
     - **Action:**
@@ -157,7 +157,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Message:** CI should enable, not hinder documentation work
     - **Done-when:** Prevention guide updated to reflect simplified philosophy
 
-- [ ] **C002 · Communicate · P1: create migration guide for existing contributors**
+- [x] **C002 · Communicate · P1: create migration guide for existing contributors**
     - **Context:** Contributors may be accustomed to comprehensive validation
     - **Action:**
         1. Document what's changing and why (focus shift from software engineering to knowledge management)
@@ -166,7 +166,7 @@ CI should **enable** documentation work, not **hinder** it. Focus on essential q
     - **Key message:** Different repositories have different quality requirements
     - **Done-when:** Migration guide clarifies new approach and rationale
 
-- [ ] **C003 · Communicate · P2: update repository README to reflect documentation focus**
+- [x] **C003 · Communicate · P2: update repository README to reflect documentation focus**
     - **Context:** Repository may present itself as software project rather than knowledge repository
     - **Action:**
         1. Review README.md for overemphasis on technical sophistication

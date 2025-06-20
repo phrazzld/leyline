@@ -1,8 +1,9 @@
 # Pre-commit hooks for Leyline repository
+# Simplified configuration focused on essential checks only
 # See https://pre-commit.com for more information
 
 repos:
-  # General hooks
+  # Essential file quality checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
@@ -11,40 +12,24 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
 
-  # Local hooks
+  # Essential validation for documentation repository
   - repo: local
     hooks:
-      # YAML-only front-matter validation - enforces valid YAML front-matter structure
+      # YAML front-matter validation - ensures automation compatibility
       - id: validate-yaml-front-matter
         name: Validate YAML front-matter in markdown files
-        description: Ensures markdown files use valid YAML front-matter (legacy horizontal rule format not supported)
-        # Pre-commit passes one file at a time
+        description: Ensures markdown files use valid YAML front-matter for automation and indexing
         entry: bash -c 'ruby tools/validate_front_matter.rb -f "$1"' --
         language: system
         files: ^docs/(tenets|bindings)/.*\.md$
         exclude: ^docs/(tenets|bindings)/00-index\.md$
         types: [markdown]
         fail_fast: true
-        verbose: true
 
-      # Check document length limits
-      - id: check-document-length
-        name: Check document length limits
-        description: Ensures tenets ≤150 lines and bindings ≤400 lines
-        entry: ruby tools/check_document_length.rb
-        language: system
-        files: ^docs/(tenets|bindings)/.*\.md$
-        exclude: ^docs/(tenets|bindings)/00-index\.md$
-        pass_filenames: true
-        types: [markdown]
-        fail_fast: true
-        verbose: true
-
-      # Run reindex.rb in strict mode to ensure all files can be properly indexed
-      # This validates YAML parsing and metadata extraction
-      - id: check-index-with-yaml-validation
-        name: Check index consistency with YAML validation
-        description: Validates all files can be properly indexed (YAML validation)
+      # Index consistency validation - ensures navigation integrity
+      - id: check-index-consistency
+        name: Check index consistency
+        description: Validates documentation indexes remain synchronized with content
         entry: ruby tools/reindex.rb --strict
         language: system
         files: ^docs/(tenets|bindings)/.*\.md$
@@ -53,14 +38,7 @@ repos:
         types: [markdown]
         stages: [pre-commit]
 
-      # Validate Python code examples in Python binding files
-      # DISABLED: Documentation examples don't need strict production code validation
-      # - id: validate-python-examples
-      #   name: Validate Python code examples
-      #   description: Validates Python code blocks in Python binding markdown files
-      #   entry: bash -c 'ruby tools/validate_python_examples.rb -f "$1"' --
-      #   language: system
-      #   files: ^docs/bindings/categories/python/.*\.md$
-      #   types: [markdown]
-      #   fail_fast: true
-      #   verbose: true
+# Removed hooks for fast feedback:
+# - Document length validation: Checked in CI, not blocking for pre-commit
+# - Python code validation: Already disabled, examples prioritize clarity over compilation
+# - Comprehensive validation: Available via `ruby tools/run_ci_checks.rb --full` when needed

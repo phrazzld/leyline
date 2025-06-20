@@ -40,6 +40,12 @@ ruby tools/run_ci_checks.rb --full
 # Essential validation with verbose output for debugging
 ruby tools/run_ci_checks.rb --essential --verbose
 
+# Optional advisory validation for interested authors (never blocks development)
+ruby tools/run_advisory_checks.rb
+
+# Advisory validation with verbose output
+ruby tools/run_advisory_checks.rb --verbose
+
 # Validate TypeScript binding configurations
 ruby tools/validate_typescript_bindings.rb
 
