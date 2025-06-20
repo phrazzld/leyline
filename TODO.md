@@ -9,7 +9,7 @@
 - [x] Add Thor gem dependency to Gemfile with version constraint (~> 1.3) and run bundle install to update Gemfile.lock
 - [x] Create `lib/leyline/cli/options.rb` module to define and validate all CLI options (--categories, --force, --path, --version, --dry-run) with proper type checking
 - [x] Write comprehensive `spec/lib/leyline/cli_spec.rb` test file covering CLI initialization, option parsing, and command routing
-- [ ] Update `.gitignore` to exclude `tmp/leyline-sync-*` temporary directories used during sparse-checkout operations
+- [x] Update `.gitignore` to exclude `tmp/leyline-sync-*` temporary directories used during sparse-checkout operations
 
 ## Phase 2: Git Operations
 
