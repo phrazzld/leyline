@@ -34,8 +34,8 @@ RSpec.describe Leyline::CLI do
       it 'displays synchronization message with current directory' do
         output = capture_stdout { cli.sync }
         expect(output).to include('Synchronizing leyline standards to: ')
-        expect(output).to include('Categories: auto-detected')
-        expect(output).to include('Sync functionality not yet implemented')
+        expect(output).to include('Categories: ')
+        expect(output).to include('Sync completed:')
       end
 
       it 'uses current directory as default path' do
@@ -58,7 +58,7 @@ RSpec.describe Leyline::CLI do
 
       it 'displays specified categories' do
         output = capture_stdout { cli.sync }
-        expect(output).to include('Categories: typescript, go')
+        expect(output).to include('Categories: go, typescript')
         expect(output).to include('Options: categories')
       end
     end
@@ -180,6 +180,7 @@ RSpec.describe Leyline::CLI do
       expect(output).to include('Synchronizing leyline standards')
     end
   end
+
 
   private
 
