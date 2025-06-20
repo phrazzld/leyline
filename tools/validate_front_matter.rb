@@ -29,14 +29,21 @@
 # Usage examples:
 # - Validate all files: ruby tools/validate_front_matter.rb
 # - Validate a specific file: ruby tools/validate_front_matter.rb -f docs/tenets/example.md
+#
+# Requirements:
+# - Ruby 2.1+ (for Time.now.iso8601 and JSON support)
+# - Standard library: yaml, date, time, json
 
 require 'yaml'
 require 'date'
+require 'time'
+require 'json'
 
 # Load enhanced validation components
 require_relative '../lib/yaml_line_tracker'
 require_relative '../lib/error_collector'
 require_relative '../lib/error_formatter'
+require_relative '../lib/metrics_collector'
 
 # Configuration
 REQUIRED_KEYS = {
@@ -129,13 +136,54 @@ $warnings_found = []     # Track warnings (non-fatal issues)
 $single_file = options[:file]
 $verbose = options[:verbose]
 $error_collector = ErrorCollector.new  # Enhanced error collection
+$metrics_collector = MetricsCollector.new(tool_name: 'validate_front_matter', tool_version: '1.0.0')  # Metrics collection
 $file_contents = {}      # Store file contents for context snippets
 
-# Helper to print styled error messages
+# Structured logging helper
+def log_structured_start
+  return unless ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+
+  begin
+    start_log = {
+      event: 'validation_start',
+      correlation_id: $metrics_collector.correlation_id,
+      timestamp: Time.now.iso8601,
+      tool: 'validate_front_matter',
+      single_file: $single_file,
+      verbose: $verbose
+    }
+    STDERR.puts JSON.generate(start_log)
+  rescue => e
+    STDERR.puts "Warning: Structured logging failed: #{e.message}"
+  end
+end
+
+# Helper to print styled error messages with metrics tracking
 def print_error(file, message, details = nil, exit_code = 1)
   puts "  [ERROR] #{file}: #{message}"
   puts "  #{details}" if details
   $files_with_issues << file
+
+  # Track error pattern for metrics
+  error_type = case message
+  when /Missing required field/
+    'missing_field'
+  when /Invalid field format/
+    'invalid_format'
+  when /Duplicate ID/
+    'duplicate_id'
+  when /YAML syntax error/
+    'yaml_syntax_error'
+  else
+    'front_matter_validation_error'
+  end
+
+  $metrics_collector.record_error_pattern(
+    error_type: error_type,
+    component: 'front_matter_validator',
+    context: { file: file, message: message }
+  )
+
   exit exit_code unless $single_file.nil?
 end
 
@@ -273,8 +321,8 @@ def process_tenets_files
   dir_base = 'tenets'
   puts "Validating #{dir_base}..."
 
-  # Skip index files
-  Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ }.each do |file|
+  # Skip index and overview files
+  Dir.glob("#{dir}/*.md").reject { |f| f =~ /(00-index|glance)\.md$/ }.each do |file|
     process_single_file(file, dir_base)
   end
 end
@@ -284,14 +332,14 @@ def get_binding_files
 
   # Core bindings
   core_glob = "docs/bindings/core/*.md"
-  files.concat(Dir.glob(core_glob).reject { |f| f =~ /00-index\.md$/ })
+  files.concat(Dir.glob(core_glob).reject { |f| f =~ /(00-index|glance)\.md$/ })
 
   # Category bindings
   categories_glob = "docs/bindings/categories/*/*.md"
-  files.concat(Dir.glob(categories_glob).reject { |f| f =~ /00-index\.md$/ })
+  files.concat(Dir.glob(categories_glob).reject { |f| f =~ /(00-index|glance)\.md$/ })
 
   # Check for misplaced files in the root - these should be warned about
-  root_files = Dir.glob("docs/bindings/*.md").reject { |f| f =~ /00-index\.md$/ }
+  root_files = Dir.glob("docs/bindings/*.md").reject { |f| f =~ /(00-index|glance)\.md$/ }
   if root_files.any?
     puts "  [WARNING] Found #{root_files.size} binding file(s) directly in docs/bindings/ directory."
     puts "  These should be moved to either docs/bindings/core/ or docs/bindings/categories/<category>/:"
@@ -705,6 +753,26 @@ def process_single_file(file, dir_base)
   end
 end
 
+# Log validation start with correlation ID
+if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+  begin
+    start_log = {
+      event: 'validation_start',
+      correlation_id: $error_collector.correlation_id,
+      timestamp: Time.now.iso8601,
+      mode: $single_file ? 'single_file' : 'full_validation',
+      target: $single_file || 'all_files'
+    }
+    $stderr.puts JSON.generate(start_log)
+  rescue => e
+    # Graceful degradation if structured logging fails
+    $stderr.puts "Warning: Structured logging failed: #{e.message}"
+  end
+end
+
+# Log structured validation start
+log_structured_start
+
 # Run the validation process
 if $single_file
   # If a specific file is specified, just validate that one
@@ -758,7 +826,18 @@ else
   end
 end
 
-# Summarize results
+# Summarize results with structured logging and metrics
+$error_collector.log_validation_summary
+$metrics_collector.log_completion_summary
+
+# Save metrics for aggregation
+begin
+  metrics_file = $metrics_collector.save_metrics
+  puts "📊 Metrics saved to #{metrics_file}" if $verbose
+rescue => e
+  puts "⚠️ Failed to save metrics: #{e.message}" if $verbose
+end
+
 if $error_collector.any?
   # Use ErrorFormatter for enhanced error output
   formatter = ErrorFormatter.new

@@ -8,6 +8,11 @@ require 'yaml'
 require 'json'
 require 'optparse'
 require 'fileutils'
+require 'time'
+
+# Load enhanced validation and metrics components
+require_relative '../lib/error_collector'
+require_relative '../lib/metrics_collector'
 
 # Configuration and options
 $options = {
@@ -19,8 +24,9 @@ $options = {
   output_format: 'text'
 }
 
-$errors = []
-$warnings = []
+# Initialize structured logging and metrics collection
+$error_collector = ErrorCollector.new
+$metrics_collector = MetricsCollector.new(tool_name: 'validate_migration', tool_version: '1.0.0')
 $validations = []
 
 # Parse command line options
@@ -57,23 +63,90 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-# Helper methods
-def log_info(message)
+# Helper methods with structured logging
+def log_info(message, component: 'migration_validator', metadata: {})
   puts "[INFO] #{message}"
+
+  if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+    begin
+      log_entry = {
+        event: 'validation_info',
+        correlation_id: $metrics_collector.correlation_id,
+        timestamp: Time.now.iso8601,
+        level: 'INFO',
+        message: message,
+        component: component,
+        **metadata
+      }
+      STDERR.puts JSON.generate(log_entry)
+    rescue => e
+      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    end
+  end
 end
 
-def log_verbose(message)
-  puts "[VERBOSE] #{message}" if $options[:verbose]
+def log_verbose(message, component: 'migration_validator', metadata: {})
+  return unless $options[:verbose]
+  puts "[VERBOSE] #{message}"
+
+  if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+    begin
+      log_entry = {
+        event: 'validation_verbose',
+        correlation_id: $metrics_collector.correlation_id,
+        timestamp: Time.now.iso8601,
+        level: 'DEBUG',
+        message: message,
+        component: component,
+        **metadata
+      }
+      STDERR.puts JSON.generate(log_entry)
+    rescue => e
+      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    end
+  end
 end
 
-def log_warning(message)
+def log_warning(message, component: 'migration_validator', metadata: {})
   puts "[WARNING] #{message}"
-  $warnings << message
+
+  if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+    begin
+      log_entry = {
+        event: 'validation_warning',
+        correlation_id: $metrics_collector.correlation_id,
+        timestamp: Time.now.iso8601,
+        level: 'WARN',
+        message: message,
+        component: component,
+        **metadata
+      }
+      STDERR.puts JSON.generate(log_entry)
+    rescue => e
+      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    end
+  end
 end
 
-def log_error(message)
+def log_error(message, file: nil, line: nil, field: nil, suggestion: nil, component: 'migration_validator', metadata: {})
   puts "[ERROR] #{message}"
-  $errors << message
+
+  # Add to error collector for structured tracking
+  $error_collector.add_error(
+    file: file || 'unknown',
+    line: line,
+    field: field,
+    type: 'migration_error',
+    message: message,
+    suggestion: suggestion
+  )
+
+  # Record error pattern for metrics
+  $metrics_collector.record_error_pattern(
+    error_type: 'migration_validation_error',
+    component: component,
+    context: metadata
+  )
 end
 
 def log_validation(component, check, status, details = nil)
@@ -617,12 +690,31 @@ end
 def exit_with_summary
   puts ""
 
-  if $errors.any?
-    puts "❌ Migration validation failed with #{$errors.size} error(s)"
+  # Log structured completion summary and save metrics
+  $error_collector.log_validation_summary
+  $metrics_collector.log_completion_summary
+
+  # Save metrics for aggregation
+  begin
+    metrics_file = $metrics_collector.save_metrics
+    log_verbose("Metrics saved to #{metrics_file}", metadata: { metrics_file: metrics_file })
+  rescue => e
+    log_warning("Failed to save metrics: #{e.message}", metadata: { error: e.class.name })
+  end
+
+  # Generate remediation guidance
+  guidance = $metrics_collector.get_remediation_guidance
+  if guidance.any?
+    puts "\n📋 Remediation Guidance:"
+    guidance.each_with_index do |item, index|
+      puts "#{index + 1}. #{item[:recommendation]} (#{item[:occurrences]} occurrences)"
+      puts "   Action: #{item[:action]}"
+    end
+  end
+
+  if $error_collector.any?
+    puts "❌ Migration validation failed with #{$error_collector.count} error(s)"
     exit 1
-  elsif $warnings.any?
-    puts "⚠️ Migration validation passed with #{$warnings.size} warning(s)"
-    exit 0
   else
     puts "✅ Migration validation passed successfully"
     exit 0
@@ -639,7 +731,24 @@ def main
   target_version = normalize_version($options[:target_version])
   $options[:target_version] = target_version
 
-  log_info("Validating migration to #{target_version}")
+  # Log validation start with correlation ID
+  if ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+    begin
+      start_log = {
+        event: 'validation_start',
+        correlation_id: $metrics_collector.correlation_id,
+        timestamp: Time.now.iso8601,
+        tool: 'validate_migration',
+        target_version: target_version,
+        options: $options
+      }
+      STDERR.puts JSON.generate(start_log)
+    rescue => e
+      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    end
+  end
+
+  log_info("Validating migration to #{target_version}", metadata: { target_version: target_version })
 
   # Run validation
   run_comprehensive_validation(target_version)

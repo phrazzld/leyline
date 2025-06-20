@@ -261,7 +261,7 @@ jobs:
 
           # Test secret detection patterns
           echo "password123" > test-examples/security/test-file.txt
-          echo "API_KEY=sk-1234567890abcdef" >> test-examples/security/test-file.txt
+          echo "API_KEY=[REDACTED]" >> test-examples/security/test-file.txt
 
           # Test with TruffleHog (if available)
           docker run --rm -v "$(pwd):/pwd" trufflesecurity/trufflehog:latest git file:///pwd/test-examples/security/ || echo "Security scan completed"

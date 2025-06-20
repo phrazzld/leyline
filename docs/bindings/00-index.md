@@ -109,11 +109,17 @@ _No frontend bindings defined yet._
 |---|---|---|
 | [async-patterns](./categories/typescript/async-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by establishing clear patterns for asynchronous code flow in TypeScript. Async programming introduces ... |
 | [avoid-type-gymnastics](./categories/typescript/avoid-type-gymnastics.md) | 0.1.0 | Grug teaches that type systems should make development easier, not harder. TypeScript's main benefits are IDE support (autocomplete, navigation), c... |
+| [eslint-prettier-setup](./categories/typescript/eslint-prettier-setup.md) | 0.1.0 | This binding implements our automation tenet by eliminating manual code quality decisions and creating systematic barriers that enforce consistent ... |
 | [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | This binding implements DRY by using functional composition to create single, authoritative representations of knowledge reusable across different ... |
+| [modern-typescript-toolchain](./categories/typescript/modern-typescript-toolchain.md) | 0.1.0 | This binding implements our automation tenet by eliminating the cognitive overhead and friction of tool selection, configuration, and integration d... |
 | [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, purpose-driven modules in TypeScript projects. Effective modul... |
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
+| [package-json-standards](./categories/typescript/package-json-standards.md) | 0.1.0 | This binding implements our automation tenet by establishing package.json as a security-critical configuration artifact that requires standardized ... |
+| [tanstack-query-state](./categories/typescript/tanstack-query-state.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making server state management transparent and predictable through TanStack Query's dec... |
+| [tsup-build-system](./categories/typescript/tsup-build-system.md) | 0.1.0 | This binding implements our simplicity tenet by choosing tsup as a zero-configuration build tool that eliminates the complexity demons of webpack c... |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 | [use-pnpm-for-nodejs](./categories/typescript/use-pnpm-for-nodejs.md) | 0.1.0 | This binding implements our automation tenet by establishing a consistent, efficient package management foundation that eliminates "works on my mac... |
+| [vitest-testing-framework](./categories/typescript/vitest-testing-framework.md) | 0.1.0 | This binding implements our testability tenet by establishing a consistent, behavior-focused testing approach that enables confident refactoring an... |
 
 ## Api Bindings
 

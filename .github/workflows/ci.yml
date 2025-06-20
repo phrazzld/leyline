@@ -18,35 +18,26 @@ jobs:
     - name: Install markdown link checker
       run: npm install -g markdown-link-check
 
-    - name: Link check
+    - name: Essential CI Validation
       run: |
+        echo "🚀 Running essential CI validation (fast mode)"
+        echo "This validates only essential quality gates: YAML front-matter + Index consistency"
+        export LEYLINE_STRUCTURED_LOGGING=true
+        ruby tools/run_ci_checks.rb --essential
+        if [ $? -ne 0 ]; then
+          echo "::error::Essential validation failed!"
+          echo "::error::Run 'ruby tools/run_ci_checks.rb --essential' locally to debug"
+          exit 1
+        fi
+        echo "✅ Essential validation completed successfully"
+
+    - name: External link validation
+      run: |
+        echo "🔗 Validating external links"
         find . -name "*.md" | grep -v "node_modules\|venv\|site" | xargs markdown-link-check -q -c ./.mlc-config
-    - name: Validate metadata (YAML-only format)
-      run: |
-        echo "Validating YAML front-matter in markdown files (YAML-only mode)"
-        ruby tools/validate_front_matter.rb -v
         if [ $? -ne 0 ]; then
-          echo "::error::YAML validation failed. All files must use YAML front-matter format only."
-          echo "::error::Legacy horizontal rule metadata format is no longer supported."
+          echo "::error::External link validation failed!"
+          echo "::error::Some external links are broken or unreachable"
           exit 1
         fi
-
-    - name: Check index consistency and YAML format
-      run: |
-        echo "Running reindex.rb to check if docs/bindings/00-index.md is up-to-date (with YAML-only validation)"
-        # Run reindex with strict mode to fail on any YAML or format errors
-        ruby tools/reindex.rb --strict
-        if [ $? -ne 0 ]; then
-          echo "::error::Failed to generate index due to YAML format errors."
-          echo "::error::All files must use valid YAML front-matter."
-          exit 1
-        fi
-
-        # Check if there are any changes to the index file
-        if ! git diff --exit-code docs/bindings/00-index.md; then
-          echo "::error::The docs/bindings/00-index.md file is not up-to-date!"
-          echo "::error::Please run 'ruby tools/reindex.rb' locally and commit the updated index file."
-          exit 1
-        else
-          echo "✅ Index file is up-to-date and all documents use valid YAML front-matter"
-        fi
+        echo "✅ External link validation completed successfully"

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+*.tsbuildinfo
+
+# Environment variables (prevent accidental secret commits)
+.env
+.env.local
+.env.production
+.env.staging
+
+# Generated security reports and dependency data
+sbom.json
+licenses-report.json
+risk-assessment.json

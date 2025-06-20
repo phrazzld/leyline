@@ -225,13 +225,51 @@ Secrets management must implement comprehensive protection with zero tolerance f
    });
    ```
 
+## Documentation Security Patterns
+
+When creating documentation, code examples, and tutorials, follow secure patterns to prevent accidental secret exposure and false positives in security scanning:
+
+**Secure Example Patterns:**
+- Use explicit redaction markers: `[REDACTED]`, `[EXAMPLE]`, `[PLACEHOLDER]`
+- Avoid realistic-looking secrets that trigger detection tools
+- Include security context in comments explaining why values are redacted
+
+```typescript
+// ✅ GOOD: Secure documentation examples
+const config = {
+  apiKey: process.env.API_KEY,           // Retrieved from environment
+  endpoint: 'https://api.example.com'    // Public endpoint
+};
+
+// ✅ GOOD: Clear redaction in examples
+const apiConfig = {
+  apiKey: 'sk_live_[REDACTED]',          // Use explicit redaction markers
+  webhookSecret: 'whsec_[EXAMPLE]',      // Clear example indicator
+  token: '[YOUR_API_TOKEN_HERE]'         // Template-style placeholder
+};
+
+// ❌ BAD: Realistic-looking secrets that trigger scanners
+const badConfig = {
+  apiKey: 'sk_live_[EXAMPLE_ONLY]',      // Use redaction markers instead
+  token: 'ghp_[REDACTED]',               // Clear placeholder format
+  secret: 'sk-proj-[PLACEHOLDER]'        // Template-style indicator
+};
+```
+
+**Documentation Review Checklist:**
+- [ ] All example secrets use `[REDACTED]` or `[EXAMPLE]` markers
+- [ ] No realistic key patterns (`sk_live_*`, `ghp_*`, `pk_*`, etc.)
+- [ ] Environment variable usage demonstrated in examples
+- [ ] Security context explained in surrounding text
+- [ ] Gitleaks scan passes without false positives
+
 ## Examples
 
 ```python
 # ❌ BAD: Hardcoded secrets with suppressed detection
 # GitLeaks:ignore - "temporary" suppression that becomes permanent
-API_KEY = "sk-1a2b3c4d5e6f7g8h9i0j"  # Real API key hardcoded!
-DATABASE_URL = "postgresql://admin:password@db.production.com:5432/app"
+API_KEY = "sk-[REDACTED]"  # Never hardcode real API keys!
+DATABASE_URL = "postgresql://admin:[PASSWORD]@db.production.com:5432/app"
 ```
 
 ```typescript

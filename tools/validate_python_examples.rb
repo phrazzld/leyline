@@ -13,6 +13,12 @@
 require 'optparse'
 require 'fileutils'
 require 'tempfile'
+require 'time'
+require 'json'
+
+# Load enhanced validation and metrics components
+require_relative '../lib/error_collector'
+require_relative '../lib/metrics_collector'
 
 # Configuration
 PYTHON_DIR = 'docs/bindings/categories/python'
@@ -30,8 +36,12 @@ MYPY_CONFIG = [
 class PythonCodeValidator
   def initialize(verbose: false)
     @verbose = verbose
-    @errors = []
     @temp_files = []
+    @error_collector = ErrorCollector.new
+    @metrics_collector = MetricsCollector.new(tool_name: 'validate_python_examples', tool_version: '1.0.0')
+
+    # Log validation start
+    log_structured_start
   end
 
   def validate_all_files
@@ -53,8 +63,11 @@ class PythonCodeValidator
   end
 
   def validate_file(file_path)
+    @metrics_collector.start_timer(operation: "validate_file")
+
     unless File.exist?(file_path)
       add_error(file_path, 0, "File not found")
+      @metrics_collector.end_timer(operation: "validate_file", success: false, metadata: { file: file_path, error: "file_not_found" })
       return false
     end
 
@@ -65,6 +78,7 @@ class PythonCodeValidator
 
     if code_blocks.empty?
       puts "  No Python code blocks found" if @verbose
+      @metrics_collector.end_timer(operation: "validate_file", success: true, metadata: { file: file_path, code_blocks: 0 })
       return true
     end
 
@@ -74,6 +88,12 @@ class PythonCodeValidator
     code_blocks.each_with_index do |block, index|
       success = validate_code_block(block, file_path, index + 1) && success
     end
+
+    @metrics_collector.end_timer(operation: "validate_file", success: success, metadata: {
+      file: file_path,
+      code_blocks: code_blocks.length,
+      errors: @error_collector.count
+    })
 
     success
   end
@@ -202,21 +222,57 @@ class PythonCodeValidator
   end
 
   def add_error(file, line, message, column = nil)
-    error = { file: file, line: line, message: message }
-    error[:column] = column if column
-    @errors << error
+    # Determine error type from message
+    error_type = case message
+    when /flake8/
+      'python_lint_error'
+    when /mypy/
+      'python_type_error'
+    else
+      'python_validation_error'
+    end
+
+    # Structured error tracking
+    @error_collector.add_error(
+      file: file,
+      line: line,
+      field: column ? "column_#{column}" : nil,
+      type: error_type,
+      message: message,
+      suggestion: generate_suggestion(message)
+    )
+
+    # Record error pattern for metrics
+    @metrics_collector.record_error_pattern(
+      error_type: error_type,
+      component: 'python_code_validator',
+      context: { file: file, line: line, column: column }
+    )
   end
 
   def report_errors
-    return if @errors.empty?
+    return unless @error_collector.any?
 
     puts "\n❌ Python code validation errors found:"
-    @errors.each do |error|
+    @error_collector.errors.each do |error|
       location = "#{error[:file]}:#{error[:line]}"
-      location += ":#{error[:column]}" if error[:column]
+      location += ":#{error[:field]}" if error[:field]
       puts "  #{location}: #{error[:message]}"
+      puts "    💡 #{error[:suggestion]}" if error[:suggestion]
     end
-    puts "\nTotal errors: #{@errors.length}"
+    puts "\nTotal errors: #{@error_collector.count}"
+
+    # Log structured completion summary
+    @error_collector.log_validation_summary
+    @metrics_collector.log_completion_summary
+
+    # Save metrics
+    begin
+      metrics_file = @metrics_collector.save_metrics
+      puts "📊 Metrics saved to #{metrics_file}" if @verbose
+    rescue => e
+      puts "⚠️ Failed to save metrics: #{e.message}" if @verbose
+    end
   end
 
   def cleanup
@@ -224,7 +280,45 @@ class PythonCodeValidator
   end
 
   def has_errors?
-    !@errors.empty?
+    @error_collector.any?
+  end
+
+  private
+
+  def log_structured_start
+    return unless ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
+
+    begin
+      start_log = {
+        event: 'validation_start',
+        correlation_id: @metrics_collector.correlation_id,
+        timestamp: Time.now.iso8601,
+        tool: 'validate_python_examples',
+        python_dir: PYTHON_DIR
+      }
+      STDERR.puts JSON.generate(start_log)
+    rescue => e
+      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    end
+  end
+
+  def generate_suggestion(message)
+    case message
+    when /line too long/
+      "Consider breaking long lines or using a line formatter like Black"
+    when /undefined name/
+      "Check variable names and imports"
+    when /imported but unused/
+      "Remove unused import or add '# noqa: F401' if intentionally unused"
+    when /missing whitespace/
+      "Add proper whitespace around operators"
+    when /type.*error/i
+      "Review type annotations and ensure correct types are used"
+    when /syntax error/i
+      "Check Python syntax - missing colons, brackets, or indentation"
+    else
+      "Review Python code formatting and syntax"
+    end
   end
 end
 
