@@ -24,7 +24,7 @@
 ## Phase 3: Language Detection
 
 - [x] Create `lib/leyline/detection/language_detector.rb` base class with abstract `detect` method returning array of detected languages
-- [ ] Implement `lib/leyline/detection/node_detector.rb` checking for package.json, parsing it for typescript/react dependencies, returning ["typescript", "web"] categories
+- [x] Implement `lib/leyline/detection/node_detector.rb` checking for package.json, parsing it for typescript/react dependencies, returning ["typescript", "web"] categories
 - [ ] Implement `lib/leyline/detection/go_detector.rb` checking for go.mod/go.sum files, returning ["go", "backend"] categories
 - [ ] Implement `lib/leyline/detection/rust_detector.rb` checking for Cargo.toml, parsing for web frameworks (actix, rocket), returning appropriate categories
 - [ ] Implement `lib/leyline/detection/python_detector.rb` checking for pyproject.toml, requirements.txt, setup.py, detecting frameworks (django, fastapi)
