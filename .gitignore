@@ -21,6 +21,7 @@ dist/
 test-repo/
 site/
 thinktank_*/
+tmp/leyline-sync-*/
 coverage/
 
 # Working documents (should use planning/ and research/ instead)
@@ -38,3 +39,9 @@ thinktank*.log
 
 # Validation metrics (operational data)
 metrics/
+
+# Ruby gems
+*.gem
+
+# RSpec test status
+.rspec_status

@@ -54,7 +54,38 @@ can adopt on their own schedule through consumer-initiated synchronization.
 ### Integration: Pull-Based Content Sync
 
 Leyline uses a consumer-initiated pull model. You control when and what to sync from Leyline
-into your repository using our reusable GitHub Actions workflow.
+into your repository. Choose the method that works best for your team:
+
+#### Option 1: CLI Sync (Simple & Direct)
+
+The Leyline CLI provides the simplest way to sync standards to your project:
+
+```bash
+# Install the Leyline gem
+gem install leyline
+
+# Sync TypeScript standards to your project
+leyline sync --categories typescript
+
+# Sync multiple categories
+leyline sync --categories go,rust
+
+# See what would be synced (dry run)
+leyline sync --categories typescript --verbose
+
+# Force overwrite local modifications
+leyline sync --categories typescript --force
+```
+
+The CLI will:
+- Fetch the latest Leyline standards from GitHub
+- Copy relevant tenets and bindings to `docs/leyline/` in your project
+- Skip files you've already modified (unless using --force)
+- Show clear output about what was synced
+
+#### Option 2: GitHub Actions Workflow (Automated)
+
+For automated syncing, use our reusable GitHub Actions workflow:
 
 ### Migrating from Symlinks
 
