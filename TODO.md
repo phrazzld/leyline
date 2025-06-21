@@ -21,7 +21,7 @@
 - [x] Add `--no-cache` flag to CLI
 
 ### Ship It
-- [ ] Manual test: sync twice, verify second sync is faster
+- [x] Manual test: sync twice, verify second sync is faster
 - [ ] Commit and push
 
 ## Phase 2: Make It Robust (Only If Needed)
