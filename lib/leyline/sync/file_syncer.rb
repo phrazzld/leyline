@@ -8,9 +8,10 @@ module Leyline
     class FileSyncer
       class SyncError < StandardError; end
 
-      def initialize(source_directory, target_directory)
+      def initialize(source_directory, target_directory, cache: nil)
         @source_directory = source_directory
         @target_directory = target_directory
+        @cache = cache
         @sync_results = {
           copied: [],
           skipped: [],
@@ -56,7 +57,8 @@ module Leyline
         FileUtils.mkdir_p(target_dir) unless Dir.exist?(target_dir)
 
         # Check if target file exists
-        if File.exist?(target_path)
+        target_existed = File.exist?(target_path)
+        if target_existed
           if !files_different?(source_path, target_path)
             # Files are identical, skip copying
             @sync_results[:skipped] << relative_path
@@ -73,15 +75,30 @@ module Leyline
         begin
           FileUtils.cp(source_path, target_path)
           @sync_results[:copied] << relative_path
+
+          # Cache the content after successful copy (only if target didn't exist before)
+          # If target existed, files_different? already cached the content
+          if @cache && !target_existed
+            source_content = File.read(source_path)
+            @cache.put(source_content)
+          end
         rescue => e
           @sync_results[:errors] << { file: relative_path, error: e.message }
         end
       end
 
       def files_different?(source_path, target_path)
-        # Simple comparison using file content hash
-        source_hash = Digest::SHA256.hexdigest(File.read(source_path))
-        target_hash = Digest::SHA256.hexdigest(File.read(target_path))
+        # Read source file and compute hash
+        source_content = File.read(source_path)
+        source_hash = Digest::SHA256.hexdigest(source_content)
+
+        # Read target file and compute hash
+        target_content = File.read(target_path)
+        target_hash = Digest::SHA256.hexdigest(target_content)
+
+        # Cache the source content for future use
+        @cache&.put(source_content)
+
         source_hash != target_hash
       rescue => e
         # If we can't read files for comparison, assume they're different

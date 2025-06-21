@@ -1,67 +1,51 @@
-# CLI Sync Implementation TODO
+# Leyline Cache Implementation TODO
 
-What would John Carmack do? Ship the simplest thing that works. Delete everything else.
+*Make it fast. Ship it. No excuses.*
 
-## Phase 1: Delete Overengineered Code ✅ COMPLETED
+## Phase 1: Basic Cache (Ship This Week)
 
-- [x] Remove entire `lib/leyline/detection/` directory - we don't need language detection
-- [x] Remove entire `spec/lib/leyline/detection/` directory - we don't need these tests
-- [x] Simplify `lib/leyline/cli.rb` - remove all detection methods, just use explicit --categories
-- [x] Update `spec/lib/leyline/cli_spec.rb` - remove language detection tests
-- [x] Remove 'data-science' from VALID_CATEGORIES if not needed
+### Core Implementation
+- [x] Create `lib/leyline/cache/` directory structure
+- [x] Create `lib/leyline/cache/file_cache.rb` with class skeleton
+- [x] Add `require 'digest'` and `require 'fileutils'`
+- [x] Implement `ensure_directories` private method
+- [x] Add instance variables: `@cache_dir`, `@content_dir`, `@max_cache_size`
+- [x] Implement `content_file_path(hash)` for git-style sharding
+- [x] Implement `put(content)` that returns SHA256 hash and stores file
+- [x] Implement `get(hash)` that returns content or nil
+- [x] Add basic `File.exist?` check before reading
 
-## Phase 2: Ship Core Value ✅ COMPLETED
+### Wire It Up
+- [x] Modify FileSyncer to check cache before copying
+- [x] Cache files after successful sync
+- [x] Add `--no-cache` flag to CLI
 
-- [x] Implement actual file sync in `lib/leyline/sync/file_syncer.rb` - just copy files from git to target
-- [x] Wire up GitClient + FileSyncer in CLI - make `leyline sync --categories typescript` actually work
-- [x] Add basic conflict handling - skip modified files by default, overwrite with --force
-- [x] Write minimal tests to verify it works
-- [x] Ship it. Get user feedback. Iterate.
+### Ship It
+- [x] Manual test: sync twice, verify second sync is faster
+- [x] Commit and push
 
-## What's Working Now
+## Phase 2: Make It Robust (Only If Needed)
 
-```bash
-# Sync TypeScript standards
-leyline sync --categories typescript
+### Size Management
+- [ ] Add `cache_size` method using Dir.glob
+- [ ] Delete oldest files when > 50MB
+- [ ] Add `clear_cache` command
 
-# Sync multiple categories
-leyline sync --categories go,rust
+### Error Handling
+- [ ] Handle corrupted files (return nil, log error)
+- [ ] Clean up failed writes
 
-# Force overwrite local changes
-leyline sync --categories typescript --force
+## Phase 3: Optimize (Only If Still Slow)
 
-# See what's happening
-leyline sync --categories typescript --verbose
-```
+### Measure First
+- [ ] Add simple timing output in verbose mode
+- [ ] Identify actual bottlenecks
 
-**Features:**
-- Syncs tenets + requested category bindings
-- Smart conflict detection (skips identical files)
-- Preserves local modifications by default
-- Force flag to overwrite when needed
-- Clear output about what was synced
+### Then Fix
+- [ ] Parallel file operations (if needed)
+- [ ] Better cache keys (if needed)
+- [ ] Version awareness (if needed)
 
-**Next:** Get real user feedback before adding more features.
+---
 
-## Phase 3: Maybe Later (If Users Actually Ask)
-
-- [ ] Add progress indicators (but text output is probably fine)
-- [ ] Add --dry-run flag (users can just look at the files)
-- [ ] Add .leyline-sync.yml state tracking (or just use git)
-- [ ] Integration with reindex.rb (can be manual for now)
-
-## What We're NOT Building (Until Proven Necessary)
-
-- ❌ Auto-detection of languages (users know their stack)
-- ❌ Complex UI with colors and spinners (this is a CLI tool)
-- ❌ Offline caching (git already caches)
-- ❌ Telemetry (privacy matters)
-- ❌ Config files (command line flags are sufficient)
-- ❌ Multiple subcommands (one command, one job)
-- ❌ 90% test coverage (test what breaks, ship what works)
-
-## Success Metric
-
-Can a user type `leyline sync --categories typescript,react` and get their standards synced? That's it.
-
-Everything else is negotiable.
+*Remember: Working code > Perfect plan. Ship the minimum that makes sync fast.*

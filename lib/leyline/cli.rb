@@ -6,6 +6,7 @@ require_relative 'version'
 require_relative 'cli/options'
 require_relative 'sync/git_client'
 require_relative 'sync/file_syncer'
+require_relative 'cache/file_cache'
 
 module Leyline
   class CLI < Thor
@@ -33,6 +34,10 @@ module Leyline
                   type: :boolean,
                   desc: 'Show detailed output',
                   aliases: '-v'
+    method_option :no_cache,
+                  type: :boolean,
+                  desc: 'Bypass cache and fetch fresh content',
+                  aliases: '--no-cache'
     def sync(path = '.')
       # Pre-process categories to handle comma-separated values
       processed_options = options.dup
@@ -76,6 +81,10 @@ module Leyline
     def perform_sync(target_path, categories, options)
       force = options[:force] || false
       verbose = options[:verbose] || false
+      no_cache = options[:no_cache] || false
+
+      # Create cache unless disabled
+      cache = no_cache ? nil : Cache::FileCache.new
 
       # Create temp directory for git operations
       temp_dir = Dir.mktmpdir('leyline-sync-')
@@ -101,7 +110,7 @@ module Leyline
         leyline_target = File.join(target_path, 'docs', 'leyline')
         # Point to the docs subdirectory in temp_dir to avoid double nesting
         source_docs_dir = File.join(temp_dir, 'docs')
-        file_syncer = Sync::FileSyncer.new(source_docs_dir, leyline_target)
+        file_syncer = Sync::FileSyncer.new(source_docs_dir, leyline_target, cache: cache)
         results = file_syncer.sync(force: force)
 
         # Report results

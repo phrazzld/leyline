@@ -13,13 +13,69 @@
 ## Priority 1: Performance (Make it Fast)
 
 ### Cache GitHub Content Locally
-- **Problem**: Currently clones entire repo via git (slow, ~3-5 seconds)
-- **Solution**: Use GitHub API to fetch only needed files, cache locally
+
+#### PR 1: Add Local File Cache Infrastructure
+- **Problem**: No caching mechanism exists, causing repeated 3-5 second git operations
+- **Solution**: Implement file-based cache using existing SHA256 hashing from FileSyncer
 - **Implementation**:
-  - Cache in `~/.leyline/cache/[version]/`
-  - Check cache before fetching
-  - `--no-cache` flag to force refresh
-- **Success**: Sync completes in <0.5 seconds for cached content
+  - Create `Leyline::Cache::FileCache` class
+  - Store files in `~/.leyline/cache/content/[sha256]/`
+  - Reuse `FileSyncer#files_different?` logic for cache validation
+  - Add cache directory creation and cleanup utilities
+  - Maximum cache size: 50MB with LRU eviction
+- **Testing**: Unit tests for cache operations (store, retrieve, evict)
+- **Success**: Cache hit/miss functionality working with existing git flow
+
+#### PR 2: Integrate Cache with Git Sync Flow
+- **Problem**: Git sync doesn't check cache before fetching
+- **Solution**: Modify sync flow to check cache before git operations
+- **Implementation**:
+  - Update `FileSyncer#sync` to check cache before copying
+  - Cache files after successful git fetch
+  - Add cache statistics to verbose output
+  - No changes to existing CLI interface
+- **Testing**: Integration tests showing performance improvement
+- **Success**: Second sync of same content completes in <1 second
+
+#### PR 3: Add --no-cache Flag
+- **Problem**: No way to bypass cache for fresh content
+- **Solution**: Add `--no-cache` flag to sync command
+- **Implementation**:
+  - Add `no_cache` option to `CliOptions::SYNC_OPTIONS`
+  - Pass flag through to `FileSyncer`
+  - Clear relevant cache entries when flag is used
+  - Update help documentation
+- **Testing**: CLI tests for new flag behavior
+- **Success**: Users can force fresh sync when needed
+
+#### PR 4: Add Cache Version Management
+- **Problem**: Cache doesn't handle different leyline versions
+- **Solution**: Version-aware cache keys
+- **Implementation**:
+  - Read version from fetched `VERSION` file
+  - Include version in cache key: `[version]-[sha256]`
+  - Auto-cleanup old version caches (keep last 3)
+  - Add version info to cache statistics
+- **Testing**: Tests for version transitions and cleanup
+- **Success**: Different versions don't conflict in cache
+
+#### PR 5: Optimize Git Operations for Cache Misses
+- **Problem**: Still doing full sparse-checkout even for single file updates
+- **Solution**: Track which files need updates before git operations
+- **Implementation**:
+  - Pre-scan target directory for existing files
+  - Compare with expected file list from categories
+  - Only fetch if >20% files need updates
+  - Otherwise, skip git entirely for cached files
+- **Testing**: Performance tests with various cache hit ratios
+- **Success**: Near-instant sync when most files are cached
+
+#### Future Enhancement (Not Priority 1): GitHub API Integration
+- **Problem**: Git operations still needed for cache misses
+- **Solution**: Use GitHub API for individual file fetches
+- **Note**: Separate feature requiring new dependencies and auth handling
+- **Complexity**: Requires HTTP client, rate limiting, auth tokens
+- **Decision**: Defer until cache proves insufficient
 
 ### Parallel File Operations
 - **Problem**: Files copied sequentially
