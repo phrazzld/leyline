@@ -12,7 +12,7 @@
 - [x] Add instance variables: `@cache_dir`, `@content_dir`, `@max_cache_size = 50 * 1024 * 1024` (50MB in bytes)
 
 ### Content Storage Implementation
-- [ ] Implement `content_file_path(hash)` private method that returns `File.join(@content_dir, hash[0..1], hash[2..-1])` for git-style sharding
+- [x] Implement `content_file_path(hash)` private method that returns `File.join(@content_dir, hash[0..1], hash[2..-1])` for git-style sharding
 - [ ] Create `put(path, content)` method that computes SHA256 hash via `Digest::SHA256.hexdigest(content)`
 - [ ] In `put` method, check if content file already exists at `content_file_path(hash)` before writing
 - [ ] Implement atomic file writing in `put` using temp file + rename pattern: write to `#{path}.tmp.#{Process.pid}` then `File.rename`

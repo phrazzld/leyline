@@ -20,6 +20,10 @@ module Leyline
       def ensure_directories
         FileUtils.mkdir_p(@content_dir)
       end
+
+      def content_file_path(hash)
+        File.join(@content_dir, hash[0..1], hash[2..-1])
+      end
     end
   end
 end
