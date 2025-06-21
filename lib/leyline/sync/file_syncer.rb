@@ -8,9 +8,10 @@ module Leyline
     class FileSyncer
       class SyncError < StandardError; end
 
-      def initialize(source_directory, target_directory)
+      def initialize(source_directory, target_directory, cache: nil)
         @source_directory = source_directory
         @target_directory = target_directory
+        @cache = cache
         @sync_results = {
           copied: [],
           skipped: [],
@@ -79,9 +80,17 @@ module Leyline
       end
 
       def files_different?(source_path, target_path)
-        # Simple comparison using file content hash
-        source_hash = Digest::SHA256.hexdigest(File.read(source_path))
-        target_hash = Digest::SHA256.hexdigest(File.read(target_path))
+        # Read source file and compute hash
+        source_content = File.read(source_path)
+        source_hash = Digest::SHA256.hexdigest(source_content)
+
+        # Read target file and compute hash
+        target_content = File.read(target_path)
+        target_hash = Digest::SHA256.hexdigest(target_content)
+
+        # Cache the source content for future use
+        @cache&.put(source_content)
+
         source_hash != target_hash
       rescue => e
         # If we can't read files for comparison, assume they're different

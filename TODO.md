@@ -16,7 +16,7 @@
 - [x] Add basic `File.exist?` check before reading
 
 ### Wire It Up
-- [ ] Modify FileSyncer to check cache before copying
+- [x] Modify FileSyncer to check cache before copying
 - [ ] Cache files after successful sync
 - [ ] Add `--no-cache` flag to CLI
 
