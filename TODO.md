@@ -12,8 +12,8 @@
 - [x] Add instance variables: `@cache_dir`, `@content_dir`, `@max_cache_size`
 - [x] Implement `content_file_path(hash)` for git-style sharding
 - [x] Implement `put(content)` that returns SHA256 hash and stores file
-- [ ] Implement `get(hash)` that returns content or nil
-- [ ] Add basic `File.exist?` check before reading
+- [x] Implement `get(hash)` that returns content or nil
+- [x] Add basic `File.exist?` check before reading
 
 ### Wire It Up
 - [ ] Modify FileSyncer to check cache before copying

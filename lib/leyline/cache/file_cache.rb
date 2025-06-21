@@ -28,6 +28,13 @@ module Leyline
         hash
       end
 
+      def get(hash)
+        file_path = content_file_path(hash)
+        return nil unless File.exist?(file_path)
+
+        File.read(file_path)
+      end
+
       private
 
       def ensure_directories
