@@ -17,7 +17,7 @@
 
 ### Wire It Up
 - [x] Modify FileSyncer to check cache before copying
-- [ ] Cache files after successful sync
+- [x] Cache files after successful sync
 - [ ] Add `--no-cache` flag to CLI
 
 ### Ship It

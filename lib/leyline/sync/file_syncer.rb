@@ -57,7 +57,8 @@ module Leyline
         FileUtils.mkdir_p(target_dir) unless Dir.exist?(target_dir)
 
         # Check if target file exists
-        if File.exist?(target_path)
+        target_existed = File.exist?(target_path)
+        if target_existed
           if !files_different?(source_path, target_path)
             # Files are identical, skip copying
             @sync_results[:skipped] << relative_path
@@ -74,6 +75,13 @@ module Leyline
         begin
           FileUtils.cp(source_path, target_path)
           @sync_results[:copied] << relative_path
+
+          # Cache the content after successful copy (only if target didn't exist before)
+          # If target existed, files_different? already cached the content
+          if @cache && !target_existed
+            source_content = File.read(source_path)
+            @cache.put(source_content)
+          end
         rescue => e
           @sync_results[:errors] << { file: relative_path, error: e.message }
         end
