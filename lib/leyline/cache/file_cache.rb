@@ -10,12 +10,14 @@ module Leyline
 
       def initialize(cache_dir = '~/.leyline/cache')
         @cache_dir = File.expand_path(cache_dir)
+        @content_dir = File.join(@cache_dir, 'content')
+        @max_cache_size = 50 * 1024 * 1024  # 50MB in bytes
+        ensure_directories
       end
 
       private
 
       def ensure_directories
-        @content_dir = File.join(@cache_dir, 'content')
         FileUtils.mkdir_p(@content_dir)
       end
     end
