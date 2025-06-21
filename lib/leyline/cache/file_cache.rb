@@ -15,6 +15,19 @@ module Leyline
         ensure_directories
       end
 
+      def put(content)
+        hash = Digest::SHA256.hexdigest(content)
+        file_path = content_file_path(hash)
+
+        # Create directory if needed
+        FileUtils.mkdir_p(File.dirname(file_path))
+
+        # Write file
+        File.write(file_path, content)
+
+        hash
+      end
+
       private
 
       def ensure_directories
