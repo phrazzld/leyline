@@ -45,3 +45,6 @@ metrics/
 
 # RSpec test status
 .rspec_status
+
+# Synced leyline standards (test artifacts)
+docs/leyline/
