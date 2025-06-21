@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'digest'
+require 'fileutils'
+
 module Leyline
   module Cache
     class FileCache
