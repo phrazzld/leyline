@@ -22,7 +22,7 @@
 
 ### Ship It
 - [x] Manual test: sync twice, verify second sync is faster
-- [ ] Commit and push
+- [x] Commit and push
 
 ## Phase 2: Make It Robust (Only If Needed)
 
