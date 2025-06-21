@@ -18,7 +18,7 @@
 ### Wire It Up
 - [x] Modify FileSyncer to check cache before copying
 - [x] Cache files after successful sync
-- [ ] Add `--no-cache` flag to CLI
+- [x] Add `--no-cache` flag to CLI
 
 ### Ship It
 - [ ] Manual test: sync twice, verify second sync is faster
