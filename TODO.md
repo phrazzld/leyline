@@ -8,7 +8,7 @@
 - [x] Create `lib/leyline/cache/` directory structure
 - [x] Create `lib/leyline/cache/file_cache.rb` with class skeleton including initialize method that accepts `cache_dir` parameter defaulting to `~/.leyline/cache`
 - [x] Add `require 'digest'` and `require 'fileutils'` to file_cache.rb for SHA256 hashing and directory operations
-- [ ] Implement `ensure_directories` private method that creates `@content_dir = #{@cache_dir}/content` with FileUtils.mkdir_p
+- [x] Implement `ensure_directories` private method that creates `@content_dir = #{@cache_dir}/content` with FileUtils.mkdir_p
 - [ ] Add instance variables: `@cache_dir`, `@content_dir`, `@max_cache_size = 50 * 1024 * 1024` (50MB in bytes)
 
 ### Content Storage Implementation
