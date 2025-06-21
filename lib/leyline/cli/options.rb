@@ -73,6 +73,8 @@ module Leyline
           validate_boolean_option(options[:dry_run], 'dry_run')
           validate_boolean_option(options[:verbose], 'verbose')
           validate_boolean_option(options[:no_cache], 'no_cache')
+          validate_boolean_option(options[:force_git], 'force_git')
+          validate_boolean_option(options[:stats], 'stats')
           validate_path(path)
 
           true

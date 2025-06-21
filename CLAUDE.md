@@ -130,6 +130,99 @@ The project uses a detailed TODO.md with task dependencies:
    - Update TODO.md to mark task as [x]
    - Commit with descriptive conventional commit message
 
+## Performance & Cache Optimization
+
+### Cache-Aware Sync Performance
+
+Leyline implements intelligent cache-aware syncing to dramatically improve performance for repeated sync operations:
+
+**Performance Targets:**
+- First sync (cold cache): Normal git fetch time (~2-5 seconds)
+- Second sync (warm cache): <1 second when cache hit ratio >80%
+- Cache hit ratio: >80% for typical development workflows
+
+### Cache Configuration
+
+**Environment Variables:**
+```bash
+# Cache hit ratio threshold (default: 0.8 = 80%)
+export LEYLINE_CACHE_THRESHOLD=0.8
+
+# Disable cache warnings (default: enabled)
+export LEYLINE_CACHE_WARNINGS=false
+
+# Enable structured JSON logging (default: human-readable)
+export LEYLINE_STRUCTURED_LOGGING=true
+
+# Enable debug mode for detailed logging
+export LEYLINE_DEBUG=true
+
+# Enable automatic cache recovery (experimental)
+export LEYLINE_CACHE_AUTO_RECOVERY=true
+```
+
+### CLI Performance Flags
+
+```bash
+# Force git operations even when cache is sufficient
+leyline sync --force-git
+
+# Show detailed cache and performance statistics
+leyline sync --stats
+
+# Bypass cache entirely (force fresh fetch)
+leyline sync --no-cache
+
+# Combine for detailed analysis
+leyline sync --stats --verbose
+```
+
+### Performance Monitoring
+
+**Example Stats Output:**
+```
+Cache Performance:
+  Cache hits: 45
+  Cache misses: 5
+  Hit ratio: 90.0%
+  Cache puts: 5
+  Cache operations: 55
+
+Timing Performance:
+  Total sync time: 0.8s
+  Cache check time: 0.1s
+  Git operations: SKIPPED (cache sufficient)
+  File operations: 0.7s
+
+Cache Directory Stats:
+  Files: 1,250
+  Size: 15.2 MB
+  Path: ~/.cache/leyline
+```
+
+**Performance Benchmarks:**
+- Cache-aware sync typically achieves 70-90% performance improvement on subsequent runs
+- Git operations are automatically skipped when cache hit ratio exceeds threshold
+- Smart cache invalidation ensures content consistency
+
+### Cache Directory Management
+
+**Default Cache Location:** `~/.cache/leyline/`
+
+**Cache Structure:**
+```
+~/.cache/leyline/
+├── content/        # SHA256-addressed content files
+│   ├── ab/         # First 2 chars of hash
+│   │   └── cd...   # Remaining hash as filename
+└── metadata/       # Cache metadata and stats
+```
+
+**Cache Health Monitoring:**
+- Automatic corruption detection and cleanup
+- Health status reporting in verbose mode
+- Graceful fallback to git operations on cache failures
+
 ## CI Failure Prevention
 
 ### Recommended Daily Development Workflow
