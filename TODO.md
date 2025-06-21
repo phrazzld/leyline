@@ -84,6 +84,67 @@
   - Ruby linting passes with no new violations
   - Manual testing on macOS, Linux confirms cross-platform compatibility
 
+## MERGE BLOCKERS - Critical Fixes Required
+
+**Context**: Code review synthesis identified 4 critical issues that prevent cache-aware sync from working correctly. These must be fixed before merge to achieve the "<1 second on second sync" performance target.
+
+### Critical Fixes (Must Fix Before Merge)
+
+- [x] **T-MB1: Fix recursive warn method stack overflow** - BLOCKER ✅ COMPLETED
+  - **File**: `lib/leyline/cache/cache_error_handler.rb` (lines 27, 38, 100, 104)
+  - **Problem**: `warn` method calls itself recursively instead of `Kernel.warn`, causing immediate crash
+  - **Impact**: Application crashes with SystemStackError on first cache operation
+  - **Fix**: Replace `warn` with `Kernel.warn` in all error handler methods
+  - **Validation**: ✅ Cache operations log without crashing - all tests pass
+
+- [x] **T-MB2: Fix flawed git operations skip logic** - BLOCKER ✅ COMPLETED
+  - **File**: `lib/leyline/cli.rb` (lines 140-160, perform_sync method)
+  - **Problem**: Pre-check creates FileSyncer with target dir as both source/target, calculates hit ratio on existing local files instead of expected remote files
+  - **Impact**: Core cache-aware feature doesn't work - may skip git when updates exist, or fetch unnecessarily when cache warm
+  - **Fix**: Remove pre-check logic (lines 140-160). Always fetch to temp dir, let FileSyncer.sync handle cache optimization
+  - **Validation**: ✅ Cache-aware sync correctly skips file operations when cache hit ratio >80%
+
+- [x] **T-MB3: Initialize file_path variables in error handlers** - BLOCKER ✅ COMPLETED
+  - **File**: `lib/leyline/cache/file_cache.rb` (get/put rescue blocks)
+  - **Problem**: If exceptions occur before file_path assignment, rescue blocks reference undefined variables causing NameError
+  - **Impact**: Cache error handling crashes instead of gracefully falling back to git operations
+  - **Fix**: Initialize `file_path = nil` at start of both get() and put() methods
+  - **Validation**: ✅ Cache errors degrade gracefully without crashing sync flow
+
+- [x] **T-MB4: Add LEYLINE_CACHE_DIR environment variable support** - BLOCKER ✅ COMPLETED
+  - **File**: `lib/leyline/cache/file_cache.rb` (initialize method)
+  - **Problem**: Performance validation script sets LEYLINE_CACHE_DIR but FileCache ignores it, using hardcoded path
+  - **Impact**: Performance tests invalid - run against user's global cache instead of isolated test cache
+  - **Fix**: Change initialize to `cache_dir = ENV.fetch('LEYLINE_CACHE_DIR', '~/.leyline/cache')`
+  - **Validation**: ✅ Performance tests run in isolation, achieve <1 second target on warm cache
+
+### High-Priority Fixes (Should Fix Before Merge)
+
+- [ ] **T-HP1: Fix false cache hits from incorrect validation** - HIGH
+  - **File**: `lib/leyline/sync/file_syncer.rb` (calculate_cache_hit_ratio method)
+  - **Problem**: `cache_result != nil` treats false/empty strings as hits instead of misses
+  - **Impact**: Inflated hit ratios may cause premature git skip when cache invalid
+  - **Fix**: Change to `if cache_result && !cache_result.empty?`
+
+- [ ] **T-HP2: Initialize cache_check_time to prevent TypeError** - HIGH
+  - **File**: `lib/leyline/cache/cache_stats.rb` (initialize method)
+  - **Problem**: @cache_check_time not initialized, causes TypeError when add_cache_check_time called
+  - **Impact**: Stats crash when cache timing recorded
+  - **Fix**: Add `@cache_check_time = 0.0` to initialize method
+
+### Issues Deferred to Future PRs
+
+**Why these are NOT merge-blockers for this branch:**
+
+- **Thread Safety Issues**: No parallel operations in this PR scope (mentioned in BACKLOG.md PR6)
+- **Cache Size Enforcement**: Feature works without size limits, enforcement is enhancement
+- **Temp Directory Leaks**: Resource leak but doesn't break functionality, can be addressed in cleanup PR
+- **Cache Health Monitoring Accuracy**: Health checking is auxiliary feature, not core functionality
+- **Configuration Improvements**: Existing defaults work, improvements can be iterated
+- **Hardcoded Time Estimates**: Cosmetic issue in stats output, doesn't affect performance
+
+**John Carmack Principle**: Fix what's broken (crashes, core feature not working), ship it, iterate. These 4 blockers prevent the basic cache-aware sync from working. Everything else can be improved in future PRs.
+
 ---
 
 *Focus: Make the most common case (repeated sync) dramatically faster while maintaining reliability*

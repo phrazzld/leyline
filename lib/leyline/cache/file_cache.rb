@@ -9,7 +9,7 @@ module Leyline
     class FileCache
       class CacheError < StandardError; end
 
-      def initialize(cache_dir = '~/.leyline/cache')
+      def initialize(cache_dir = ENV.fetch('LEYLINE_CACHE_DIR', '~/.leyline/cache'))
         @cache_dir = File.expand_path(cache_dir)
         @content_dir = File.join(@cache_dir, 'content')
         @max_cache_size = 50 * 1024 * 1024 # 50MB in bytes
@@ -26,6 +26,7 @@ module Leyline
 
       def put(content)
         @operation_count += 1
+        file_path = nil
 
         begin
           # Validate input
@@ -59,6 +60,7 @@ module Leyline
 
       def get(hash)
         @operation_count += 1
+        file_path = nil
 
         begin
           # Validate input

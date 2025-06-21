@@ -124,58 +124,31 @@ module Leyline
       # Target directory for leyline content
       leyline_target = File.join(target_path, 'docs', 'leyline')
 
-      # Smart git detection: check if we can serve from cache
-      skip_git = false
-      if cache && Dir.exist?(leyline_target)
-        puts "Checking cache for existing content..." if verbose
+      # Always fetch from git to temp directory
+      # FileSyncer will handle cache optimization during sync
+      temp_dir = Dir.mktmpdir('leyline-sync-')
+      git_client = Sync::GitClient.new
 
-        # Create temporary file syncer to check cache hit ratio for existing files
-        temp_syncer = Sync::FileSyncer.new(leyline_target, leyline_target, cache: cache)
-        existing_files = temp_syncer.send(:find_files, leyline_target)
+      begin
+        puts "Fetching leyline standards..." if verbose
 
-        if existing_files.any?
-          cache_hit_ratio = temp_syncer.calculate_cache_hit_ratio(existing_files, cache)
-          skip_git = !temp_syncer.git_sync_needed?(cache_hit_ratio, force_git: force_git)
+        # Set up git sparse-checkout
+        git_client.setup_sparse_checkout(temp_dir)
 
-          if skip_git
-            puts "Serving from cache (#{(cache_hit_ratio * 100).round(1)}% hit ratio)" if verbose
-          else
-            puts "Cache hit ratio #{(cache_hit_ratio * 100).round(1)}% below threshold, fetching from git..." if verbose
-          end
-        end
-      end
+        # Determine sparse paths based on categories
+        sparse_paths = build_sparse_paths(categories)
+        git_client.add_sparse_paths(sparse_paths)
 
-      # Initialize git client and temp directory only if needed
-      temp_dir = nil
-      git_client = nil
-      source_docs_dir = leyline_target  # Default to target if serving from cache
+        # Fetch from leyline repository
+        remote_url = 'https://github.com/phrazzld/leyline.git'
+        git_client.fetch_version(remote_url, 'master')
 
-      unless skip_git
-        # Create temp directory for git operations
-        temp_dir = Dir.mktmpdir('leyline-sync-')
-        git_client = Sync::GitClient.new
-
-        begin
-          puts "Fetching leyline standards..." if verbose
-
-          # Set up git sparse-checkout
-          git_client.setup_sparse_checkout(temp_dir)
-
-          # Determine sparse paths based on categories
-          sparse_paths = build_sparse_paths(categories)
-          git_client.add_sparse_paths(sparse_paths)
-
-          # Fetch from leyline repository
-          remote_url = 'https://github.com/phrazzld/leyline.git'
-          git_client.fetch_version(remote_url, 'master')
-
-          # Point to the docs subdirectory in temp_dir to avoid double nesting
-          source_docs_dir = File.join(temp_dir, 'docs')
-        rescue => e
-          # Clean up and re-raise git errors
-          git_client&.cleanup
-          raise e
-        end
+        # Point to the docs subdirectory in temp_dir to avoid double nesting
+        source_docs_dir = File.join(temp_dir, 'docs')
+      rescue => e
+        # Clean up and re-raise git errors
+        git_client&.cleanup
+        raise e
       end
 
       begin

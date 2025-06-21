@@ -17,7 +17,7 @@ module Leyline
           output_log(log_entry, :warn)
         rescue StandardError => e
           # Even error logging shouldn't break the application
-          warn "Failed to log warning: #{e.message}" if debug_mode?
+          Kernel.warn "Failed to log warning: #{e.message}" if debug_mode?
         end
 
         # Log a cache error and return safe default
@@ -34,7 +34,7 @@ module Leyline
           output_log(log_entry, :error)
         rescue StandardError => e
           # Even error logging shouldn't break the application
-          warn "Failed to log error: #{e.message}" if debug_mode?
+          Kernel.warn "Failed to log error: #{e.message}" if debug_mode?
         end
 
         # Check if cache directory is healthy
@@ -114,7 +114,7 @@ module Leyline
 
         def output_log(log_entry, level)
           if structured_logging?
-            warn JSON.generate(log_entry)
+            Kernel.warn JSON.generate(log_entry)
           else
             # Human-readable format
             prefix = level == :error ? 'ERROR' : 'WARNING'
@@ -122,7 +122,7 @@ module Leyline
 
             message += " (operation: #{log_entry[:operation]})" if debug_mode? && log_entry[:operation]
 
-            warn message
+            Kernel.warn message
           end
         end
       end
