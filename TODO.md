@@ -7,7 +7,7 @@
 ### Foundation Tasks
 - [x] **[Core Infrastructure] T001: Implement FileComparator service**: Create `lib/leyline/file_comparator.rb` with methods `#compare_with_remote(local_path, category)`, `#detect_modifications(base_manifest, current_files)`, and `#generate_diff_data(file_a, file_b)`. Leverage existing FileSyncer SHA256 logic for content comparison. Must support category filtering and cache-aware operations. *Depends-on: None (foundational)* **COMPLETED**: 34 test cases passing, performance targets met (<500ms for 100 files)
 
-- [ ] **[CLI Integration] T002: Add transparency command structure to CLI**: Extend `lib/leyline/cli.rb` with `desc` and `method_option` definitions for `diff`, `status`, and `update` commands. Follow existing sync command patterns for option handling (--categories, --verbose, --stats). Register commands with Thor and add help documentation. *Depends-on: None*
+- [x] **[CLI Integration] T002: Add transparency command structure to CLI**: Extend `lib/leyline/cli.rb` with `desc` and `method_option` definitions for `diff`, `status`, and `update` commands. Follow existing sync command patterns for option handling (--categories, --verbose, --stats). Register commands with Thor and add help documentation. *Depends-on: None* **COMPLETED**: Commands registered in Thor CLI, option processing working, performance stats integration, placeholder implementations ready for T004-T006
 
 - [ ] **[Metadata] T003: Implement sync state tracking**: Create `lib/leyline/sync_state.rb` to track sync metadata (timestamp, version, synced categories, file manifest) in `~/.cache/leyline/sync_state.yaml`. Provide methods `#save_sync_state(metadata)`, `#load_sync_state`, and `#state_exists?`. Use YAML for human-readable format. *Depends-on: None*
 

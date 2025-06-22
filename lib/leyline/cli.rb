@@ -64,6 +64,74 @@ module Leyline
       perform_discovery_command(:search, options.merge(query: query))
     end
 
+    desc 'status [PATH]', 'Show sync status and local modifications'
+    method_option :categories,
+                  type: :array,
+                  desc: 'Filter status by specific categories',
+                  aliases: '-c'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed status information',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    method_option :json,
+                  type: :boolean,
+                  desc: 'Output status in JSON format',
+                  aliases: '--json'
+    def status(path = '.')
+      perform_transparency_command(:status, options.merge(path: path))
+    end
+
+    desc 'diff [PATH]', 'Show differences between local and remote leyline standards'
+    method_option :categories,
+                  type: :array,
+                  desc: 'Filter diff by specific categories',
+                  aliases: '-c'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed diff output',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    method_option :format,
+                  type: :string,
+                  desc: 'Output format (text, json)',
+                  default: 'text',
+                  enum: ['text', 'json']
+    def diff(path = '.')
+      perform_transparency_command(:diff, options.merge(path: path))
+    end
+
+    desc 'update [PATH]', 'Preview and apply leyline updates with conflict detection'
+    method_option :categories,
+                  type: :array,
+                  desc: 'Update specific categories only',
+                  aliases: '-c'
+    method_option :force,
+                  type: :boolean,
+                  desc: 'Force updates even with conflicts',
+                  aliases: '-f'
+    method_option :dry_run,
+                  type: :boolean,
+                  desc: 'Show what would be updated without making changes',
+                  aliases: '-n'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed update information',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    def update(path = '.')
+      perform_transparency_command(:update, options.merge(path: path))
+    end
+
     desc 'sync [PATH]', 'Synchronize leyline standards to target directory'
     method_option :categories,
                   type: :array,
@@ -598,6 +666,131 @@ module Leyline
 
         cache_directory_stats = cache&.directory_stats || {}
         puts stats.format_stats(cache_directory_stats)
+      end
+    end
+
+    def perform_transparency_command(command, options)
+      start_time = Time.now
+
+      # Pre-process categories (consistent with sync command)
+      processed_options = preprocess_transparency_options(options)
+
+      # Validate options
+      begin
+        validate_transparency_options(command, processed_options)
+      rescue CliOptions::ValidationError => e
+        puts "Error: #{e.message}"
+        exit 1
+      end
+
+      # Expand and validate path
+      target_path = File.expand_path(processed_options[:path] || '.')
+
+      begin
+        # Initialize shared infrastructure
+        file_cache = create_file_cache_if_needed(processed_options[:verbose])
+
+        # Execute specific transparency command
+        case command
+        when :status
+          execute_status_command(target_path, processed_options, file_cache)
+        when :diff
+          execute_diff_command(target_path, processed_options, file_cache)
+        when :update
+          execute_update_command(target_path, processed_options, file_cache)
+        else
+          puts "Unknown transparency command: #{command}"
+          exit 1
+        end
+
+        # Show performance statistics if requested
+        if processed_options[:stats]
+          display_transparency_stats(file_cache, start_time)
+        end
+
+      rescue => e
+        puts "Error during #{command}: #{e.message}"
+        puts e.backtrace if processed_options[:verbose]
+        exit 1
+      end
+    end
+
+    def preprocess_transparency_options(options)
+      processed = options.dup
+
+      # Handle comma-separated categories (consistent with sync)
+      if processed[:categories].is_a?(Array) &&
+         processed[:categories].length == 1 &&
+         processed[:categories].first.include?(',')
+        processed[:categories] = processed[:categories].first.split(',').map(&:strip)
+      end
+
+      processed
+    end
+
+    def validate_transparency_options(command, options)
+      # Common validations using existing patterns
+      if options[:categories]
+        CliOptions.normalize_categories(options[:categories])
+      end
+
+      # Command-specific validations
+      case command
+      when :diff
+        validate_format_option(options[:format])
+      end
+    end
+
+    def validate_format_option(format)
+      return true if format.nil?
+
+      valid_formats = ['text', 'json']
+      unless valid_formats.include?(format)
+        raise CliOptions::ValidationError, "Invalid format '#{format}'. Valid formats: #{valid_formats.join(', ')}"
+      end
+
+      true
+    end
+
+    def execute_status_command(target_path, options, cache)
+      puts "Status command implementation coming in T004..."
+      puts "Path: #{target_path}"
+      puts "Categories: #{options[:categories]&.join(', ') || 'core'}"
+      puts "JSON output: #{options[:json] ? 'enabled' : 'disabled'}"
+    end
+
+    def execute_diff_command(target_path, options, cache)
+      puts "Diff command implementation coming in T005..."
+      puts "Path: #{target_path}"
+      puts "Categories: #{options[:categories]&.join(', ') || 'core'}"
+      puts "Format: #{options[:format] || 'text'}"
+    end
+
+    def execute_update_command(target_path, options, cache)
+      puts "Update command implementation coming in T006..."
+      puts "Path: #{target_path}"
+      puts "Categories: #{options[:categories]&.join(', ') || 'core'}"
+      puts "Dry run: #{options[:dry_run] ? 'enabled' : 'disabled'}"
+      puts "Force: #{options[:force] ? 'enabled' : 'disabled'}"
+    end
+
+    def display_transparency_stats(cache, start_time)
+      total_time = Time.now - start_time
+
+      puts "\n" + "="*50
+      puts "TRANSPARENCY COMMAND PERFORMANCE"
+      puts "="*50
+
+      puts "Execution Time: #{total_time.round(3)}s"
+      puts "Target Met: #{total_time < 2.0 ? '✅' : '❌'} (<2s)"
+
+      if cache&.respond_to?(:directory_stats)
+        stats = cache.directory_stats
+        puts "\nCache Performance:"
+        puts "  Directory: #{stats[:path]}"
+        puts "  Files: #{stats[:file_count]}"
+        puts "  Size: #{format_bytes(stats[:size])}"
+        puts "  Utilization: #{stats[:utilization_percent]}%"
       end
     end
   end
