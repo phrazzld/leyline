@@ -251,29 +251,22 @@ module Leyline
         return
       end
 
-      # Limit results
+      # Store full results count before limiting
+      total_results = results.length
       results = results.first(limit)
 
-      puts "Search Results for '#{query}' (#{results.length} of #{metadata_cache.search(query).length}):"
+      # Enhanced search result header with progressive disclosure
+      puts format_search_header(query, results.length, total_results, limit)
       puts
 
+      # Display results with enhanced formatting
       results.each_with_index do |result, index|
-        doc = result[:document]
-        score = result[:score]
-        category = result[:category]
+        display_search_result(result, index, verbose)
+      end
 
-        puts "#{index + 1}. #{doc[:title]}"
-        puts "   Category: #{category} | Type: #{doc[:type]} | ID: #{doc[:id]}"
-
-        if verbose
-          puts "   Score: #{score} | Path: #{doc[:path]}"
-        end
-
-        unless doc[:content_preview].empty?
-          puts "   #{doc[:content_preview]}"
-        end
-
-        puts
+      # Show truncation notice if applicable
+      if total_results > limit
+        puts "Showing #{limit} of #{total_results} results. Use --limit to see more."
       end
     end
 
@@ -340,6 +333,113 @@ module Leyline
         puts "\nCache Operations:"
         puts "  Scan operations: #{cache_stats[:scan_count]}"
         puts "  Last scan: #{cache_stats[:last_scan]&.strftime('%H:%M:%S') || 'never'}"
+      end
+    end
+
+    def format_search_header(query, shown_count, total_count, limit)
+      header = "Search Results for '#{query}'"
+
+      if total_count <= limit
+        "#{header} (#{total_count} results):"
+      else
+        "#{header} (showing #{shown_count} of #{total_count}):"
+      end
+    end
+
+    def display_search_result(result, index, verbose)
+      doc = result[:document]
+      score = result[:score]
+      category = result[:category]
+
+      # Progressive disclosure: Basic info always shown
+      puts "#{format_result_number(index + 1)} #{doc[:title]}"
+      puts "   #{format_result_metadata(category, doc[:type], doc[:id], score, verbose)}"
+
+      # Progressive disclosure: Content preview with smart truncation
+      if doc[:content_preview] && !doc[:content_preview].empty?
+        preview = format_content_preview(doc[:content_preview], verbose)
+        puts "   #{preview}" if preview
+      end
+
+      # Verbose mode: Additional context
+      if verbose
+        display_verbose_search_details(doc, result, score)
+      end
+
+      puts
+    end
+
+    def format_result_number(number)
+      # Add visual hierarchy with consistent numbering
+      sprintf("%2d.", number)
+    end
+
+    def format_result_metadata(category, type, id, score, verbose)
+      base_info = "Category: #{category} | Type: #{type} | ID: #{id}"
+
+      if verbose
+        relevance_indicator = format_relevance_score(score)
+        "#{base_info} | #{relevance_indicator}"
+      else
+        base_info
+      end
+    end
+
+    def format_relevance_score(score)
+      # Convert numeric score to visual relevance indicator
+      case score
+      when 100..Float::INFINITY
+        "Relevance: ★★★★★ (#{score})"
+      when 75..99
+        "Relevance: ★★★★☆ (#{score})"
+      when 50..74
+        "Relevance: ★★★☆☆ (#{score})"
+      when 25..49
+        "Relevance: ★★☆☆☆ (#{score})"
+      when 10..24
+        "Relevance: ★☆☆☆☆ (#{score})"
+      else
+        "Relevance: ☆☆☆☆☆ (#{score})"
+      end
+    end
+
+    def format_content_preview(content, verbose)
+      return nil if content.nil? || content.empty?
+
+      # Smart truncation based on mode
+      max_length = verbose ? 200 : 100
+
+      if content.length <= max_length
+        content
+      else
+        # Try to break at word boundary
+        truncated = content[0, max_length]
+        last_space = truncated.rindex(' ')
+
+        if last_space && last_space > max_length * 0.7
+          "#{content[0, last_space]}..."
+        else
+          "#{truncated}..."
+        end
+      end
+    end
+
+    def display_verbose_search_details(doc, result, score)
+      # Additional context in verbose mode
+      puts "   Path: #{doc[:path]}" if doc[:path]
+
+      # Show match details if available
+      if doc[:metadata] && doc[:metadata].any?
+        metadata_preview = doc[:metadata].select { |k, v| k.to_s != 'content' }
+                                         .first(3)
+                                         .map { |k, v| "#{k}: #{v}" }
+                                         .join(', ')
+        puts "   Metadata: #{metadata_preview}" unless metadata_preview.empty?
+      end
+
+      # Show timing if document has scan time
+      if doc[:scan_time]
+        puts "   Last updated: #{doc[:scan_time].strftime('%Y-%m-%d %H:%M')}"
       end
     end
 
