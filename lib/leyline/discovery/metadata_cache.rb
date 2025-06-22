@@ -223,6 +223,11 @@ module Leyline
         # Apply compression if enabled
         cached_document = @compression_enabled ? compress_document(document) : document
 
+        # Subtract old document size if replacing existing document
+        if (old_document = @memory_cache[document[:path]])
+          @memory_usage -= old_document[:size]
+        end
+
         # Add to memory cache with size tracking
         @memory_cache[document[:path]] = cached_document
         @memory_usage += cached_document[:size]
