@@ -7,6 +7,7 @@ require_relative 'cli/options'
 require_relative 'sync/git_client'
 require_relative 'sync/file_syncer'
 require_relative 'cache/file_cache'
+require_relative 'cache/cache_stats'
 
 module Leyline
   class CLI < Thor
@@ -38,6 +39,14 @@ module Leyline
                   type: :boolean,
                   desc: 'Bypass cache and fetch fresh content',
                   aliases: '--no-cache'
+    method_option :force_git,
+                  type: :boolean,
+                  desc: 'Force git operations even when cache is sufficient',
+                  aliases: '--force-git'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show detailed cache and performance statistics',
+                  aliases: '--stats'
     def sync(path = '.')
       # Pre-process categories to handle comma-separated values
       processed_options = options.dup
@@ -82,11 +91,41 @@ module Leyline
       force = options[:force] || false
       verbose = options[:verbose] || false
       no_cache = options[:no_cache] || false
+      force_git = options[:force_git] || false
+      show_stats = options[:stats] || false
 
       # Create cache unless disabled
-      cache = no_cache ? nil : Cache::FileCache.new
+      cache = nil
+      unless no_cache
+        begin
+          cache = Cache::FileCache.new
 
-      # Create temp directory for git operations
+          # Check cache health on verbose mode
+          if verbose && cache
+            health = cache.health_status
+            unless health[:healthy]
+              puts "Warning: Cache health issues detected:"
+              health[:issues].each do |issue|
+                puts "  - #{issue[:type]}: #{issue[:path] || issue[:error]}"
+              end
+            end
+          end
+        rescue => e
+          # Log cache initialization failure but continue without cache
+          puts "Warning: Cache initialization failed: #{e.message}" if verbose
+          puts "Continuing without cache optimization..." if verbose
+          cache = nil
+        end
+      end
+
+      # Create stats tracker
+      stats = show_stats ? Cache::CacheStats.new : nil
+
+      # Target directory for leyline content
+      leyline_target = File.join(target_path, 'docs', 'leyline')
+
+      # Always fetch from git to temp directory
+      # FileSyncer will handle cache optimization during sync
       temp_dir = Dir.mktmpdir('leyline-sync-')
       git_client = Sync::GitClient.new
 
@@ -104,21 +143,27 @@ module Leyline
         remote_url = 'https://github.com/phrazzld/leyline.git'
         git_client.fetch_version(remote_url, 'master')
 
-        puts "Copying files to #{File.join(target_path, 'docs', 'leyline')}..." if verbose
-
-        # Sync files to target directory under docs/leyline
-        leyline_target = File.join(target_path, 'docs', 'leyline')
         # Point to the docs subdirectory in temp_dir to avoid double nesting
         source_docs_dir = File.join(temp_dir, 'docs')
-        file_syncer = Sync::FileSyncer.new(source_docs_dir, leyline_target, cache: cache)
-        results = file_syncer.sync(force: force)
+      rescue => e
+        # Clean up and re-raise git errors
+        git_client&.cleanup
+        raise e
+      end
+
+      begin
+        puts "Copying files to #{leyline_target}..." if verbose
+
+        # Sync files to target directory under docs/leyline
+        file_syncer = Sync::FileSyncer.new(source_docs_dir, leyline_target, cache: cache, stats: stats)
+        results = file_syncer.sync(force: force, force_git: force_git, verbose: verbose)
 
         # Report results
-        report_sync_results(results, verbose)
+        report_sync_results(results, verbose, stats: show_stats ? stats : nil, cache: cache)
 
       ensure
         # Clean up temp directory
-        git_client.cleanup if git_client
+        git_client&.cleanup if temp_dir
       end
     end
 
@@ -139,7 +184,7 @@ module Leyline
       paths
     end
 
-    def report_sync_results(results, verbose)
+    def report_sync_results(results, verbose, stats: nil, cache: nil)
       copied_count = results[:copied].length
       skipped_count = results[:skipped].length
       error_count = results[:errors].length
@@ -163,6 +208,16 @@ module Leyline
       if error_count > 0
         puts "\nErrors:"
         results[:errors].each { |error| puts "  ! #{error[:file]}: #{error[:error]}" }
+      end
+
+      # Display cache statistics if requested
+      if stats
+        puts "\n" + "="*50
+        puts "CACHE STATISTICS"
+        puts "="*50
+
+        cache_directory_stats = cache&.directory_stats || {}
+        puts stats.format_stats(cache_directory_stats)
       end
     end
   end
