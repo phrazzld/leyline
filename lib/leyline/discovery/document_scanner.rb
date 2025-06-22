@@ -190,7 +190,7 @@ module Leyline
         content_hash = Digest::SHA256.hexdigest(content)
 
         # Extract document title efficiently
-        title = extract_title_fast(content)
+        title = extract_title_fast(content, file_path)
 
         # Determine document type and category from path
         doc_type = determine_document_type(file_path)
@@ -216,7 +216,7 @@ module Leyline
       end
 
       # Fast title extraction using line-by-line scanning
-      def extract_title_fast(content)
+      def extract_title_fast(content, file_path)
         # Scan for first markdown header after front-matter
         lines = content.lines
         in_front_matter = false

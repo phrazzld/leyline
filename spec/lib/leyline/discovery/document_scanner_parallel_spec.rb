@@ -147,4 +147,63 @@ RSpec.describe Leyline::Discovery::DocumentScanner do
       expect(stats[:files_scanned]).to eq(2)
     end
   end
+
+  describe 'title extraction fallback' do
+    let(:temp_dir) { Dir.mktmpdir('title_fallback_test') }
+    let(:no_header_file) { File.join(temp_dir, 'my-test-document.md') }
+
+    before do
+      # Create document with front-matter but no markdown header
+      content = <<~MARKDOWN
+        ---
+        id: fallback-test
+        category: testing
+        ---
+
+        This document has no markdown header.
+        Title should fallback to filename.
+      MARKDOWN
+
+      File.write(no_header_file, content)
+    end
+
+    after do
+      FileUtils.rm_rf(temp_dir)
+    end
+
+    it 'falls back to filename-based title when no markdown header present' do
+      result = scanner.scan_document(no_header_file)
+
+      expect(result).to include(
+        id: 'fallback-test',
+        title: 'My test document', # Extracted from filename: my-test-document.md
+        path: no_header_file
+      )
+
+      # Verify title transformation: dashes to spaces, capitalized
+      expect(result[:title]).to eq('My test document')
+    end
+
+    it 'handles edge cases in filename-based title extraction' do
+      # Test different filename patterns
+      test_cases = [
+        ['simple-name.md', 'Simple name'],
+        ['multi-word-title.md', 'Multi word title'],
+        ['single.md', 'Single'],
+        ['UPPERCASE-WORDS.md', 'Uppercase words']
+      ]
+
+      test_cases.each do |filename, expected_title|
+        file_path = File.join(temp_dir, filename)
+        content = "---\nid: test\n---\n\nNo header content."
+        File.write(file_path, content)
+
+        result = scanner.scan_document(file_path)
+        expect(result[:title]).to eq(expected_title),
+          "Expected filename '#{filename}' to produce title '#{expected_title}' but got '#{result[:title]}'"
+
+        File.delete(file_path)
+      end
+    end
+  end
 end
