@@ -143,6 +143,15 @@ module Leyline
         file_cache = create_file_cache_if_needed(verbose)
         metadata_cache = Discovery::MetadataCache.new(file_cache: file_cache)
 
+        # Start background cache warming to eliminate cold-start penalty
+        begin
+          warming_started = metadata_cache.warm_cache_in_background
+          puts "🔄 Starting cache warm-up in background..." if verbose && warming_started
+        rescue => e
+          # Warming failures should not break the command
+          puts "Warning: Cache warming failed: #{e.message}" if verbose
+        end
+
         # Execute the specific discovery command
         case command
         when :categories

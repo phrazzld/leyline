@@ -24,6 +24,10 @@ module Leyline
         @last_scan_time = nil
         @memory_usage = 0
 
+        # Cache warming state
+        @warming_thread = nil
+        @warming_complete = false
+
         # Performance tracking
         @hit_count = 0
         @miss_count = 0
@@ -119,6 +123,28 @@ module Leyline
           operation_metrics: operation_metrics,
           performance_summary: calculate_performance_summary(operation_metrics)
         }
+      end
+
+      # Start cache warming in background to eliminate cold-start penalty
+      def warm_cache_in_background
+        return false if @warming_thread&.alive? || @warming_complete
+
+        @warming_thread = Thread.new do
+          begin
+            ensure_cache_current
+            @warming_complete = true
+          rescue => e
+            # Warming failures shouldn't break existing functionality
+            warn "Cache warming failed: #{e.message}" if ENV['LEYLINE_DEBUG']
+          end
+        end
+
+        true
+      end
+
+      # Check if cache warming has completed
+      def cache_warm?
+        @warming_complete || (!@warming_thread&.alive? && !@last_scan_time.nil?)
       end
 
       # Force cache refresh - use sparingly for testing
