@@ -2,6 +2,7 @@
 
 require 'digest'
 require 'yaml'
+require 'lz4-ruby'
 require_relative 'document_scanner'
 
 module Leyline
@@ -15,7 +16,7 @@ module Leyline
       TARGET_CACHE_HIT_RATIO = 0.8
       MAX_MEMORY_USAGE = 10 * 1024 * 1024  # 10MB
 
-      def initialize(file_cache: nil)
+      def initialize(file_cache: nil, compression_enabled: false)
         @file_cache = file_cache
         @memory_cache = {}
         @content_hashes = {}
@@ -23,6 +24,15 @@ module Leyline
         @search_index = {}
         @last_scan_time = nil
         @memory_usage = 0
+
+        # Compression configuration
+        @compression_enabled = compression_enabled
+        @compression_stats = {
+          compressed_documents: 0,
+          total_original_size: 0,
+          total_compressed_size: 0,
+          compression_events: 0
+        }
 
         # Cache warming state
         @warming_thread = nil
@@ -58,7 +68,9 @@ module Leyline
       def documents_for_category(category)
         time_operation(:show_category) do
           ensure_cache_current
-          @categories_index[category.to_s] || []
+          documents = @categories_index[category.to_s] || []
+          # Decompress documents for external access
+          documents.map { |doc| decompress_if_needed(doc) }
         end
       end
 
@@ -75,10 +87,11 @@ module Leyline
           @memory_cache.each_value do |document|
             score = calculate_relevance_score(document, query_normalized)
             if score > 0
+              decompressed_document = decompress_if_needed(document)
               results << {
-                document: document,
+                document: decompressed_document,
                 score: score,
-                category: document[:category] # Use category from DocumentScanner
+                category: decompressed_document[:category] # Use category from DocumentScanner
               }
             end
           end
@@ -121,7 +134,10 @@ module Leyline
 
           # New microsecond precision metrics
           operation_metrics: operation_metrics,
-          performance_summary: calculate_performance_summary(operation_metrics)
+          performance_summary: calculate_performance_summary(operation_metrics),
+
+          # Compression statistics
+          compression_stats: calculate_compression_stats
         }
       end
 
@@ -145,6 +161,37 @@ module Leyline
       # Check if cache warming has completed
       def cache_warm?
         @warming_complete || (!@warming_thread&.alive? && !@last_scan_time.nil?)
+      end
+
+      # Check if compression is enabled
+      def compression_enabled?
+        @compression_enabled
+      end
+
+      # Get current memory usage in bytes
+      def memory_usage_bytes
+        @memory_usage
+      end
+
+      # Cache a document with optional compression
+      def cache_document(document)
+        # Apply compression if enabled
+        cached_document = @compression_enabled ? compress_document(document) : document
+
+        # Add to memory cache with size tracking
+        @memory_cache[document[:path]] = cached_document
+        @memory_usage += cached_document[:size]
+
+        # Track content hash and mtime for change detection
+        @content_hashes[document[:path]] = {
+          hash: document[:content_hash],
+          mtime: document[:modified_time]
+        }
+
+        # Implement simple LRU if memory usage exceeds limit
+        if @memory_usage > MAX_MEMORY_USAGE
+          evict_least_recently_used
+        end
       end
 
       # Force cache refresh - use sparingly for testing
@@ -194,6 +241,25 @@ module Leyline
           total_operation_time_ms: total_time_ms,
           avg_operation_time_ms: total_operations > 0 ? total_time_ms / total_operations : 0.0,
           performance_target_met: operation_metrics.values.all? { |m| m[:avg_time_ms] < 1000.0 } # <1s target
+        }
+      end
+
+      def calculate_compression_stats
+        return { enabled: false } unless @compression_enabled
+
+        compression_ratio = if @compression_stats[:total_original_size] > 0
+          @compression_stats[:total_compressed_size].to_f / @compression_stats[:total_original_size]
+        else
+          1.0
+        end
+
+        {
+          enabled: true,
+          compressed_documents: @compression_stats[:compressed_documents],
+          compression_ratio: compression_ratio,
+          space_saved_bytes: @compression_stats[:total_original_size] - @compression_stats[:total_compressed_size],
+          space_saved_percent: ((1.0 - compression_ratio) * 100).round(1),
+          compression_events: @compression_stats[:compression_events]
         }
       end
 
@@ -288,25 +354,6 @@ module Leyline
         false
       end
 
-
-
-      def cache_document(document)
-        # Add to memory cache with size tracking
-        @memory_cache[document[:path]] = document
-        @memory_usage += document[:size]
-
-        # Track content hash and mtime for change detection
-        @content_hashes[document[:path]] = {
-          hash: document[:content_hash],
-          mtime: document[:modified_time]
-        }
-
-        # Implement simple LRU if memory usage exceeds limit
-        if @memory_usage > MAX_MEMORY_USAGE
-          evict_least_recently_used
-        end
-      end
-
       def evict_least_recently_used
         # Simple LRU implementation - remove oldest entries until under limit
         # In a production system, would track access times
@@ -333,26 +380,122 @@ module Leyline
         end
       end
 
+      def compress_document(document)
+        return document unless @compression_enabled
+
+        compressed_document = document.dup
+        original_size = document[:size]
+
+        # Compress content_preview and metadata if they're large enough
+        compressible_fields = [:content_preview, :metadata]
+        compression_applied = false
+
+        compressible_fields.each do |field|
+          next unless document[field]
+
+          original_data = field == :metadata ? document[field].to_yaml : document[field].to_s
+          next if original_data.bytesize < 100  # Only compress if worthwhile
+
+          begin
+            compressed_data = LZ4.compress(original_data)
+
+            # Only use compression if it saves space
+            if compressed_data.bytesize < original_data.bytesize
+              compressed_document[:"#{field}_compressed"] = compressed_data
+              compressed_document[:"#{field}_original_size"] = original_data.bytesize
+              compressed_document.delete(field)
+              compression_applied = true
+            end
+          rescue => e
+            # Graceful fallback on compression failure
+            warn "Compression failed for #{field}: #{e.message}" if ENV['LEYLINE_DEBUG']
+          end
+        end
+
+        if compression_applied
+          compressed_document[:_compressed] = true
+          compressed_document[:size] = calculate_compressed_document_size(compressed_document)
+
+          # Update compression statistics
+          @compression_stats[:compressed_documents] += 1
+          @compression_stats[:total_original_size] += original_size
+          @compression_stats[:total_compressed_size] += compressed_document[:size]
+          @compression_stats[:compression_events] += 1
+        end
+
+        compressed_document
+      end
+
+      def decompress_document(document)
+        return document unless document[:_compressed]
+
+        decompressed_document = document.dup
+
+        # Decompress each compressed field
+        [:content_preview, :metadata].each do |field|
+          compressed_key = :"#{field}_compressed"
+          if document[compressed_key]
+            begin
+              decompressed_data = LZ4.decompress(document[compressed_key])
+              decompressed_document[field] = field == :metadata ? YAML.safe_load(decompressed_data) : decompressed_data
+              decompressed_document.delete(compressed_key)
+              decompressed_document.delete(:"#{field}_original_size")
+            rescue => e
+              warn "Decompression failed for #{field}: #{e.message}" if ENV['LEYLINE_DEBUG']
+              # Continue with missing field rather than breaking entirely
+            end
+          end
+        end
+
+        decompressed_document.delete(:_compressed)
+        decompressed_document
+      end
+
+      def decompress_if_needed(document)
+        document[:_compressed] ? decompress_document(document) : document
+      end
+
+      def calculate_compressed_document_size(document)
+        size = 0
+        document.each do |key, value|
+          case value
+          when String
+            size += value.bytesize
+          when Integer, Numeric
+            size += 8
+          when Time
+            size += 16
+          when Hash
+            size += value.to_yaml.bytesize
+          else
+            size += value.to_s.bytesize
+          end
+        end
+        size
+      end
+
       def calculate_relevance_score(document, query)
+        # Ensure document is decompressed for search
+        searchable_document = decompress_if_needed(document)
         score = 0
 
         # Title match (highest weight)
-        if document[:title]&.downcase&.include?(query)
+        if searchable_document[:title]&.downcase&.include?(query)
           score += 100
         end
 
         # ID match (high weight)
-        if document[:id]&.include?(query)
+        if searchable_document[:id]&.include?(query)
           score += 50
         end
 
         # Content preview match (medium weight)
-        if document[:content_preview]&.downcase&.include?(query)
+        if searchable_document[:content_preview]&.downcase&.include?(query)
           score += 25
         end
 
         # Category match (low weight)
-        if document[:category]&.include?(query)
+        if searchable_document[:category]&.include?(query)
           score += 10
         end
 
