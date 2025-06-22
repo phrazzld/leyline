@@ -196,6 +196,72 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
       end
     end
 
+    context 'edge cases and error handling' do
+      it 'handles documents with nil content preview in verbose mode' do
+        # Mock metadata cache to return a document with nil content_preview
+        mock_document = {
+          id: 'test-nil-preview',
+          title: 'Document with Nil Preview',
+          path: '/test/nil-preview.md',
+          category: 'testing',
+          type: 'binding',
+          metadata: {},
+          content_preview: nil,  # This used to cause NoMethodError
+          content_hash: 'abc123',
+          size: 500,
+          modified_time: Time.now,
+          scan_time: Time.now
+        }
+
+        allow_any_instance_of(Leyline::Discovery::MetadataCache)
+          .to receive(:documents_for_category)
+          .with('testing')
+          .and_return([mock_document])
+
+        cli.options = { verbose: true }
+
+        # This should not raise NoMethodError
+        expect {
+          output = capture_stdout { cli.show('testing') }
+
+          # Should show the document without the preview
+          expect(output).to include('Document with Nil Preview')
+          expect(output).to include('ID: test-nil-preview')
+          expect(output).not_to include('Preview:')
+        }.not_to raise_error
+      end
+
+      it 'handles documents with empty content preview in verbose mode' do
+        mock_document = {
+          id: 'test-empty-preview',
+          title: 'Document with Empty Preview',
+          path: '/test/empty-preview.md',
+          category: 'testing',
+          type: 'binding',
+          metadata: {},
+          content_preview: '',  # Empty string should also not show preview
+          content_hash: 'abc123',
+          size: 500,
+          modified_time: Time.now,
+          scan_time: Time.now
+        }
+
+        allow_any_instance_of(Leyline::Discovery::MetadataCache)
+          .to receive(:documents_for_category)
+          .with('testing')
+          .and_return([mock_document])
+
+        cli.options = { verbose: true }
+
+        output = capture_stdout { cli.show('testing') }
+
+        # Should show the document without the preview (empty string)
+        expect(output).to include('Document with Empty Preview')
+        expect(output).to include('ID: test-empty-preview')
+        expect(output).not_to include('Preview:')
+      end
+    end
+
     context 'with stats option' do
       before { cli.options = { stats: true } }
 

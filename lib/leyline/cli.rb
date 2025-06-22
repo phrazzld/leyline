@@ -226,7 +226,7 @@ module Leyline
         puts "  Type: #{doc[:type]}"
         puts "  Path: #{doc[:path]}" if verbose
 
-        if verbose && !doc[:content_preview].empty?
+        if verbose && doc[:content_preview] && !doc[:content_preview].empty?
           puts "  Preview: #{doc[:content_preview]}"
         end
 
