@@ -1,6 +1,6 @@
-# Multi-Agent Code Review with Thinktank Synthesis for Leyline
+# Multi-Agent Code Review for Leyline
 
-Generate a comprehensive code review using parallel expert analysis and multi-model thinktank synthesis, tailored for Leyline's Ruby CLI gem and knowledge management system.
+Generate a comprehensive code review using parallel expert analysis, tailored for Leyline's Ruby CLI gem and knowledge management system.
 
 **Usage**: `/project:review`
 
@@ -16,12 +16,15 @@ Generate a comprehensive code review using parallel expert analysis and multi-mo
 
 2. **Generate Full Diff and Context**
    ```bash
-   git diff ${BASE_BRANCH}...HEAD > current_diff.patch
    git diff --name-status ${BASE_BRANCH}...HEAD > changed_files_summary.txt
    ```
 
 3. **Create REVIEW-CONTEXT.md**
-   ```markdown
+   ```bash
+   # IMPORTANT: DO NOT READ THE FULL DIFF - IT'S TOO LARGE
+   # Use bash commands to create the file efficiently
+
+   cat > REVIEW-CONTEXT.md << 'EOF'
    # Code Review Context
 
    ## PR Details
@@ -44,7 +47,10 @@ Generate a comprehensive code review using parallel expert analysis and multi-mo
      * Knowledge base (tenets and bindings in `docs/`)
 
    ## Full Diff
-   $(cat current_diff.patch)
+   EOF
+
+   # Append the full diff directly without reading it
+   git diff ${BASE_BRANCH}...HEAD >> REVIEW-CONTEXT.md
    ```
 
 ### Phase 2: Parallel Expert Review
@@ -69,66 +75,30 @@ Prompt: "As Kent Beck, review this code for testability, quality practices, and 
 **Task 6: Leyline Standards Compliance**
 Prompt: "Review this code specifically for Leyline standards compliance. Check alignment with core tenets (simplicity, testability, maintainability, modularity, etc.) and applicable bindings. Evaluate YAML front-matter standards, conventional commits compliance, documentation quality, and adherence to Leyline's 80/20 solution patterns. Assess how well changes support the knowledge management mission and maintain backward compatibility."
 
-### Phase 4: Thinktank Multi-Model Analysis
-Execute specialized thinktank analyses:
+### Phase 4: Leyline-Specific Validation
 
-#### Ruby/CLI-Focused Review (functional and integration issues):
 ```bash
-thinktank-wrapper --template review-ruby-cli \
-  --include-leyline \
-  --inject REVIEW-CONTEXT.md \
-  --model o3 \
-  --model o4-mini \
-  --model gemini-2.5-pro \
-  --model gemini-2.5-flash \
-  --model openrouter/openrouter/llama-4-maverick \
-  --model openrouter/openrouter/deepseek-r1-0528 \
-  --synthesis-model gemini-2.5-pro \
-  --output-dir ./thinktank-output \
-  lib/leyline/ spec/ tools/ *.rb *.md
+# Run Leyline's essential validation suite
+ruby tools/run_ci_checks.rb --essential
+
+# Check specific Ruby patterns if applicable
+if [[ -f .rubocop.yml ]]; then
+  bundle exec rubocop --format simple
+fi
+
+# Validate any new bindings or tenets
+if git diff --name-only ${BASE_BRANCH}...HEAD | grep -q "docs/.*\.md"; then
+  ruby tools/validate_front_matter.rb
+fi
 ```
 
-#### Performance & Cache Review (optimization and efficiency):
-```bash
-thinktank-wrapper --template review-performance \
-  --include-leyline \
-  --inject REVIEW-CONTEXT.md \
-  --model o3 \
-  --model gemini-2.5-pro \
-  --model openrouter/openrouter/llama-4-scout \
-  --synthesis-model o3 \
-  --output-dir ./thinktank-output-perf \
-  lib/leyline/cache/ lib/leyline/sync/ spec/performance/ tools/validate_cache_performance.rb
-```
-
-### Phase 5: Superior Synthesis
-1. **Read All Review Outputs:**
-   - Expert subagent reviews (6 perspectives)
-   - `./thinktank-output/synthesis.md` (Ruby/CLI focus)
-   - `./thinktank-output-perf/synthesis.md` (Performance focus)
-
-2. **Generate Leyline-Specific Validation:**
-   ```bash
-   # Run Leyline's essential validation suite
-   ruby tools/run_ci_checks.rb --essential
-
-   # Check specific Ruby patterns if applicable
-   if [[ -f .rubocop.yml ]]; then
-     bundle exec rubocop --format simple
-   fi
-
-   # Validate any new bindings or tenets
-   if git diff --name-only ${BASE_BRANCH}...HEAD | grep -q "docs/.*\.md"; then
-     ruby tools/validate_front_matter.rb
-   fi
-   ```
-
-3. **Create Final CODE_REVIEW.md:**
+### Phase 5: Final Synthesis
+**Create Final CODE_REVIEW.md:**
    ```markdown
    # Code Review: ${CURRENT_BRANCH}
 
    ## Executive Summary
-   [High-level overview combining all expert perspectives and thinktank synthesis]
+   [High-level overview combining all expert perspectives]
 
    ## Leyline Standards Compliance
    ### ✅ Tenet Alignment
@@ -219,8 +189,7 @@ thinktank-wrapper --template review-performance \
 ### Phase 6: Cleanup & Validation
 ```bash
 # Clean up temporary files
-rm -f current_diff.patch changed_files_summary.txt REVIEW-CONTEXT.md
-rm -rf ./thinktank-output ./thinktank-output-perf
+rm -f REVIEW-CONTEXT.md changed_files_summary.txt
 
 # Preserve final review
 echo "✅ Code review complete: CODE_REVIEW.md"
