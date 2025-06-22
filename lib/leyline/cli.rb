@@ -248,6 +248,15 @@ module Leyline
 
       if results.empty?
         puts "No results found for '#{query}'"
+
+        # Provide "Did you mean?" suggestions
+        suggestions = metadata_cache.suggest_corrections(query)
+        if suggestions.any?
+          puts
+          puts "Did you mean:"
+          suggestions.each { |suggestion| puts "  #{suggestion}" }
+        end
+
         return
       end
 

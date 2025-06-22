@@ -175,6 +175,49 @@ module Leyline
         @memory_usage
       end
 
+      # Generate "Did you mean?" suggestions for failed searches
+      def suggest_corrections(query, max_suggestions = 3)
+        return [] if query.nil? || query.strip.empty? || query.length < 3
+
+        query_normalized = query.downcase.strip
+        candidates = []
+
+        # Collect potential suggestions from document titles
+        @memory_cache.each_value do |document|
+          searchable_document = decompress_if_needed(document)
+          title = searchable_document[:title]
+          next unless title
+
+          # Check whole title
+          title_normalized = title.downcase
+          if title_normalized != query_normalized
+            distance = edit_distance(query_normalized, title_normalized)
+            if distance > 0 && distance <= 3 && distance < query_normalized.length
+              candidates << [title, distance]
+            end
+          end
+
+          # Check individual words in title
+          title.split(/\s+/).each do |word|
+            word_normalized = word.downcase
+            next if word_normalized.length < 3
+
+            if word_normalized != query_normalized
+              distance = edit_distance(query_normalized, word_normalized)
+              if distance > 0 && distance <= 2 && distance < query_normalized.length
+                candidates << [word, distance]
+              end
+            end
+          end
+        end
+
+        # Sort by distance and remove duplicates
+        candidates.uniq { |suggestion, _| suggestion.downcase }
+                  .sort_by(&:last)
+                  .first(max_suggestions)
+                  .map(&:first)
+      end
+
       # Cache a document with optional compression
       def cache_document(document)
         # Apply compression if enabled
@@ -481,9 +524,12 @@ module Leyline
         searchable_document = decompress_if_needed(document)
         score = 0
 
-        # Title match (highest weight)
-        if searchable_document[:title]&.downcase&.include?(query)
-          score += 100
+        # Title matches (exact and fuzzy)
+        title = searchable_document[:title]&.downcase
+        if title&.include?(query)
+          score += 100  # Exact substring match
+        elsif title && fuzzy_match?(title, query)
+          score += fuzzy_score(title, query)  # Fuzzy match with distance-based scoring
         end
 
         # ID match (high weight)
@@ -492,8 +538,11 @@ module Leyline
         end
 
         # Content preview match (medium weight)
-        if searchable_document[:content_preview]&.downcase&.include?(query)
+        content = searchable_document[:content_preview]&.downcase
+        if content&.include?(query)
           score += 25
+        elsif content && fuzzy_match?(content, query)
+          score += fuzzy_score(content, query) / 2  # Lower weight for content fuzzy match
         end
 
         # Category match (low weight)
@@ -502,6 +551,91 @@ module Leyline
         end
 
         score
+      end
+
+      # Simple fuzzy matching with edit distance threshold
+      def fuzzy_match?(text, query)
+        return false if text.nil? || query.nil? || query.length < 3
+
+        # Try exact word matches first (more efficient)
+        text_words = text.split(/\s+/)
+        query_words = query.split(/\s+/)
+
+        # Check for fuzzy word matches
+        query_words.any? do |q_word|
+          text_words.any? { |t_word| word_fuzzy_match?(t_word, q_word) }
+        end || whole_string_fuzzy_match?(text, query)
+      end
+
+      # Calculate fuzzy score based on edit distance
+      def fuzzy_score(text, query)
+        # Word-level fuzzy matching
+        text_words = text.split(/\s+/)
+        query_words = query.split(/\s+/)
+
+        max_word_score = 0
+        query_words.each do |q_word|
+          text_words.each do |t_word|
+            if word_fuzzy_match?(t_word, q_word)
+              distance = edit_distance(t_word, q_word)
+              word_score = case distance
+                when 0 then 90  # Exact word match
+                when 1 then 75  # Single character difference
+                when 2 then 60  # Two character difference
+                else 40         # More differences but still acceptable
+              end
+              max_word_score = [max_word_score, word_score].max
+            end
+          end
+        end
+
+        max_word_score
+      end
+
+      # Check if two words are fuzzy matches
+      def word_fuzzy_match?(word1, word2)
+        return false if word1.nil? || word2.nil? || word1.length < 3 || word2.length < 3
+
+        # Quick length check - if too different, no match
+        return false if (word1.length - word2.length).abs > 3
+
+        edit_distance(word1, word2) <= 2
+      end
+
+      # Check fuzzy match for whole strings (fallback)
+      def whole_string_fuzzy_match?(text, query)
+        return false if text.length > query.length * 2 || query.length > text.length * 2
+
+        edit_distance(text, query) <= [query.length / 3, 3].min
+      end
+
+      # Simple Levenshtein distance implementation
+      def edit_distance(str1, str2)
+        return str2.length if str1.empty?
+        return str1.length if str2.empty?
+
+        # Use single dimensional array for memory efficiency
+        prev_row = (0..str2.length).to_a
+
+        str1.each_char.with_index do |char1, i|
+          curr_row = [i + 1]
+
+          str2.each_char.with_index do |char2, j|
+            # Calculate cost
+            cost = char1 == char2 ? 0 : 1
+
+            # Choose minimum operation
+            curr_row << [
+              prev_row[j + 1] + 1,     # deletion
+              curr_row[j] + 1,         # insertion
+              prev_row[j] + cost       # substitution
+            ].min
+          end
+
+          prev_row = curr_row
+        end
+
+        prev_row.last
       end
     end
   end
