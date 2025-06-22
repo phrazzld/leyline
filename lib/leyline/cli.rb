@@ -8,6 +8,8 @@ require_relative 'sync/git_client'
 require_relative 'sync/file_syncer'
 require_relative 'cache/file_cache'
 require_relative 'cache/cache_stats'
+require_relative 'discovery/metadata_cache'
+require_relative 'discovery/document_scanner'
 
 module Leyline
   class CLI < Thor
@@ -16,6 +18,50 @@ module Leyline
     desc 'version', 'Show version information'
     def version
       puts VERSION
+    end
+
+    desc 'categories', 'List all available leyline categories'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed category information',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    def categories
+      perform_discovery_command(:categories, options)
+    end
+
+    desc 'show CATEGORY', 'Show documents in a specific category'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed document information',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    def show(category)
+      perform_discovery_command(:show, options.merge(category: category))
+    end
+
+    desc 'search QUERY', 'Search leyline documents by content'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed search results',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    method_option :limit,
+                  type: :numeric,
+                  desc: 'Maximum number of results to show',
+                  default: 10,
+                  aliases: '-l'
+    def search(query)
+      perform_discovery_command(:search, options.merge(query: query))
     end
 
     desc 'sync [PATH]', 'Synchronize leyline standards to target directory'
@@ -86,6 +132,222 @@ module Leyline
     default_task :sync
 
     private
+
+    def perform_discovery_command(command, options)
+      start_time = Time.now
+      verbose = options[:verbose] || false
+      show_stats = options[:stats] || false
+
+      begin
+        # Initialize cache infrastructure
+        file_cache = create_file_cache_if_needed(verbose)
+        metadata_cache = Discovery::MetadataCache.new(file_cache: file_cache)
+
+        # Execute the specific discovery command
+        case command
+        when :categories
+          execute_categories_command(metadata_cache, options)
+        when :show
+          execute_show_command(metadata_cache, options)
+        when :search
+          execute_search_command(metadata_cache, options)
+        else
+          puts "Unknown discovery command: #{command}"
+          exit 1
+        end
+
+        # Show performance statistics if requested
+        if show_stats
+          display_discovery_stats(metadata_cache, start_time)
+        end
+
+      rescue => e
+        puts "Error during #{command}: #{e.message}"
+        puts e.backtrace if verbose
+        exit 1
+      end
+    end
+
+    def execute_categories_command(metadata_cache, options)
+      verbose = options[:verbose] || false
+      categories = metadata_cache.categories
+
+      if categories.empty?
+        puts "No categories found."
+        return
+      end
+
+      puts "Available Categories (#{categories.length}):"
+      puts
+
+      categories.each do |category|
+        documents = metadata_cache.documents_for_category(category)
+
+        if verbose
+          puts "#{category} (#{documents.length} documents)"
+          documents.each do |doc|
+            puts "  - #{doc[:title]} (#{doc[:id]})"
+          end
+          puts
+        else
+          puts "  #{category} (#{documents.length} documents)"
+        end
+      end
+    end
+
+    def execute_show_command(metadata_cache, options)
+      category = options[:category]
+      verbose = options[:verbose] || false
+
+      documents = metadata_cache.documents_for_category(category)
+
+      if documents.empty?
+        puts "No documents found in category '#{category}'"
+        puts
+        puts "Available categories: #{metadata_cache.categories.join(', ')}"
+        return
+      end
+
+      puts "Documents in '#{category}' (#{documents.length}):"
+      puts
+
+      documents.each do |doc|
+        puts "#{doc[:title]}"
+        puts "  ID: #{doc[:id]}"
+        puts "  Type: #{doc[:type]}"
+        puts "  Path: #{doc[:path]}" if verbose
+
+        if verbose && !doc[:content_preview].empty?
+          puts "  Preview: #{doc[:content_preview]}"
+        end
+
+        puts
+      end
+    end
+
+    def execute_search_command(metadata_cache, options)
+      query = options[:query]
+      verbose = options[:verbose] || false
+      limit = options[:limit] || 10
+
+      if query.nil? || query.strip.empty?
+        puts "Search query cannot be empty"
+        exit 1
+      end
+
+      results = metadata_cache.search(query)
+
+      if results.empty?
+        puts "No results found for '#{query}'"
+        return
+      end
+
+      # Limit results
+      results = results.first(limit)
+
+      puts "Search Results for '#{query}' (#{results.length} of #{metadata_cache.search(query).length}):"
+      puts
+
+      results.each_with_index do |result, index|
+        doc = result[:document]
+        score = result[:score]
+        category = result[:category]
+
+        puts "#{index + 1}. #{doc[:title]}"
+        puts "   Category: #{category} | Type: #{doc[:type]} | ID: #{doc[:id]}"
+
+        if verbose
+          puts "   Score: #{score} | Path: #{doc[:path]}"
+        end
+
+        unless doc[:content_preview].empty?
+          puts "   #{doc[:content_preview]}"
+        end
+
+        puts
+      end
+    end
+
+    def create_file_cache_if_needed(verbose)
+      # Reuse existing cache creation logic but don't fail if cache unavailable
+      begin
+        cache = Cache::FileCache.new
+
+        if verbose && cache
+          health = cache.health_status
+          unless health[:healthy]
+            puts "Warning: Cache health issues detected (continuing anyway)"
+          end
+        end
+
+        cache
+      rescue => e
+        puts "Warning: Cache unavailable (#{e.message}), using slower fallback" if verbose
+        nil
+      end
+    end
+
+    def display_discovery_stats(metadata_cache, start_time)
+      total_time = Time.now - start_time
+      cache_stats = metadata_cache.performance_stats
+
+      puts "\n" + "="*50
+      puts "DISCOVERY PERFORMANCE STATISTICS"
+      puts "="*50
+
+      puts "Command Performance:"
+      puts "  Total time: #{total_time.round(3)}s"
+      puts "  Cache hit ratio: #{(cache_stats[:hit_ratio] * 100).round(1)}%"
+      puts "  Documents cached: #{cache_stats[:document_count]}"
+      puts "  Categories: #{cache_stats[:category_count]}"
+      puts "  Memory usage: #{format_bytes(cache_stats[:memory_usage])}"
+
+      # New: Operation-specific microsecond metrics
+      if cache_stats[:operation_metrics]&.any?
+        puts "\nOperation Performance (Microsecond Precision):"
+        cache_stats[:operation_metrics].each do |operation, metrics|
+          avg_ms = (metrics[:avg_time_us] / 1000.0).round(3)
+          min_ms = (metrics[:min_time_us] / 1000.0).round(3)
+          max_ms = (metrics[:max_time_us] / 1000.0).round(3)
+
+          puts "  #{operation.to_s.tr('_', ' ').capitalize}:"
+          puts "    Operations: #{metrics[:count]}"
+          puts "    Average: #{avg_ms}ms (#{metrics[:avg_time_us].round(0)}μs)"
+          puts "    Range: #{min_ms}ms - #{max_ms}ms"
+          puts "    Target met: #{avg_ms < 1000 ? '✅' : '❌'} (<1000ms)"
+        end
+      end
+
+      # Performance summary
+      if summary = cache_stats[:performance_summary]
+        puts "\nPerformance Summary:"
+        puts "  Total operations: #{summary[:total_discovery_operations]}"
+        puts "  Total operation time: #{summary[:total_operation_time_ms].round(3)}ms"
+        puts "  Average per operation: #{summary[:avg_operation_time_ms].round(3)}ms"
+        puts "  All targets met: #{summary[:performance_target_met] ? '✅' : '❌'}"
+      end
+
+      if cache_stats[:scan_count] > 0
+        puts "\nCache Operations:"
+        puts "  Scan operations: #{cache_stats[:scan_count]}"
+        puts "  Last scan: #{cache_stats[:last_scan]&.strftime('%H:%M:%S') || 'never'}"
+      end
+    end
+
+    def format_bytes(bytes)
+      return '0 B' if bytes == 0
+
+      units = %w[B KB MB GB]
+      unit_index = 0
+      size = bytes.to_f
+
+      while size >= 1024 && unit_index < units.length - 1
+        size /= 1024
+        unit_index += 1
+      end
+
+      "#{size.round(1)} #{units[unit_index]}"
+    end
 
     def perform_sync(target_path, categories, options)
       force = options[:force] || false
