@@ -11,12 +11,12 @@
 - ✅ Test coverage: 263/263 tests passing across entire codebase
 - ✅ Zero breaking changes: All existing CLI workflows preserved
 
-**🚨 MERGE BLOCKERS**: 3 critical bugs found in comprehensive code review (synthesis of 11 AI models)
-- ❌ Title extraction crashes on documents without headers (affects all discovery commands)
-- ❌ Memory accounting bug causes cache corruption over time
-- ❌ CLI crashes on verbose output for certain documents
+**✅ MERGE BLOCKERS RESOLVED**: All 3 critical bugs fixed through comprehensive code review (synthesis of 11 AI models)
+- ✅ Title extraction crashes on documents without headers → Fixed with method signature update + tests
+- ✅ Memory accounting bug causes cache corruption over time → Fixed with proper memory tracking + 8 test cases
+- ✅ CLI crashes on verbose output for certain documents → Fixed with nil-safe conditions + regression tests
 
-**🚀 READY TO SHIP**: Once critical bugs fixed (~10 lines of code), this delivers substantial user value
+**🚀 READY TO SHIP**: All critical bugs fixed! Branch is now ready for safe merge and delivers substantial user value
 
 ### Core Implementation Tasks (COMPLETED)
 
@@ -61,7 +61,7 @@
 
 - [x] **[HIGH] Fix memory usage double-counting in MetadataCache document updates**: In `lib/leyline/discovery/metadata_cache.rb:317-329`, the `cache_document` method increments `@memory_usage` for new documents but doesn't decrement for replaced documents, causing memory accounting corruption and incorrect LRU eviction behavior. **Fix**: Add `if (old_document = @memory_cache[document[:path]]); @memory_usage -= old_document[:size]; end` before caching new document. **Impact**: Memory leaks and unpredictable cache behavior in long-running usage. **Effort**: 3 lines added. ✅ **COMPLETED**: Fixed memory accounting, added comprehensive test suite (8 test cases), all tests passing, verified manual testing with different document sizes.
 
-- [ ] **[HIGH] Fix nil content preview crash in CLI verbose output**: In `lib/leyline/cli.rb:247-250`, the code calls `doc[:content_preview].empty?` without checking for nil, causing `NoMethodError` crashes in `leyline show --verbose` command when documents lack content previews. **Fix**: Change condition to `if verbose && doc[:content_preview] && !doc[:content_preview].empty?`. **Impact**: CLI crashes on verbose output for certain documents. **Effort**: 1 line changed.
+- [x] **[HIGH] Fix nil content preview crash in CLI verbose output**: In `lib/leyline/cli.rb:247-250`, the code calls `doc[:content_preview].empty?` without checking for nil, causing `NoMethodError` crashes in `leyline show --verbose` command when documents lack content previews. **Fix**: Change condition to `if verbose && doc[:content_preview] && !doc[:content_preview].empty?`. **Impact**: CLI crashes on verbose output for certain documents. **Effort**: 1 line changed. ✅ **COMPLETED**: Fixed nil-unsafe condition, added 2 comprehensive regression tests for nil and empty content preview edge cases, all 55 CLI discovery tests passing.
 
 ### Success Criteria Validation
 
