@@ -126,6 +126,8 @@ module Leyline
         {
           # Existing stats
           hit_ratio: hit_ratio,
+          hit_count: @hit_count,
+          miss_count: @miss_count,
           memory_usage: @memory_usage,
           document_count: @memory_cache.size,
           category_count: @categories_index.size,
