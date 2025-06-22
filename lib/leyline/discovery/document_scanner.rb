@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'digest'
+require 'concurrent-ruby'
 
 module Leyline
   module Discovery
@@ -13,14 +14,19 @@ module Leyline
       # Performance optimization constants
       MAX_FRONT_MATTER_SIZE = 8 * 1024  # 8KB max front-matter size
       CONTENT_PREVIEW_LENGTH = 200      # Characters for search preview
+      PARALLEL_THRESHOLD = 10           # Use parallel processing for 10+ files
+      MAX_THREADS = 4                   # Limit concurrent threads for I/O
 
       def initialize
-        @scan_stats = {
+        @scan_stats = Concurrent::Hash.new
+        @scan_stats.merge!({
           files_scanned: 0,
           yaml_parse_errors: 0,
           total_bytes_processed: 0,
-          avg_scan_time: 0.0
-        }
+          avg_scan_time: 0.0,
+          parallel_batches: 0,
+          sequential_batches: 0
+        })
       end
 
       # Scan a single document file for metadata
@@ -61,15 +67,16 @@ module Leyline
       end
 
       # Batch scan multiple documents with optimized I/O
+      # Uses parallel processing for large batches (10+ files)
       def scan_documents(file_paths)
-        documents = []
+        return [] if file_paths.empty?
 
-        file_paths.each do |path|
-          document = scan_document(path)
-          documents << document if document
+        # Use parallel processing for larger batches
+        if file_paths.length >= PARALLEL_THRESHOLD
+          scan_documents_parallel(file_paths)
+        else
+          scan_documents_sequential(file_paths)
         end
-
-        documents
       end
 
       # Get scanning performance statistics
@@ -79,15 +86,73 @@ module Leyline
 
       # Reset statistics (useful for testing)
       def reset_statistics!
-        @scan_stats = {
+        @scan_stats = Concurrent::Hash.new
+        @scan_stats.merge!({
           files_scanned: 0,
           yaml_parse_errors: 0,
           total_bytes_processed: 0,
-          avg_scan_time: 0.0
-        }
+          avg_scan_time: 0.0,
+          parallel_batches: 0,
+          sequential_batches: 0
+        })
       end
 
       private
+
+      # Parallel document scanning using ThreadPoolExecutor
+      def scan_documents_parallel(file_paths)
+        @scan_stats[:parallel_batches] += 1
+        start_time = Time.now
+
+        # Thread-safe results collection
+        results = Concurrent::Map.new
+
+        # Create thread pool with limited concurrency for I/O operations
+        pool = Concurrent::ThreadPoolExecutor.new(
+          min_threads: 1,
+          max_threads: MAX_THREADS,
+          max_queue: file_paths.length
+        )
+
+        # Submit all scanning tasks
+        futures = file_paths.map.with_index do |path, index|
+          Concurrent::Future.execute(executor: pool) do
+            document = scan_document(path)
+            results[index] = document if document
+          end
+        end
+
+        # Wait for all tasks to complete
+        futures.each(&:value)
+
+        # Shutdown the thread pool
+        pool.shutdown
+        pool.wait_for_termination(30) # 30 second timeout
+
+        # Extract results in original order
+        documents = []
+        file_paths.each_with_index do |_path, index|
+          documents << results[index] if results.key?(index)
+        end
+
+        total_time = Time.now - start_time
+        puts "Parallel scan: #{documents.length} documents in #{total_time.round(3)}s" if ENV['LEYLINE_DEBUG']
+
+        documents
+      end
+
+      # Sequential document scanning (fallback for small batches)
+      def scan_documents_sequential(file_paths)
+        @scan_stats[:sequential_batches] += 1
+        documents = []
+
+        file_paths.each do |path|
+          document = scan_document(path)
+          documents << document if document
+        end
+
+        documents
+      end
 
       # Optimized front-matter extraction using string operations
       # Avoids regex for better performance on large files

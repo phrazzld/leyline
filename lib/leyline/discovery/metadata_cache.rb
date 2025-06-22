@@ -2,6 +2,7 @@
 
 require 'digest'
 require 'yaml'
+require_relative 'document_scanner'
 
 module Leyline
   module Discovery
@@ -73,7 +74,7 @@ module Leyline
               results << {
                 document: document,
                 score: score,
-                category: extract_category_from_path(document[:path])
+                category: document[:category] # Use category from DocumentScanner
               }
             end
           end
@@ -189,22 +190,33 @@ module Leyline
         # Scan order optimized for cache performance:
         # 1. Check existing cache for unchanged files (cache hit)
         # 2. Only re-read files that have changed (cache miss)
-        # 3. Build optimized lookup structures
+        # 3. Build optimized lookup structures with parallel processing
 
         paths_to_scan = discover_document_paths
+        changed_paths = []
 
+        # First pass: check which files need scanning
         paths_to_scan.each do |path|
           begin
             if file_changed?(path)
               @miss_count += 1
-              document = load_document_metadata(path)
-              cache_document(document) if document
+              changed_paths << path
             else
               @hit_count += 1
             end
           rescue => e
             # Log error but continue scanning other documents
-            warn "Error scanning #{path}: #{e.message}"
+            warn "Error checking #{path}: #{e.message}"
+          end
+        end
+
+        # Second pass: scan changed files using parallel processing
+        if changed_paths.any?
+          scanner = DocumentScanner.new
+          documents = scanner.scan_documents(changed_paths)
+
+          documents.each do |document|
+            cache_document(document) if document
           end
         end
 
@@ -250,121 +262,18 @@ module Leyline
         false
       end
 
-      def load_document_metadata(path)
-        content = File.read(path)
 
-        # Extract YAML front-matter efficiently
-        front_matter = extract_front_matter(content)
-        return nil unless front_matter
-
-        # Calculate content hash for cache invalidation
-        content_hash = Digest::SHA256.hexdigest(content)
-
-        # Build document metadata structure
-        document = {
-          id: front_matter['id'],
-          title: extract_title(content),
-          path: path,
-          category: extract_category_from_path(path),
-          type: determine_document_type(path),
-          metadata: front_matter,
-          content_preview: extract_content_preview(content),
-          content_hash: content_hash,
-          size: content.bytesize
-        }
-
-        # Track content hash and mtime for change detection
-        @content_hashes[path] = {
-          hash: content_hash,
-          mtime: File.mtime(path)
-        }
-
-        document
-      end
-
-      def extract_front_matter(content)
-        # Efficient YAML front-matter extraction
-        return nil unless content.start_with?('---')
-
-        # Find the end of front-matter
-        end_marker = content.index("\n---\n", 4)
-        return nil unless end_marker
-
-        yaml_content = content[4...end_marker]
-        YAML.safe_load(yaml_content)
-      rescue => e
-        warn "YAML parsing error: #{e.message}"
-        nil
-      end
-
-      def extract_title(content)
-        # Extract title from first markdown header
-        lines = content.lines
-        lines.each do |line|
-          if line.start_with?('#')
-            return line.gsub(/^#+\s*/, '').strip
-          end
-        end
-        'Untitled'
-      end
-
-      def extract_category_from_path(path)
-        # Extract category from path structure
-        # e.g., docs/bindings/categories/typescript/file.md -> typescript
-        path_parts = path.split('/')
-
-        if path_parts.include?('categories')
-          category_index = path_parts.index('categories')
-          return path_parts[category_index + 1] if category_index && path_parts[category_index + 1]
-        elsif path_parts.include?('core')
-          return 'core'
-        elsif path_parts.include?('tenets')
-          return 'tenets'
-        end
-
-        'unknown'
-      end
-
-      def determine_document_type(path)
-        return 'tenet' if path.include?('/tenets/')
-        return 'binding' if path.include?('/bindings/')
-        'unknown'
-      end
-
-      def extract_content_preview(content)
-        # Extract first paragraph after front-matter for search previews
-        lines = content.lines
-        in_front_matter = false
-        front_matter_ended = false
-
-        lines.each do |line|
-          line = line.strip
-
-          if line == '---'
-            if in_front_matter
-              front_matter_ended = true
-              in_front_matter = false
-            else
-              in_front_matter = true
-            end
-            next
-          end
-
-          next if in_front_matter
-          next if !front_matter_ended
-          next if line.empty? || line.start_with?('#')
-
-          # Return first substantial paragraph
-          return line if line.length > 20
-        end
-
-        ''
-      end
 
       def cache_document(document)
         # Add to memory cache with size tracking
         @memory_cache[document[:path]] = document
         @memory_usage += document[:size]
+
+        # Track content hash and mtime for change detection
+        @content_hashes[document[:path]] = {
+          hash: document[:content_hash],
+          mtime: document[:modified_time]
+        }
 
         # Implement simple LRU if memory usage exceeds limit
         if @memory_usage > MAX_MEMORY_USAGE
