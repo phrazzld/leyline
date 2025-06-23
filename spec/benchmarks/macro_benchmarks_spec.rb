@@ -603,7 +603,56 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
   end
 
   def get_memory_usage_mb
-    `ps -o rss= -p #{Process.pid}`.to_i / 1024.0
+    @memory_strategy ||= detect_memory_strategy
+    @memory_strategy.call
+  rescue => e
+    warn "Memory measurement failed: #{e.message}" if ENV['LEYLINE_DEBUG']
+    0.0
+  end
+
+  private
+
+  def detect_memory_strategy
+    require 'rbconfig'
+
+    case RbConfig::CONFIG['host_os']
+    when /mswin|mingw|cygwin/
+      method(:windows_memory)
+    when /darwin/
+      method(:macos_memory)
+    when /linux/
+      method(:linux_memory)
+    else
+      method(:unix_memory)
+    end
+  end
+
+  def windows_memory
+    output = `wmic process where processid=#{Process.pid} get WorkingSetSize /format:list 2>nul`
+    if match = output.match(/WorkingSetSize=(\d+)/)
+      match[1].to_i / (1024.0 * 1024.0)
+    else
+      0.0
+    end
+  end
+
+  def macos_memory
+    `ps -o rss= -p #{Process.pid} 2>/dev/null`.to_i / 1024.0
+  end
+
+  def linux_memory
+    status = File.read("/proc/#{Process.pid}/status")
+    if match = status.match(/VmRSS:\s*(\d+)\s*kB/)
+      match[1].to_f / 1024.0
+    else
+      unix_memory
+    end
+  rescue
+    unix_memory
+  end
+
+  def unix_memory
+    `ps -o rss= -p #{Process.pid} 2>/dev/null`.to_i / 1024.0
   end
 
   def generate_benchmark_report(results)
