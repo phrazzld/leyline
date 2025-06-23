@@ -2,6 +2,8 @@
 
 require 'digest'
 require 'fileutils'
+require_relative 'errors'
+require_relative 'platform_helper'
 
 module Leyline
   # File comparison service for transparency commands
@@ -59,17 +61,33 @@ module Leyline
       raise ComparisonError, "File A does not exist: #{file_a}" unless File.exist?(file_a)
       raise ComparisonError, "File B does not exist: #{file_b}" unless File.exist?(file_b)
 
-      {
-        file_a: file_a,
-        file_b: file_b,
-        identical: files_identical?(file_a, file_b),
-        size_a: File.size(file_a),
-        size_b: File.size(file_b),
-        hash_a: content_hash(file_a),
-        hash_b: content_hash(file_b),
-        modified_time_a: File.mtime(file_a),
-        modified_time_b: File.mtime(file_b)
-      }
+      begin
+        {
+          file_a: file_a,
+          file_b: file_b,
+          identical: files_identical?(file_a, file_b),
+          size_a: File.size(file_a),
+          size_b: File.size(file_b),
+          hash_a: content_hash(file_a),
+          hash_b: content_hash(file_b),
+          modified_time_a: File.mtime(file_a),
+          modified_time_b: File.mtime(file_b)
+        }
+      rescue Errno::EACCES => e
+        raise ComparisonFailedError.new(
+          "Permission denied comparing files",
+          reason: :permission_denied,
+          file_a: file_a,
+          file_b: file_b
+        )
+      rescue Encoding::InvalidByteSequenceError => e
+        raise ComparisonFailedError.new(
+          "File encoding error during comparison",
+          reason: :encoding_error,
+          file_a: file_a,
+          file_b: file_b
+        )
+      end
     end
 
     # Create file manifest for tracking sync state
@@ -82,6 +100,15 @@ module Leyline
 
         begin
           manifest[file_path] = content_hash(file_path)
+        rescue ComparisonFailedError => e
+          # For manifest creation, we can continue with warnings for individual file failures
+          if e.context[:reason] == :permission_denied
+            warn "Warning: Permission denied reading #{file_path}" if defined?(@verbose) && @verbose
+          elsif e.context[:reason] == :encoding_error
+            warn "Warning: Encoding error in #{file_path}" if defined?(@verbose) && @verbose
+          else
+            warn "Warning: Could not hash file #{file_path}: #{e.message}"
+          end
         rescue => e
           # Skip files that can't be read but don't fail entire operation
           warn "Warning: Could not hash file #{file_path}: #{e.message}"
@@ -96,6 +123,12 @@ module Leyline
     def files_identical?(file_a, file_b)
       return false unless File.exist?(file_a) && File.exist?(file_b)
       return true if file_a == file_b
+
+      # Handle platform-specific path normalization
+      if PlatformHelper.windows?
+        # Windows: case-insensitive comparison
+        return true if file_a.downcase == file_b.downcase
+      end
 
       # Quick size check first
       return false if File.size(file_a) != File.size(file_b)
@@ -129,6 +162,41 @@ module Leyline
       end
 
       hash
+    rescue Errno::ENOENT => e
+      raise ComparisonFailedError.new(
+        "File not found during hash calculation",
+        reason: :file_not_found,
+        file: file_path
+      )
+    rescue Errno::EACCES => e
+      raise ComparisonFailedError.new(
+        "Permission denied reading file",
+        reason: :permission_denied,
+        file: file_path
+      )
+    rescue Errno::EMFILE, Errno::ENFILE => e
+      raise ComparisonFailedError.new(
+        "Too many open files",
+        reason: :too_many_files,
+        file: file_path,
+        suggestion: 'Close other applications or increase file descriptor limit'
+      )
+    rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError => e
+      raise ComparisonFailedError.new(
+        "File contains invalid encoding",
+        reason: :encoding_error,
+        file: file_path
+      )
+    rescue IOError => e
+      if e.message.include?('closed stream')
+        raise ComparisonFailedError.new(
+          "File was closed during read operation",
+          reason: :concurrent_modification,
+          file: file_path
+        )
+      else
+        raise ComparisonError, "Failed to read file #{file_path}: #{e.message}"
+      end
     rescue => e
       raise ComparisonError, "Failed to read file #{file_path}: #{e.message}"
     end

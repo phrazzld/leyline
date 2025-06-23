@@ -14,6 +14,9 @@ require 'leyline/cli/options'
 require 'leyline/sync/git_client'
 require 'leyline/sync/file_syncer'
 
+# Load shared examples
+Dir[File.join(__dir__, 'support', 'shared_examples', '*.rb')].each { |f| require f }
+
 RSpec.configure do |config|
   # Use the expect syntax (not should)
   config.expect_with :rspec do |expectations|
@@ -38,4 +41,25 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 
   # Don't capture stdout/stderr globally - let individual tests handle it
+
+  # Performance test configuration
+  config.before(:example, :performance) do
+    # Disable verbose output during performance tests for cleaner results
+    @original_verbose = $VERBOSE
+    $VERBOSE = nil
+  end
+
+  config.after(:example, :performance) do
+    $VERBOSE = @original_verbose
+  end
+
+  # Tag configuration for performance tests
+  config.define_derived_metadata(file_path: %r{/spec/performance/}) do |metadata|
+    metadata[:performance] = true
+  end
+
+  # Aggregate failures for performance tests to get complete picture
+  config.define_derived_metadata(:performance) do |metadata|
+    metadata[:aggregate_failures] = true
+  end
 end

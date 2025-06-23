@@ -6,6 +6,7 @@ require_relative 'version'
 require_relative 'cli/options'
 require_relative 'sync/git_client'
 require_relative 'sync/file_syncer'
+require_relative 'sync_state'
 require_relative 'cache/file_cache'
 require_relative 'cache/cache_stats'
 require_relative 'discovery/metadata_cache'
@@ -609,6 +610,11 @@ module Leyline
         # Report results
         report_sync_results(results, verbose, stats: show_stats ? stats : nil, cache: cache)
 
+        # Save sync state for status/diff/update commands
+        if results[:errors].empty?
+          save_sync_state(leyline_target, categories, cache)
+        end
+
       ensure
         # Clean up temp directory
         git_client&.cleanup if temp_dir
@@ -667,6 +673,29 @@ module Leyline
         cache_directory_stats = cache&.directory_stats || {}
         puts stats.format_stats(cache_directory_stats)
       end
+    end
+
+    def save_sync_state(leyline_target, categories, cache)
+      # Save sync state for future status/diff/update commands
+      cache_dir = ENV['LEYLINE_CACHE_DIR'] || File.expand_path('~/.cache/leyline')
+      cache_dir = File.expand_path(cache_dir)
+      sync_state = SyncState.new(cache_dir)
+
+      # Build manifest of synced files
+      manifest = {}
+      Dir.glob(File.join(leyline_target, '**', '*.md')).each do |file|
+        relative_path = file.sub("#{leyline_target}/", '')
+        content = File.read(file)
+        manifest[relative_path] = Digest::SHA256.hexdigest(content)
+      end
+
+      # Save state with current timestamp and version
+      sync_state.save_sync_state({
+        categories: categories,
+        manifest: manifest,
+        leyline_version: VERSION,
+        timestamp: Time.now.to_s
+      })
     end
 
     def perform_transparency_command(command, options)
@@ -753,25 +782,39 @@ module Leyline
     end
 
     def execute_status_command(target_path, options, cache)
-      puts "Status command implementation coming in T004..."
-      puts "Path: #{target_path}"
-      puts "Categories: #{options[:categories]&.join(', ') || 'core'}"
-      puts "JSON output: #{options[:json] ? 'enabled' : 'disabled'}"
+      require_relative 'commands/status_command'
+
+      command_options = options.merge(
+        directory: target_path,
+        cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
+      )
+
+      status_command = Commands::StatusCommand.new(command_options)
+      status_command.execute
     end
 
     def execute_diff_command(target_path, options, cache)
-      puts "Diff command implementation coming in T005..."
-      puts "Path: #{target_path}"
-      puts "Categories: #{options[:categories]&.join(', ') || 'core'}"
-      puts "Format: #{options[:format] || 'text'}"
+      require_relative 'commands/diff_command'
+
+      command_options = options.merge(
+        directory: target_path,
+        cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
+      )
+
+      diff_command = Commands::DiffCommand.new(command_options)
+      diff_command.execute
     end
 
     def execute_update_command(target_path, options, cache)
-      puts "Update command implementation coming in T006..."
-      puts "Path: #{target_path}"
-      puts "Categories: #{options[:categories]&.join(', ') || 'core'}"
-      puts "Dry run: #{options[:dry_run] ? 'enabled' : 'disabled'}"
-      puts "Force: #{options[:force] ? 'enabled' : 'disabled'}"
+      require_relative 'commands/update_command'
+
+      command_options = options.merge(
+        directory: target_path,
+        cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
+      )
+
+      update_command = Commands::UpdateCommand.new(command_options)
+      update_command.execute
     end
 
     def display_transparency_stats(cache, start_time)

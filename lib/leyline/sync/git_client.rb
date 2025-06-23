@@ -1,19 +1,45 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'tempfile'
+require_relative '../errors'
 
 module Leyline
   module Sync
     class GitClient
-      class GitNotAvailableError < StandardError; end
+      class GitNotAvailableError < GitError
+        def recovery_suggestions
+          [
+            'Install git using your system package manager',
+            'On macOS: brew install git',
+            'On Ubuntu/Debian: sudo apt-get install git',
+            'Ensure git is in your PATH'
+          ]
+        end
+      end
 
-      class GitCommandError < StandardError
+      class GitCommandError < GitError
         attr_reader :command, :exit_status
 
         def initialize(message, command = nil, exit_status = nil)
-          super(message)
+          super(message, { command: command, exit_status: exit_status }.compact)
           @command = command
           @exit_status = exit_status
+        end
+
+        def recovery_suggestions
+          suggestions = []
+
+          if exit_status == 128
+            suggestions << 'Check if the repository is properly initialized'
+            suggestions << 'Run: git init'
+          elsif command&.include?('sparse-checkout')
+            suggestions << 'Ensure git version supports sparse-checkout (2.25+)'
+            suggestions << 'Check git version: git --version'
+          end
+
+          suggestions << 'Check git status and working directory'
+          suggestions
         end
       end
 
@@ -163,20 +189,58 @@ module Leyline
         work_dir = chdir || @working_directory
         git_command = "git #{command}"
 
-        success = system(
-          git_command,
-          chdir: work_dir,
-          out: '/dev/null',
-          err: '/dev/null'
-        )
+        # Capture stderr for better error messages
+        stderr_file = Tempfile.new('git-stderr')
 
-        unless success
-          exit_status = $? ? $?.exitstatus : 'unknown'
-          raise GitCommandError.new(
-            "Git command failed: #{git_command} (exit status: #{exit_status})",
+        begin
+          success = system(
             git_command,
-            exit_status
+            chdir: work_dir,
+            out: '/dev/null',
+            err: stderr_file.path
           )
+
+          unless success
+            exit_status = $? ? $?.exitstatus : 'unknown'
+            stderr_content = File.read(stderr_file.path) rescue ''
+
+            # Enhance error message based on stderr content
+            error_message = build_git_error_message(git_command, exit_status, stderr_content)
+
+            raise GitCommandError.new(
+              error_message,
+              git_command,
+              exit_status
+            )
+          end
+        ensure
+          stderr_file.close
+          stderr_file.unlink
+        end
+      end
+
+      def build_git_error_message(command, exit_status, stderr_content)
+        base_msg = "Git command failed: #{command} (exit status: #{exit_status})"
+
+        # Add context based on common git errors
+        if stderr_content.include?('Permission denied')
+          "#{base_msg} - Permission denied. Check file permissions and SSH keys."
+        elsif stderr_content.include?('Could not resolve host')
+          "#{base_msg} - Network error. Check internet connection."
+        elsif stderr_content.include?('Authentication failed')
+          "#{base_msg} - Authentication failed. Check credentials."
+        elsif stderr_content.include?('index.lock')
+          "#{base_msg} - Repository locked. Another git process may be running."
+        elsif stderr_content.include?('disk quota exceeded')
+          "#{base_msg} - Disk quota exceeded. Free up disk space."
+        elsif stderr_content.include?('No space left on device')
+          "#{base_msg} - No disk space available."
+        elsif stderr_content.empty?
+          base_msg
+        else
+          # Include first line of stderr if not recognized
+          first_line = stderr_content.lines.first&.strip || ''
+          "#{base_msg} - #{first_line}"
         end
       end
     end

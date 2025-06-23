@@ -3,11 +3,20 @@
 require 'digest'
 require 'fileutils'
 require_relative 'cache_error_handler'
+require_relative '../errors'
 
 module Leyline
   module Cache
     class FileCache
-      class CacheError < StandardError; end
+      class CacheError < Leyline::CacheError
+        def recovery_suggestions
+          [
+            'Clear the cache directory: rm -rf ~/.cache/leyline',
+            'Run sync with --no-cache flag to bypass cache',
+            'Set LEYLINE_CACHE_AUTO_RECOVERY=true for automatic recovery'
+          ]
+        end
+      end
 
       def initialize(cache_dir = ENV.fetch('LEYLINE_CACHE_DIR', '~/.leyline/cache'))
         @cache_dir = File.expand_path(cache_dir)
