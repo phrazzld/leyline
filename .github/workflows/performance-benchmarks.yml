@@ -62,7 +62,12 @@ jobs:
               fi
               ;;
             "Windows")
-              expected_platform="x64-mingw32"
+              # Ruby 3.1+ uses x64-mingw-ucrt, Ruby 3.0 uses x64-mingw32
+              if [[ "${{ matrix.ruby }}" == "3.0" ]]; then
+                expected_platform="x64-mingw32"
+              else
+                expected_platform="x64-mingw-ucrt"
+              fi
               ;;
             *)
               echo "::error::Unknown runner OS: ${{ runner.os }}"
