@@ -6,6 +6,11 @@ require 'json'
 require 'tmpdir'
 require_relative '../support/benchmark_helpers'
 
+# Require command classes for benchmarks
+require 'leyline/commands/status_command'
+require 'leyline/commands/diff_command'
+require 'leyline/commands/update_command'
+
 RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
   include BenchmarkHelpers
 
@@ -71,7 +76,9 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     }
   }.freeze
 
-  let(:benchmark_results) { {} }
+  before(:all) do
+    @benchmark_results = {}
+  end
 
   describe 'Status Command Performance' do
     BENCHMARK_SCENARIOS.each do |scenario_name, scenario|
@@ -88,7 +95,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           expect(result[:max_memory_mb]).to be < 50,
             "Memory usage #{result[:max_memory_mb]}MB exceeds 50MB limit"
 
-          benchmark_results["status_#{scenario_name}"] = result
+          @benchmark_results["status_#{scenario_name}"] = result
         end
       end
     end
@@ -126,7 +133,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           expect(result[:max_memory_mb]).to be < 50,
             "Memory usage #{result[:max_memory_mb]}MB exceeds 50MB limit"
 
-          benchmark_results["diff_#{scenario_name}"] = result
+          @benchmark_results["diff_#{scenario_name}"] = result
         end
       end
     end
@@ -134,7 +141,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
   describe 'Update Command Performance' do
     # Update command has different expectations for preview vs apply
-    let(:update_scenarios) do
+    def self.update_scenarios
       BENCHMARK_SCENARIOS.map do |name, scenario|
         preview_scenario = scenario.merge(
           phase: :preview,
@@ -155,7 +162,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           expect(result[:conflict_detection_ms]).to be < 200,
             "Conflict detection took #{result[:conflict_detection_ms]}ms, expected <200ms"
 
-          benchmark_results["update_preview_#{scenario_name}"] = result
+          @benchmark_results["update_preview_#{scenario_name}"] = result
         end
       end
     end
@@ -276,7 +283,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
   after(:all) do
     # Generate comprehensive benchmark report
-    generate_benchmark_report(benchmark_results)
+    generate_benchmark_report(@benchmark_results)
   end
 
   private
