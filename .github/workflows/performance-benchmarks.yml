@@ -25,6 +25,7 @@ jobs:
   performance-validation:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         ruby: ['3.0', '3.1', '3.2']
@@ -89,6 +90,13 @@ jobs:
 
           echo "✅ Platform $expected_platform found in Gemfile.lock"
           echo "🎯 Bundler platform compatibility validated successfully"
+        shell: bash
+
+      - name: Windows Platform Diagnostic
+        if: runner.os == 'Windows'
+        run: |
+          echo "🔍 Running Windows Platform Diagnostic"
+          ruby windows-diagnostic.rb
         shell: bash
 
       - name: Setup benchmark environment
