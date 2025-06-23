@@ -41,7 +41,7 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
     zero_byte_cache_files: {
       description: "Cache files exist but are zero bytes",
       setup: lambda { |cache_dir| create_zero_byte_cache_files(cache_dir) },
-      cleanup: lambda { |cache_dir| # handled by cache },
+      cleanup: lambda { |cache_dir| }, # handled by cache
       expected_behavior: :auto_cleanup,
       max_performance_penalty: 1.3,
       should_succeed: true
@@ -59,7 +59,7 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
     partial_cache_state: {
       description: "Cache metadata is incomplete",
       setup: lambda { |cache_dir| create_partial_cache_state(cache_dir) },
-      cleanup: lambda { |cache_dir| # handled by cache },
+      cleanup: lambda { |cache_dir| }, # handled by cache
       expected_behavior: :rebuild_metadata,
       max_performance_penalty: 1.8,
       should_succeed: true
@@ -77,7 +77,7 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
     invalid_cache_content: {
       description: "Cache contains invalid/malformed data",
       setup: lambda { |cache_dir| inject_invalid_cache_content(cache_dir) },
-      cleanup: lambda { |cache_dir| # handled by cache },
+      cleanup: lambda { |cache_dir| }, # handled by cache
       expected_behavior: :skip_invalid,
       max_performance_penalty: 1.3,
       should_succeed: true
