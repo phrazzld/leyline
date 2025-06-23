@@ -56,7 +56,6 @@ Conduct comprehensive review before execution:
 - Study Thor CLI patterns and command-line UX best practices
 
 ### 4. **Advanced Analysis** (for complex tasks only)
-- Invoke `thinktank` CLI for multi-perspective analysis of challenging problems
 - Consider security implications for file operations and cache management
 - Evaluate performance impact on Leyline's speed-first philosophy
 - Assess long-term maintainability implications
