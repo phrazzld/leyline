@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'benchmark'
 require 'fileutils'
 require 'tmpdir'
+require_relative '../support/benchmark_helpers'
 
 RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
   include BenchmarkHelpers

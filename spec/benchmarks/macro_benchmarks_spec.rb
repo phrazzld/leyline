@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'benchmark'
 require 'json'
 require 'tmpdir'
+require_relative '../support/benchmark_helpers'
 
 RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
   include BenchmarkHelpers

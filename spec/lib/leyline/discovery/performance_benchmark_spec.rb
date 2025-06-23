@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../../support/benchmark_helpers'
 
 RSpec.describe 'Discovery Performance Benchmark', type: :performance do
+  include BenchmarkHelpers
   let(:cache) { Leyline::Discovery::MetadataCache.new(compression_enabled: true) }
   let(:temp_dir) { Dir.mktmpdir('performance-benchmark') }
 
   # Performance targets from Leyline requirements
-  TARGET_PERFORMANCE_MS = 1000 # <1s target
-  TARGET_CACHE_HIT_RATIO = 0.8 # >80% cache hit ratio
+  # Using constants from BenchmarkHelpers module instead of redefining
 
   before(:all) do
     # Create comprehensive test document structure for realistic performance testing

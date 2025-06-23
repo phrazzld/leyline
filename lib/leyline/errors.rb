@@ -577,4 +577,15 @@ module Leyline
       end
     end
   end
+
+  # Configuration-related errors
+  class ConfigurationError < LeylineError
+    def recovery_suggestions
+      [
+        'Check configuration file syntax and permissions',
+        'Verify environment variables are set correctly',
+        'Use default configuration if custom config is problematic'
+      ]
+    end
+  end
 end

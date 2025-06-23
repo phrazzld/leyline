@@ -17,11 +17,55 @@ module Leyline
     package_name 'leyline'
 
     desc 'version', 'Show version information'
+    long_desc <<-LONGDESC
+      Display leyline CLI version and system information.
+
+      EXAMPLES:
+        leyline version                   # Show version number
+        leyline version -v               # Verbose with system details
+
+      VERSION INFORMATION:
+        - leyline CLI version
+        - Ruby version compatibility
+        - System platform detection
+        - Cache directory location
+    LONGDESC
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed system information',
+                  aliases: '-v'
     def version
       puts VERSION
+
+      if options[:verbose]
+        puts "\nSystem Information:"
+        puts "  Ruby version: #{RUBY_VERSION}"
+        puts "  Platform: #{RUBY_PLATFORM}"
+        puts "  Cache directory: #{ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')}"
+        puts "  Git available: #{system('which git > /dev/null 2>&1') ? 'Yes' : 'No'}"
+      end
     end
 
     desc 'categories', 'List all available leyline categories'
+    long_desc <<-LONGDESC
+      Display all available leyline categories with document counts.
+      Categories represent different technology stacks and contexts.
+
+      EXAMPLES:
+        leyline categories                # List all categories
+        leyline categories -v             # Verbose with document details
+        leyline categories --stats        # Include cache performance stats
+
+      UNDERSTANDING CATEGORIES:
+        - Core: Universal principles that apply to all projects
+        - Language-specific: TypeScript, Go, Rust, Python, etc.
+        - Context-specific: Frontend, Backend, Testing, etc.
+
+      PERFORMANCE:
+        - First run: May take 1-2s for cache warming
+        - Subsequent runs: <500ms with warm cache
+        - Cache automatically managed in background
+    LONGDESC
     method_option :verbose,
                   type: :boolean,
                   desc: 'Show detailed category information',
@@ -35,6 +79,31 @@ module Leyline
     end
 
     desc 'show CATEGORY', 'Show documents in a specific category'
+    long_desc <<-LONGDESC
+      Display all documents (tenets and bindings) within a specific category.
+      Useful for exploring standards relevant to your technology stack.
+
+      EXAMPLES:
+        leyline show typescript           # Show TypeScript-specific documents
+        leyline show core                # Show universal core principles
+        leyline show frontend -v         # Verbose with content previews
+        leyline show backend --stats     # Include performance metrics
+
+      DOCUMENT TYPES:
+        - Tenets: Fundamental principles and philosophies
+        - Bindings: Specific, actionable rules and guidelines
+
+      OUTPUT INFORMATION:
+        - Document title and unique identifier
+        - Document type (tenet or binding)
+        - Content preview (in verbose mode)
+        - File path (in verbose mode)
+
+      PERFORMANCE:
+        - Category filtering optimizes load time
+        - Cache-aware: subsequent runs are faster
+        - Use --stats to monitor cache efficiency
+    LONGDESC
     method_option :verbose,
                   type: :boolean,
                   desc: 'Show detailed document information',
@@ -48,6 +117,34 @@ module Leyline
     end
 
     desc 'search QUERY', 'Search leyline documents by content'
+    long_desc <<-LONGDESC
+      Full-text search across all leyline documents with relevance scoring.
+      Searches titles, content, and metadata with intelligent ranking.
+
+      EXAMPLES:
+        leyline search "error handling"   # Search for error handling practices
+        leyline search testing -v         # Verbose results with previews
+        leyline search api --limit 5      # Limit to top 5 results
+        leyline search "type safety" --stats  # Include performance stats
+
+      SEARCH FEATURES:
+        - Full-text search across all document content
+        - Relevance scoring with visual indicators (★★★★★)
+        - Content preview with smart truncation
+        - "Did you mean?" suggestions for typos
+
+      SEARCH TIPS:
+        - Use quotes for exact phrases: "error handling"
+        - Single words find broader matches: testing
+        - Results ranked by relevance score
+        - Use --limit to control number of results
+
+      PERFORMANCE:
+        - Search index cached for speed
+        - First search may be slower (index building)
+        - Subsequent searches: <200ms typical response
+        - Use --stats to monitor search performance
+    LONGDESC
     method_option :verbose,
                   type: :boolean,
                   desc: 'Show detailed search results',
@@ -66,6 +163,28 @@ module Leyline
     end
 
     desc 'status [PATH]', 'Show sync status and local modifications'
+    long_desc <<-LONGDESC
+      Display the current sync status for leyline standards in the specified directory.
+      Shows locally modified files, available updates, and summary statistics.
+
+      EXAMPLES:
+        leyline status                    # Check status in current directory
+        leyline status /path/to/project   # Check status in specific directory
+        leyline status -c typescript     # Check only TypeScript category
+        leyline status --json            # Output as JSON for automation
+        leyline status -v --stats        # Verbose output with performance stats
+
+      PERFORMANCE TIPS:
+        - Use category filtering (-c) for faster checks on large projects
+        - Cache hit ratio >80% indicates optimal performance
+        - Run with --stats to monitor cache efficiency
+        - First run may be slower (cache warming)
+
+      TROUBLESHOOTING:
+        - If no leyline directory found, run 'leyline sync' first
+        - Permission errors: check file access in docs/leyline
+        - Slow performance: ensure cache directory is writable
+    LONGDESC
     method_option :categories,
                   type: :array,
                   desc: 'Filter status by specific categories',
@@ -87,6 +206,32 @@ module Leyline
     end
 
     desc 'diff [PATH]', 'Show differences between local and remote leyline standards'
+    long_desc <<-LONGDESC
+      Display unified diff showing changes between your local leyline standards
+      and the latest remote version, without making any modifications.
+
+      EXAMPLES:
+        leyline diff                      # Show all differences
+        leyline diff /path/to/project     # Check specific directory
+        leyline diff -c typescript,go    # Show only TypeScript and Go changes
+        leyline diff --format json       # Output as JSON for scripts
+        leyline diff -v                  # Verbose with file-by-file details
+
+      OUTPUT FORMATS:
+        text (default): Human-readable unified diff format
+        json:          Structured data for automation and scripts
+
+      PERFORMANCE OPTIMIZATION:
+        - Category filtering reduces comparison scope
+        - Cache optimization speeds up repeated diff operations
+        - Use --stats to monitor performance metrics
+        - Target: <1.5s for 100 files, <2s for 1000+ files
+
+      COMMON WORKFLOWS:
+        1. leyline diff                   # See what would change
+        2. leyline update --dry-run       # Preview update without applying
+        3. leyline update                 # Apply changes after review
+    LONGDESC
     method_option :categories,
                   type: :array,
                   desc: 'Filter diff by specific categories',
@@ -109,6 +254,39 @@ module Leyline
     end
 
     desc 'update [PATH]', 'Preview and apply leyline updates with conflict detection'
+    long_desc <<-LONGDESC
+      Safely update leyline standards with preview-first approach and intelligent
+      conflict detection. Always shows what will change before applying updates.
+
+      EXAMPLES:
+        leyline update                    # Interactive update with preview
+        leyline update --dry-run          # Show changes without applying
+        leyline update -c core           # Update only core standards
+        leyline update --force           # Override conflicts (use carefully)
+        leyline update -v --stats        # Verbose with performance monitoring
+
+      SAFETY FEATURES:
+        - Three-way conflict detection (base, local, remote)
+        - Preview-first: see changes before applying
+        - Backup recommendations for important modifications
+        - Rollback guidance if issues occur
+
+      CONFLICT RESOLUTION:
+        1. Review conflicts shown in preview
+        2. Manually resolve conflicts in your editor
+        3. Re-run update to apply remaining changes
+        4. Use --force only when conflicts are intentional
+
+      PERFORMANCE TARGETS:
+        - Conflict detection: <2 seconds
+        - Cache hit ratio: >80% for optimal speed
+        - Memory usage: <50MB regardless of project size
+
+      TROUBLESHOOTING:
+        - Conflicts detected: Review and resolve manually before --force
+        - Permission denied: Check write access to docs/leyline
+        - Network errors: Ensure internet connectivity for remote fetch
+    LONGDESC
     method_option :categories,
                   type: :array,
                   desc: 'Update specific categories only',
@@ -134,6 +312,45 @@ module Leyline
     end
 
     desc 'sync [PATH]', 'Synchronize leyline standards to target directory'
+    long_desc <<-LONGDESC
+      Download and synchronize leyline standards to your project's docs/leyline directory.
+      Creates the foundation for transparency commands (status, diff, update).
+
+      EXAMPLES:
+        leyline sync                      # Sync core standards to current directory
+        leyline sync /path/to/project     # Sync to specific project
+        leyline sync -c typescript,go    # Sync TypeScript and Go categories
+        leyline sync --dry-run           # Preview without making changes
+        leyline sync --force             # Overwrite local modifications
+        leyline sync --no-cache         # Force fresh download
+        leyline sync --stats            # Show detailed performance metrics
+
+      CATEGORIES:
+        core:       Universal development principles (always included)
+        typescript: TypeScript-specific standards
+        go:         Go-specific standards
+        rust:       Rust-specific standards
+        frontend:   Frontend development standards
+        backend:    Backend development standards
+
+      CACHE OPTIMIZATION:
+        - First sync: Downloads and caches content (~2-5 seconds)
+        - Subsequent syncs: <1 second with >80% cache hit ratio
+        - Use --force-git to bypass cache when needed
+        - Cache directory: ~/.cache/leyline
+
+      PERFORMANCE MONITORING:
+        - Use --stats for detailed cache and timing metrics
+        - Target: <2s response times for all operations
+        - Cache hit ratio >80% indicates optimal performance
+        - Memory usage bounded to <50MB regardless of project size
+
+      TROUBLESHOOTING:
+        - Network errors: Check internet connectivity
+        - Permission denied: Ensure write access to target directory
+        - Cache issues: Clear ~/.cache/leyline and retry
+        - Git not found: Install git and ensure it's in PATH
+    LONGDESC
     method_option :categories,
                   type: :array,
                   desc: 'Specific categories to sync (e.g., typescript, go, core)',
@@ -195,6 +412,36 @@ module Leyline
       rescue => e
         puts "Error during sync: #{e.message}"
         exit 1
+      end
+    end
+
+    desc 'help [COMMAND]', 'Show comprehensive help information'
+    long_desc <<-LONGDESC
+      Display detailed help information for leyline commands.
+      Provides usage examples, performance tips, and troubleshooting guidance.
+
+      EXAMPLES:
+        leyline help                      # Show overview of all commands
+        leyline help sync                # Detailed help for sync command
+        leyline help status              # Detailed help for status command
+        leyline                          # Show basic command list (Thor default)
+
+      GETTING STARTED:
+        1. leyline sync                  # Download standards to current project
+        2. leyline status               # Check sync status and modifications
+        3. leyline diff                 # See what has changed
+        4. leyline update               # Apply updates safely
+
+      COMMON WORKFLOWS:
+        Discovery:    categories → show → search
+        Sync:         sync → status → diff → update
+        Monitoring:   Use --stats flag for performance insights
+    LONGDESC
+    def help(command = nil)
+      if command.nil?
+        display_comprehensive_help
+      else
+        super(command)
       end
     end
 
@@ -835,6 +1082,52 @@ module Leyline
         puts "  Size: #{format_bytes(stats[:size])}"
         puts "  Utilization: #{stats[:utilization_percent]}%"
       end
+    end
+
+    def display_comprehensive_help
+      puts "LEYLINE CLI - Development Standards Synchronization"
+      puts "="*60
+      puts
+      puts "Leyline helps you synchronize and manage development standards across"
+      puts "your projects, providing transparency into changes and updates."
+      puts
+      puts "COMMAND CATEGORIES:"
+      puts
+      puts "  📋 DISCOVERY COMMANDS"
+      puts "    categories          List available leyline categories"
+      puts "    show CATEGORY       Show documents in a specific category"
+      puts "    search QUERY        Search leyline documents by content"
+      puts
+      puts "  🔄 SYNC COMMANDS"
+      puts "    sync [PATH]         Download leyline standards to project"
+      puts "    status [PATH]       Show sync status and local modifications"
+      puts "    diff [PATH]         Show differences without applying changes"
+      puts "    update [PATH]       Preview and apply updates with conflict detection"
+      puts
+      puts "  ℹ️  UTILITY COMMANDS"
+      puts "    version             Show version and system information"
+      puts "    help [COMMAND]      Show detailed help for specific commands"
+      puts
+      puts "QUICK START:"
+      puts "  1. leyline sync               # Download standards to current project"
+      puts "  2. leyline status            # Check what's synchronized"
+      puts "  3. leyline categories        # Explore available categories"
+      puts "  4. leyline show typescript   # View TypeScript-specific standards"
+      puts
+      puts "PERFORMANCE OPTIMIZATION:"
+      puts "  • Cache automatically optimizes subsequent operations"
+      puts "  • Use category filtering (-c) for faster operations"
+      puts "  • Add --stats to any command for performance insights"
+      puts "  • Target response times: <2s for all operations"
+      puts
+      puts "TROUBLESHOOTING:"
+      puts "  • Run with -v (verbose) flag for detailed output"
+      puts "  • Use --stats to monitor cache and performance"
+      puts "  • Check ~/.cache/leyline for cache issues"
+      puts "  • Ensure git is installed and internet connectivity"
+      puts
+      puts "For detailed help on any command: leyline help COMMAND"
+      puts "Documentation: https://github.com/phrazzld/leyline"
     end
   end
 end

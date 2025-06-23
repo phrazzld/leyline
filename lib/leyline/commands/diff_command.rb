@@ -6,6 +6,8 @@ require_relative '../version'
 require_relative '../errors'
 require 'tmpdir'
 require 'json'
+require 'net/http'
+require 'timeout'
 
 module Leyline
   module Commands
@@ -482,16 +484,20 @@ module Leyline
         when Leyline::LeylineError
           error
         when Errno::EACCES, Errno::EPERM
+          path = nil
+          begin
+            path = error.message.match(/- (.+)$/)[1] if error.message
+          rescue
+            # Ignore extraction errors
+          end
+
           Leyline::FileSystemError.new(
             "Permission denied accessing files",
             reason: :permission_denied,
-            path: error.message.match(/- (.+)$/)[1] rescue nil
+            path: path
           )
         when Errno::ENOENT
-          DiffError.new(
-            "Leyline directory not found",
-            path: File.join(@base_directory, 'docs', 'leyline')
-          )
+          DiffError.new("Leyline directory not found")
         when Errno::ENOSPC
           Leyline::CacheOperationError.new(
             "No space left on device for temporary diff operations",
@@ -512,10 +518,7 @@ module Leyline
             url: 'https://github.com/phrazzld/leyline.git'
           )
         else
-          DiffError.new(
-            error.message,
-            original_error: error.class.name
-          )
+          DiffError.new(error.message)
         end
 
         # Output error with recovery suggestions
@@ -549,7 +552,7 @@ module Leyline
       end
 
       def output_error_with_recovery(error)
-        warn "Error: #{error.formatted_message}"
+        warn "Error: #{error.message}"
 
         suggestions = error.recovery_suggestions
         if suggestions.any?

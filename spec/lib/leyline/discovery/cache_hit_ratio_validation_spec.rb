@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../../support/benchmark_helpers'
 
 RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
+  include BenchmarkHelpers
   # Validate that the cache system achieves >80% hit ratio for repeated operations
   # as specified in the Leyline performance requirements
-
-  TARGET_CACHE_HIT_RATIO = 0.8 # >80% target
 
   let(:temp_dir) { Dir.mktmpdir('cache-hit-ratio-test') }
   let(:cache) { Leyline::Discovery::MetadataCache.new }

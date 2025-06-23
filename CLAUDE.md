@@ -12,6 +12,50 @@ The repository uses standardized YAML front-matter in all tenet and binding Mark
 
 ## Common Commands
 
+### Leyline CLI Commands
+The transparency commands provide visibility into sync operations and changes:
+
+```bash
+# Synchronization and Management
+leyline sync                      # Download leyline standards to current project
+leyline sync -c typescript,go    # Sync specific categories only
+leyline sync --dry-run           # Preview sync without making changes
+leyline sync --stats            # Show detailed performance metrics
+
+# Transparency Commands (added in transparency commands implementation)
+leyline status                    # Show sync status and local modifications
+leyline status -c typescript     # Check status for specific category only
+leyline status --json           # Output status as JSON for automation
+leyline diff                     # Show differences without applying changes
+leyline diff --format json      # Output diff as JSON for scripts
+leyline update                   # Preview and apply updates with conflict detection
+leyline update --dry-run        # Show what would be updated without applying
+leyline update --force          # Override conflicts (use carefully)
+
+# Discovery Commands
+leyline categories               # List all available categories
+leyline show typescript         # Show documents in TypeScript category
+leyline search "error handling" # Search leyline documents by content
+leyline search testing --limit 5 # Limit search results
+
+# Utility Commands
+leyline version                  # Show version information
+leyline version -v              # Verbose with system details
+leyline help                    # Show comprehensive command overview
+leyline help status             # Show detailed help for specific command
+```
+
+**Performance Tips:**
+- Use category filtering (`-c`) for faster operations on large projects
+- Add `--stats` to monitor cache efficiency and performance
+- Target response times: <2s for all transparency operations
+- Cache hit ratio >80% indicates optimal performance
+
+**Common Workflows:**
+1. **Initial Setup:** `leyline sync` → `leyline status`
+2. **Change Detection:** `leyline diff` → `leyline update --dry-run` → `leyline update`
+3. **Discovery:** `leyline categories` → `leyline show <category>` → `leyline search <query>`
+
 ### Ruby Documentation Tools
 Location: `tools/`
 
