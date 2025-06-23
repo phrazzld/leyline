@@ -43,6 +43,54 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
+      - name: Validate Bundler Platform Compatibility
+        run: |
+          echo "🔍 Validating Bundler platform compatibility"
+          echo "Current runner platform: ${{ runner.os }}-${{ runner.arch }}"
+
+          # Map GitHub Actions runner info to expected Gemfile.lock platforms
+          case "${{ runner.os }}" in
+            "Linux")
+              expected_platform="x86_64-linux"
+              ;;
+            "macOS")
+              if [[ "${{ runner.arch }}" == "ARM64" ]]; then
+                expected_platform="arm64-darwin-23"
+              else
+                expected_platform="x86_64-darwin-23"
+              fi
+              ;;
+            "Windows")
+              expected_platform="x64-mingw32"
+              ;;
+            *)
+              echo "::error::Unknown runner OS: ${{ runner.os }}"
+              exit 1
+              ;;
+          esac
+
+          echo "Expected platform in Gemfile.lock: $expected_platform"
+
+          # Check if the expected platform exists in Gemfile.lock
+          if ! grep -q "$expected_platform" Gemfile.lock; then
+            echo "::error::Platform compatibility issue detected!"
+            echo "::error::Gemfile.lock does not support platform: $expected_platform"
+            echo "::error::"
+            echo "::error::Current platforms in Gemfile.lock:"
+            grep -A 10 "^PLATFORMS" Gemfile.lock || echo "::error::No PLATFORMS section found"
+            echo "::error::"
+            echo "::error::To fix this issue, run one of the following commands locally:"
+            echo "::error::  bundle lock --add-platform $expected_platform"
+            echo "::error::  bundle lock --add-platform x86_64-linux x86_64-darwin-23 arm64-darwin-23 x64-mingw32"
+            echo "::error::"
+            echo "::error::Then commit and push the updated Gemfile.lock"
+            exit 1
+          fi
+
+          echo "✅ Platform $expected_platform found in Gemfile.lock"
+          echo "🎯 Bundler platform compatibility validated successfully"
+        shell: bash
+
       - name: Setup benchmark environment
         run: |
           # Create directories
