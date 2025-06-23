@@ -303,7 +303,24 @@ def main
     })
   end
 
-  # Step 7: External link checking (full mode only)
+  # Step 7: GitHub Actions validation (both modes)
+  puts ""
+  puts "🔍 GitHub Actions validation..."
+
+  if File.exist?("tools/validate_github_actions.rb")
+    command = "ruby tools/validate_github_actions.rb#{$verbose ? ' --verbose' : ''}"
+    unless run_command(command, "GitHub Actions deprecation check")
+      failed_validations << "GitHub Actions validation"
+    end
+  else
+    puts "   ⏭️ Skipping GitHub Actions validation (validation tool not found)"
+    log_structured('validation_step_skipped', {
+      step: "GitHub Actions validation",
+      reason: "tool_not_found"
+    })
+  end
+
+  # Step 8: External link checking (full mode only)
   if $validation_mode == :full && !$skip_external_links
     puts ""
     puts "📡 Checking external link validation tool availability..."
@@ -365,9 +382,9 @@ def main
 
     # Calculate validations run based on mode
     if $validation_mode == :essential
-      validations_count = 2  # YAML, index (essential mode)
+      validations_count = 3  # YAML, index, GitHub Actions (essential mode)
     else
-      validations_count = 3  # YAML, cross-reference, index (full mode)
+      validations_count = 4  # YAML, cross-reference, index, GitHub Actions (full mode)
       validations_count += 1 if Dir.exist?("docs/bindings/categories/typescript")  # TypeScript validation (full mode only)
       validations_count += 1 if system("command -v gitleaks >/dev/null 2>&1")  # Security scan (full mode only)
       validations_count += 1 if File.exist?("examples/typescript-full-toolchain/package.json")  # Security audit (full mode only)
