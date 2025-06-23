@@ -25,7 +25,9 @@ tmp/leyline-sync-*/
 coverage/
 
 # Working documents (should use planning/ and research/ instead)
-CODE_REVIEW.md
+/CODE_REVIEW.md
+/TODO.md
+/TASK.md
 T*-plan.md
 T*-summary.md
 *-verification.md
