@@ -164,35 +164,30 @@ module Leyline
       hash
     rescue Errno::ENOENT => e
       raise ComparisonFailedError.new(
-        "File not found during hash calculation",
-        reason: :file_not_found,
-        file: file_path
+        file_path, nil,
+        reason: :file_not_found
       )
     rescue Errno::EACCES => e
       raise ComparisonFailedError.new(
-        "Permission denied reading file",
-        reason: :permission_denied,
-        file: file_path
+        file_path, nil,
+        reason: :permission_denied
       )
     rescue Errno::EMFILE, Errno::ENFILE => e
       raise ComparisonFailedError.new(
-        "Too many open files",
+        file_path, nil,
         reason: :too_many_files,
-        file: file_path,
         suggestion: 'Close other applications or increase file descriptor limit'
       )
     rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError => e
       raise ComparisonFailedError.new(
-        "File contains invalid encoding",
-        reason: :encoding_error,
-        file: file_path
+        file_path, nil,
+        reason: :encoding_error
       )
     rescue IOError => e
       if e.message.include?('closed stream')
         raise ComparisonFailedError.new(
-          "File was closed during read operation",
-          reason: :concurrent_modification,
-          file: file_path
+          file_path, nil,
+          reason: :concurrent_modification
         )
       else
         raise ComparisonError, "Failed to read file #{file_path}: #{e.message}"

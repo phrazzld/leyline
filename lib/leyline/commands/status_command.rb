@@ -85,9 +85,8 @@ module Leyline
             rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError => e
               # Handle encoding errors gracefully
               raise Leyline::ComparisonFailedError.new(
-                "File encoding error in #{relative_path}",
-                reason: :encoding_error,
-                file: relative_path
+                relative_path, nil,
+                reason: :encoding_error
               )
             end
           end
