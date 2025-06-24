@@ -131,19 +131,14 @@ _No frontend bindings defined yet._
 | [rest-api-standards](./categories/api/rest-api-standards.md) | 0.1.0 | This binding implements our simplicity tenet by leveraging the established semantics of HTTP rather than inventing custom conventions. When APIs fo... |
 | [rest-first-api-design](./categories/api/rest-first-api-design.md) | 0.1.0 | This binding implements our simplicity tenet by establishing REST as the foundation for API design, avoiding the accidental complexity that often c... |
 
-## Browser-extension Bindings
-
-| ID | Version | Summary |
-|---|---|---|
-| [cross-browser-compatibility](./categories/browser-extension/cross-browser-compatibility.md) | 0.1.0 | This binding implements our adaptability-and-reversibility tenet by ensuring extensions can adapt to different browser environments and evolve as b... |
-| [extension-permissions-model](./categories/browser-extension/extension-permissions-model.md) | 0.1.0 | This binding implements our no-secret-suppression tenet by making extension capabilities and data access explicit to users. Browser extensions oper... |
-| [extension-update-strategy](./categories/browser-extension/extension-update-strategy.md) | 0.1.0 | This binding implements our deliver-value-continuously tenet by ensuring that improvements and fixes reach users efficiently while maintaining trus... |
-
 ## Browser-extensions Bindings
 
 | ID | Version | Summary |
 |---|---|---|
 | [browser-extension-security-patterns](./categories/browser-extensions/browser-extension-security-patterns.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring that browser extension security concerns be visible, documented, and intentio... |
+| [cross-browser-compatibility](./categories/browser-extensions/cross-browser-compatibility.md) | 0.1.0 | This binding implements our adaptability-and-reversibility tenet by ensuring extensions can adapt to different browser environments and evolve as b... |
+| [extension-permissions-model](./categories/browser-extensions/extension-permissions-model.md) | 0.1.0 | This binding implements our no-secret-suppression tenet by making extension capabilities and data access explicit to users. Browser extensions oper... |
+| [extension-update-strategy](./categories/browser-extensions/extension-update-strategy.md) | 0.1.0 | This binding implements our deliver-value-continuously tenet by ensuring that improvements and fixes reach users efficiently while maintaining trus... |
 
 ## Database Bindings
 
