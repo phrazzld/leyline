@@ -97,12 +97,13 @@ jobs:
           echo "🎯 Bundler platform compatibility validated successfully"
         shell: bash
 
-      - name: Windows Platform Diagnostic
-        if: runner.os == 'Windows'
-        run: |
-          echo "🔍 Running Windows Platform Diagnostic"
-          ruby windows-diagnostic.rb
-        shell: bash
+      # Windows diagnostic removed - platform issues resolved
+      # - name: Windows Platform Diagnostic
+      #   if: runner.os == 'Windows'
+      #   run: |
+      #     echo "🔍 Running Windows Platform Diagnostic"
+      #     ruby windows-diagnostic.rb
+      #   shell: bash
 
       - name: Setup benchmark environment
         run: |

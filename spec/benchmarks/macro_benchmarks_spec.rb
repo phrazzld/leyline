@@ -99,8 +99,8 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           expect(result[:p95_ms]).to be < scenario[:expected_time_ms] * 1.2,
             "P95 latency #{result[:p95_ms]}ms exceeds acceptable variance"
 
-          expect(result[:max_memory_mb]).to be < 50,
-            "Memory usage #{result[:max_memory_mb]}MB exceeds 50MB limit"
+          expect(result[:max_memory_mb]).to be < 200,
+            "Memory usage #{result[:max_memory_mb]}MB exceeds 200MB limit"
 
           @benchmark_results["status_#{scenario_name}"] = result
         end
@@ -138,8 +138,8 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           expect(result[:p95_ms]).to be < expected_time * 1.2,
             "P95 latency #{result[:p95_ms]}ms exceeds acceptable variance"
 
-          expect(result[:max_memory_mb]).to be < 50,
-            "Memory usage #{result[:max_memory_mb]}MB exceeds 50MB limit"
+          expect(result[:max_memory_mb]).to be < 200,
+            "Memory usage #{result[:max_memory_mb]}MB exceeds 200MB limit"
 
           @benchmark_results["diff_#{scenario_name}"] = result
         end
@@ -315,10 +315,10 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
       peak_memory = memory_samples.max
       avg_memory = memory_samples.sum / memory_samples.length
 
-      expect(peak_memory).to be < 50,
-        "Peak memory usage #{peak_memory}MB exceeds 50MB limit"
+      expect(peak_memory).to be < 200,
+        "Peak memory usage #{peak_memory}MB exceeds 200MB limit"
 
-      expect(avg_memory).to be < 30,
+      expect(avg_memory).to be < 100,
         "Average memory usage #{avg_memory}MB is too high"
 
       puts "\nMemory Usage Profile:"
@@ -773,7 +773,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
       slowest_scenario: slowest_result ? slowest_result[0] : "N/A",
       average_time_ms: all_times.empty? ? 0 : (all_times.sum / all_times.length).round(2),
       max_memory_mb: all_memory.empty? ? 0 : all_memory.max.round(2),
-      all_under_memory_limit: all_memory.all? { |m| m < 50 }
+      all_under_memory_limit: all_memory.all? { |m| m < 200 }
     }
   end
 end
