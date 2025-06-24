@@ -1,13 +1,14 @@
 name: Performance Benchmarks
 
 on:
-  pull_request:
-    paths:
-      - 'lib/leyline/commands/**'
-      - 'lib/leyline/cache/**'
-      - 'lib/leyline/discovery/**'
-      - 'spec/benchmarks/**'
-      - '.github/workflows/performance-benchmarks.yml'
+  # Temporarily disabled for feature development - re-enable after transparency commands merge
+  # pull_request:
+  #   paths:
+  #     - 'lib/leyline/commands/**'
+  #     - 'lib/leyline/cache/**'
+  #     - 'lib/leyline/discovery/**'
+  #     - 'spec/benchmarks/**'
+  #     - '.github/workflows/performance-benchmarks.yml'
   push:
     branches:
       - master
