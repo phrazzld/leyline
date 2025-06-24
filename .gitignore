@@ -50,3 +50,5 @@ metrics/
 
 # Synced leyline standards (test artifacts)
 docs/leyline/
+# Benchmark results
+benchmark-results.json
