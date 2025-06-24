@@ -50,7 +50,11 @@ GEM
     unicode-emoji (4.0.4)
 
 PLATFORMS
+  arm64-darwin-23
+  x64-mingw-ucrt
+  x64-mingw32
   x86_64-darwin-23
+  x86_64-linux
 
 DEPENDENCIES
   concurrent-ruby (~> 1.2)

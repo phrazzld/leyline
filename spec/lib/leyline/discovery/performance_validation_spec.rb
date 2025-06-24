@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../../../support/benchmark_helpers'
 
 RSpec.describe 'Discovery Performance Validation', type: :integration do
+  include BenchmarkHelpers
   # This is a simplified performance validation that can be run in CI
   # to ensure the <1s performance target is maintained over time
-
-  TARGET_PERFORMANCE_MS = 1000 # <1s target
 
   describe 'real-world performance validation' do
     let(:cache) { Leyline::Discovery::MetadataCache.new(compression_enabled: true) }

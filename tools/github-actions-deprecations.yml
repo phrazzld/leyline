@@ -1,0 +1,131 @@
+# GitHub Actions Deprecation Database
+# Maintains a list of deprecated actions to prevent CI failures
+# Format: action@version -> deprecation details
+
+# Artifact Actions (deprecated v3)
+actions/download-artifact@v3:
+  deprecated_since: '2024-04-16'
+  reason: 'Deprecated by GitHub, auto-failing since January 2025'
+  upgrade_to: 'actions/download-artifact@v4'
+  severity: 'high'
+
+actions/upload-artifact@v3:
+  deprecated_since: '2024-04-16'
+  reason: 'Deprecated by GitHub, auto-failing since January 2025'
+  upgrade_to: 'actions/upload-artifact@v4'
+  severity: 'high'
+
+# Checkout Actions (deprecated old versions)
+actions/checkout@v1:
+  deprecated_since: '2021-09-01'
+  reason: 'Uses deprecated Node.js 12 and lacks security features'
+  upgrade_to: 'actions/checkout@v4'
+  severity: 'high'
+
+actions/checkout@v2:
+  deprecated_since: '2023-09-01'
+  reason: 'Uses deprecated Node.js 16'
+  upgrade_to: 'actions/checkout@v4'
+  severity: 'medium'
+
+# Setup Actions (deprecated Node.js 12/16 versions)
+actions/setup-node@v1:
+  deprecated_since: '2021-09-01'
+  reason: 'Uses deprecated Node.js 12'
+  upgrade_to: 'actions/setup-node@v4'
+  severity: 'high'
+
+actions/setup-node@v2:
+  deprecated_since: '2023-09-01'
+  reason: 'Uses deprecated Node.js 16'
+  upgrade_to: 'actions/setup-node@v4'
+  severity: 'medium'
+
+actions/setup-python@v1:
+  deprecated_since: '2021-09-01'
+  reason: 'Uses deprecated Node.js 12'
+  upgrade_to: 'actions/setup-python@v5'
+  severity: 'high'
+
+actions/setup-python@v2:
+  deprecated_since: '2023-09-01'
+  reason: 'Uses deprecated Node.js 16'
+  upgrade_to: 'actions/setup-python@v5'
+  severity: 'medium'
+
+actions/setup-ruby@v1:
+  deprecated_since: '2021-09-01'
+  reason: 'Uses deprecated Node.js 12'
+  upgrade_to: 'ruby/setup-ruby@v1'
+  severity: 'high'
+
+# Cache Actions
+actions/cache@v1:
+  deprecated_since: '2021-09-01'
+  reason: 'Uses deprecated Node.js 12'
+  upgrade_to: 'actions/cache@v4'
+  severity: 'high'
+
+actions/cache@v2:
+  deprecated_since: '2023-09-01'
+  reason: 'Uses deprecated Node.js 16'
+  upgrade_to: 'actions/cache@v4'
+  severity: 'medium'
+
+# GitHub Script Actions
+actions/github-script@v3:
+  deprecated_since: '2023-01-01'
+  reason: 'Superseded by v6 with better TypeScript support'
+  upgrade_to: 'actions/github-script@v7'
+  severity: 'low'
+
+actions/github-script@v4:
+  deprecated_since: '2023-01-01'
+  reason: 'Superseded by v6 with better TypeScript support'
+  upgrade_to: 'actions/github-script@v7'
+  severity: 'low'
+
+actions/github-script@v5:
+  deprecated_since: '2023-01-01'
+  reason: 'Superseded by v6 with better TypeScript support'
+  upgrade_to: 'actions/github-script@v7'
+  severity: 'low'
+
+# Third-party popular actions that have deprecated versions
+peaceiris/actions-gh-pages@v2:
+  deprecated_since: '2022-01-01'
+  reason: 'Security and performance issues'
+  upgrade_to: 'peaceiris/actions-gh-pages@v3'
+  severity: 'medium'
+
+peter-evans/create-pull-request@v3:
+  deprecated_since: '2022-06-01'
+  reason: 'Superseded by v4 with better conflict resolution'
+  upgrade_to: 'peter-evans/create-pull-request@v5'
+  severity: 'low'
+
+# Docker Actions
+docker/build-push-action@v1:
+  deprecated_since: '2021-09-01'
+  reason: 'Uses deprecated Node.js 12'
+  upgrade_to: 'docker/build-push-action@v5'
+  severity: 'high'
+
+docker/build-push-action@v2:
+  deprecated_since: '2023-09-01'
+  reason: 'Uses deprecated Node.js 16'
+  upgrade_to: 'docker/build-push-action@v5'
+  severity: 'medium'
+
+# Security scanning
+github/codeql-action/init@v1:
+  deprecated_since: '2022-01-01'
+  reason: 'Superseded by v2 with better language support'
+  upgrade_to: 'github/codeql-action/init@v3'
+  severity: 'medium'
+
+github/codeql-action/analyze@v1:
+  deprecated_since: '2022-01-01'
+  reason: 'Superseded by v2 with better language support'
+  upgrade_to: 'github/codeql-action/analyze@v3'
+  severity: 'medium'

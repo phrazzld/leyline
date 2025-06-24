@@ -57,6 +57,15 @@ module Leyline
         @cache_hits.to_f / total_operations
       end
 
+      # Aliases for benchmark compatibility
+      alias hit_ratio cache_hit_ratio
+      alias hits cache_hits
+      alias misses cache_misses
+
+      def total_operations
+        @cache_hits + @cache_misses
+      end
+
       def time_saved_estimate
         # Estimate: git operations typically take 3-5 seconds
         @git_operations_skipped ? 4.0 : 0.0

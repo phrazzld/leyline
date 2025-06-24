@@ -1,0 +1,225 @@
+name: Validate GitHub Actions
+
+# This workflow implements automated quality gates to prevent GitHub Actions
+# deprecation failures by detecting deprecated actions early and providing
+# clear upgrade guidance.
+#
+# Aligned with Leyline's automation tenet: "Treat manual, repetitive tasks
+# as bugs in your process" - this automates the detection of deprecated
+# actions that would otherwise cause manual CI debugging sessions.
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - '.github/workflows/**'
+      - 'tools/validate_github_actions.rb'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - '.github/workflows/**'
+      - 'tools/validate_github_actions.rb'
+  schedule:
+    # Run weekly on Mondays at 09:00 UTC to catch new deprecations
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      update_database:
+        description: 'Update deprecation database'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  validate-actions:
+    runs-on: ubuntu-latest
+    name: GitHub Actions Deprecation Check
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history for comprehensive workflow scanning
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: false
+
+      - name: Validate Actions Tool Health Check
+        run: |
+          echo "🔍 GitHub Actions Validation Tool Health Check"
+          echo "=============================================="
+          echo ""
+
+          # Verify validation tool exists and is executable
+          if [ ! -f "tools/validate_github_actions.rb" ]; then
+            echo "❌ Validation tool not found: tools/validate_github_actions.rb"
+            exit 1
+          fi
+
+          # Test tool help functionality
+          if ! ruby tools/validate_github_actions.rb --help >/dev/null 2>&1; then
+            echo "❌ Validation tool help command failed"
+            exit 1
+          fi
+
+          echo "✅ Validation tool health check passed"
+          echo "Tool: $(ls -la tools/validate_github_actions.rb | awk '{print $1, $5, $9}')"
+          echo "Ruby: $(ruby --version)"
+          echo ""
+
+      - name: Update Deprecation Database
+        if: github.event.inputs.update_database == 'true'
+        run: |
+          echo "🔄 Updating deprecation database..."
+          export LEYLINE_STRUCTURED_LOGGING=true
+          ruby tools/validate_github_actions.rb --update --verbose
+          echo "✅ Database update completed"
+
+      - name: Scan for Deprecated Actions
+        run: |
+          echo "🔍 Scanning GitHub Actions workflows for deprecated actions..."
+          echo "This implements fail-fast validation to catch deprecation issues early"
+          echo ""
+
+          # Enable structured logging for CI integration
+          export LEYLINE_STRUCTURED_LOGGING=true
+
+          # Run validation with verbose output for debugging
+          if ! ruby tools/validate_github_actions.rb --verbose; then
+            echo ""
+            echo "❌ GITHUB ACTIONS VALIDATION FAILED"
+            echo ""
+            echo "🚨 This is a quality gate failure - deprecated actions detected!"
+            echo ""
+            echo "🔧 IMMEDIATE ACTIONS REQUIRED:"
+            echo "1. Review the deprecation warnings above"
+            echo "2. Update deprecated actions to recommended versions"
+            echo "3. Test workflows locally after updates"
+            echo "4. Commit the fixes and re-run this check"
+            echo ""
+            echo "💡 For upgrade guidance, see the specific recommendations above"
+            echo "   or visit: https://docs.github.com/en/actions/using-workflows"
+            echo ""
+            echo "🎯 This validation prevents future CI failures from action deprecations"
+            exit 1
+          fi
+
+          echo ""
+          echo "✅ GitHub Actions validation passed successfully"
+          echo "🎉 All workflow actions are up-to-date and supported"
+
+      - name: Generate Actions Inventory Report
+        if: always()
+        run: |
+          echo "📊 Generating GitHub Actions inventory report..."
+
+          # Create comprehensive actions inventory
+          echo "# GitHub Actions Inventory Report" > actions-inventory.md
+          echo "Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> actions-inventory.md
+          echo "" >> actions-inventory.md
+
+          # Count workflow files
+          workflow_count=$(find .github/workflows -name "*.yml" -o -name "*.yaml" 2>/dev/null | wc -l)
+          echo "## Summary" >> actions-inventory.md
+          echo "- Workflow files: ${workflow_count}" >> actions-inventory.md
+          echo "" >> actions-inventory.md
+
+          # List all unique actions in use
+          echo "## Actions in Use" >> actions-inventory.md
+          echo "" >> actions-inventory.md
+
+          if [ "$workflow_count" -gt 0 ]; then
+            # Extract all 'uses:' lines and sort uniquely
+            find .github/workflows -name "*.yml" -o -name "*.yaml" 2>/dev/null | \
+              xargs grep -h "^\s*-\s*uses:" | \
+              sed 's/^\s*-\s*uses:\s*//' | \
+              sed 's/\s*$//' | \
+              sort -u | \
+              while read -r action; do
+                echo "- \`${action}\`" >> actions-inventory.md
+              done
+          else
+            echo "No workflow files found." >> actions-inventory.md
+          fi
+
+          echo "" >> actions-inventory.md
+          echo "## Validation Status" >> actions-inventory.md
+          echo "- Last validated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> actions-inventory.md
+          echo "- Validation result: ${{ job.status }}" >> actions-inventory.md
+          echo "- Repository: ${{ github.repository }}" >> actions-inventory.md
+          echo "- Commit: ${{ github.sha }}" >> actions-inventory.md
+
+          # Display report summary
+          echo ""
+          echo "📋 Actions Inventory Summary:"
+          echo "Workflow files: ${workflow_count}"
+          if [ "$workflow_count" -gt 0 ]; then
+            action_count=$(find .github/workflows -name "*.yml" -o -name "*.yaml" 2>/dev/null | \
+              xargs grep -h "^\s*-\s*uses:" | wc -l)
+            unique_actions=$(find .github/workflows -name "*.yml" -o -name "*.yaml" 2>/dev/null | \
+              xargs grep -h "^\s*-\s*uses:" | \
+              sed 's/^\s*-\s*uses:\s*//' | \
+              sed 's/\s*$//' | \
+              sort -u | wc -l)
+            echo "Total action uses: ${action_count}"
+            echo "Unique actions: ${unique_actions}"
+          fi
+
+      - name: Upload Actions Inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-actions-inventory
+          path: actions-inventory.md
+          retention-days: 30
+
+      - name: Deprecation Check Summary
+        if: failure()
+        run: |
+          echo ""
+          echo "🚨 GITHUB ACTIONS DEPRECATION CHECK FAILED"
+          echo "=========================================="
+          echo ""
+          echo "This quality gate prevents CI failures from deprecated GitHub Actions."
+          echo "The validation above found actions that are deprecated or will be deprecated."
+          echo ""
+          echo "🔧 TO FIX:"
+          echo "1. Review the specific deprecation warnings in the 'Scan for Deprecated Actions' step"
+          echo "2. Update each deprecated action to its recommended replacement"
+          echo "3. Test your workflows after making changes"
+          echo "4. Commit the updates and re-run this workflow"
+          echo ""
+          echo "💡 EXAMPLE FIXES:"
+          echo "  actions/setup-node@v3 → actions/setup-node@v4"
+          echo "  actions/checkout@v3 → actions/checkout@v4"
+          echo "  actions/setup-python@v4 → actions/setup-python@v5"
+          echo ""
+          echo "🎯 This automation saves you from future CI failures and security issues."
+          echo "   Keeping actions up-to-date ensures you get the latest features and security patches."
+          echo ""
+          exit 1
+
+      - name: Success Summary
+        if: success()
+        run: |
+          echo ""
+          echo "✅ GITHUB ACTIONS VALIDATION SUCCESSFUL"
+          echo "======================================"
+          echo ""
+          echo "🎉 All GitHub Actions in your workflows are up-to-date!"
+          echo ""
+          echo "📊 VALIDATION RESULTS:"
+          echo "- All actions are using supported versions"
+          echo "- No deprecated actions detected"
+          echo "- Workflows are protected against future deprecation failures"
+          echo ""
+          echo "🔄 AUTOMATED MAINTENANCE:"
+          echo "- This check runs on every workflow change"
+          echo "- Weekly scheduled scans catch new deprecations"
+          echo "- Manual updates available via workflow_dispatch"
+          echo ""
+          echo "🛡️  Your CI pipeline is protected against GitHub Actions deprecations!"
