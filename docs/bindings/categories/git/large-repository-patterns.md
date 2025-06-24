@@ -222,18 +222,29 @@ Large repository patterns must optimize for developer experience at scale:
 
        def analyze_repository_growth(self):
            """Identify growth patterns and large objects."""
-           # Find large objects
-           subprocess.run([
+           # Step 1: Get all objects
+           result1 = subprocess.run([
                'git', '-C', self.repo_path,
                'rev-list', '--objects', '--all'
-           ], stdout=subprocess.PIPE) | subprocess.run([
+           ], capture_output=True, text=True, check=True)
+
+           # Step 2: Get object details
+           result2 = subprocess.run([
                'git', '-C', self.repo_path,
                'cat-file', '--batch-check=%(objecttype) %(objectname) %(objectsize) %(rest)'
-           ], stdin=subprocess.PIPE) | subprocess.run([
+           ], input=result1.stdout, capture_output=True, text=True, check=True)
+
+           # Step 3: Sort by size (descending)
+           result3 = subprocess.run([
                'sort', '-k3', '-n', '-r'
-           ], stdin=subprocess.PIPE) | subprocess.run([
+           ], input=result2.stdout, capture_output=True, text=True, check=True)
+
+           # Step 4: Get top 20 largest objects
+           result4 = subprocess.run([
                'head', '-20'
-           ], stdin=subprocess.PIPE)
+           ], input=result3.stdout, capture_output=True, text=True, check=True)
+
+           return result4.stdout
    ```
 
 ## Examples

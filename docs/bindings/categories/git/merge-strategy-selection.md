@@ -90,7 +90,11 @@ COMMIT_COUNT=$(git rev-list --count $BASE_BRANCH..HEAD)
 
 # Analyze commit messages
 FIXUP_COMMITS=$(git log $BASE_BRANCH..HEAD --oneline | grep -iE "(fix|typo|update|wip|tmp)" | wc -l)
-FIXUP_RATIO=$(echo "scale=2; $FIXUP_COMMITS / $COMMIT_COUNT" | bc)
+if [ "$COMMIT_COUNT" -eq 0 ]; then
+    FIXUP_RATIO=0
+else
+    FIXUP_RATIO=$(echo "scale=2; $FIXUP_COMMITS / $COMMIT_COUNT" | bc)
+fi
 
 # Recommendation logic
 echo "📊 Branch Analysis for: $BRANCH"

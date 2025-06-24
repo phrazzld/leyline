@@ -133,11 +133,15 @@ The solution isn't to baby Git or restrict its use—it's to understand its desi
    while read oldrev newrev refname; do
      # Check all new objects
      for file in $(git diff --name-only $oldrev..$newrev); do
-       size=$(git cat-file -s "$newrev:$file" 2>/dev/null || echo 0)
-       if [ $size -gt $MAX_FILE_SIZE ]; then
-         echo "Error: File $file is too large ($size bytes)"
-         echo "Files over 10MB must use Git LFS"
-         exit 1
+       # Get blob SHA for the file in the new commit
+       blob_sha=$(git ls-tree -r "$newrev" -- "$file" | awk '{print $3}')
+       if [ -n "$blob_sha" ]; then
+         size=$(git cat-file -s "$blob_sha" 2>/dev/null || echo 0)
+         if [ $size -gt $MAX_FILE_SIZE ]; then
+           echo "Error: File $file is too large ($size bytes)"
+           echo "Files over 10MB must use Git LFS"
+           exit 1
+         fi
        fi
      done
 
