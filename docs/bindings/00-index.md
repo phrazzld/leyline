@@ -15,6 +15,7 @@ This file contains an automatically generated list of all bindings with their on
 | [ci-cd-pipeline-standards](./core/ci-cd-pipeline-standards.md) | 0.1.0 | This binding extends our automation tenet by establishing CI/CD pipelines as the backbone of development workflow automation. CI/CD pipelines serve... |
 | [code-review-excellence](./core/code-review-excellence.md) | 0.1.0 | While automation can catch formatting issues, syntax errors, and common bugs, human review remains essential for evaluating design decisions, ident... |
 | [code-size](./core/code-size.md) | 0.1.0 | This binding implements our simplicity tenet by addressing the cognitive overhead |
+| [collaborative-branch-naming](./core/collaborative-branch-naming.md) | 0.1.0 | This binding implements our Git least surprise principle by ensuring branch names are self-documenting and predictable. When developers can underst... |
 | [complexity-detection-patterns](./core/complexity-detection-patterns.md) | 0.1.0 | The complexity demon is cunning—it disguises itself as "necessary abstraction," "future-proofing," and "enterprise architecture." This binding prov... |
 | [component-architecture](./core/component-architecture.md) | 0.1.0 | This binding implements our modularity tenet by establishing systematic frontend component organization. User interfaces combine hundreds of intera... |
 | [component-isolation](./core/component-isolation.md) | 0.1.0 | This binding directly implements our orthogonality tenet by eliminating unwanted coupling between components. When components are truly isolated, c... |
@@ -26,24 +27,31 @@ This file contains an automatically generated list of all bindings with their on
 | [dependency-inversion](./core/dependency-inversion.md) | 0.1.0 | This binding directly implements our testability tenet by making code inherently more |
 | [dependency-management](./core/dependency-management.md) | 0.1.0 | This binding implements our simplicity tenet by addressing a major source of hidden |
 | [development-environment-consistency](./core/development-environment-consistency.md) | 0.1.0 | This binding applies our automation tenet to development environment management, transforming manual setup processes that are error-prone and time-... |
+| [distributed-git-workflow-practices](./core/distributed-git-workflow-practices.md) | 0.1.0 | This binding directly implements our distributed resilience tenet by ensuring Git workflows embrace rather than fight Git's fundamental architectur... |
 | [external-configuration](./core/external-configuration.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by preventing one of |
 | [extract-common-logic](./core/extract-common-logic.md) | 0.1.0 | This binding implements our DRY tenet by eliminating knowledge duplication at the code level. Like creating a recipe book where each technique is d... |
 | [fail-fast-validation](./core/fail-fast-validation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function assumptions and constraints visible through immediate validation rather... |
 | [feature-flag-management](./core/feature-flag-management.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating software that can change behavior dynamically without requiring code c... |
 | [flexible-architecture-patterns](./core/flexible-architecture-patterns.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that evolve gracefully over time. Software requirements change... |
+| [forgiving-git-workflows](./core/forgiving-git-workflows.md) | 0.1.0 | This binding implements our Git least surprise principle by ensuring that mistakes lead to learning opportunities rather than disasters. When devel... |
+| [git-automation-assistance](./core/git-automation-assistance.md) | 0.1.0 | This binding implements our joyful version control tenet by ensuring automation enhances rather than constrains developer workflows. When automatio... |
 | [git-hooks-automation](./core/git-hooks-automation.md) | 0.1.0 | This binding directly implements our automation tenet by eliminating manual quality checks that are prone to human error and inconsistent applicati... |
+| [git-repository-integrity](./core/git-repository-integrity.md) | 0.1.0 | This binding implements our maintainability tenet specifically for Git repositories, recognizing that repository health directly impacts developer ... |
 | [github-actions-deprecation-prevention](./core/github-actions-deprecation-prevention.md) | 0.1.0 | This binding implements our automated-quality-gates principle by creating specific systems that prevent CI failures from GitHub Actions deprecation... |
 | [hex-domain-purity](./core/hex-domain-purity.md) | 0.1.0 | This binding implements our simplicity tenet by eliminating entanglement between business rules and technical implementations. Mixed concerns creat... |
+| [human-readable-commit-history](./core/human-readable-commit-history.md) | 0.1.0 | This binding directly implements our joyful version control tenet by transforming Git history from a cryptic log into a narrative that developers a... |
 | [immutable-by-default](./core/immutable-by-default.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating a major source of |
 | [incremental-delivery](./core/incremental-delivery.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating a delivery process that prioritizes safety, speed, and adaptability ov... |
 | [integration-first-testing](./core/integration-first-testing.md) | 0.1.0 | Most real-world bugs occur at the boundaries between components, not within individual functions. Grug's wisdom teaches that integration tests prov... |
 | [interface-contracts](./core/interface-contracts.md) | 0.1.0 | This binding implements our orthogonality tenet by creating clear boundaries between components. Well-defined interface contracts enable components... |
 | [layered-architecture](./core/layered-architecture.md) | 0.1.0 | This binding implements our orthogonality tenet by creating structured separation between different levels of abstraction and responsibility. Layer... |
+| [merge-conflict-mastery](./core/merge-conflict-mastery.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making merge conflict resolution a deliberate, understood process rather than a mysteri... |
 | [natural-refactoring-points](./core/natural-refactoring-points.md) | 0.1.0 | Premature abstraction is one of the most expensive mistakes in software development. Grug's wisdom teaches that code needs time to "settle" and rev... |
 | [no-internal-mocking](./core/no-internal-mocking.md) | 0.1.0 | This binding implements our testability tenet by ensuring tests verify real system behavior rather than mock behavior. Internal mocking creates dan... |
 | [no-lint-suppression](./core/no-lint-suppression.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by requiring |
 | [normalized-data-design](./core/normalized-data-design.md) | 0.1.0 | This binding implements our DRY tenet at the data layer by ensuring that knowledge represented in data exists in only one location. When the same i... |
 | [performance-testing-standards](./core/performance-testing-standards.md) | 0.1.0 | Performance problems discovered in production are exponentially more expensive to fix than those caught during development. Most teams discover per... |
+| [pragmatic-branching-strategies](./core/pragmatic-branching-strategies.md) | 0.1.0 | This binding implements our simplicity tenet by recognizing that elaborate branching strategies often create more problems than they solve. Too man... |
 | [preferred-technology-patterns](./core/preferred-technology-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by recognizing that every piece of novel technology introduces complexity that extends far beyond its ... |
 | [property-based-testing](./core/property-based-testing.md) | 0.1.0 | This binding implements our testability tenet by dramatically expanding test coverage beyond what's practical with manually written examples. Prope... |
 | [pure-functions](./core/pure-functions.md) | 0.1.0 | This binding implements our simplicity tenet by reducing complexity at its most fundamental level—predictable code execution. When a function is pu... |
@@ -153,6 +161,31 @@ _No frontend bindings defined yet._
 | [query-optimization-and-indexing](./categories/database/query-optimization-and-indexing.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by ensuring database performance decisions are visible and intentional. Database optimizer... |
 | [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding implements maintainability by ensuring that read replica patterns remain comprehensible and manageable as systems scale. Read replicas... |
 | [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding implements our modularity tenet by treating transactions as well-defined, independent units of work with clear boundaries. Like shippi... |
+
+## Git Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [atomic-commits](./categories/git/atomic-commits.md) | 0.1.0 | This binding leverages Git's content-addressable architecture to create a history that serves as a powerful debugging and development tool. When co... |
+| [automated-release-workflow](./categories/git/automated-release-workflow.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by automating the entire release process through conventions. Just as Rails eliminated m... |
+| [automated-rollback-procedures](./categories/git/automated-rollback-procedures.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by acknowledging that failures are inevitable and preparing systematic responses. In ... |
+| [branch-namespace-organization](./categories/git/branch-namespace-organization.md) | 0.1.0 | Git stores branches as refs—simple files containing commit SHAs. This minimalist design provides maximum flexibility but no inherent organization. ... |
+| [branch-naming-standards](./categories/git/branch-naming-standards.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by establishing clear, predictable branch naming patterns. Just as Rails chose plural re... |
+| [commit-graph-optimization](./categories/git/commit-graph-optimization.md) | 0.1.0 | Git operations that traverse the commit graph—log, merge-base, contains queries, ahead/behind calculations—traditionally require reading individual... |
+| [commit-message-conventions](./categories/git/commit-message-conventions.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by establishing Conventional Commits as the default standard. Just as Rails made the opi... |
+| [distributed-conflict-resolution](./categories/git/distributed-conflict-resolution.md) | 0.1.0 | This binding implements our distributed Git workflows tenet by acknowledging that conflicts are not failures but natural outcomes of distributed co... |
+| [distributed-team-workflows](./categories/git/distributed-team-workflows.md) | 0.1.0 | This binding implements our distributed Git workflows tenet by acknowledging that the sun never sets on modern software teams. Traditional workflow... |
+| [feature-flag-driven-development](./categories/git/feature-flag-driven-development.md) | 0.1.0 | This binding directly implements our distributed Git workflows tenet by solving one of the fundamental challenges of distributed development: how t... |
+| [git-backup-strategy](./categories/git/git-backup-strategy.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by applying data durability principles to version control. While Git's distributed na... |
+| [git-monitoring-metrics](./categories/git/git-monitoring-metrics.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by bringing production-grade observability to version control operations. While we me... |
+| [git-performance-optimization](./categories/git/git-performance-optimization.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by recognizing that performance is a feature, not a luxury. When Git operations are s... |
+| [git-implementation-roadmap](./categories/git/implementation-roadmap.md) | 0.1.0 | The Git category now contains: |
+| [large-repository-patterns](./categories/git/large-repository-patterns.md) | 0.1.0 | This binding implements our distributed Git workflows tenet by addressing the unique challenges of scale. As repositories grow—whether through accu... |
+| [linear-history-optimization](./categories/git/linear-history-optimization.md) | 0.1.0 | This binding maximizes the performance and utility of Git's content-addressable model by maintaining simple, linear commit graphs. Complex merge-he... |
+| [merge-strategy-selection](./categories/git/merge-strategy-selection.md) | 0.1.0 | Git provides multiple strategies for integrating changes—merge, rebase, squash—each with distinct effects on repository history and performance. Ch... |
+| [pull-request-workflow](./categories/git/pull-request-workflow.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by establishing streamlined, automated pull request workflows. Just as Rails recognized ... |
+| [repository-performance-standards](./categories/git/repository-performance-standards.md) | 0.1.0 | Git's performance characteristics change dramatically with repository size, history length, and usage patterns. A repository that performs well wit... |
+| [trunk-based-development](./categories/git/trunk-based-development.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by establishing trunk-based development as the default branching strategy. Just as Rails... |
 
 ## Python Bindings
 
