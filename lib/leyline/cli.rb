@@ -46,25 +46,15 @@ module Leyline
       end
     end
 
-    desc 'categories', 'List all available leyline categories'
+    desc 'categories', 'List all available categories for synchronization'
     long_desc <<-LONGDESC
-      Display all available leyline categories with document counts.
-      Categories represent different technology stacks and contexts.
+      Lists all available categories that can be synchronized using the `sync` command.
 
-      EXAMPLES:
-        leyline categories                # List all categories
-        leyline categories -v             # Verbose with document details
-        leyline categories --stats        # Include cache performance stats
+      This command provides a simple list of category names that you can use with
+      the `leyline sync -c <category>` command to add specific standards to your project.
 
-      UNDERSTANDING CATEGORIES:
-        - Core: Universal principles that apply to all projects
-        - Language-specific: TypeScript, Go, Rust, Python, etc.
-        - Context-specific: Frontend, Backend, Testing, etc.
-
-      PERFORMANCE:
-        - First run: May take 1-2s for cache warming
-        - Subsequent runs: <500ms with warm cache
-        - Cache automatically managed in background
+      EXAMPLE:
+        leyline categories
     LONGDESC
     method_option :verbose,
                   type: :boolean,
@@ -75,7 +65,26 @@ module Leyline
                   desc: 'Show cache performance statistics',
                   aliases: '--stats'
     def categories
-      perform_discovery_command(:categories, options)
+      # Handle deprecated options with warnings
+      if options[:verbose]
+        puts "Warning: --verbose option has been deprecated for 'categories' command."
+        puts "Use 'leyline show <category>' for detailed information about specific categories."
+        puts
+      end
+
+      if options[:stats]
+        puts "Warning: --stats option has been deprecated for 'categories' command."
+        puts "Use 'leyline show <category> --stats' for performance statistics."
+        puts
+      end
+
+      puts 'Available categories for sync:'
+      puts
+      Leyline::CliOptions::VALID_CATEGORIES.each do |category|
+        puts "  - #{category}"
+      end
+      puts
+      puts 'You can sync them using: leyline sync -c <category1>,<category2>'
     end
 
     desc 'show CATEGORY', 'Show documents in a specific category'
@@ -462,7 +471,7 @@ module Leyline
         # Start background cache warming to eliminate cold-start penalty
         begin
           warming_started = metadata_cache.warm_cache_in_background
-          puts "🔄 Starting cache warm-up in background..." if verbose && warming_started
+          puts '🔄 Starting cache warm-up in background...' if verbose && warming_started
         rescue => e
           # Warming failures should not break the command
           puts "Warning: Cache warming failed: #{e.message}" if verbose
@@ -470,8 +479,6 @@ module Leyline
 
         # Execute the specific discovery command
         case command
-        when :categories
-          execute_categories_command(metadata_cache, options)
         when :show
           execute_show_command(metadata_cache, options)
         when :search
@@ -493,32 +500,7 @@ module Leyline
       end
     end
 
-    def execute_categories_command(metadata_cache, options)
-      verbose = options[:verbose] || false
-      categories = metadata_cache.categories
 
-      if categories.empty?
-        puts "No categories found."
-        return
-      end
-
-      puts "Available Categories (#{categories.length}):"
-      puts
-
-      categories.each do |category|
-        documents = metadata_cache.documents_for_category(category)
-
-        if verbose
-          puts "#{category} (#{documents.length} documents)"
-          documents.each do |doc|
-            puts "  - #{doc[:title]} (#{doc[:id]})"
-          end
-          puts
-        else
-          puts "  #{category} (#{documents.length} documents)"
-        end
-      end
-    end
 
     def execute_show_command(metadata_cache, options)
       category = options[:category]
@@ -556,7 +538,7 @@ module Leyline
       limit = options[:limit] || 10
 
       if query.nil? || query.strip.empty?
-        puts "Search query cannot be empty"
+        puts 'Search query cannot be empty'
         exit 1
       end
 
@@ -569,7 +551,7 @@ module Leyline
         suggestions = metadata_cache.suggest_corrections(query)
         if suggestions.any?
           puts
-          puts "Did you mean:"
+          puts 'Did you mean:'
           suggestions.each { |suggestion| puts "  #{suggestion}" }
         end
 
@@ -603,7 +585,7 @@ module Leyline
         if verbose && cache
           health = cache.health_status
           unless health[:healthy]
-            puts "Warning: Cache health issues detected (continuing anyway)"
+            puts 'Warning: Cache health issues detected (continuing anyway)'
           end
         end
 
@@ -618,11 +600,11 @@ module Leyline
       total_time = Time.now - start_time
       cache_stats = metadata_cache.performance_stats
 
-      puts "\n" + "="*50
-      puts "DISCOVERY PERFORMANCE STATISTICS"
-      puts "="*50
+      puts "\n" + '='*50
+      puts 'DISCOVERY PERFORMANCE STATISTICS'
+      puts '='*50
 
-      puts "Command Performance:"
+      puts 'Command Performance:'
       puts "  Total time: #{total_time.round(3)}s"
       puts "  Cache hit ratio: #{(cache_stats[:hit_ratio] * 100).round(1)}%"
       puts "  Documents cached: #{cache_stats[:document_count]}"
@@ -696,7 +678,7 @@ module Leyline
 
     def format_result_number(number)
       # Add visual hierarchy with consistent numbering
-      sprintf("%2d.", number)
+      sprintf('%2d.', number)
     end
 
     def format_result_metadata(category, type, id, score, verbose)
@@ -800,7 +782,7 @@ module Leyline
           if verbose && cache
             health = cache.health_status
             unless health[:healthy]
-              puts "Warning: Cache health issues detected:"
+              puts 'Warning: Cache health issues detected:'
               health[:issues].each do |issue|
                 puts "  - #{issue[:type]}: #{issue[:path] || issue[:error]}"
               end
@@ -809,7 +791,7 @@ module Leyline
         rescue => e
           # Log cache initialization failure but continue without cache
           puts "Warning: Cache initialization failed: #{e.message}" if verbose
-          puts "Continuing without cache optimization..." if verbose
+          puts 'Continuing without cache optimization...' if verbose
           cache = nil
         end
       end
@@ -826,7 +808,7 @@ module Leyline
       git_client = Sync::GitClient.new
 
       begin
-        puts "Fetching leyline standards..." if verbose
+        puts 'Fetching leyline standards...' if verbose
 
         # Set up git sparse-checkout
         git_client.setup_sparse_checkout(temp_dir)
@@ -913,9 +895,9 @@ module Leyline
 
       # Display cache statistics if requested
       if stats
-        puts "\n" + "="*50
-        puts "CACHE STATISTICS"
-        puts "="*50
+        puts "\n" + '='*50
+        puts 'CACHE STATISTICS'
+        puts '='*50
 
         cache_directory_stats = cache&.directory_stats || {}
         puts stats.format_stats(cache_directory_stats)
@@ -1067,9 +1049,9 @@ module Leyline
     def display_transparency_stats(cache, start_time)
       total_time = Time.now - start_time
 
-      puts "\n" + "="*50
-      puts "TRANSPARENCY COMMAND PERFORMANCE"
-      puts "="*50
+      puts "\n" + '='*50
+      puts 'TRANSPARENCY COMMAND PERFORMANCE'
+      puts '='*50
 
       puts "Execution Time: #{total_time.round(3)}s"
       puts "Target Met: #{total_time < 2.0 ? '✅' : '❌'} (<2s)"
@@ -1085,49 +1067,49 @@ module Leyline
     end
 
     def display_comprehensive_help
-      puts "LEYLINE CLI - Development Standards Synchronization"
-      puts "="*60
+      puts 'LEYLINE CLI - Development Standards Synchronization'
+      puts '='*60
       puts
-      puts "Leyline helps you synchronize and manage development standards across"
-      puts "your projects, providing transparency into changes and updates."
+      puts 'Leyline helps you synchronize and manage development standards across'
+      puts 'your projects, providing transparency into changes and updates.'
       puts
-      puts "COMMAND CATEGORIES:"
+      puts 'COMMAND CATEGORIES:'
       puts
-      puts "  📋 DISCOVERY COMMANDS"
-      puts "    categories          List available leyline categories"
-      puts "    show CATEGORY       Show documents in a specific category"
-      puts "    search QUERY        Search leyline documents by content"
+      puts '  📋 DISCOVERY COMMANDS'
+      puts '    categories          List available leyline categories'
+      puts '    show CATEGORY       Show documents in a specific category'
+      puts '    search QUERY        Search leyline documents by content'
       puts
-      puts "  🔄 SYNC COMMANDS"
-      puts "    sync [PATH]         Download leyline standards to project"
-      puts "    status [PATH]       Show sync status and local modifications"
-      puts "    diff [PATH]         Show differences without applying changes"
-      puts "    update [PATH]       Preview and apply updates with conflict detection"
+      puts '  🔄 SYNC COMMANDS'
+      puts '    sync [PATH]         Download leyline standards to project'
+      puts '    status [PATH]       Show sync status and local modifications'
+      puts '    diff [PATH]         Show differences without applying changes'
+      puts '    update [PATH]       Preview and apply updates with conflict detection'
       puts
-      puts "  ℹ️  UTILITY COMMANDS"
-      puts "    version             Show version and system information"
-      puts "    help [COMMAND]      Show detailed help for specific commands"
+      puts '  ℹ️  UTILITY COMMANDS'
+      puts '    version             Show version and system information'
+      puts '    help [COMMAND]      Show detailed help for specific commands'
       puts
-      puts "QUICK START:"
-      puts "  1. leyline sync               # Download standards to current project"
+      puts 'QUICK START:'
+      puts '  1. leyline sync               # Download standards to current project'
       puts "  2. leyline status            # Check what's synchronized"
-      puts "  3. leyline categories        # Explore available categories"
-      puts "  4. leyline show typescript   # View TypeScript-specific standards"
+      puts '  3. leyline categories        # Explore available categories'
+      puts '  4. leyline show typescript   # View TypeScript-specific standards'
       puts
-      puts "PERFORMANCE OPTIMIZATION:"
-      puts "  • Cache automatically optimizes subsequent operations"
-      puts "  • Use category filtering (-c) for faster operations"
-      puts "  • Add --stats to any command for performance insights"
-      puts "  • Target response times: <2s for all operations"
+      puts 'PERFORMANCE OPTIMIZATION:'
+      puts '  • Cache automatically optimizes subsequent operations'
+      puts '  • Use category filtering (-c) for faster operations'
+      puts '  • Add --stats to any command for performance insights'
+      puts '  • Target response times: <2s for all operations'
       puts
-      puts "TROUBLESHOOTING:"
-      puts "  • Run with -v (verbose) flag for detailed output"
-      puts "  • Use --stats to monitor cache and performance"
-      puts "  • Check ~/.cache/leyline for cache issues"
-      puts "  • Ensure git is installed and internet connectivity"
+      puts 'TROUBLESHOOTING:'
+      puts '  • Run with -v (verbose) flag for detailed output'
+      puts '  • Use --stats to monitor cache and performance'
+      puts '  • Check ~/.cache/leyline for cache issues'
+      puts '  • Ensure git is installed and internet connectivity'
       puts
-      puts "For detailed help on any command: leyline help COMMAND"
-      puts "Documentation: https://github.com/phrazzld/leyline"
+      puts 'For detailed help on any command: leyline help COMMAND'
+      puts 'Documentation: https://github.com/phrazzld/leyline'
     end
   end
 end

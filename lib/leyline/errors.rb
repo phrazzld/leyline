@@ -580,6 +580,18 @@ module Leyline
 
   # Configuration-related errors
   class ConfigurationError < LeylineError
+    def initialize(message, **options)
+      # Extract known LeylineError options
+      operation = options.delete(:operation)
+      category = options.delete(:category) || :configuration
+      context = options.delete(:context) || {}
+
+      # Merge any remaining options into context
+      context = context.merge(options) if options.any?
+
+      super(message, operation: operation, context: context, category: category)
+    end
+
     def recovery_suggestions
       [
         'Check configuration file syntax and permissions',
