@@ -46,36 +46,26 @@ module Leyline
       end
     end
 
-    desc 'categories', 'List all available leyline categories'
+    desc 'categories', 'List all available categories for synchronization'
     long_desc <<-LONGDESC
-      Display all available leyline categories with document counts.
-      Categories represent different technology stacks and contexts.
+      Lists all available categories that can be synchronized using the `sync` command.
 
-      EXAMPLES:
-        leyline categories                # List all categories
-        leyline categories -v             # Verbose with document details
-        leyline categories --stats        # Include cache performance stats
+      This command provides a simple list of category names that you can use with
+      the `leyline sync -c <category>` command to add specific standards to your project.
 
-      UNDERSTANDING CATEGORIES:
-        - Core: Universal principles that apply to all projects
-        - Language-specific: TypeScript, Go, Rust, Python, etc.
-        - Context-specific: Frontend, Backend, Testing, etc.
-
-      PERFORMANCE:
-        - First run: May take 1-2s for cache warming
-        - Subsequent runs: <500ms with warm cache
-        - Cache automatically managed in background
+      EXAMPLE:
+        leyline categories
     LONGDESC
-    method_option :verbose,
-                  type: :boolean,
-                  desc: 'Show detailed category information',
-                  aliases: '-v'
-    method_option :stats,
-                  type: :boolean,
-                  desc: 'Show cache performance statistics',
-                  aliases: '--stats'
     def categories
-      perform_discovery_command(:categories, options)
+      require_relative 'cli/options'
+
+      puts "Available categories for sync:"
+      puts
+      Leyline::CliOptions::VALID_CATEGORIES.each do |category|
+        puts "  - #{category}"
+      end
+      puts
+      puts "You can sync them using: leyline sync -c <category1>,<category2>"
     end
 
     desc 'show CATEGORY', 'Show documents in a specific category'
@@ -470,8 +460,6 @@ module Leyline
 
         # Execute the specific discovery command
         case command
-        when :categories
-          execute_categories_command(metadata_cache, options)
         when :show
           execute_show_command(metadata_cache, options)
         when :search
@@ -493,32 +481,7 @@ module Leyline
       end
     end
 
-    def execute_categories_command(metadata_cache, options)
-      verbose = options[:verbose] || false
-      categories = metadata_cache.categories
 
-      if categories.empty?
-        puts "No categories found."
-        return
-      end
-
-      puts "Available Categories (#{categories.length}):"
-      puts
-
-      categories.each do |category|
-        documents = metadata_cache.documents_for_category(category)
-
-        if verbose
-          puts "#{category} (#{documents.length} documents)"
-          documents.each do |doc|
-            puts "  - #{doc[:title]} (#{doc[:id]})"
-          end
-          puts
-        else
-          puts "  #{category} (#{documents.length} documents)"
-        end
-      end
-    end
 
     def execute_show_command(metadata_cache, options)
       category = options[:category]

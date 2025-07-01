@@ -580,6 +580,10 @@ module Leyline
 
   # Configuration-related errors
   class ConfigurationError < LeylineError
+    def initialize(message, **options)
+      super(message, **options)
+    end
+
     def recovery_suggestions
       [
         'Check configuration file syntax and permissions',
