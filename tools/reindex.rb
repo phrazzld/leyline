@@ -193,7 +193,7 @@ def process_bindings_dir
 
   # 2. Process category bindings
   # Define standard categories that should always be included
-  standard_categories = ['backend', 'cli', 'frontend', 'go', 'rust', 'typescript']
+  standard_categories = ['backend', 'cli', 'csharp', 'frontend', 'go', 'rust', 'typescript']
 
   # Initialize all standard categories
   standard_categories.each do |category|
