@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Leyline
+  # Command-line interface options validation and normalization utilities
   module CliOptions
     VALID_CATEGORIES = %w[
       api
@@ -12,6 +13,7 @@ module Leyline
       go
       python
       react
+      ruby
       rust
       security
       tenets
@@ -24,16 +26,12 @@ module Leyline
     class << self
       def validate_categories(categories)
         return true if categories.nil? || categories.empty?
-
-        unless categories.is_a?(Array)
-          raise ValidationError, "Categories must be an array, got #{categories.class}"
-        end
+        raise ValidationError, "Categories must be an array, got #{categories.class}" unless categories.is_a?(Array)
 
         categories.each do |category|
           unless category.is_a?(String)
             raise ValidationError, "Category must be a string, got #{category.class}: #{category}"
           end
-
           unless VALID_CATEGORIES.include?(category)
             raise ValidationError, "Invalid category '#{category}'. Valid categories: #{VALID_CATEGORIES.join(', ')}"
           end
@@ -55,9 +53,7 @@ module Leyline
       def validate_path(path)
         return true if path.nil?
 
-        unless path.is_a?(String)
-          raise ValidationError, "Path must be a string, got #{path.class}: #{path}"
-        end
+        raise ValidationError, "Path must be a string, got #{path.class}: #{path}" unless path.is_a?(String)
 
         expanded_path = File.expand_path(path)
 
@@ -87,5 +83,5 @@ module Leyline
         categories.map(&:to_s).uniq.sort
       end
     end
-    end
   end
+end

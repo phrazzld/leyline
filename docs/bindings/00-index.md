@@ -206,6 +206,22 @@ _No frontend bindings defined yet._
 |---|---|---|
 | [state-management](./categories/react/state-management.md) | 0.1.0 | This binding implements our simplicity tenet by preventing state management over-engineering. Global stores for all state create complexity, unpred... |
 
+## Ruby Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [ruby-apis](./categories/ruby/apis.md) | 0.1.0 | - **JSON:API or custom serializers** for consistent response format |
+| [ruby-architecture-organization](./categories/ruby/architecture-organization.md) | 0.1.0 | - **Service objects** for complex business logic |
+| [ruby-cli-tools](./categories/ruby/cli-tools.md) | 0.1.0 | - **Thor framework** for command structure and help generation |
+| [ruby-gems-libraries](./categories/ruby/gems-libraries.md) | 0.1.0 | - **Semantic versioning** (MAJOR.MINOR.PATCH) for releases |
+| [ruby-language-syntax](./categories/ruby/language-syntax.md) | 0.1.0 | - **Keyword arguments** for methods with 2+ parameters |
+| [ruby-performance-scalability](./categories/ruby/performance-scalability.md) | 0.1.0 | - **Prevent N+1 queries** with `includes`/`preload` |
+| [ruby-security-production](./categories/ruby/security-production.md) | 0.1.0 | - **Input validation** on all external data |
+| [ruby-team-collaboration](./categories/ruby/team-collaboration.md) | 0.1.0 | - **Code review** required for all changes |
+| [ruby-testing-excellence](./categories/ruby/testing-excellence.md) | 0.1.0 | - **RSpec** over Minitest for readability |
+| [ruby-tooling-environment](./categories/ruby/tooling-environment.md) | 0.1.0 | - **Version management** with rbenv or rvm |
+| [ruby-web-applications](./categories/ruby/web-applications.md) | 0.1.0 | - **Thin controllers, fat services** - business logic in service objects |
+
 ## Security Bindings
 
 | ID | Version | Summary |
