@@ -65,8 +65,6 @@ module Leyline
                   desc: 'Show cache performance statistics',
                   aliases: '--stats'
     def categories
-      require_relative 'cli/options'
-
       # Handle deprecated options with warnings
       if options[:verbose]
         puts "Warning: --verbose option has been deprecated for 'categories' command."
