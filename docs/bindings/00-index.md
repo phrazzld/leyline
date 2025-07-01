@@ -87,6 +87,16 @@ _No backend bindings defined yet._
 | [cli-help-and-documentation](./categories/cli/cli-help-and-documentation.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making CLI functionality and usage patterns discoverable within the tool itself. When u... |
 | [command-interface-design](./categories/cli/command-interface-design.md) | 0.1.0 | This binding implements our empathize-with-your-user tenet by recognizing that CLI users are working under time pressure, often in high-stress situ... |
 
+## Csharp Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [csharp-async-patterns](./categories/csharp/csharp-async-patterns.md) | 0.1.0 | ## Rationale |
+| [modern-csharp-toolchain](./categories/csharp/modern-csharp-toolchain.md) | 0.1.0 | Use a standardized, integrated set of modern tools for all C# projects: .NET 8.0+ SDK with SDK-style projects, xUnit for testing, Central Package M... |
+| [nullable-reference-types](./categories/csharp/nullable-reference-types.md) | 0.1.0 | This binding implements our strict null checking tenet by leveraging C#'s nullable reference types feature to eliminate entire classes of runtime e... |
+| [pattern-matching](./categories/csharp/pattern-matching.md) | 0.1.0 | This binding implements our clarity tenet by leveraging C#'s pattern matching to create more expressive, safer code that clearly communicates inten... |
+| [record-types-and-immutability](./categories/csharp/record-types-and-immutability.md) | 0.1.0 | This binding implements our immutable-by-default tenet by leveraging C#'s record types and modern immutability features to create safer, more predi... |
+
 ## Frontend Bindings
 
 _No frontend bindings defined yet._

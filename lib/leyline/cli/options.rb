@@ -8,6 +8,7 @@ module Leyline
       browser-extensions
       cli
       core
+      csharp
       database
       git
       go
