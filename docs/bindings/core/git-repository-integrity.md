@@ -11,11 +11,9 @@ Protect repository integrity through disciplined history management, intelligent
 
 ## Rationale
 
-This binding implements our maintainability tenet specifically for Git repositories, recognizing that repository health directly impacts developer productivity. A repository is like a shared workspace—when it's well-organized and performant, everyone works efficiently. When it becomes cluttered with large files, tangled history, and accumulated cruft, every operation slows down and developers waste time fighting the tool instead of solving problems.
+Repository health directly impacts developer productivity. Git performs best with disciplined usage patterns—when teams violate these by checking in large binaries, creating excessive commits, or maintaining stale branches, performance degrades dramatically.
 
-Git was designed to be fast and efficient, but it assumes certain usage patterns. When teams violate these assumptions—checking in large binary files, creating massive numbers of tiny commits, or maintaining thousands of stale branches—Git's performance degrades dramatically. What starts as a quick clone becomes a multi-gigabyte download. Simple operations like `git status` start taking seconds instead of milliseconds. Eventually, the repository becomes so unwieldy that teams consider starting fresh, losing valuable history in the process.
-
-The solution isn't to baby Git or restrict its use—it's to understand its design constraints and work within them. Just as you wouldn't use a database without indexes or let log files grow indefinitely, you shouldn't use Git without considering repository health. By establishing clear practices around file size limits, history maintenance, and branch hygiene, you ensure the repository remains a productive tool rather than a burden.
+Without proper hygiene, repositories grow from quick clones to multi-gigabyte downloads, with simple operations taking seconds instead of milliseconds. Understanding Git's design constraints and establishing practices around file size limits, history maintenance, and branch hygiene ensures the repository remains productive rather than becoming a burden.
 
 ## Rule Definition
 

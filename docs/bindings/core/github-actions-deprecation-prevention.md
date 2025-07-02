@@ -12,32 +12,15 @@ Implement automated validation checkpoints that prevent CI failures from depreca
 
 ## Rationale
 
-This binding implements our automated-quality-gates principle by creating specific systems that prevent CI failures from GitHub Actions deprecations. As GitHub continuously evolves and deprecates older action versions, manual tracking becomes error-prone and reactive. Automated quality gates provide proactive protection against workflow failures.
-
-GitHub Actions deprecations often cause sudden CI failures that can block critical releases. These failures are preventable through systematic validation that catches deprecations early, provides clear upgrade guidance, and ensures teams stay current with supported action versions.
+GitHub Actions deprecations cause sudden CI failures that block critical releases. Manual tracking is error-prone and reactive. Automated quality gates provide proactive detection, catching deprecations early with clear upgrade guidance to prevent workflow failures.
 
 ## Rule Definition
 
-**MUST** implement GitHub Actions validation at multiple pipeline stages:
-- Pre-commit hooks for immediate developer feedback
-- Pull request validation to prevent deprecated actions from entering main branch
-- Scheduled scanning to catch new deprecations
-- Integration with existing CI validation pipelines
-
-**MUST** validate against a comprehensive deprecation database that includes:
-- Deprecated action names and versions
-- Deprecation dates and reasons
-- Recommended upgrade paths with specific guidance
-- Severity levels (high/medium/low) for prioritization
-
-**MUST** provide fast feedback with specific, actionable upgrade guidance including:
-- Exact replacement action and version
-- Configuration changes required for upgrade
-- Breaking changes and migration considerations
-
-**SHOULD** maintain an updateable deprecation database that can be refreshed from external sources.
-
-**SHOULD** include emergency override mechanisms for critical fixes with audit trails.
+**Requirements:**
+- **Validation Stages:** Pre-commit hooks, PR validation, scheduled scanning, CI integration
+- **Deprecation Database:** Action names/versions, deprecation dates, upgrade paths, severity levels
+- **Feedback:** Fast, actionable upgrade guidance with exact replacements and breaking changes
+- **Maintenance:** Updateable database, emergency override with audit trails
 
 ## Implementation Architecture
 
@@ -78,16 +61,16 @@ jobs:
 
 ## Quality Gate Flow
 
-**1. Pre-commit Validation (Immediate Feedback)**
+**1. Pre-commit Validation:**
 ```bash
 if git diff --cached --name-only | grep -q "\.github/workflows/"; then
   ruby tools/validate_github_actions.rb --verbose
 fi
 ```
 
-**2. Pull Request Validation:** Automated workflow triggers on workflow changes
-**3. Scheduled Monitoring:** Weekly scans to catch new deprecations
-**4. Emergency Override:** Skip validation with `[emergency-deploy]` in commit message
+**2. PR Validation:** Workflow triggers on changes
+**3. Scheduled Monitoring:** Weekly deprecation scans
+**4. Emergency Override:** `[emergency-deploy]` in commit message
 
 ## Severity Levels
 
@@ -109,24 +92,18 @@ fi
   + uses: actions/checkout@v4
 ```
 
-## Maintenance Strategy
+## Maintenance & Metrics
 
-**Database Updates:** Manual updates via `ruby tools/validate_github_actions.rb --update`
-**Performance Monitoring:** Track validation execution time and cache efficiency
-**False Positive Management:** Whitelist mechanism for internal/custom actions
+**Database Updates:** `ruby tools/validate_github_actions.rb --update`
+**Performance Monitoring:** Validation time and cache efficiency
+**False Positive Management:** Whitelist for internal/custom actions
 
-## Integration Examples
-
-**Common Deprecations Caught:**
+**Common Deprecations:**
 - `actions/setup-node@v1` → `actions/setup-node@v4`
 - `actions/cache@v2` → `actions/cache@v4`
 - `actions/checkout@v2` → `actions/checkout@v4`
 
-## Key Metrics
-
-- **Deprecation Detection Rate:** Percentage caught before CI failures
-- **Mean Time to Upgrade:** Detection to resolution time
-- **False Positive Rate:** Incorrect deprecation warnings
+**Key Metrics:** Detection rate, upgrade time, false positive rate
 
 ## Related Bindings
 

@@ -12,44 +12,28 @@ Organize code into distinct horizontal layers with well-defined responsibilities
 
 ## Rationale
 
-This binding implements our orthogonality tenet by creating structured separation between different levels of abstraction and responsibility. Layered architecture prevents high-level policy from becoming entangled with low-level implementation details, enabling each layer to evolve independently as long as the interfaces between layers remain stable.
-
-Without layered organization, code becomes a tangled web where business logic depends on database schemas, user interface code contains business rules, and infrastructure concerns are scattered throughout the application. Layered architecture solves these problems by enforcing a discipline where dependencies flow in only one direction, creating stability and flexibility.
+Layered architecture prevents high-level policy from entangling with low-level implementation details, enabling each layer to evolve independently while maintaining stable interfaces. Without clear organization, code becomes tangled where business logic depends on database schemas and UI contains business rules. Enforcing unidirectional dependency flow creates stability and flexibility.
 
 ## Rule Definition
 
-**MUST** implement these four distinct layers:
+**Four Layers:**
+- **Presentation:** User interface concerns, input/output formatting, interaction workflows
+- **Application:** Orchestrates business workflows, coordinates domain services, handles transactions
+- **Domain:** Core business logic, entities, domain services; independent of external concerns
+- **Infrastructure:** External concerns (databases, file systems, networks); implements higher-layer interfaces
 
-**Presentation Layer**: Handles user interface concerns, input/output formatting, and user interaction workflows. Translates between external interfaces and application use cases.
+**Dependency Rules:**
+- Presentation → Application, Domain
+- Application → Domain only
+- Domain → nothing
+- Infrastructure → Domain, Application (for interfaces)
+- No upward or sideways dependencies
 
-**Application Layer**: Orchestrates business workflows and use cases. Coordinates between domain services and handles application-specific logic like transaction boundaries and security enforcement.
+**Requirements:** Single responsibility per layer, loose coupling, explicit interfaces
 
-**Domain Layer**: Contains core business logic, entities, and domain services. Encapsulates the essential complexity of the business problem and must be independent of external concerns.
+## Implementation
 
-**Infrastructure Layer**: Handles external concerns like databases, file systems, network communication, and third-party integrations. Implements interfaces defined by higher layers.
-
-**MUST** enforce dependency rules:
-- Presentation may depend on Application and Domain
-- Application may depend on Domain only
-- Domain depends on nothing else in the application
-- Infrastructure may depend on Domain and Application (to implement their interfaces)
-- Dependencies never flow upward or sideways between peer layers
-
-**MUST** ensure each layer has a single, well-defined responsibility with cohesive internals and loose coupling to other layers.
-
-**SHOULD** communicate between layers through explicit interfaces only.
-
-## Practical Implementation
-
-**Start Simple**: Begin with clear separation of concerns before introducing complex patterns.
-
-**Interface-Driven Design**: Define interfaces in higher layers that lower layers implement.
-
-**Dependency Injection**: Use dependency injection to connect layers without creating tight coupling.
-
-**Test Boundaries**: Each layer should be testable in isolation from others.
-
-**Avoid Cross-Layer Calls**: Never skip layers or create backdoor dependencies.
+**Guidelines:** Start simple, use interface-driven design, employ dependency injection, test in isolation, avoid cross-layer calls
 
 ## Implementation Examples
 
@@ -112,43 +96,31 @@ class UserController {
 }
 ```
 
-## Layer Testing Strategy
+## Testing
 
-**Domain Layer:** Pure unit tests with no mocks
-**Application Layer:** Mock external dependencies
-**Infrastructure Layer:** Integration tests with real external systems
-**Presentation Layer:** Test HTTP request/response handling
+**Strategy:** Domain (pure unit tests), Application (mock dependencies), Infrastructure (integration tests), Presentation (HTTP tests)
 
 ```typescript
 // Domain - Pure unit tests
-test('validates email format', () => {
-  const userDomain = new UserDomainService();
+test('validates email', () => {
   expect(() => userDomain.validateUser('invalid')).toThrow('Invalid email');
 });
 
 // Application - Mock dependencies
-test('registers new user', async () => {
+test('registers user', async () => {
   const mockRepo = { save: jest.fn() };
-  const service = new UserApplicationService(mockRepo, mockDomain);
   await service.registerUser('test@example.com', 'user');
   expect(mockRepo.save).toHaveBeenCalled();
 });
 ```
 
-## Common Anti-Patterns
+## Anti-Patterns & Usage
 
-❌ **Layer Skipping:** Presentation calling Infrastructure directly
-❌ **Circular Dependencies:** Lower layers depending on higher layers
-❌ **Anemic Domain:** Domain with only data, no business logic
-❌ **Fat Controllers:** Business logic in Presentation layer
-❌ **Leaky Abstractions:** Infrastructure concerns in Domain
+**Avoid:** Layer skipping, circular dependencies, anemic domain, fat controllers, leaky abstractions
 
-## When to Use
-
-**Good Fit:** Complex business logic, high testability needs, multiple integrations
-**Poor Fit:** Simple CRUD apps, high-performance systems, small applications
-
-**Evolution:** Start minimal, measure impact, refactor boundaries as needed
+**Good Fit:** Complex business logic, high testability, multiple integrations
+**Poor Fit:** Simple CRUD, high-performance systems, small applications
+**Evolution:** Start minimal, measure impact, refactor as needed
 
 ## Related Bindings
 

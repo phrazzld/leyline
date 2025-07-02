@@ -14,71 +14,30 @@ feasible. Unexplained suppressions are strictly forbidden.
 
 ## Rationale
 
-This binding directly implements our no-secret-suppression tenet by requiring
-transparency and justification when bypassing automated quality guardrails. When you
-silence a warning without explanation, you're essentially making a unilateral decision
-that future developers must trust blindly, with no way to evaluate whether your bypass
-was warranted or remains necessary as the code evolves.
+Silencing warnings without explanation forces future developers to trust decisions blindly, with no way to evaluate whether bypasses remain necessary as code evolves.
 
-Think of lint suppressions like prescription medication warnings—they exist for
-important reasons, and choosing to ignore them requires informed, documented
-justification. Just as a doctor who overrides a medication warning must record their
-reasoning in the patient's chart for other medical professionals to understand the
-decision, a developer who bypasses a linter warning must document their reasoning for
-future maintainers. Without this documentation, others have no way to distinguish
-between legitimate exceptions and dangerous technical debt.
+Undocumented suppressions create technical debt that compounds over time. As teams change, original context is lost. New developers must either trust suppressions blindly or reverse-engineer intent. When surrounding code changes, there's no way to know if suppression conditions still apply.
 
-The dangers of undocumented suppressions compound over time. As codebases grow and team
-members change, the original context and reasoning behind suppressions are lost. New
-developers encountering a silent suppression must either blindly trust it or spend
-precious time reverse-engineering the intent. Worse, when the code surrounding a
-suppression changes, there's no way to know if the conditions that justified the
-exception still apply. By requiring clear documentation for every suppression, we create
-a history of deliberate decisions rather than mysterious exceptions, making the codebase
-more maintainable, safer, and ultimately, more trustworthy.
+Requiring documentation for every suppression creates a history of deliberate decisions rather than mysterious exceptions, making codebases more maintainable and trustworthy.
 
 ## Rule Definition
 
 This binding establishes clear requirements for any code that suppresses automated
 quality checks:
 
-- **Document Every Suppression**: All directives that disable linter rules, type
-  checking, or other automated quality checks must include an explanatory comment that:
+**Documentation Requirements:** All suppressions must include comments explaining:
+- Why the rule is triggering
+- Why the code is safe despite the warning
+- Why proper fixing isn't feasible
+- Timeline or ticket reference for revisiting
 
-  - Identifies why the underlying rule is triggering in this specific case
-  - Explains why the code is actually correct/safe despite the warning
-  - Clarifies why fixing the issue properly isn't currently feasible
-  - Ideally includes a ticket reference or timeline for revisiting the suppression
+**Covered Methods:** Linter comments (`// eslint-disable-line`), compiler flags (`@SuppressWarnings`), type assertions (`as any`), config suppressions, CI bypass flags
 
-- **Suppression Methods Covered**: This rule applies to all forms of quality check
-  suppressions, including but not limited to:
+**Scope Limitations:** Narrow scope (line-level), specific targeting, temporary by default
 
-  - Language-specific linter suppression comments (e.g., `// eslint-disable-line`,
-    `// nolint`, `// NOSONAR`)
-  - Compiler flag suppressions (e.g., `#pragma warning disable`, `#[allow(...)]`,
-    `@SuppressWarnings`)
-  - Inline type assertions that bypass type checking (e.g., `as any`, type casts,
-    `@ts-ignore`)
-  - Configuration-based suppressions in linter config files
-  - CI/build script flags that bypass quality checks (`--no-lint`, `--force`, etc.)
+**Permitted Exceptions:** External code integration, known false positives, emergency fixes, rule conflicts with higher priorities
 
-- **Limit Suppression Scope**: Beyond documentation, suppressions must be:
-
-  - As narrow as possible in scope (line-level rather than file-level when available)
-  - As specific as possible (targeting only the exact rule being suppressed)
-  - Temporary by default (include a timeline or conditions for removal when possible)
-
-- **Exceptions**: This binding recognizes limited scenarios where suppressions may be
-  necessary:
-
-  - Integration with external code you can't modify (third-party libraries, generated
-    code)
-  - Known false positives in the quality tools
-  - Temporary emergency fixes that will be properly addressed in a timely manner
-  - Cases where the automated rule conflicts with a higher-priority requirement
-
-  Even in these exception cases, the documentation requirement still applies—exceptions
-  must be explained, not merely asserted.
+Documentation requirement applies even to exceptions.
 
 ## Practical Implementation
 
@@ -133,8 +92,7 @@ fetch(config.endpoint);
 ```python
 # ❌ BAD: Unexplained suppression
 # pylint: disable=too-many-arguments
-def process_data(arg1, arg2, arg3, arg4, arg5, arg6, arg7):
-    pass
+def process_data(arg1, arg2, arg3, arg4, arg5, arg6, arg7): pass
 
 # ✅ GOOD: Refactor to class
 class DataProcessor:
@@ -144,8 +102,7 @@ class DataProcessor:
 # If refactoring not possible:
 # pylint: disable=too-many-arguments
 # Legacy import process requires many parameters (JIRA-5678, Q3 refactor)
-def process_data_legacy(arg1, arg2, arg3, arg4, arg5, arg6, arg7):
-    pass
+def process_data_legacy(arg1, arg2, arg3, arg4, arg5, arg6, arg7): pass
 ```
 
 **Error Handling:**
