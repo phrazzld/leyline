@@ -12,11 +12,11 @@ Implement systematic security automation that spans the entire development and d
 
 ## Rationale
 
-This binding extends our automation tenet by establishing security as a foundational automation concern that must be woven throughout all platform integration practices. While individual bindings address specific security aspects, comprehensive security automation creates a unified defense strategy that ensures no security gaps exist between different automation layers.
+This binding extends our automation tenet by establishing security as a foundational automation concern woven throughout all platform integration practices. Comprehensive security automation creates a unified defense strategy that ensures no security gaps exist between different automation layers.
 
-Like creating a fortress with multiple defensive rings, where each ring provides specific protection and all rings work together to create an impenetrable defense, comprehensive security automation combines git hooks, CI/CD pipelines, environment controls, and monitoring systems to create systematic protection against security threats.
+Like a fortress with multiple defensive rings, comprehensive security automation combines git hooks, CI/CD pipelines, environment controls, and monitoring systems to create systematic protection against security threats.
 
-Manual security practices inevitably fail under pressure, complexity, or scale. Security vulnerabilities compound when left undetected, often creating cascading failures that compromise entire systems. Automated security validation eliminates human error and ensures consistent application of security standards regardless of project complexity, timeline pressure, or team experience levels.
+Manual security practices inevitably fail under pressure, complexity, or scale. Automated security validation eliminates human error and ensures consistent application of security standards regardless of project complexity, timeline pressure, or team experience levels.
 
 ## Rule Definition
 
@@ -51,73 +51,45 @@ What this explicitly prohibits:
    ```yaml
    # GitHub Actions security automation pipeline
    name: Security Validation Pipeline
-
-   on:
-     push:
-       branches: [main, develop]
-     pull_request:
-       branches: [main]
+   on: [push, pull_request]
 
    jobs:
      security-scan:
        runs-on: ubuntu-latest
        steps:
-         - name: Checkout code
-           uses: actions/checkout@v4
+         - uses: actions/checkout@v4
            with:
              fetch-depth: 0
 
          - name: Secret scanning
            uses: trufflesecurity/trufflehog@main
-           with:
-             path: ./
-             base: main
-             head: HEAD
 
          - name: Dependency vulnerability scan
-           run: |
-             npm audit --audit-level moderate
-             npm run security:check
+           run: npm audit --audit-level moderate
 
          - name: Static code analysis
            uses: github/super-linter@v4
-           env:
-             DEFAULT_BRANCH: main
-             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-             VALIDATE_JAVASCRIPT_ES: true
-             VALIDATE_TYPESCRIPT_ES: true
 
          - name: Infrastructure security scan
            uses: aquasecurity/trivy-action@master
            with:
              scan-type: 'config'
-             scan-ref: '.'
              format: 'sarif'
              output: 'trivy-results.sarif'
 
          - name: Upload security results
            uses: github/codeql-action/upload-sarif@v2
-           if: always()
            with:
              sarif_file: 'trivy-results.sarif'
 
      compliance-check:
-       runs-on: ubuntu-latest
        needs: security-scan
        steps:
          - name: Compliance validation
            run: |
-             # Validate security policies are met
              npm run compliance:validate
-
-             # Check for required security documentation
              test -f SECURITY.md
-             test -f docs/security-architecture.md
-
-         - name: Generate security report
-           run: |
              npm run security:report
-             # Upload to compliance dashboard
    ```
 
 2. **Configure Development Environment Security**: Establish security
@@ -137,27 +109,17 @@ What this explicitly prohibits:
        rev: v1.18.0
        hooks:
          - id: ggshield
-           language: python
-           stages: [commit]
 
      - repo: https://github.com/aquasecurity/tfsec
        rev: v1.28.1
        hooks:
          - id: tfsec
 
-     - repo: https://github.com/antonbabenko/pre-commit-terraform
-       rev: v1.81.0
-       hooks:
-         - id: terraform_validate
-         - id: terraform_security_scan
-
      - repo: local
        hooks:
          - id: dependency-check
-           name: Check dependencies for known vulnerabilities
            entry: npm audit --audit-level moderate
            language: system
-           pass_filenames: false
    ```
 
    ```typescript
@@ -189,9 +151,6 @@ What this explicitly prohibits:
 
    ```typescript
    // Infrastructure security validation script
-   import { SecurityValidator } from './security/validator';
-   import { ComplianceChecker } from './security/compliance';
-
    interface SecurityConfig {
      environment: 'development' | 'staging' | 'production';
      encryptionRequired: boolean;
@@ -201,73 +160,33 @@ What this explicitly prohibits:
    }
 
    class InfrastructureSecurityAutomation {
-     constructor(
-       private validator: SecurityValidator,
-       private compliance: ComplianceChecker
-     ) {}
-
      async validateDeployment(config: SecurityConfig): Promise<void> {
-       // Validate security configuration
        await this.validator.validateConfiguration(config);
-
-       // Check compliance requirements
        await this.compliance.validateCompliance(config);
 
-       // Verify encryption settings
        if (config.environment === 'production' && !config.encryptionRequired) {
          throw new Error('Production deployments must have encryption enabled');
        }
 
-       // Validate secrets management
-       await this.validateSecretsManagement(config);
-
-       // Check network security
        if (!config.networkIsolation) {
          throw new Error('Network isolation is required for all environments');
        }
 
-       // Ensure audit logging is enabled
        if (!config.auditLogging) {
          throw new Error('Audit logging must be enabled');
        }
      }
 
-     private async validateSecretsManagement(config: SecurityConfig): Promise<void> {
-       const allowedProviders = ['aws-secrets', 'azure-keyvault', 'hashicorp-vault'];
-
-       if (!allowedProviders.includes(config.secretsManagement)) {
-         throw new Error(`Invalid secrets provider: ${config.secretsManagement}`);
-       }
-
-       // Verify secrets provider is properly configured
-       await this.validator.verifySecretsProvider(config.secretsManagement);
-     }
-
      async monitorRuntimeSecurity(): Promise<void> {
-       // Continuous security monitoring
        const securityMetrics = await this.validator.getRuntimeMetrics();
 
        if (securityMetrics.vulnerabilityCount > 0) {
          await this.handleSecurityAlert(securityMetrics);
        }
 
-       // Check for configuration drift
        const driftDetected = await this.validator.checkConfigurationDrift();
        if (driftDetected) {
          await this.handleConfigurationDrift(driftDetected);
-       }
-     }
-
-     private async handleSecurityAlert(metrics: any): Promise<void> {
-       // Automated security response
-       console.error('Security vulnerabilities detected:', metrics);
-
-       // Notify security team
-       await this.notifySecurityTeam(metrics);
-
-       // For critical vulnerabilities, trigger automated response
-       if (metrics.criticalVulnerabilities > 0) {
-         await this.initiateIncidentResponse(metrics);
        }
      }
    }
@@ -285,9 +204,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm test
-      # No security scanning
-      # No dependency checks
-      # No secrets detection
+      # No security scanning, dependency checks, or secrets detection
 ```
 
 ```yaml
@@ -303,7 +220,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Multi-layer security scanning
       - name: Secret detection
         uses: trufflesecurity/trufflehog@main
 
@@ -319,7 +235,6 @@ jobs:
       - name: Compliance validation
         run: npm run compliance:check
 
-      # Fail fast on security issues
       - name: Security gate
         run: |
           if [ "${{ steps.security-scan.outcome }}" != "success" ]; then
@@ -329,13 +244,10 @@ jobs:
 
   deploy:
     needs: security-validation
-    runs-on: ubuntu-latest
     if: success()
     steps:
       - name: Secure deployment
-        run: |
-          # Only deploy if security validation passed
-          npm run deploy:secure
+        run: npm run deploy:secure
 ```
 
 ## Related Bindings

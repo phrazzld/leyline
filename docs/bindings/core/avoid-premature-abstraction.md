@@ -12,11 +12,9 @@ Resist the urge to create abstractions before you understand the true pattern. C
 
 ## Rationale
 
-Premature abstraction is often worse than code duplication because the wrong abstraction is harder to fix than duplicated code. When you abstract too early, you're making architectural decisions based on incomplete information. The resulting abstractions often become impediments that require significant effort to remove or work around.
+Premature abstraction is worse than code duplication because wrong abstractions are harder to fix than duplicated code. Early abstraction makes architectural decisions based on incomplete information, creating impediments that require significant effort to remove.
 
-Grug's wisdom teaches that "complexity very, very bad" - and premature abstraction is one of the most insidious sources of complexity. It creates the illusion of sophistication while actually making code harder to understand, test, and modify. The abstraction looks clever until the third use case arrives with requirements that don't fit the abstraction's assumptions.
-
-Think of premature abstraction like building a bridge before you know where the river will flow. You might guess correctly, but more likely you'll build in the wrong place and have to tear it down when the river's actual path becomes clear. Code, like rivers, reveals its natural patterns over time through use and evolution.
+Wrong abstractions create the illusion of sophistication while making code harder to understand, test, and modify. They look clever until the third use case arrives with requirements that don't fit the abstraction's assumptions.
 
 ## Rule Definition
 
@@ -46,20 +44,9 @@ Think of premature abstraction like building a bridge before you know where the 
 
 **Before Creating Any Abstraction, Validate:**
 
-1. **Pattern Stability Test:**
-   - Has the same logical pattern appeared 3+ times in independent contexts?
-   - Have the interfaces remained stable through multiple feature additions?
-   - Do variations follow predictable, parameterizable differences?
-
-2. **Complexity Reduction Test:**
-   - Does the abstraction eliminate more complexity than it creates?
-   - Is the abstraction simpler to use than duplicating the code?
-   - Would new team members understand the abstraction without extensive documentation?
-
-3. **Future Flexibility Test:**
-   - Will this abstraction make adding new variations easier or harder?
-   - Can you accommodate likely future changes without breaking the abstraction?
-   - Does the abstraction avoid assumptions about how it will be used?
+1. **Pattern Stability:** Same pattern appears 3+ times in independent contexts with stable interfaces
+2. **Complexity Reduction:** Abstraction eliminates more complexity than it creates
+3. **Future Flexibility:** Makes adding variations easier without breaking changes
 
 ### Warning Signs of Premature Abstraction
 
@@ -67,16 +54,8 @@ Think of premature abstraction like building a bridge before you know where the 
 ```typescript
 // BAD: Building for imagined future needs
 interface FlexibleDataProcessor<T, U, V> {
-  process<K>(
-    data: T,
-    options: ProcessingOptions<U>,
-    transform: TransformFunction<T, V>,
-    middleware: Middleware<K>[],
-    context: ProcessingContext
-  ): Promise<ProcessedResult<V>>;
+  process<K>(data: T, options: ProcessingOptions<U>, ...): Promise<ProcessedResult<V>>;
 }
-
-// This looks sophisticated but probably won't fit actual use cases
 // Start with concrete implementations instead
 ```
 
@@ -84,30 +63,15 @@ interface FlexibleDataProcessor<T, U, V> {
 ```typescript
 // BAD: Abstracting after seeing only two cases
 function sendNotification(type: 'email' | 'sms', message: string, recipient: string) {
-  if (type === 'email') {
-    return emailService.send(recipient, message);
-  } else if (type === 'sms') {
-    return smsService.send(recipient, message);
-  }
+  // Wait for third notification type to see real pattern
 }
-
-// Wait for the third notification type to see the real pattern
-// Maybe push notifications work completely differently
 ```
 
 **❌ Configuration-Heavy Abstractions:**
 ```typescript
-// BAD: Abstraction that requires complex configuration
+// BAD: More configuration than actual logic
 class GenericValidator {
-  constructor(
-    private rules: ValidationRule[],
-    private errorHandler: ErrorHandler,
-    private transformers: DataTransformer[],
-    private contextProviders: ContextProvider[],
-    private middleware: ValidationMiddleware[]
-  ) {}
-
-  // More configuration than the actual validation logic
+  constructor(rules, errorHandler, transformers, contextProviders, middleware) {}
 }
 ```
 
@@ -115,36 +79,17 @@ class GenericValidator {
 
 **✅ Start with Concrete Implementations:**
 ```typescript
-// GOOD: Three concrete implementations that reveal the actual pattern
+// GOOD: Three concrete implementations reveal actual pattern
 class UserEmailSender {
   async sendWelcomeEmail(user: User): Promise<void> {
     const template = await this.getTemplate('welcome');
-    const personalizedContent = this.personalize(template, user);
-    await this.emailService.send(user.email, personalizedContent);
+    const content = this.personalize(template, user);
+    await this.emailService.send(user.email, content);
     await this.trackDelivery('welcome_email', user.id);
   }
 }
-
-class OrderEmailSender {
-  async sendOrderConfirmation(order: Order): Promise<void> {
-    const template = await this.getTemplate('order_confirmation');
-    const personalizedContent = this.personalize(template, order);
-    await this.emailService.send(order.customerEmail, personalizedContent);
-    await this.trackDelivery('order_confirmation', order.id);
-  }
-}
-
-class NotificationEmailSender {
-  async sendSystemAlert(alert: SystemAlert): Promise<void> {
-    const template = await this.getTemplate('system_alert');
-    const personalizedContent = this.personalize(template, alert);
-    await this.emailService.send(alert.recipientEmail, personalizedContent);
-    await this.trackDelivery('system_alert', alert.id);
-  }
-}
-
-// NOW the pattern is clear: getTemplate → personalize → send → track
-// Extract EmailSender<T> interface with confidence
+// After 3 similar classes, pattern emerges: getTemplate → personalize → send → track
+// NOW extract EmailSender<T> interface with confidence
 ```
 
 **✅ Use Simple Utility Functions:**
@@ -154,127 +99,67 @@ function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function validatePhoneNumber(phone: string): boolean {
-  return /^\+?[\d\s\-\(\)]+$/.test(phone);
-}
-
 function validateRequired(value: unknown): boolean {
   return value != null && value !== '';
 }
-
-// Clear, testable, and easy to understand
-// Don't force these into a ValidationStrategy<T> pattern yet
+// Don't force these into ValidationStrategy<T> pattern yet
 ```
 
 ### Common Premature Abstraction Patterns
 
-**Generic Event Systems:**
+**❌ Generic Event Systems:** Built before understanding actual event needs
 ```typescript
-// ❌ PREMATURE: Built before understanding actual event needs
-interface Event<T = any> {
-  type: string;
-  payload: T;
-  metadata: EventMetadata;
-  handlers: EventHandler<T>[];
-}
-
-// ✅ BETTER: Start with specific events
-type UserRegistered = { userId: string; email: string; timestamp: Date };
-type OrderPlaced = { orderId: string; customerId: string; total: number };
-// Abstract only when you have 3+ event types with clear patterns
+interface Event<T> { type: string; payload: T; metadata: EventMetadata; }
 ```
+**✅ Better:** Start with specific events, abstract when 3+ types show clear patterns
 
-**Flexible Configuration Systems:**
+**❌ Over-Configurable Systems:** Flexible before knowing configuration needs
 ```typescript
-// ❌ PREMATURE: Over-configurable before knowing what needs configuration
-interface AppConfig {
-  features: Record<string, FeatureConfig>;
-  services: Record<string, ServiceConfig>;
-  environment: EnvironmentConfig;
-  experimental: Record<string, unknown>;
-}
-
-// ✅ BETTER: Start with concrete configuration needs
-interface AppConfig {
-  databaseUrl: string;
-  apiKey: string;
-  debugMode: boolean;
-}
-// Add configuration options only as actual needs emerge
+interface AppConfig { features: Record<string, FeatureConfig>; experimental: Record<string, unknown>; }
 ```
+**✅ Better:** Start concrete, add options as actual needs emerge
 
-**Repository Abstractions:**
+**❌ Generic Repositories:** Built before understanding data access patterns
 ```typescript
-// ❌ PREMATURE: Generic repository before understanding data access patterns
-interface Repository<T, K> {
-  find(criteria: SearchCriteria): Promise<T[]>;
-  findById(id: K): Promise<T | null>;
-  save(entity: T): Promise<T>;
-  delete(id: K): Promise<void>;
-  query(sql: string, params: unknown[]): Promise<T[]>;
-}
-
-// ✅ BETTER: Start with specific data access needs
-class UserRepository {
-  async findByEmail(email: string): Promise<User | null> { /* ... */ }
-  async createUser(userData: CreateUserData): Promise<User> { /* ... */ }
-  async updateLastLogin(userId: string): Promise<void> { /* ... */ }
-}
-// Abstract only when multiple repositories share meaningful patterns
+interface Repository<T, K> { find(criteria: SearchCriteria): Promise<T[]>; }
 ```
+**✅ Better:** Start with specific needs, abstract when repositories share meaningful patterns
 
 ## Anti-Patterns and Recovery Strategies
 
-### Identifying Premature Abstractions
-
 **Code Smells:**
 - Abstractions used in only 1-2 places
-- Complex configuration required to handle simple cases
-- Frequent changes to abstraction interface for new use cases
-- Documentation that's longer than the implementation
-- Team members avoiding the abstraction and duplicating code instead
+- Complex configuration for simple cases
+- Frequent interface changes for new use cases
+- Documentation longer than implementation
+- Team members avoiding abstraction, duplicating code instead
 
 **Recovery Strategies:**
-1. **"Un-refactor" back to concrete implementations**
-2. **Document the lessons learned for future decisions**
-3. **Wait for genuine third use case before re-abstracting**
-4. **Consider whether the abstraction solves a real problem**
+1. "Un-refactor" back to concrete implementations
+2. Document lessons learned for future decisions
+3. Wait for genuine third use case before re-abstracting
 
-### Healthy Progression Path
-
-**Phase 1: Concrete Implementations**
-- Write specific, clear implementations for each use case
-- Focus on making each implementation simple and correct
-- Note similarities but resist immediate abstraction
-
-**Phase 2: Pattern Recognition**
-- After 3+ implementations, identify stable patterns
-- Look for invariant parts vs. variable parts
-- Ensure the pattern holds across different contexts
-
-**Phase 3: Careful Abstraction**
-- Extract only the stable, well-understood patterns
-- Parameterize the variations, don't over-generalize
-- Maintain simplicity in the abstraction's interface
+**Healthy Progression Path:**
+1. **Concrete Implementations:** Write specific, clear implementations for each use case
+2. **Pattern Recognition:** After 3+ implementations, identify stable patterns
+3. **Careful Abstraction:** Extract only stable, well-understood patterns
 
 ## Success Metrics
 
 **Healthy Abstraction Indicators:**
-- Abstractions remain stable through multiple feature additions
+- Remain stable through multiple feature additions
 - New implementations fit naturally without forcing changes
-- Team members use abstractions without hesitation
-- Abstractions reduce overall codebase complexity
+- Team members use without hesitation
+- Reduce overall codebase complexity
 
 **Warning Signs:**
-- Abstractions require frequent modification
-- New use cases force awkward compromises
+- Require frequent modification for new use cases
+- Force awkward compromises
 - Documentation grows faster than implementation
-- Developers work around abstractions instead of using them
+- Developers work around instead of using
 
 ## Related Patterns
 
-**YAGNI Principle:** Don't build abstractions you aren't going to need. Wait for clear evidence before abstracting.
+**YAGNI Principle:** Wait for clear evidence before abstracting
 
-**Natural Refactoring Points:** Wait for natural boundaries to emerge before creating abstractions. This binding provides the specific warning signs to watch for.
-
-**Rule of Three:** Require three concrete examples before abstracting. This provides enough data to identify real patterns vs. coincidental similarities.
+**Rule of Three:** Require three concrete examples to identify real patterns vs. coincidental similarities

@@ -64,11 +64,10 @@ src/
       ProductDetail/
 ```
 
-2. **Start Small and Build Up**: Begin your component library with a set of
-   well-designed atoms that form the foundation of your UI:
+2. **Start Small and Build Up**: Begin your component library with well-designed atoms:
 
-   - Create a comprehensive set of primitive UI components (buttons, inputs, typography)
-   - Ensure atoms are highly reusable and follow your design system specifications
+   - Create comprehensive primitive UI components (buttons, inputs, typography)
+   - Ensure atoms are highly reusable and follow design system specifications
    - Build thorough documentation and Storybook stories for each atom
    - Implement proper accessibility features at the atomic level
 
@@ -77,7 +76,6 @@ src/
    - Use TypeScript interfaces to document all props and their types
    - Make interfaces explicit about what is required vs. optional
    - Include JSDoc comments explaining the purpose of each prop
-   - Consider using prop validation libraries for runtime validation
 
 1. **Implement Effective Composition Patterns**: Design components to be combined in
    predictable ways:
@@ -240,9 +238,6 @@ function ContactForm() {
 ## Related Bindings
 
 - [modularity](../../tenets/modularity.md): This binding implements the modularity tenet through systematic UI breakdown into composable components.
-
 - [state-management](../categories/frontend/state-management.md): Complements component architecture by defining state organization within and between components.
-
-- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Promotes loose coupling through well-designed component interfaces that depend on abstractions.
-
-- [code-size](../../docs/bindings/core/code-size.md): Supports small, focused components that naturally emerge from atomic design principles.
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Promotes loose coupling through well-designed component interfaces.
+- [code-size](../../docs/bindings/core/code-size.md): Supports small, focused components that emerge from atomic design principles.

@@ -77,241 +77,91 @@ modification of existing ones.
 
 ## Practical Implementation
 
-Here are concrete strategies for implementing immutability across your codebase:
-
-1. **Use Language Features for Immutability**: Leverage built-in language support
-   wherever possible to make immutability the default pattern:
-
-   - In TypeScript/JavaScript:
-
-     ```typescript
-     // Mark variables as constant to prevent reassignment
-     const user = { name: "Alice", email: "alice@example.com" };
-
-     // Use readonly for properties and array types
-     interface User {
-       readonly id: string;
-       readonly name: string;
-       readonly email: string;
-       readonly permissions: readonly string[];
-     }
-     ```
-
-   - In Rust:
-
-     ```rust
-     // Default to immutable bindings
-     let user = User { name: "Alice", email: "alice@example.com" };
-
-     // Only use mut when necessary
-     let mut builder = UserBuilder::new();
-     ```
-
-   - In Java/Kotlin:
-
-     ```java
-     // Make fields final
-     public final class User {
-       private final String id;
-       private final String name;
-
-       // Constructor and getters (no setters)
-     }
-     ```
-
-   - In C#:
-
-     ```csharp
-     // Use init-only properties
-     public class User {
-       public string Id { get; init; }
-       public string Name { get; init; }
-     }
-     ```
-
-1. **Implement Immutable Update Patterns**: Learn the patterns for updating immutable
-   data structures in your language:
-
-   - Spread/rest operator for objects and arrays in JavaScript/TypeScript:
-
-     ```typescript
-     // Update user properties by creating a new object
-     const updatedUser = { ...user, name: "Bob" };
-
-     // Add item to array by creating a new array
-     const newItems = [...items, newItem];
-
-     // Remove item from array by creating a new array
-     const filteredItems = items.filter(item => item.id !== itemToRemove.id);
-     ```
-
-   - Builder pattern for complex objects:
-
-     ```java
-     User updatedUser = User.builder()
-       .from(originalUser)  // Copy all properties from original
-       .name("Bob")         // Override specific properties
-       .build();            // Create new immutable instance
-     ```
-
-   - Record types in languages that support them:
-
-     ```csharp
-     // C# record types are immutable by default
-     public record User(string Id, string Name, string Email);
-
-     // Create new record with updated properties
-     var updatedUser = user with { Name = "Bob" };
-     ```
-
-1. **Use Immutability Libraries**: When built-in language features aren't sufficient,
-   leverage libraries specifically designed for immutable data:
-
-   - For JavaScript/TypeScript:
-
-     - Immer.js for simpler immutable updates
-     - Immutable.js for persistent data structures
-     - Redux Toolkit for immutable state management
-
-   - For Java:
-
-     - Immutables for generating immutable classes
-     - Vavr for persistent collections
-
-   - For other languages, seek equivalent libraries that provide:
-
-     - Persistent data structures with efficient updates
-     - Helper utilities for immutable transformations
-     - Thread-safe immutable collections
-
-1. **Apply Functional Programming Techniques**: Adopt functional patterns that work well
-   with immutable data:
-
-   - Favor pure functions that don't modify their inputs
-   - Use function composition instead of sequential mutation
-   - Apply transformations with map/filter/reduce instead of in-place loops
-   - Implement copy-on-write when performance is a concern
-
-1. **Enforce Through Tooling**: Use automated checks to prevent accidental mutations:
-
-   - Configure ESLint with rules like `no-param-reassign`, `prefer-const`
-   - Enable compiler flags like `-XStrict` (Haskell) or `--strict` (TypeScript)
-   - Set up code reviews to specifically check for immutability violations
-   - Write tests that verify objects remain unchanged when they should
-
-## Examples
-
+**Language Features for Immutability:**
 ```typescript
-// ❌ BAD: Mutating objects directly
-function updateUserPreferences(user, preferences) {
-  user.preferences = {
-    ...user.preferences,
-    ...preferences
-  };
-  return user;  // Returns same object with modified properties
+// TypeScript/JavaScript
+const user = { name: "Alice", email: "alice@example.com" };
+interface User {
+  readonly id: string;
+  readonly name: string;
 }
-
-const user = { name: "Alice", preferences: { theme: "light" } };
-updateUserPreferences(user, { notifications: "all" });
-// Now the original user object has been changed!
-
-// ✅ GOOD: Creating new objects instead
-function updateUserPreferences(user, preferences) {
-  return {
-    ...user,
-    preferences: {
-      ...user.preferences,
-      ...preferences
-    }
-  };  // Returns new object with updated properties
-}
-
-const user = { name: "Alice", preferences: { theme: "light" } };
-const updatedUser = updateUserPreferences(user, { notifications: "all" });
-// Original user object remains unchanged
-// updatedUser contains the updated preferences
-```
-
-```javascript
-// ❌ BAD: Mutating arrays in place
-function addItem(cart, item) {
-  cart.items.push(item);         // Mutates the array in place
-  cart.total += item.price;      // Mutates the total
-  return cart;                   // Returns the same modified object
-}
-
-// ✅ GOOD: Creating new arrays and objects
-function addItem(cart, item) {
-  return {
-    ...cart,
-    items: [...cart.items, item],  // Creates new array with added item
-    total: cart.total + item.price // Calculates new total
-  };  // Returns entirely new cart object
-}
-```
-
-```go
-// ❌ BAD: Methods that modify the receiver
-type Counter struct {
-  Value int
-}
-
-func (c *Counter) Increment() {
-  c.Value++  // Modifies the counter in place
-}
-
-// ✅ GOOD: Methods that return new instances
-type Counter struct {
-  Value int
-}
-
-func (c Counter) Increment() Counter {
-  return Counter{Value: c.Value + 1}  // Returns new Counter
-}
-
-// Usage:
-counter := Counter{Value: 5}
-increasedCounter := counter.Increment()  // counter still has Value=5
 ```
 
 ```rust
-// ❌ BAD: Mutation when unnecessary
-fn add_tag(mut tags: Vec<String>, tag: String) -> Vec<String> {
-    tags.push(tag);  // Mutates the vector in place
-    tags  // Returns the same vector
+// Rust - default to immutable bindings
+let user = User { name: "Alice", email: "alice@example.com" };
+let mut builder = UserBuilder::new(); // Only when necessary
+```
+
+**Immutable Update Patterns:**
+```typescript
+// Update objects and arrays
+const updatedUser = { ...user, name: "Bob" };
+const newItems = [...items, newItem];
+const filteredItems = items.filter(item => item.id !== itemToRemove.id);
+```
+
+**Recommended Libraries:**
+- JavaScript/TypeScript: Immer.js, Immutable.js, Redux Toolkit
+- Java: Immutables, Vavr
+- General: Seek persistent data structures and immutable transformations
+
+**Enforcement:**
+- ESLint rules: `no-param-reassign`, `prefer-const`
+- Compiler flags: `--strict` (TypeScript)
+- Code reviews and tests for immutability violations
+
+## Examples
+
+**Object Updates:**
+```typescript
+// ❌ BAD: Mutating objects directly
+function updateUserPreferences(user, preferences) {
+  user.preferences = { ...user.preferences, ...preferences };
+  return user; // Modifies original!
 }
 
-// ✅ GOOD: Creating new collections and properly handling ownership
-fn add_tag(tags: Vec<String>, tag: String) -> Vec<String> {
-    let mut new_tags = tags;  // Take ownership
-    new_tags.push(tag);       // Mutate locally, before it's shared
-    new_tags                  // Return the new vector
+// ✅ GOOD: Creating new objects
+function updateUserPreferences(user, preferences) {
+  return {
+    ...user,
+    preferences: { ...user.preferences, ...preferences }
+  }; // Returns new object
+}
+```
+
+**Array Operations:**
+```javascript
+// ❌ BAD: Mutating arrays
+function addItem(cart, item) {
+  cart.items.push(item);
+  cart.total += item.price;
+  return cart;
 }
 
-// Alternative approach with clone
-fn add_tag_clone(tags: &[String], tag: String) -> Vec<String> {
-    let mut new_tags = tags.to_vec();  // Create new vector
-    new_tags.push(tag);                // Add the new tag
-    new_tags                           // Return the new vector
+// ✅ GOOD: Creating new arrays
+function addItem(cart, item) {
+  return {
+    ...cart,
+    items: [...cart.items, item],
+    total: cart.total + item.price
+  };
+}
+```
+
+**Method Design:**
+```go
+// ❌ BAD: Modifying receiver
+func (c *Counter) Increment() { c.Value++ }
+
+// ✅ GOOD: Returning new instances
+func (c Counter) Increment() Counter {
+  return Counter{Value: c.Value + 1}
 }
 ```
 
 ## Related Bindings
 
-- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Immutability and dependency inversion
-  work together to make code more testable and maintainable. Immutability ensures your
-  data doesn't change unexpectedly, while dependency inversion ensures your components
-  are loosely coupled. Together, they dramatically reduce the complexity of
-  understanding how data flows through your system.
-
-- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Domain purity and immutability are
-  complementary approaches to simplifying your codebase. Domain purity keeps your
-  business logic free from infrastructure concerns, while immutability ensures your data
-  structures remain stable and predictable. Both reduce the cognitive load of
-  understanding how your system evolves over time.
-
-- [no-internal-mocking](../../docs/bindings/core/no-internal-mocking.md): Immutable data structures make testing
-  significantly easier, supporting our no-internal-mocking binding. When components use
-  immutable data, they're naturally more testable because inputs and outputs are clear
-  and predictable. You can verify that functions produce the expected outputs without
-  worrying about side effects on shared state.
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Makes code more testable and maintainable
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Keeps business logic stable and predictable
+- [no-internal-mocking](../../docs/bindings/core/no-internal-mocking.md): Immutable data makes testing easier

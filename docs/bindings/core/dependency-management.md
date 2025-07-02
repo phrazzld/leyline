@@ -234,29 +234,10 @@ class DateService {
 
 ## Related Bindings
 
-- [simplicity](../../docs/tenets/simplicity.md): This dependency management binding is a direct
-  application of the simplicity tenet's guidance to "minimize moving parts." Each
-  dependency adds complexity that must be understood, maintained, and debugged. By
-  deliberately limiting dependencies, you reduce the cognitive load required to work
-  with your codebase and minimize potential points of failure.
+- [simplicity](../../docs/tenets/simplicity.md): Direct application of "minimize moving parts." Each dependency adds complexity to understand, maintain, and debug.
 
-- [external-configuration](../../docs/bindings/core/external-configuration.md): External configuration and
-  careful dependency management are complementary practices that improve system
-  maintainability. Both focus on isolating aspects of your system that are likely to
-  change—configuration values and third-party code—behind clear boundaries. This
-  isolation makes it easier to adapt to changes without disrupting the core
-  functionality of your application.
+- [external-configuration](../../docs/bindings/core/external-configuration.md): Both isolate change-prone aspects—configuration and third-party code—behind clear boundaries for easier adaptation.
 
-- [no-secret-suppression](../../docs/tenets/no-secret-suppression.md): Proper dependency
-  management is essential for security, directly supporting the no-secret-suppression
-  tenet. Unpatched dependencies with known vulnerabilities are one of the most common
-  security risks in modern applications. By maintaining an accurate inventory of
-  dependencies and automating security scanning, you can detect and address
-  vulnerabilities before they impact your users.
+- [no-secret-suppression](../../docs/tenets/no-secret-suppression.md): Unpatched dependencies are common security risks. Accurate inventory and automated scanning detect vulnerabilities early.
 
-- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Hexagonal architecture and careful
-  dependency management work together to create more maintainable systems. By isolating
-  third-party dependencies at the boundaries of your application, you keep your domain
-  logic pure and focused on business rules rather than implementation details. This
-  approach makes it easier to replace or upgrade dependencies without disrupting your
-  core functionality.
+- [hex-domain-purity](../../docs/bindings/core/hex-domain-purity.md): Isolating dependencies at boundaries keeps domain logic pure and makes replacement easier without disrupting core functionality.

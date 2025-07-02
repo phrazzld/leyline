@@ -53,259 +53,105 @@ Without layered organization, code becomes a tangled web where business logic de
 
 ## Implementation Examples
 
-### ❌ Tangled Architecture
-
+**❌ Tangled Architecture:**
 ```typescript
-// Bad: Business logic mixed with infrastructure concerns
 class UserService {
   async registerUser(userData: any) {
-    // UI validation mixed with business logic
-    if (!userData.email?.includes('@')) {
-      throw new Error('Invalid email');
-    }
-
-    // Direct database coupling in business logic
+    if (!userData.email?.includes('@')) throw new Error('Invalid email');
     const user = await db.query('INSERT INTO users...', userData);
-
-    // Infrastructure concerns in business layer
     await sendEmail(user.email, 'Welcome!');
-
-    return { message: 'User created successfully' }; // UI concern in service
+    return { message: 'User created successfully' };
   }
 }
 ```
 
-### ✅ Layered Architecture
-
+**✅ Layered Architecture:**
 ```typescript
 // Domain Layer - Pure business logic
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  createdAt: Date;
-}
-
-interface UserRepository {
-  save(user: User): Promise<User>;
-  findByEmail(email: string): Promise<User | null>;
-}
-
-interface EmailService {
-  sendWelcome(email: string): Promise<void>;
-}
+interface User { id: string; email: string; username: string; }
+interface UserRepository { save(user: User): Promise<User>; }
 
 class UserDomainService {
-  validateUser(email: string, username: string): void {
-    if (!email.includes('@')) {
-      throw new Error('Invalid email format');
-    }
-    if (username.length < 3) {
-      throw new Error('Username must be at least 3 characters');
-    }
+  validateUser(email: string): void {
+    if (!email.includes('@')) throw new Error('Invalid email');
   }
-
   createUser(email: string, username: string): User {
-    this.validateUser(email, username);
-    return {
-      id: crypto.randomUUID(),
-      email: email.toLowerCase(),
-      username,
-      createdAt: new Date()
-    };
+    this.validateUser(email);
+    return { id: crypto.randomUUID(), email, username };
   }
 }
 
-// Application Layer - Orchestrates business workflows
+// Application Layer - Orchestrates workflows
 class UserApplicationService {
-  constructor(
-    private userRepository: UserRepository,
-    private emailService: EmailService,
-    private userDomain: UserDomainService
-  ) {}
+  constructor(private userRepo: UserRepository, private userDomain: UserDomainService) {}
 
   async registerUser(email: string, username: string): Promise<string> {
-    // Check if user already exists
-    const existingUser = await this.userRepository.findByEmail(email);
-    if (existingUser) {
-      throw new Error('User already exists');
-    }
-
-    // Create domain object
     const user = this.userDomain.createUser(email, username);
-
-    // Persist user
-    await this.userRepository.save(user);
-
-    // Send welcome email
-    await this.emailService.sendWelcome(user.email);
-
+    await this.userRepo.save(user);
     return user.id;
   }
 }
 
-// Infrastructure Layer - Implements external concerns
+// Infrastructure Layer - External concerns
 class DatabaseUserRepository implements UserRepository {
   async save(user: User): Promise<User> {
-    // Database-specific implementation
-    const result = await this.db.query(
-      'INSERT INTO users (id, email, username, created_at) VALUES ($1, $2, $3, $4)',
-      [user.id, user.email, user.username, user.createdAt]
-    );
+    await this.db.query('INSERT INTO users...', [user.id, user.email]);
     return user;
   }
-
-  async findByEmail(email: string): Promise<User | null> {
-    const result = await this.db.query(
-      'SELECT id, email, username, created_at FROM users WHERE email = $1',
-      [email]
-    );
-    return result.rows[0] || null;
-  }
 }
 
-class EmailServiceImpl implements EmailService {
-  async sendWelcome(email: string): Promise<void> {
-    // Email service implementation
-    await this.emailClient.send({
-      to: email,
-      subject: 'Welcome!',
-      template: 'welcome'
-    });
-  }
-}
-
-// Presentation Layer - Handles HTTP concerns
+// Presentation Layer - HTTP concerns
 class UserController {
   constructor(private userService: UserApplicationService) {}
 
   async register(req: Request, res: Response): Promise<void> {
-    try {
-      const { email, username } = req.body;
-
-      // Input validation and formatting
-      if (!email || !username) {
-        res.status(400).json({ error: 'Email and username required' });
-        return;
-      }
-
-      const userId = await this.userService.registerUser(email, username);
-
-      res.status(201).json({
-        success: true,
-        userId,
-        message: 'User registered successfully'
-      });
-    } catch (error) {
-      res.status(400).json({
-        error: error.message
-      });
-    }
-  }
-}
-
-// Composition Root - Wire dependencies
-class DIContainer {
-  static createUserController(): UserController {
-    const userDomain = new UserDomainService();
-    const userRepository = new DatabaseUserRepository();
-    const emailService = new EmailServiceImpl();
-
-    const userApplication = new UserApplicationService(
-      userRepository,
-      emailService,
-      userDomain
-    );
-
-    return new UserController(userApplication);
+    const { email, username } = req.body;
+    const userId = await this.userService.registerUser(email, username);
+    res.status(201).json({ userId });
   }
 }
 ```
 
 ## Layer Testing Strategy
 
+**Domain Layer:** Pure unit tests with no mocks
+**Application Layer:** Mock external dependencies
+**Infrastructure Layer:** Integration tests with real external systems
+**Presentation Layer:** Test HTTP request/response handling
+
 ```typescript
-// Domain Layer - Pure unit tests
-describe('UserDomainService', () => {
-  test('validates email format', () => {
-    const userDomain = new UserDomainService();
-    expect(() => userDomain.validateUser('invalid', 'user')).toThrow('Invalid email');
-  });
+// Domain - Pure unit tests
+test('validates email format', () => {
+  const userDomain = new UserDomainService();
+  expect(() => userDomain.validateUser('invalid')).toThrow('Invalid email');
 });
 
-// Application Layer - Mock external dependencies
-describe('UserApplicationService', () => {
-  test('registers new user successfully', async () => {
-    const mockRepo = { save: jest.fn(), findByEmail: jest.fn().mockResolvedValue(null) };
-    const mockEmail = { sendWelcome: jest.fn() };
-    const mockDomain = { createUser: jest.fn().mockReturnValue({ id: '123' }) };
-
-    const service = new UserApplicationService(mockRepo, mockEmail, mockDomain);
-    const result = await service.registerUser('test@example.com', 'testuser');
-
-    expect(result).toBe('123');
-    expect(mockRepo.save).toHaveBeenCalled();
-    expect(mockEmail.sendWelcome).toHaveBeenCalled();
-  });
-});
-
-// Infrastructure Layer - Integration tests
-describe('DatabaseUserRepository', () => {
-  test('saves user to database', async () => {
-    const repo = new DatabaseUserRepository();
-    const user = { id: '123', email: 'test@example.com', username: 'test', createdAt: new Date() };
-
-    const saved = await repo.save(user);
-    const found = await repo.findByEmail('test@example.com');
-
-    expect(found).toEqual(user);
-  });
+// Application - Mock dependencies
+test('registers new user', async () => {
+  const mockRepo = { save: jest.fn() };
+  const service = new UserApplicationService(mockRepo, mockDomain);
+  await service.registerUser('test@example.com', 'user');
+  expect(mockRepo.save).toHaveBeenCalled();
 });
 ```
 
 ## Common Anti-Patterns
 
-**❌ Layer Skipping**: Presentation layer directly calling Infrastructure layer.
+❌ **Layer Skipping:** Presentation calling Infrastructure directly
+❌ **Circular Dependencies:** Lower layers depending on higher layers
+❌ **Anemic Domain:** Domain with only data, no business logic
+❌ **Fat Controllers:** Business logic in Presentation layer
+❌ **Leaky Abstractions:** Infrastructure concerns in Domain
 
-**❌ Circular Dependencies**: Lower layers depending on higher layers.
+## When to Use
 
-**❌ Anemic Domain**: Domain layer with only data structures and no business logic.
+**Good Fit:** Complex business logic, high testability needs, multiple integrations
+**Poor Fit:** Simple CRUD apps, high-performance systems, small applications
 
-**❌ Fat Controllers**: Presentation layer containing business logic.
+**Evolution:** Start minimal, measure impact, refactor boundaries as needed
 
-**❌ Leaky Abstractions**: Infrastructure concerns bleeding into domain layer.
+## Related Bindings
 
-## When to Use Layered Architecture
-
-**Good Fit**:
-- Complex business logic that benefits from isolation
-- Applications requiring high testability
-- Systems with multiple external integrations
-- Teams needing clear separation of responsibilities
-
-**Poor Fit**:
-- Simple CRUD applications with minimal business logic
-- High-performance systems where layer overhead is problematic
-- Small applications where architectural overhead exceeds benefits
-
-## Architecture Evolution
-
-**Start Minimal**: Begin with basic layer separation and add complexity as needed.
-
-**Measure Impact**: Monitor whether layering improves or hinders development velocity.
-
-**Refactor Boundaries**: Adjust layer responsibilities as domain understanding improves.
-
-**Consider Alternatives**: Evaluate whether other patterns (hexagonal, event-driven) better fit evolving requirements.
-
-## Related Standards
-
-- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Provides dependency management patterns that support layer isolation
-- [interface-contracts](../../docs/bindings/core/interface-contracts.md): Defines contract design that enables clean layer boundaries
-- [component-isolation](../../docs/bindings/core/component-isolation.md): Component separation principles that complement layered architecture
-
-## References
-
-- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [Layered Architecture Pattern](https://www.oreilly.com/library/view/software-architecture-patterns/9781491971437/ch01.html)
-- [Domain-Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+- [dependency-inversion](../../docs/bindings/core/dependency-inversion.md): Dependency management for layer isolation
+- [interface-contracts](../../docs/bindings/core/interface-contracts.md): Clean layer boundaries
+- [component-isolation](../../docs/bindings/core/component-isolation.md): Component separation principles
