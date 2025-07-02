@@ -26,7 +26,7 @@ This file contains an automatically generated list of all bindings with their on
 | [debugger-first-development](./core/debugger-first-development.md) | 0.1.0 | Grug observes that many developers default to print statements (console.log, printf, etc.) for debugging because debuggers feel intimidating or com... |
 | [dependency-inversion](./core/dependency-inversion.md) | 0.1.0 | This binding directly implements our testability tenet by making code inherently more |
 | [dependency-management](./core/dependency-management.md) | 0.1.0 | This binding implements our simplicity tenet by addressing a major source of hidden |
-| [development-environment-consistency](./core/development-environment-consistency.md) | 0.1.0 | This binding applies our automation tenet to development environment management, transforming manual setup processes that are error-prone and time-... |
+| [development-environment-consistency](./core/development-environment-consistency.md) | 0.1.0 | Manual environment setup is a bug in your process. Like a perfectly organized workshop where every tool has its place, automated environments ensur... |
 | [distributed-git-workflow-practices](./core/distributed-git-workflow-practices.md) | 0.1.0 | This binding directly implements our distributed resilience tenet by ensuring Git workflows embrace rather than fight Git's fundamental architectur... |
 | [external-configuration](./core/external-configuration.md) | 0.1.0 | This binding directly implements our no-secret-suppression tenet by preventing one of |
 | [extract-common-logic](./core/extract-common-logic.md) | 0.1.0 | This binding implements our DRY tenet by eliminating knowledge duplication at the code level. Like creating a recipe book where each technique is d... |
