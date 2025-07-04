@@ -204,10 +204,10 @@ _No frontend bindings defined yet._
 | [python-dependency-management](./categories/python/dependency-management.md) | 0.1.0 | This binding implements automation by transforming manual dependency management into reproducible processes. Virtual environments provide isolation... |
 | [python-error-handling](./categories/python/error-handling.md) | 0.1.0 | Explicit error handling makes failure modes visible and intentional. Specific exception types document what can go wrong and how code responds. Bar... |
 | [modern-python-toolchain](./categories/python/modern-python-toolchain.md) | 0.1.0 | Unified toolchain automates all essential development tasks through consistent configuration. Modern tools (uv, ruff, mypy, pytest) work together s... |
-| [package-structure](./categories/python/package-structure.md) | 0.1.0 | This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. Good package str... |
+| [package-structure](./categories/python/package-structure.md) | 0.1.0 | Implements modularity through clear boundaries and dependencies. Organizing by business domain rather than technical layer makes code immediately c... |
 | [pyproject-toml-configuration](./categories/python/pyproject-toml-configuration.md) | 0.1.0 | This binding implements our simplicity tenet by eliminating scattered configuration files across multiple formats. Instead of managing separate fil... |
 | [ruff-code-quality](./categories/python/ruff-code-quality.md) | 0.1.0 | This binding implements our automation tenet by consolidating multiple manual and fragmented code quality tools into a single, lightning-fast solut... |
-| [testing-patterns](./categories/python/testing-patterns.md) | 0.1.0 | This binding implements our testability tenet by ensuring that tests provide meaningful feedback about system correctness rather than coupling to i... |
+| [testing-patterns](./categories/python/testing-patterns.md) | 0.1.0 | Implements testability by focusing on behavior verification rather than implementation coupling. Tests should verify outcomes users care about, not... |
 | [type-hinting](./categories/python/type-hinting.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making function contracts and data structures visible through the type system rather th... |
 
 ## React Bindings
