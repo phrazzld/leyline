@@ -8,19 +8,13 @@ enforced_by: secret detection tools (trufflehog, detect-secrets, gitleaks) + pre
 
 # Binding: Implement Comprehensive Secrets Management Practices
 
-Establish secure handling of credentials, API keys, and sensitive configuration throughout development and deployment. Never suppress secret detection mechanisms, ensuring proper management, rotation, and monitoring of all sensitive data.
+Establish secure handling of credentials, API keys, and sensitive configuration throughout development and deployment. Never suppress secret detection mechanisms.
 
 ## Rationale
 
 This binding implements no-secret-suppression by preventing hardcoding or improper handling of secrets. It builds upon external-configuration principles by ensuring sensitive data is externalized, secured, and managed throughout its lifecycle.
 
-Secrets management works like a secure vault with multiple protection layers: access controls, audit logging, and time-limited access. Applications must never store secrets in source code or suppress detection mechanisms.
-
-Poor secrets management creates systemic vulnerabilities that compound over time. Each suppressed warning potentially represents a credential compromise leading to data breaches.
-
 ## Rule Definition
-
-Secrets management must implement comprehensive protection with zero tolerance for suppression:
 
 **Secrets Classification:**
 - High Sensitivity: Production passwords, encryption keys, write-access API keys
@@ -29,210 +23,123 @@ Secrets management must implement comprehensive protection with zero tolerance f
 
 **Zero Suppression Policy:**
 - Never suppress or bypass secret detection tools
-- All detections must be investigated and remediated
-- Address detection immediately, never defer
+- All detections must be investigated and remediated immediately
 - Resolve through proper configuration, not suppression
 
 **Lifecycle Management:**
 - Use dedicated secrets management systems (Vault, AWS Secrets Manager)
-- Implement environment-specific isolation
-- Enforce role-based access with least privilege
+- Implement environment-specific isolation with role-based access
 - Log all secret access and modifications
-- Implement automated rotation with verification
-- Set explicit expiration dates with alerts
+- Implement automated rotation with explicit expiration dates
 
 ## Practical Implementation
 
-1. **Establish Secret Detection Pipeline**: Implement multi-layered detection:
+**1. Secret Detection Pipeline:**
 
-   ```yaml
-   # .pre-commit-config.yaml
-   repos:
-     - repo: https://github.com/trufflesecurity/trufflehog
-       rev: v3.67.7
-       hooks:
-         - id: trufflehog
-           args: ['--only-verified', '--fail']
-     - repo: https://github.com/Yelp/detect-secrets
-       rev: v1.4.0
-       hooks:
-         - id: detect-secrets
-           args: ['--baseline', '.secrets.baseline']
-   ```
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/trufflesecurity/trufflehog
+    rev: v3.67.7
+    hooks:
+      - id: trufflehog
+        args: ['--only-verified', '--fail']
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+```
 
-2. **Implement Secure Secrets Management**: Create infrastructure that handles the credential lifecycle:
+**2. Secure Secrets Management:**
 
-   ```typescript
-   interface SecretMetadata {
-     id: string;
-     name: string;
-     sensitivity: 'high' | 'medium' | 'low';
-     environment: string;
-     createdAt: Date;
-     expiresAt: Date;
-     rotationPeriod: number;
-   }
+```typescript
+interface SecretMetadata {
+  id: string;
+  name: string;
+  sensitivity: 'high' | 'medium' | 'low';
+  environment: string;
+  expiresAt: Date;
+}
 
-   class SecureSecretsManager {
-     private secretsProvider: SecretsProvider;
-     private auditLogger: SecurityAuditLogger;
-     private accessControl: AccessControlService;
+class SecureSecretsManager {
+  async storeSecret(name: string, value: string, metadata: Partial<SecretMetadata>): Promise<SecretMetadata> {
+    this.validateSecretValue(value, name);
+    await this.accessControl.canStoreSecret(name);
 
-     async storeSecret(name: string, value: string, metadata: Partial<SecretMetadata>): Promise<SecretMetadata> {
-       // Validate secret value
-       this.validateSecretValue(value, name);
+    const completeMetadata = {
+      ...metadata,
+      id: generateId(),
+      expiresAt: this.calculateExpiration(metadata.sensitivity)
+    };
 
-       // Check permissions
-       await this.accessControl.canStoreSecret(name);
+    await this.secretsProvider.store(name, value, completeMetadata);
+    await this.auditLogger.logSecretCreated(completeMetadata);
+    return completeMetadata;
+  }
 
-       // Store with metadata
-       const completeMetadata = {
-         ...metadata,
-         id: generateId(),
-         createdAt: new Date(),
-         expiresAt: this.calculateExpiration(metadata.sensitivity)
-       };
+  async retrieveSecret(name: string): Promise<string> {
+    await this.accessControl.canRetrieveSecret(name);
+    const metadata = await this.secretsProvider.getMetadata(name);
 
-       await this.secretsProvider.store(name, value, completeMetadata);
-       await this.auditLogger.logSecretCreated(completeMetadata);
+    if (metadata.expiresAt < new Date()) {
+      throw new ExpiredSecretError(`Secret ${name} has expired`);
+    }
 
-       return completeMetadata;
-     }
+    const value = await this.secretsProvider.retrieve(name);
+    await this.auditLogger.logSecretAccessed(name);
+    return value;
+  }
 
-     async retrieveSecret(name: string): Promise<string> {
-       await this.accessControl.canRetrieveSecret(name);
+  private validateSecretValue(value: string, name: string): void {
+    const problematicPatterns = [/^(test|demo|example|placeholder)/i, /^.{1,7}$/];
+    for (const pattern of problematicPatterns) {
+      if (pattern.test(value)) {
+        throw new InvalidSecretError(`Invalid secret value for ${name}`);
+      }
+    }
+  }
+}
+```
 
-       const metadata = await this.secretsProvider.getMetadata(name);
-       if (metadata.expiresAt < new Date()) {
-         throw new ExpiredSecretError(`Secret ${name} has expired`);
-       }
+**3. Secrets Monitoring:**
 
-       const value = await this.secretsProvider.retrieve(name);
-       await this.auditLogger.logSecretAccessed(name);
+```typescript
+class SecretsMonitoringService {
+  async monitorSecretUsage(event: SecretUsageEvent): Promise<void> {
+    await this.auditLogger.logSecretAccess(event);
 
-       return value;
-     }
+    if (await this.isSuspiciousAccess(event)) {
+      await this.alertManager.triggerAlert({
+        severity: 'high',
+        message: `Suspicious secret access: ${event.secretName}`
+      });
+    }
+  }
 
-     private validateSecretValue(value: string, name: string): void {
-       const problematicPatterns = [
-         /^(test|demo|example|placeholder)/i,
-         /^(password|secret|key)$/i,
-         /^.{1,7}$/  // Too short
-       ];
+  async validateCompliance(environment: string): Promise<ComplianceReport> {
+    const secrets = await this.secretsProvider.listSecrets(environment);
+    const violations = secrets.filter(s => this.isRotationOverdue(s)).map(s => ({
+      type: 'rotation_overdue',
+      secretName: s.name,
+      severity: 'high'
+    }));
 
-       for (const pattern of problematicPatterns) {
-         if (pattern.test(value)) {
-           throw new InvalidSecretError(`Invalid secret value for ${name}`);
-         }
-       }
-     }
-   }
-   ```
-
-3. **Create Secrets Monitoring System**: Implement validation and monitoring:
-
-   ```typescript
-   class SecretsMonitoringService {
-     private auditLogger: SecurityAuditLogger;
-     private alertManager: SecurityAlertManager;
-
-     async monitorSecretUsage(event: SecretUsageEvent): Promise<void> {
-       // Record usage event
-       await this.auditLogger.logSecretAccess(event);
-
-       // Check for immediate threats
-       if (await this.isSuspiciousAccess(event)) {
-         await this.alertManager.triggerAlert({
-           severity: 'high',
-           message: `Suspicious secret access: ${event.secretName}`,
-           details: event
-         });
-       }
-
-       // Check for anomalies
-       const anomalies = await this.detectAnomalies(event);
-       for (const anomaly of anomalies) {
-         await this.alertManager.triggerAlert(anomaly);
-       }
-     }
-
-     async validateCompliance(environment: string): Promise<ComplianceReport> {
-       const secrets = await this.secretsProvider.listSecrets(environment);
-       const violations = [];
-
-       for (const secret of secrets) {
-         if (this.isRotationOverdue(secret)) {
-           violations.push({
-             type: 'rotation_overdue',
-             secretName: secret.name,
-             severity: 'high'
-           });
-         }
-       }
-
-       return {
-         environment,
-         totalSecrets: secrets.length,
-         violations,
-         compliancePercentage: this.calculateCompliance(violations, secrets.length)
-       };
-     }
-   }
-   ```
-
-4. **Implement Secrets Testing**: Create validation strategies without exposing real credentials:
-
-   ```typescript
-   describe('SecretsManager', () => {
-     let secretsManager: SecretsManager;
-     let mockProvider: MockSecretsProvider;
-
-     beforeEach(() => {
-       mockProvider = new MockSecretsProvider();
-       secretsManager = new SecretsManager(mockProvider);
-     });
-
-     test('should store valid secret successfully', async () => {
-       const testSecret = generateTestSecret();
-       const metadata = {
-         sensitivity: 'medium' as const,
-         environment: 'test'
-       };
-
-       const result = await secretsManager.storeSecret('test-api-key', testSecret, metadata);
-
-       expect(result.name).toBe('test-api-key');
-       expect(result.sensitivity).toBe('medium');
-     });
-
-     test('should reject placeholder secrets', async () => {
-       const placeholders = ['test-key', 'placeholder', 'example-secret'];
-
-       for (const placeholder of placeholders) {
-         await expect(
-           secretsManager.storeSecret('test', placeholder, { sensitivity: 'medium' })
-         ).rejects.toThrow('Invalid secret value');
-       }
-     });
-
-     test('should enforce access control', async () => {
-       mockProvider.shouldRejectAccess = true;
-
-       await expect(
-         secretsManager.retrieveSecret('restricted-secret')
-       ).rejects.toThrow('Insufficient permissions');
-     });
-   });
-   ```
+    return {
+      environment,
+      totalSecrets: secrets.length,
+      violations,
+      compliancePercentage: this.calculateCompliance(violations, secrets.length)
+    };
+  }
+}
+```
 
 ## Documentation Security Patterns
-
-When creating documentation, code examples, and tutorials, follow secure patterns to prevent accidental secret exposure and false positives in security scanning:
 
 **Secure Example Patterns:**
 - Use explicit redaction markers: `[REDACTED]`, `[EXAMPLE]`, `[PLACEHOLDER]`
 - Avoid realistic-looking secrets that trigger detection tools
-- Include security context in comments explaining why values are redacted
 
 ```typescript
 // ✅ GOOD: Secure documentation examples
@@ -247,21 +154,7 @@ const apiConfig = {
   webhookSecret: 'whsec_[EXAMPLE]',      // Clear example indicator
   token: '[YOUR_API_TOKEN_HERE]'         // Template-style placeholder
 };
-
-// ❌ BAD: Realistic-looking secrets that trigger scanners
-const badConfig = {
-  apiKey: 'sk_live_[EXAMPLE_ONLY]',      // Use redaction markers instead
-  token: 'ghp_[REDACTED]',               // Clear placeholder format
-  secret: 'sk-proj-[PLACEHOLDER]'        // Template-style indicator
-};
 ```
-
-**Documentation Review Checklist:**
-- [ ] All example secrets use `[REDACTED]` or `[EXAMPLE]` markers
-- [ ] No realistic key patterns (`sk_live_*`, `ghp_*`, `pk_*`, etc.)
-- [ ] Environment variable usage demonstrated in examples
-- [ ] Security context explained in surrounding text
-- [ ] Gitleaks scan passes without false positives
 
 ## Examples
 
@@ -275,9 +168,6 @@ DATABASE_URL = "postgresql://admin:[PASSWORD]@db.production.com:5432/app"
 ```typescript
 // ✅ GOOD: Secure secrets management with proper externalization
 class SecureConfigurationManager {
-  private secretsManager: SecretsManager;
-  private auditLogger: SecurityAuditLogger;
-
   async getDatabaseConfig(): Promise<DatabaseConfig> {
     try {
       const dbSecret = await this.secretsManager.retrieveSecret(
@@ -297,28 +187,13 @@ class SecureConfigurationManager {
       throw new ConfigurationError('Failed to retrieve database configuration');
     }
   }
-
-  private validateCredentials(credentials: any, secretName: string): void {
-    const placeholders = ['test-key', 'example', 'placeholder', 'demo'];
-    for (const placeholder of placeholders) {
-      if (credentials.apiKey?.toLowerCase().includes(placeholder)) {
-        throw new InvalidCredentialsError(
-          `Secret ${secretName} contains placeholder: ${placeholder}`
-        );
-      }
-    }
-  }
 }
 ```
 
 ## Related Bindings
 
-- [no-secret-suppression](../../tenets/no-secret-suppression.md): Secrets management directly implements no-secret-suppression by requiring all secret detection warnings be addressed rather than bypassed.
-
-- [external-configuration](../core/external-configuration.md): Secrets management builds upon external configuration by ensuring sensitive data is not only externalized but properly secured and managed.
-
-- [secure-by-design-principles](../../docs/bindings/categories/security/secure-by-design-principles.md): Secrets management provides the secure credential handling foundation that enables other security controls.
-
-- [comprehensive-security-automation](../core/comprehensive-security-automation.md): Secrets management practices are enforced through automated detection, scanning, and monitoring systems.
-
-- [use-structured-logging](../core/use-structured-logging.md): Secrets operations require comprehensive logging while ensuring actual secret values are never logged.
+- [no-secret-suppression](../../tenets/no-secret-suppression.md): Requires all secret detection warnings be addressed rather than bypassed
+- [external-configuration](../../core/external-configuration.md): Ensures sensitive data is externalized and properly secured
+- [secure-by-design-principles](secure-by-design-principles.md): Provides secure credential handling foundation
+- [comprehensive-security-automation](../../core/comprehensive-security-automation.md): Enforces practices through automated detection and monitoring
+- [use-structured-logging](../../core/use-structured-logging.md): Requires comprehensive logging while protecting secret values

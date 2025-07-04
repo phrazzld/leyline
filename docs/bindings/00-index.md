@@ -117,9 +117,9 @@ _No frontend bindings defined yet._
 
 | ID | Version | Summary |
 |---|---|---|
-| [configuration-management](./categories/rust/configuration-management.md) | 0.1.0 | This binding implements adaptability-and-reversibility by using Rust's configuration capabilities to make decisions reversible without code changes... |
-| [error-handling](./categories/rust/error-handling.md) | 0.1.0 | This binding directly implements our simplicity and explicit-over-implicit tenets by |
-| [ownership-patterns](./categories/rust/ownership-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by leveraging Rust's ownership system to prevent entire categories of bugs that would otherwise add tr... |
+| [configuration-management](./categories/rust/configuration-management.md) | 0.1.0 | This binding implements adaptability-and-reversibility through Rust's configuration capabilities. Rust's type system and feature management provide... |
+| [error-handling](./categories/rust/error-handling.md) | 0.1.0 | This binding implements simplicity and explicit-over-implicit tenets by making errors a first-class concern in the type system. Rust's `Result<T, E... |
+| [ownership-patterns](./categories/rust/ownership-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by leveraging Rust's ownership system to prevent entire categories of bugs. Rust's ownership model mov... |
 | [trait-composition-patterns](./categories/rust/trait-composition-patterns.md) | 0.1.0 | This binding implements orthogonality by leveraging Rust's trait system to create independent, composable behaviors. Traits enable safer, more flex... |
 
 ## TypeScript Bindings
@@ -240,7 +240,7 @@ _No frontend bindings defined yet._
 | [input-validation-standards](./categories/security/input-validation-standards.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by applying security-focused validation at every trust boundary. Like an immune system wit... |
 | [secrets-management-practices](./categories/security/secrets-management-practices.md) | 0.1.0 | This binding implements no-secret-suppression by preventing hardcoding or improper handling of secrets. It builds upon external-configuration princ... |
 | [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that security concerns be visible, documented, and intentional archi... |
-| [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding implements automation by transforming manual security reviews into systematic validation that runs consistently across all development... |
+| [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding implements automation by transforming manual security reviews into systematic validation. It embodies fix-broken-windows by ensuring s... |
 
 ## Web Bindings
 
