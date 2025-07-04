@@ -133,12 +133,12 @@ _No frontend bindings defined yet._
 | [modern-typescript-toolchain](./categories/typescript/modern-typescript-toolchain.md) | 0.1.0 | This binding implements our automation tenet by eliminating the cognitive overhead and friction of tool selection, configuration, and integration d... |
 | [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | Feature-focused modules create natural boundaries that align with system changes, while technical-layer modules create artificial boundaries that c... |
 | [no-any](./categories/typescript/no-any.md) | 0.1.0 | Each `any` type creates a blind spot where TypeScript can't provide guidance, intellisense help, or error checking. These blind spots spread outwar... |
-| [package-json-standards](./categories/typescript/package-json-standards.md) | 0.1.0 | This binding implements our automation tenet by establishing package.json as a security-critical configuration artifact that requires standardized ... |
-| [tanstack-query-state](./categories/typescript/tanstack-query-state.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making server state management transparent and predictable through TanStack Query's dec... |
+| [package-json-standards](./categories/typescript/package-json-standards.md) | 0.1.0 | This binding implements our automation tenet by establishing package.json as a security-critical configuration artifact requiring standardized stru... |
+| [tanstack-query-state](./categories/typescript/tanstack-query-state.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making server state management transparent and predictable. Server state is fundamental... |
 | [tsup-build-system](./categories/typescript/tsup-build-system.md) | 0.1.0 | Applies to all TypeScript projects producing distributable artifacts. Requirements: |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 | [use-pnpm-for-nodejs](./categories/typescript/use-pnpm-for-nodejs.md) | 0.1.0 | This binding implements our automation tenet by establishing a consistent, efficient package management foundation that eliminates "works on my mac... |
-| [vitest-testing-framework](./categories/typescript/vitest-testing-framework.md) | 0.1.0 | This binding implements our testability tenet by establishing a consistent, behavior-focused testing approach that enables confident refactoring an... |
+| [vitest-testing-framework](./categories/typescript/vitest-testing-framework.md) | 0.1.0 | This binding implements our testability tenet by establishing a consistent, behavior-focused testing approach. A well-structured test pyramid catch... |
 
 ## Api Bindings
 
@@ -163,13 +163,13 @@ _No frontend bindings defined yet._
 | ID | Version | Summary |
 |---|---|---|
 | [audit-logging-implementation](./categories/database/audit-logging-implementation.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by ensuring |
-| [connection-pooling-standards](./categories/database/connection-pooling-standards.md) | 0.1.0 | This binding implements our simplicity tenet by ensuring database connection management remains predictable and maintainable. Database connections ... |
+| [connection-pooling-standards](./categories/database/connection-pooling-standards.md) | 0.1.0 | Database connections are expensive resources. Simple, explicit pool configuration based on measured load prevents both resource waste and bottlenec... |
 | [data-validation-at-boundaries](./categories/database/data-validation-at-boundaries.md) | 0.1.0 | This binding implements our modularity tenet by ensuring each module takes complete responsibility for data validity at database boundaries. Like c... |
-| [database-testing-strategies](./categories/database/database-testing-strategies.md) | 0.1.0 | This binding directly implements our testability tenet by ensuring that database |
-| [migration-management-strategy](./categories/database/migration-management-strategy.md) | 0.1.0 | This binding directly implements our simplicity tenet by eliminating the complexity |
+| [database-testing-strategies](./categories/database/database-testing-strategies.md) | 0.1.0 | Database interactions are complex and error-prone, requiring systematic testing at multiple levels. Poor database testing creates flaky tests and p... |
+| [migration-management-strategy](./categories/database/migration-management-strategy.md) | 0.1.0 | Bidirectional migration systems create complexity by managing two synchronized codebases for "up" and "down" operations. Most rollback capabilities... |
 | [orm-usage-patterns](./categories/database/orm-usage-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by ensuring that database interactions remain predictable and performant. ORMs promise to simplify dat... |
 | [query-optimization-and-indexing](./categories/database/query-optimization-and-indexing.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by ensuring database performance decisions are visible and intentional. Database optimizer... |
-| [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding implements maintainability by ensuring read replica patterns remain comprehensible and manageable as systems scale. Read replicas solv... |
+| [read-replica-patterns](./categories/database/read-replica-patterns.md) | 0.1.0 | This binding implements maintainability by ensuring read replica patterns remain comprehensible and manageable as systems scale. Read replicas intr... |
 | [transaction-management-patterns](./categories/database/transaction-management-patterns.md) | 0.1.0 | This binding implements our modularity tenet by treating transactions as well-defined, independent units of work with clear boundaries. Like shippi... |
 
 ## Git Bindings
@@ -202,8 +202,8 @@ _No frontend bindings defined yet._
 | ID | Version | Summary |
 |---|---|---|
 | [python-dependency-management](./categories/python/dependency-management.md) | 0.1.0 | This binding implements automation by transforming manual dependency management into reproducible processes. Virtual environments provide isolation... |
-| [python-error-handling](./categories/python/error-handling.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error handling strategies visible and intentional rather than hidden behind catc... |
-| [modern-python-toolchain](./categories/python/modern-python-toolchain.md) | 0.1.0 | This binding directly implements our automation tenet by establishing a unified toolchain that automates all essential development tasks—dependency... |
+| [python-error-handling](./categories/python/error-handling.md) | 0.1.0 | Explicit error handling makes failure modes visible and intentional. Specific exception types document what can go wrong and how code responds. Bar... |
+| [modern-python-toolchain](./categories/python/modern-python-toolchain.md) | 0.1.0 | Unified toolchain automates all essential development tasks through consistent configuration. Modern tools (uv, ruff, mypy, pytest) work together s... |
 | [package-structure](./categories/python/package-structure.md) | 0.1.0 | This binding implements our modularity tenet by creating clear boundaries and dependencies between different parts of your system. Good package str... |
 | [pyproject-toml-configuration](./categories/python/pyproject-toml-configuration.md) | 0.1.0 | This binding implements our simplicity tenet by eliminating scattered configuration files across multiple formats. Instead of managing separate fil... |
 | [ruff-code-quality](./categories/python/ruff-code-quality.md) | 0.1.0 | This binding implements our automation tenet by consolidating multiple manual and fragmented code quality tools into a single, lightning-fast solut... |
