@@ -239,7 +239,7 @@ _No frontend bindings defined yet._
 | [authentication-authorization-patterns](./categories/security/authentication-authorization-patterns.md) | 0.1.0 | This binding implements explicit-over-implicit by requiring that all authentication and authorization decisions be visible, documented, and intenti... |
 | [input-validation-standards](./categories/security/input-validation-standards.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by applying security-focused validation at every trust boundary. Like an immune system wit... |
 | [secrets-management-practices](./categories/security/secrets-management-practices.md) | 0.1.0 | This binding implements no-secret-suppression by preventing hardcoding or improper handling of secrets. It builds upon external-configuration princ... |
-| [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by requiring that security concerns be visible, documented, and intentional archi... |
+| [secure-by-design-principles](./categories/security/secure-by-design-principles.md) | 0.1.0 | Implements explicit-over-implicit by requiring security concerns be visible, documented architectural decisions rather than hidden assumptions. Sec... |
 | [secure-coding-checklist](./categories/security/secure-coding-checklist.md) | 0.1.0 | This binding implements automation by transforming manual security reviews into systematic validation. It embodies fix-broken-windows by ensuring s... |
 
 ## Web Bindings
