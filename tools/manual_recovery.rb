@@ -13,21 +13,21 @@ $options = {
 }
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: manual_recovery.rb [options]"
+  opts.banner = 'Usage: manual_recovery.rb [options]'
 
-  opts.on("--guide", "Show manual recovery guide") do
+  opts.on('--guide', 'Show manual recovery guide') do
     $options[:guide] = true
   end
 
-  opts.on("--check", "Check current release state") do
+  opts.on('--check', 'Check current release state') do
     $options[:check] = true
   end
 
-  opts.on("-v", "--version VERSION", "Version to recover from") do |version|
+  opts.on('-v', '--version VERSION', 'Version to recover from') do |version|
     $options[:version] = version
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -168,12 +168,12 @@ def check_release_state
   version = $options[:version]
 
   unless version
-    puts "Error: Version required for check (use --version)"
+    puts 'Error: Version required for check (use --version)'
     exit 1
   end
 
   puts "Checking release state for #{version}..."
-  puts ""
+  puts ''
 
   # Check VERSION file
   if File.exist?('VERSION')
@@ -181,12 +181,12 @@ def check_release_state
     puts "✓ Current VERSION: #{current_version}"
 
     if "v#{current_version}" == version || current_version == version.gsub(/^v/, '')
-      puts "  ⚠️  VERSION file still shows failed version"
+      puts '  ⚠️  VERSION file still shows failed version'
     else
-      puts "  ✓ VERSION file already reverted"
+      puts '  ✓ VERSION file already reverted'
     end
   else
-    puts "✗ VERSION file not found"
+    puts '✗ VERSION file not found'
   end
 
   # Check CHANGELOG
@@ -198,7 +198,7 @@ def check_release_state
       puts "✓ CHANGELOG does not contain #{version}"
     end
   else
-    puts "✗ CHANGELOG.md not found"
+    puts '✗ CHANGELOG.md not found'
   end
 
   # Check git tag
@@ -207,16 +207,16 @@ def check_release_state
 
     # Check if pushed to remote
     if system("git ls-remote --tags origin | grep #{version} >/dev/null 2>&1")
-      puts "  ⚠️  Tag also exists on remote"
+      puts '  ⚠️  Tag also exists on remote'
     else
-      puts "  ✓ Tag not on remote"
+      puts '  ✓ Tag not on remote'
     end
   else
     puts "✓ Git tag #{version} not found locally"
   end
 
   # Check GitHub release (requires gh CLI)
-  if system("which gh >/dev/null 2>&1")
+  if system('which gh >/dev/null 2>&1')
     if system("gh release view #{version} >/dev/null 2>&1")
       puts "⚠️  GitHub release #{version} still exists"
     else
@@ -226,12 +226,12 @@ def check_release_state
     puts "ℹ️  GitHub CLI not available - can't check releases"
   end
 
-  puts ""
-  puts "Based on this check, you may need to:"
-  puts "- Revert VERSION file" if "v#{current_version}" == version
+  puts ''
+  puts 'Based on this check, you may need to:'
+  puts '- Revert VERSION file' if "v#{current_version}" == version
   puts "- Remove #{version} from CHANGELOG" if changelog&.include?(version.gsub(/^v/, ''))
   puts "- Delete git tag #{version}" if system("git rev-parse #{version} >/dev/null 2>&1")
-  puts "- Delete GitHub release" if system("gh release view #{version} >/dev/null 2>&1")
+  puts '- Delete GitHub release' if system("gh release view #{version} >/dev/null 2>&1")
 end
 
 # Main execution
@@ -240,14 +240,14 @@ if $options[:guide]
 elsif $options[:check]
   check_release_state
 else
-  puts "Manual Recovery Tool"
-  puts ""
-  puts "Options:"
-  puts "  --guide     Show step-by-step manual recovery guide"
-  puts "  --check     Check current release state"
-  puts "  --version   Version to check (with --check)"
-  puts ""
-  puts "Example:"
-  puts "  ruby tools/manual_recovery.rb --guide"
-  puts "  ruby tools/manual_recovery.rb --check --version v0.2.0"
+  puts 'Manual Recovery Tool'
+  puts ''
+  puts 'Options:'
+  puts '  --guide     Show step-by-step manual recovery guide'
+  puts '  --check     Check current release state'
+  puts '  --version   Version to check (with --check)'
+  puts ''
+  puts 'Example:'
+  puts '  ruby tools/manual_recovery.rb --guide'
+  puts '  ruby tools/manual_recovery.rb --check --version v0.2.0'
 end

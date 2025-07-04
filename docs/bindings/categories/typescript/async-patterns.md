@@ -14,9 +14,7 @@ unhandled promises, excessive nesting, and missing error management.
 
 ## Rationale
 
-This binding implements our simplicity tenet by establishing clear patterns for asynchronous code flow in TypeScript. Async programming introduces temporal coupling, error propagation challenges, and timing-dependent bugs that are difficult to test consistently.
-
-Clear async patterns create predictability, reduce mental overhead, and prevent categories of errors like unhandled promises, race conditions, and missing error context.
+This binding implements our simplicity tenet by establishing clear patterns for asynchronous code flow in TypeScript. Async programming introduces temporal coupling, error propagation challenges, and timing-dependent bugs. Clear async patterns create predictability and prevent unhandled promises, race conditions, and missing error context.
 
 ## Rule Definition
 
@@ -148,59 +146,28 @@ async function processItemsConcurrently<T, R>(
     }
   }
 
-  await Promise.all(executing);
-  return results;
 }
-
-// Testing async functions
-describe('Async Operations', () => {
-  test('fetchWithSafety handles errors correctly', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
-
-    const { promise } = fetchWithSafety<any>('/api/test');
-
-    await expect(promise).rejects.toThrow('Network error');
-  });
-
-  test('concurrent operations complete successfully', async () => {
-    const mockData = [{ id: 1 }, { id: 2 }, { id: 3 }];
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockData[0])
-    });
-
-    const result = await processItemsConcurrently(
-      [1, 2, 3],
-      id => fetchWithSafety<any>(`/api/items/${id}`).promise,
-      2
-    );
-
-    expect(result).toHaveLength(3);
-  });
-});
 ```
 
 ## Examples
 
+**❌ BAD: Callback hell, unhandled promises**
 ```typescript
-// ❌ BAD: Callback hell, unhandled promises, no types
 function loadUserData(userId, callback) {
   fetchUser(userId, (userError, user) => {
-    if (userError) {
-      callback(userError, null);
-      return;
-    }
+    if (userError) return callback(userError, null);
     fetchOrders(user.id, (ordersError, orders) => {
-      // Nested callbacks create complex error handling
-      callback(ordersError, { user, orders });
+      callback(ordersError, { user, orders }); // Nested callbacks
     });
   });
 }
 
-// Unhandled promise without awaiting
+// Unhandled promise
 fetch('/api/data').then(response => response.json());
+```
 
-// ✅ GOOD: Structured async with proper error handling
+**✅ GOOD: Structured async with proper error handling**
+```typescript
 async function loadUserData(userId: string): Promise<UserWithOrders> {
   try {
     const user = await fetchUser(userId);
@@ -208,24 +175,13 @@ async function loadUserData(userId: string): Promise<UserWithOrders> {
     const details = await Promise.all(
       orders.map(order => fetchOrderDetails(order.id))
     );
-
-    return {
-      user,
-      orders: orders.map((order, index) => ({
-        ...order,
-        details: details[index]
-      }))
-    };
+    return { user, orders: orders.map((order, i) => ({ ...order, details: details[i] })) };
   } catch (error) {
-    throw new ApiError(
-      `Failed to fetch user ${userId} data`,
-      500,
-      error instanceof Error ? error : undefined
-    );
+    throw new ApiError(`Failed to fetch user ${userId}`, 500, error as Error);
   }
 }
 
-// Proper usage with error handling
+// Proper usage
 try {
   const userData = await loadUserData('123');
   displayData(userData);
@@ -236,22 +192,7 @@ try {
 
 ## Related Bindings
 
-- [simplicity](../../docs/tenets/simplicity.md): Well-structured async code is inherently
-  simpler to understand and maintain, even though asynchronous operations are complex by
-  nature. This binding provides specific patterns that reduce the complexity of async
-  operations.
-
-- [ts-no-any](ts-no-any.md): Proper typing of async functions and their results is
-  critical for catching errors at compile time rather than runtime. Using `Promise<T>`
-  with specific return types instead of `Promise<any>` creates more robust code.
-
-- [ts-module-organization](ts-module-organization.md): Clear module boundaries make
-  async operations more manageable by defining what data and operations cross
-  boundaries, simplifying testing and error handling.
-
-- [testability](../../docs/tenets/testability.md): Async code requires special consideration in
-  testing. Well-structured async patterns make tests more reliable and easier to write.
-
-- [pure-functions](../../docs/bindings/core/pure-functions.md): While async functions inherently involve side
-  effects, following pure function principles for the logic within async functions
-  improves maintainability and testability.
+- [simplicity](../../tenets/simplicity.md): Well-structured async code reduces complexity of async operations
+- [no-any](no-any.md): Proper typing with `Promise<T>` instead of `Promise<any>` creates robust code
+- [module-organization](module-organization.md): Clear module boundaries make async operations more manageable
+- [testability](../../tenets/testability.md): Well-structured async patterns make tests more reliable

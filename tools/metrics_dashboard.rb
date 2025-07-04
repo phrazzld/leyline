@@ -64,18 +64,16 @@ class MetricsDashboard
     }
 
     files.each do |file|
-      begin
-        data = JSON.parse(File.read(file))
-        process_metrics_file(data, file)
-      rescue => e
-        puts "Warning: Failed to parse metrics file #{file}: #{e.message}"
-      end
+      data = JSON.parse(File.read(file))
+      process_metrics_file(data, file)
+    rescue StandardError => e
+      puts "Warning: Failed to parse metrics file #{file}: #{e.message}"
     end
 
     calculate_aggregated_statistics
   end
 
-  def process_metrics_file(data, filename)
+  def process_metrics_file(data, _filename)
     tool_name = data.dig('tool_info', 'name') || 'unknown'
 
     # Initialize tool data if not exists
@@ -137,11 +135,17 @@ class MetricsDashboard
     end
 
     # Update time range
-    if start_time
-      parsed_time = Time.parse(start_time)
-      @aggregated_data[:time_range][:start] = parsed_time if @aggregated_data[:time_range][:start].nil? || parsed_time < @aggregated_data[:time_range][:start]
-      @aggregated_data[:time_range][:end] = parsed_time if @aggregated_data[:time_range][:end].nil? || parsed_time > @aggregated_data[:time_range][:end]
+    return unless start_time
+
+    parsed_time = Time.parse(start_time)
+    if @aggregated_data[:time_range][:start].nil? || parsed_time < @aggregated_data[:time_range][:start]
+      @aggregated_data[:time_range][:start] =
+        parsed_time
     end
+    return unless @aggregated_data[:time_range][:end].nil? || parsed_time > @aggregated_data[:time_range][:end]
+
+    @aggregated_data[:time_range][:end] =
+      parsed_time
   end
 
   def calculate_aggregated_statistics
@@ -155,14 +159,14 @@ class MetricsDashboard
     end
 
     # Calculate per-tool statistics
-    @aggregated_data[:by_tool].each do |tool, data|
+    @aggregated_data[:by_tool].each do |_tool, data|
       if data[:total_runs] > 0
         data[:success_rate] = (data[:successful_runs].to_f / data[:total_runs] * 100).round(2)
         data[:avg_duration] = (data[:total_duration] / data[:total_runs]).round(3)
       end
 
       # Calculate operation statistics
-      data[:operations].each do |operation, op_data|
+      data[:operations].each do |_operation, op_data|
         if op_data[:count] > 0
           op_data[:avg_duration] = (op_data[:total_duration] / op_data[:count]).round(3)
           op_data[:success_rate] = (op_data[:successes].to_f / op_data[:count] * 100).round(2)
@@ -183,8 +187,8 @@ class MetricsDashboard
   end
 
   def generate_text_report
-    puts "📊 Leyline Validation Metrics Dashboard"
-    puts "=" * 50
+    puts '📊 Leyline Validation Metrics Dashboard'
+    puts '=' * 50
     puts
 
     # Time range
@@ -195,8 +199,8 @@ class MetricsDashboard
 
     # Summary statistics
     summary = @aggregated_data[:summary]
-    puts "📈 Summary Statistics"
-    puts "-" * 25
+    puts '📈 Summary Statistics'
+    puts '-' * 25
     puts "Total Validations: #{summary[:total_validations]}"
     puts "Successful: #{summary[:successful_validations]} (#{summary[:success_rate]}%)"
     puts "Failed: #{summary[:failed_validations]}"
@@ -217,17 +221,21 @@ class MetricsDashboard
     puts
 
     # Per-tool breakdown
-    puts "🔧 Tool Performance"
-    puts "-" * 20
+    puts '🔧 Tool Performance'
+    puts '-' * 20
     @aggregated_data[:by_tool].each do |tool, data|
-      status = data[:success_rate] >= 95 ? "✅" : data[:success_rate] >= 85 ? "⚠️" : "🔴"
+      status = if data[:success_rate] >= 95
+                 '✅'
+               else
+                 data[:success_rate] >= 85 ? '⚠️' : '🔴'
+               end
       puts "#{status} #{tool}"
       puts "   Runs: #{data[:total_runs]} | Success Rate: #{data[:success_rate]}% | Avg Duration: #{data[:avg_duration]}s"
 
       # Show slowest operations
       slow_ops = data[:operations].sort_by { |_, op| -op[:avg_duration] }.first(3)
       unless slow_ops.empty?
-        puts "   Slowest Operations:"
+        puts '   Slowest Operations:'
         slow_ops.each do |op_name, op_data|
           puts "     - #{op_name}: #{op_data[:avg_duration]}s (#{op_data[:count]} runs, #{op_data[:success_rate]}% success)"
         end
@@ -238,8 +246,8 @@ class MetricsDashboard
     # Top error patterns
     top_errors = @aggregated_data[:error_patterns].sort_by { |_, count| -count }.first(10)
     unless top_errors.empty?
-      puts "🚨 Top Error Patterns"
-      puts "-" * 22
+      puts '🚨 Top Error Patterns'
+      puts '-' * 22
       top_errors.each_with_index do |(pattern, count), index|
         puts "#{index + 1}. #{pattern}: #{count} occurrences"
       end
@@ -248,29 +256,29 @@ class MetricsDashboard
 
     # Performance trends
     if @aggregated_data[:performance_trends].length >= 5
-      puts "📊 Performance Trends"
-      puts "-" * 21
+      puts '📊 Performance Trends'
+      puts '-' * 21
 
       # Group by day and calculate daily averages
       daily_stats = @aggregated_data[:performance_trends]
-        .group_by { |trend| Time.parse(trend[:timestamp]).strftime('%Y-%m-%d') }
-        .transform_values do |trends|
-          successful = trends.count { |t| t[:success] }
-          {
-            total: trends.length,
-            success_rate: (successful.to_f / trends.length * 100).round(1),
-            avg_duration: (trends.sum { |t| t[:duration] } / trends.length).round(2)
-          }
-        end
+                    .group_by { |trend| Time.parse(trend[:timestamp]).strftime('%Y-%m-%d') }
+                    .transform_values do |trends|
+        successful = trends.count { |t| t[:success] }
+        {
+          total: trends.length,
+          success_rate: (successful.to_f / trends.length * 100).round(1),
+          avg_duration: (trends.sum { |t| t[:duration] } / trends.length).round(2)
+        }
+      end
 
       daily_stats.each do |date, stats|
         trend_indicator = if stats[:success_rate] >= 95
-          "✅"
-        elsif stats[:success_rate] >= 85
-          "⚠️"
-        else
-          "🔴"
-        end
+                            '✅'
+                          elsif stats[:success_rate] >= 85
+                            '⚠️'
+                          else
+                            '🔴'
+                          end
         puts "#{trend_indicator} #{date}: #{stats[:total]} runs, #{stats[:success_rate]}% success, #{stats[:avg_duration]}s avg"
       end
       puts
@@ -281,8 +289,8 @@ class MetricsDashboard
   end
 
   def generate_recommendations
-    puts "💡 Recommendations"
-    puts "-" * 18
+    puts '💡 Recommendations'
+    puts '-' * 18
 
     recommendations = []
 
@@ -293,9 +301,7 @@ class MetricsDashboard
 
     # Performance recommendations
     slow_tools = @aggregated_data[:by_tool].select { |_, data| data[:avg_duration] > 5 }
-    unless slow_tools.empty?
-      recommendations << "⚡ Optimize slow tools: #{slow_tools.keys.join(', ')}"
-    end
+    recommendations << "⚡ Optimize slow tools: #{slow_tools.keys.join(', ')}" unless slow_tools.empty?
 
     # Error pattern recommendations
     top_error = @aggregated_data[:error_patterns].max_by { |_, count| count }
@@ -305,12 +311,10 @@ class MetricsDashboard
 
     # Tool-specific recommendations
     failing_tools = @aggregated_data[:by_tool].select { |_, data| data[:success_rate] < 90 }
-    unless failing_tools.empty?
-      recommendations << "🚨 Fix failing tools: #{failing_tools.keys.join(', ')}"
-    end
+    recommendations << "🚨 Fix failing tools: #{failing_tools.keys.join(', ')}" unless failing_tools.empty?
 
     if recommendations.empty?
-      puts "🎉 System is performing well! No immediate actions required."
+      puts '🎉 System is performing well! No immediate actions required.'
     else
       recommendations.each_with_index do |rec, index|
         puts "#{index + 1}. #{rec}"
@@ -329,24 +333,24 @@ def main
   }
 
   OptionParser.new do |opts|
-    opts.banner = "Usage: metrics_dashboard.rb [options]"
-    opts.separator ""
-    opts.separator "Generate validation metrics dashboard and reports"
-    opts.separator ""
+    opts.banner = 'Usage: metrics_dashboard.rb [options]'
+    opts.separator ''
+    opts.separator 'Generate validation metrics dashboard and reports'
+    opts.separator ''
 
-    opts.on("-d", "--metrics-dir DIR", "Metrics directory (default: metrics)") do |dir|
+    opts.on('-d', '--metrics-dir DIR', 'Metrics directory (default: metrics)') do |dir|
       options[:metrics_dir] = dir
     end
 
-    opts.on("-f", "--format FORMAT", "Output format: text, json (default: text)") do |format|
+    opts.on('-f', '--format FORMAT', 'Output format: text, json (default: text)') do |format|
       options[:output_format] = format
     end
 
-    opts.on("--days DAYS", Integer, "Number of days to include (default: 7)") do |days|
+    opts.on('--days DAYS', Integer, 'Number of days to include (default: 7)') do |days|
       options[:days_back] = days
     end
 
-    opts.on("-h", "--help", "Show this help") do
+    opts.on('-h', '--help', 'Show this help') do
       puts opts
       exit 0
     end
@@ -368,7 +372,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nInterrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     puts "Error: #{e.message}"
     exit 1
   end

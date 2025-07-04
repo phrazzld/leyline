@@ -15,17 +15,17 @@ $options = {
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: export_submodule_config.rb [options]"
+  opts.banner = 'Usage: export_submodule_config.rb [options]'
 
-  opts.on("-o", "--output FILE", "Output selection config file path") do |file|
+  opts.on('-o', '--output FILE', 'Output selection config file path') do |file|
     $options[:output_file] = file
   end
 
-  opts.on("--verbose", "Verbose output") do
+  opts.on('--verbose', 'Verbose output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -51,11 +51,11 @@ def main
     exit 1
   end
 
-  log_info("Exporting submodule configuration to direct copy format")
+  log_info('Exporting submodule configuration to direct copy format')
 
   # Load submodule configuration
   submodule_config = YAML.load_file(config_file)
-  log_verbose("Loaded submodule configuration")
+  log_verbose('Loaded submodule configuration')
 
   # Convert to direct copy selection format
   selection_config = {
@@ -92,14 +92,12 @@ def main
   log_info("Direct copy selection config written to #{$options[:output_file]}")
 
   # Provide next steps
-  puts ""
-  puts "Next steps to complete migration from git submodule to direct copy:"
+  puts ''
+  puts 'Next steps to complete migration from git submodule to direct copy:'
   puts "1. Run: ruby examples/consumer-direct-copy/scripts/copy-leyline-standards.rb --config #{$options[:output_file]}"
-  puts "2. Verify copied standards in docs/standards/"
-  puts "3. Remove submodule: git submodule deinit leyline && git rm leyline"
-  puts "4. Update workflows to use direct copy validation"
+  puts '2. Verify copied standards in docs/standards/'
+  puts '3. Remove submodule: git submodule deinit leyline && git rm leyline'
+  puts '4. Update workflows to use direct copy validation'
 end
 
-if __FILE__ == $0
-  main
-end
+main if __FILE__ == $0

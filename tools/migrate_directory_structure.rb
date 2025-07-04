@@ -17,17 +17,17 @@ $options = {
 }
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: migrate_directory_structure.rb [options]"
+  opts.banner = 'Usage: migrate_directory_structure.rb [options]'
 
-  opts.on("--dry-run", "Show what would be changed without making changes") do
+  opts.on('--dry-run', 'Show what would be changed without making changes') do
     $options[:dry_run] = true
   end
 
-  opts.on("-v", "--verbose", "Show detailed output") do
+  opts.on('-v', '--verbose', 'Show detailed output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -46,7 +46,7 @@ def log_dry_run(message)
 end
 
 def validate_current_structure
-  log_info("Validating current directory structure")
+  log_info('Validating current directory structure')
 
   required_dirs = [
     'docs/tenets',
@@ -67,20 +67,20 @@ def validate_current_structure
   end
 
   if missing_dirs.empty?
-    log_info("Directory structure validation passed")
-    return true
+    log_info('Directory structure validation passed')
+    true
   else
     log_info("Directory structure validation failed - missing #{missing_dirs.length} directories")
-    return false
+    false
   end
 end
 
 def migrate_directory_structure
-  log_info("Starting directory structure migration")
+  log_info('Starting directory structure migration')
 
   # Validate current structure first
   unless validate_current_structure
-    log_info("Current structure validation failed - no migration needed")
+    log_info('Current structure validation failed - no migration needed')
     exit 0
   end
 
@@ -100,7 +100,7 @@ def migrate_directory_structure
   end
 
   if legacy_dirs.empty?
-    log_info("No legacy directories found - structure is current")
+    log_info('No legacy directories found - structure is current')
   else
     log_info("Found #{legacy_dirs.length} legacy directories")
 
@@ -129,13 +129,13 @@ def migrate_directory_structure
       if $options[:dry_run]
         log_dry_run("Would regenerate missing index: #{index_file}")
       else
-        log_info("Consider running: ruby tools/reindex.rb")
+        log_info('Consider running: ruby tools/reindex.rb')
       end
     end
   end
 
-  log_info("Directory structure migration completed")
-  log_info("Current structure is compatible with latest version")
+  log_info('Directory structure migration completed')
+  log_info('Current structure is compatible with latest version')
 
   exit 0
 end
@@ -147,7 +147,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nDirectory migration interrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     puts "Directory migration error: #{e.message}"
     puts e.backtrace.join("\n") if $options[:verbose]
     exit 1

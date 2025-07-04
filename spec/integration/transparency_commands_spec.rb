@@ -49,15 +49,18 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
           capture_cli_output { cli.invoke(:status, [target_dir], verbose: true, stats: true) }
         end
 
-        expect(status_result[:time_seconds]).to be < 2.0, "Status command took #{status_result[:time_seconds]}s (target: <2s)"
-        expect(status_result[:memory_delta_mb]).to be < 50, "Status used #{status_result[:memory_delta_mb]}MB (target: <50MB)"
+        expect(status_result[:time_seconds]).to be < 2.0,
+                                                "Status command took #{status_result[:time_seconds]}s (target: <2s)"
+        expect(status_result[:memory_delta_mb]).to be < 50,
+                                                   "Status used #{status_result[:memory_delta_mb]}MB (target: <50MB)"
 
         # Step 2: Diff Command - should show pending changes
         diff_result = measure_performance do
           capture_cli_output { cli.invoke(:diff, [target_dir], verbose: true, stats: true) }
         end
 
-        expect(diff_result[:time_seconds]).to be < 1.5, "Diff command took #{diff_result[:time_seconds]}s (target: <1.5s)"
+        expect(diff_result[:time_seconds]).to be < 1.5,
+                                              "Diff command took #{diff_result[:time_seconds]}s (target: <1.5s)"
         expect(diff_result[:memory_delta_mb]).to be < 50, "Diff used #{diff_result[:memory_delta_mb]}MB (target: <50MB)"
 
         # Step 3: Update Command (dry-run) - should detect conflicts
@@ -65,8 +68,10 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
           capture_cli_output { cli.invoke(:update, [target_dir], dry_run: true, verbose: true, stats: true) }
         end
 
-        expect(update_result[:time_seconds]).to be < 2.0, "Update command took #{update_result[:time_seconds]}s (target: <2s)"
-        expect(update_result[:memory_delta_mb]).to be < 50, "Update used #{update_result[:memory_delta_mb]}MB (target: <50MB)"
+        expect(update_result[:time_seconds]).to be < 2.0,
+                                                "Update command took #{update_result[:time_seconds]}s (target: <2s)"
+        expect(update_result[:memory_delta_mb]).to be < 50,
+                                                   "Update used #{update_result[:memory_delta_mb]}MB (target: <50MB)"
       end
 
       it 'handles JSON output formats correctly' do
@@ -106,14 +111,16 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
           capture_cli_output { cli.invoke(:status, [target_dir], stats: true) }
         end
 
-        expect(cached_sync_result[:time_seconds]).to be < 2.0, "Cached status took #{cached_sync_result[:time_seconds]}s (target: <2s)"
+        expect(cached_sync_result[:time_seconds]).to be < 2.0,
+                                                     "Cached status took #{cached_sync_result[:time_seconds]}s (target: <2s)"
 
         # Test diff performance with many files
         diff_result = measure_performance do
           capture_cli_output { cli.invoke(:diff, [target_dir], stats: true) }
         end
 
-        expect(diff_result[:time_seconds]).to be < 2.0, "Diff with 1200+ files took #{diff_result[:time_seconds]}s (target: <2s)"
+        expect(diff_result[:time_seconds]).to be < 2.0,
+                                              "Diff with 1200+ files took #{diff_result[:time_seconds]}s (target: <2s)"
       end
     end
   end
@@ -138,7 +145,8 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
 
       # Cache should provide significant performance improvement
       time_improvement = (first_status[:time_seconds] - second_status[:time_seconds]) / first_status[:time_seconds]
-      expect(time_improvement).to be > 0.1, "Cache provided only #{(time_improvement * 100).round(1)}% improvement (target: >10%)"
+      expect(time_improvement).to be > 0.1,
+                                  "Cache provided only #{(time_improvement * 100).round(1)}% improvement (target: >10%)"
     end
   end
 
@@ -150,13 +158,13 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
       end
 
       it 'handles missing sync state gracefully' do
-        expect {
+        expect do
           capture_cli_output { cli.invoke(:status, [target_dir]) }
-        }.not_to raise_error
+        end.not_to raise_error
 
-        expect {
+        expect do
           capture_cli_output { cli.invoke(:diff, [target_dir]) }
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
 
@@ -169,18 +177,19 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
         # Corrupt cache files
         Dir.glob(File.join(cache_dir, '**/*')).each do |file|
           next unless File.file?(file)
+
           File.write(file, 'corrupted data')
         end
       end
 
       it 'recovers gracefully from cache corruption' do
-        expect {
+        expect do
           capture_cli_output { cli.invoke(:status, [target_dir], verbose: true) }
-        }.not_to raise_error
+        end.not_to raise_error
 
-        expect {
+        expect do
           capture_cli_output { cli.invoke(:diff, [target_dir], verbose: true) }
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
 
@@ -189,9 +198,9 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
         # Create target without git
         create_basic_leyline_structure(target_dir)
 
-        expect {
+        expect do
           capture_cli_output { cli.invoke(:status, [target_dir]) }
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
   end
@@ -214,7 +223,9 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
       expect(combined_output).to match(/typescript|TypeScript|No changes|no.*diff|Error.*fetch.*remote|Failed.*git/i)
 
       # Update with category filtering - gracefully handles git fetch failures in test environment
-      update_output = capture_cli_output { cli.invoke(:update, [target_dir], categories: ['typescript'], dry_run: true) }
+      update_output = capture_cli_output do
+        cli.invoke(:update, [target_dir], categories: ['typescript'], dry_run: true)
+      end
       combined_update = update_output[:stdout] + update_output[:stderr]
       expect(combined_update).to match(/typescript|TypeScript|No.*update|Already.*up.*to.*date|Error.*fetch.*remote|Failed.*git/i)
     end
@@ -243,9 +254,9 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
 
     it 'allows force updates to override conflicts' do
       # Force update should proceed despite conflicts
-      expect {
+      expect do
         capture_cli_output { cli.invoke(:update, [target_dir], force: true, verbose: true) }
-      }.not_to raise_error
+      end.not_to raise_error
     end
   end
 
@@ -451,7 +462,7 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
       MARKDOWN
     end
 
-    ['typescript', 'go', 'rust', 'python', 'java', 'csharp'].each do |category|
+    %w[typescript go rust python java csharp].each do |category|
       category_dir = File.join(docs_dir, 'bindings', 'categories', category)
       FileUtils.mkdir_p(category_dir)
 
@@ -482,9 +493,9 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
 
     # Also ensure target has the basic structure
     target_leyline = File.join(target_dir, 'docs', 'leyline')
-    unless Dir.exist?(target_leyline)
-      FileUtils.cp_r(File.join(source_repo_dir, 'docs'), target_dir)
-    end
+    return if Dir.exist?(target_leyline)
+
+    FileUtils.cp_r(File.join(source_repo_dir, 'docs'), target_dir)
   end
 
   def save_mock_sync_state
@@ -495,11 +506,11 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
     require_relative '../../lib/leyline/sync_state'
     sync_state = Leyline::SyncState.new(cache_dir)
     sync_state.save_sync_state({
-      timestamp: Time.now.iso8601,
-      categories: ['core', 'typescript', 'go', 'rust'],
-      manifest: {},
-      leyline_version: '0.1.0'
-    })
+                                 timestamp: Time.now.iso8601,
+                                 categories: %w[core typescript go rust],
+                                 manifest: {},
+                                 leyline_version: '0.1.0'
+                               })
   end
 
   def measure_performance(&block)
@@ -524,7 +535,7 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
       # Linux and others
       `ps -o rss= -p #{Process.pid}`.to_i / 1024.0
     end
-  rescue
+  rescue StandardError
     0.0 # Fallback if ps command fails
   end
 
@@ -540,7 +551,7 @@ RSpec.describe 'Transparency Commands Integration', type: :integration do
 
     begin
       block.call
-    rescue SystemExit => e
+    rescue SystemExit
       # CLI commands may call exit, capture the exit code
     ensure
       $stdout = original_stdout

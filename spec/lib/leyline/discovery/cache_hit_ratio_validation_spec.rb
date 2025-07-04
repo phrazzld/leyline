@@ -33,8 +33,8 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
 
       # Phase 1: Initial operations that will build the cache
       initial_categories = cache.categories
-      initial_documents = cache.documents_for_category(initial_categories.first) if initial_categories.any?
-      initial_search = cache.search('test')
+      cache.documents_for_category(initial_categories.first) if initial_categories.any?
+      cache.search('test')
 
       phase1_stats = cache.performance_stats
       puts "  Initial scan: #{phase1_stats[:document_count]} docs cached, #{phase1_stats[:scan_count]} scans"
@@ -66,11 +66,11 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
       # The key validation: repeated operations should NOT trigger additional file scans
       # because the memory cache should handle them
       expect(scan_count_after - scan_count_before).to be <= 1,
-        "Too many additional scans (#{scan_count_after - scan_count_before}), memory cache not effective"
+                                                      "Too many additional scans (#{scan_count_after - scan_count_before}), memory cache not effective"
 
       # Verify cache infrastructure is working
-      expect(final_stats[:document_count]).to be > 0, "No documents cached"
-      expect(final_stats[:category_count]).to be > 0, "No categories indexed"
+      expect(final_stats[:document_count]).to be > 0, 'No documents cached'
+      expect(final_stats[:category_count]).to be > 0, 'No categories indexed'
 
       # File-level hit ratio tracking
       file_hit_ratio = final_stats[:hit_ratio]
@@ -95,8 +95,8 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
       puts "  Categories indexed: #{initial_stats[:category_count]}"
 
       # Verify cache infrastructure is operational
-      expect(initial_stats[:document_count]).to be > 0, "No documents cached"
-      expect(initial_stats[:category_count]).to be > 0, "No categories indexed"
+      expect(initial_stats[:document_count]).to be > 0, 'No documents cached'
+      expect(initial_stats[:category_count]).to be > 0, 'No categories indexed'
 
       # Verify hit ratio calculation formula
       total_ops = initial_stats[:hit_count] + initial_stats[:miss_count]
@@ -105,14 +105,14 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
         reported_ratio = initial_stats[:hit_ratio]
 
         expect(reported_ratio).to be_within(0.01).of(calculated_ratio),
-          "Hit ratio calculation mismatch: reported #{reported_ratio}, calculated #{calculated_ratio}"
+                                  "Hit ratio calculation mismatch: reported #{reported_ratio}, calculated #{calculated_ratio}"
 
         puts "  Hit ratio calculation: ✅ accurate (#{(reported_ratio * 100).round(1)}%)"
       else
-        puts "  Hit ratio: Not applicable (no file operations yet)"
+        puts '  Hit ratio: Not applicable (no file operations yet)'
       end
 
-      puts "  ✅ Cache infrastructure operational"
+      puts '  ✅ Cache infrastructure operational'
     end
 
     it 'demonstrates cache effectiveness under real-world access patterns' do
@@ -141,7 +141,7 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
       end
 
       # Pattern 3: User performs various searches
-      search_queries = ['test', 'performance', 'binding', 'typescript']
+      search_queries = %w[test performance binding typescript]
       search_queries.each do |query|
         results = cache.search(query)
         puts "  🔍 Searched '#{query}' -> #{results.length} results"
@@ -150,7 +150,7 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
       # Pattern 4: User repeats common operations
       5.times do
         cache.categories
-        cache.search('test') if rand < 0.7  # 70% chance
+        cache.search('test') if rand < 0.7 # 70% chance
       end
 
       final_stats = cache.performance_stats
@@ -164,12 +164,12 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
       puts "  File-level hit ratio: #{(final_stats[:hit_ratio] * 100).round(1)}%"
 
       # Validate cache effectiveness: minimal additional scanning during heavy usage
-      expect(final_stats[:document_count]).to be > 0, "No documents cached"
-      expect(final_stats[:category_count]).to be > 0, "No categories indexed"
+      expect(final_stats[:document_count]).to be > 0, 'No documents cached'
+      expect(final_stats[:category_count]).to be > 0, 'No categories indexed'
       expect(final_scans - initial_scans).to be <= 2,
-        "Too many additional scans (#{final_scans - initial_scans}), cache not effective"
+                                             "Too many additional scans (#{final_scans - initial_scans}), cache not effective"
 
-      puts "  Status: Cache effectiveness ✅ validated (minimal rescanning)"
+      puts '  Status: Cache effectiveness ✅ validated (minimal rescanning)'
     end
   end
 
@@ -189,7 +189,7 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
 
       # Warm cache: Repeated access
       warm_start = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
-      warm_categories = cold_cache.categories  # Same cache, second access
+      warm_categories = cold_cache.categories # Same cache, second access
       warm_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond) - warm_start
 
       puts "  Cold cache (first access): #{cold_time}ms"
@@ -202,16 +202,16 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
       # In a well-optimized cache, repeated access should be faster or equal
       # (may be equal if operations are already sub-millisecond)
       expect(warm_time).to be <= cold_time * 2,
-        "Warm cache should not be significantly slower than cold cache"
+                           'Warm cache should not be significantly slower than cold cache'
 
       if warm_time < cold_time
         performance_improvement = ((cold_time - warm_time) / cold_time * 100).round(1)
         puts "  ⚡ Performance improvement: #{performance_improvement}%"
       else
-        puts "  ⚡ Performance maintained (operations already optimized)"
+        puts '  ⚡ Performance maintained (operations already optimized)'
       end
 
-      puts "  ✅ Cache effectiveness validated"
+      puts '  ✅ Cache effectiveness validated'
     end
   end
 
@@ -219,7 +219,7 @@ RSpec.describe 'Cache Hit Ratio Validation', type: :integration do
 
   def setup_test_document_structure
     # Create realistic test documents with proper YAML front-matter
-    categories = ['typescript', 'go', 'core']
+    categories = %w[typescript go core]
 
     categories.each do |category|
       category_dir = File.join(temp_dir, 'docs', 'bindings', 'categories', category)

@@ -22,7 +22,7 @@ module Leyline
         attr_reader :command, :exit_status
 
         def initialize(message, command = nil, exit_status = nil)
-          super(message, { command: command, exit_status: exit_status }.compact)
+          super(message, command: command, exit_status: exit_status)
           @command = command
           @exit_status = exit_status
         end
@@ -71,9 +71,7 @@ module Leyline
       end
 
       def add_sparse_paths(paths)
-        if @working_directory.nil?
-          raise GitCommandError, 'No working directory set. Call setup_sparse_checkout first.'
-        end
+        raise GitCommandError, 'No working directory set. Call setup_sparse_checkout first.' if @working_directory.nil?
 
         # Handle nil/empty arrays
         paths = Array(paths)
@@ -99,9 +97,7 @@ module Leyline
       end
 
       def fetch_version(remote_url, version_ref)
-        if @working_directory.nil?
-          raise GitCommandError, 'No working directory set. Call setup_sparse_checkout first.'
-        end
+        raise GitCommandError, 'No working directory set. Call setup_sparse_checkout first.' if @working_directory.nil?
 
         # Validate inputs
         validate_remote_url(remote_url)
@@ -117,15 +113,13 @@ module Leyline
         run_git_command("fetch origin #{version_ref}")
 
         # Checkout the fetched version
-        run_git_command("checkout FETCH_HEAD")
+        run_git_command('checkout FETCH_HEAD')
       end
 
       def cleanup
         return if @working_directory.nil?
 
-        if Dir.exist?(@working_directory)
-          FileUtils.rm_rf(@working_directory)
-        end
+        FileUtils.rm_rf(@working_directory) if Dir.exist?(@working_directory)
 
         @working_directory = nil
       end
@@ -142,47 +136,41 @@ module Leyline
           raise GitCommandError, "Invalid sparse-checkout path '#{path}': absolute paths not allowed"
         end
 
-        if path.include?('../')
-          raise GitCommandError, "Invalid sparse-checkout path '#{path}': parent directory traversal not allowed"
-        end
+        return unless path.include?('../')
+
+        raise GitCommandError, "Invalid sparse-checkout path '#{path}': parent directory traversal not allowed"
       end
 
       def validate_remote_url(url)
         # Basic URL format validation - support https, http, git@, and file:// URLs
         valid_patterns = [
-          /\A(https?:\/\/|git@)[\w\-\.]+[\w\-]+(\/[\w\-\.]+)*\.git\z/,  # Remote URLs
-          /\Afile:\/\/.*\z/  # Local file URLs
+          %r{\A(https?://|git@)[\w\-.]+[\w-]+(/[\w\-.]+)*\.git\z}, # Remote URLs
+          %r{\Afile://.*\z} # Local file URLs
         ]
 
-        unless valid_patterns.any? { |pattern| url.match?(pattern) }
-          raise GitCommandError, "Invalid remote URL format: #{url}"
-        end
+        return if valid_patterns.any? { |pattern| url.match?(pattern) }
+
+        raise GitCommandError, "Invalid remote URL format: #{url}"
       end
 
       def validate_version_reference(ref)
         # Check for path traversal and other invalid patterns
-        if ref.include?('../') || ref.include?('..\\')
-          raise GitCommandError, "Invalid version reference: #{ref}"
-        end
+        raise GitCommandError, "Invalid version reference: #{ref}" if ref.include?('../') || ref.include?('..\\')
 
         # Check for other potentially dangerous patterns
-        if ref.include?(' ') || ref.start_with?('-')
-          raise GitCommandError, "Invalid version reference: #{ref}"
-        end
+        return unless ref.include?(' ') || ref.start_with?('-')
+
+        raise GitCommandError, "Invalid version reference: #{ref}"
       end
 
       def add_remote_origin(remote_url)
-        begin
-          run_git_command("remote add origin #{remote_url}")
-        rescue GitCommandError => e
-          # If remote already exists, remove it and try again
-          if e.message.include?('already exists') || e.message.include?('remote origin')
-            run_git_command("remote remove origin")
-            run_git_command("remote add origin #{remote_url}")
-          else
-            raise e
-          end
-        end
+        run_git_command("remote add origin #{remote_url}")
+      rescue GitCommandError => e
+        # If remote already exists, remove it and try again
+        raise e unless e.message.include?('already exists') || e.message.include?('remote origin')
+
+        run_git_command('remote remove origin')
+        run_git_command("remote add origin #{remote_url}")
       end
 
       def run_git_command(command, chdir: nil)
@@ -202,7 +190,11 @@ module Leyline
 
           unless success
             exit_status = $? ? $?.exitstatus : 'unknown'
-            stderr_content = File.read(stderr_file.path) rescue ''
+            stderr_content = begin
+              File.read(stderr_file.path)
+            rescue StandardError
+              ''
+            end
 
             # Enhance error message based on stderr content
             error_message = build_git_error_message(git_command, exit_status, stderr_content)

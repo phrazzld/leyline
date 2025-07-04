@@ -17,7 +17,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
   # Real-world scenarios with deterministic datasets
   BENCHMARK_SCENARIOS = {
     fresh_install: {
-      description: "First run with no cache",
+      description: 'First run with no cache',
       file_count: 1000,
       cache_state: :empty,
       expected_time_ms: 200,    # Status: ~49ms, Diff: ~900ms
@@ -26,7 +26,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     },
 
     warm_cache_no_changes: {
-      description: "Repeated run with no file changes",
+      description: 'Repeated run with no file changes',
       file_count: 1000,
       cache_state: :warm,
       expected_time_ms: 150,    # Status: ~49ms, Diff: ~900ms
@@ -35,7 +35,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     },
 
     incremental_changes: {
-      description: "10% of files modified",
+      description: '10% of files modified',
       file_count: 1000,
       modified_percentage: 0.1,
       cache_state: :warm,
@@ -45,7 +45,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     },
 
     large_repository: {
-      description: "Performance at scale",
+      description: 'Performance at scale',
       file_count: 5000,
       cache_state: :warm,
       expected_time_ms: 500,    # Status: ~351ms, Diff: ~1500ms
@@ -54,7 +54,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     },
 
     cache_corruption: {
-      description: "Recovery from corrupted cache",
+      description: 'Recovery from corrupted cache',
       file_count: 1000,
       cache_state: :corrupted,
       expected_time_ms: 300,    # Status: ~49ms, Diff: ~900ms
@@ -63,7 +63,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     },
 
     many_small_files: {
-      description: "Many small files (typical documentation)",
+      description: 'Many small files (typical documentation)',
       file_count: 2000,
       file_size: :small,
       cache_state: :warm,
@@ -73,7 +73,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     },
 
     few_large_files: {
-      description: "Few large files (detailed specifications)",
+      description: 'Few large files (detailed specifications)',
       file_count: 100,
       file_size: :large,
       cache_state: :warm,
@@ -94,13 +94,13 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           result = run_status_benchmark(scenario_name, scenario)
 
           expect(result[:average_ms]).to be < scenario[:expected_time_ms],
-            "Status command averaged #{result[:average_ms]}ms, expected <#{scenario[:expected_time_ms]}ms"
+                                         "Status command averaged #{result[:average_ms]}ms, expected <#{scenario[:expected_time_ms]}ms"
 
           expect(result[:p95_ms]).to be < scenario[:expected_time_ms] * 1.2,
-            "P95 latency #{result[:p95_ms]}ms exceeds acceptable variance"
+                                     "P95 latency #{result[:p95_ms]}ms exceeds acceptable variance"
 
           expect(result[:max_memory_mb]).to be < 200,
-            "Memory usage #{result[:max_memory_mb]}MB exceeds 200MB limit"
+                                            "Memory usage #{result[:max_memory_mb]}MB exceeds 200MB limit"
 
           @benchmark_results["status_#{scenario_name}"] = result
         end
@@ -121,7 +121,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
       variance = avg_times.map { |t| (t - overall_avg).abs }.max
 
       expect(variance).to be < overall_avg * 0.1,
-        "Performance variance #{variance}ms exceeds 10% of average #{overall_avg}ms"
+                          "Performance variance #{variance}ms exceeds 10% of average #{overall_avg}ms"
     end
   end
 
@@ -133,13 +133,13 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           result = run_diff_benchmark(scenario_name, scenario)
 
           expect(result[:average_ms]).to be < expected_time,
-            "Diff command averaged #{result[:average_ms]}ms, expected <#{expected_time}ms"
+                                         "Diff command averaged #{result[:average_ms]}ms, expected <#{expected_time}ms"
 
           expect(result[:p95_ms]).to be < expected_time * 1.2,
-            "P95 latency #{result[:p95_ms]}ms exceeds acceptable variance"
+                                     "P95 latency #{result[:p95_ms]}ms exceeds acceptable variance"
 
           expect(result[:max_memory_mb]).to be < 200,
-            "Memory usage #{result[:max_memory_mb]}MB exceeds 200MB limit"
+                                            "Memory usage #{result[:max_memory_mb]}MB exceeds 200MB limit"
 
           @benchmark_results["diff_#{scenario_name}"] = result
         end
@@ -179,10 +179,10 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
           result = run_update_benchmark(scenario_name, scenario, dry_run: true)
 
           expect(result[:average_ms]).to be < scenario[:expected_time_ms],
-            "Update preview averaged #{result[:average_ms]}ms, expected <#{scenario[:expected_time_ms]}ms"
+                                         "Update preview averaged #{result[:average_ms]}ms, expected <#{scenario[:expected_time_ms]}ms"
 
           expect(result[:conflict_detection_ms]).to be < 200,
-            "Conflict detection took #{result[:conflict_detection_ms]}ms, expected <200ms"
+                                                    "Conflict detection took #{result[:conflict_detection_ms]}ms, expected <200ms"
 
           @benchmark_results["update_preview_#{scenario_name}"] = result
         end
@@ -202,7 +202,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
         result = run_status_benchmark("cache_test_#{scenario_name}", scenario)
 
         expect(result[:cache_hit_ratio]).to be > 0.8,
-          "Cache hit ratio #{(result[:cache_hit_ratio] * 100).round(1)}% below 80% target"
+                                            "Cache hit ratio #{(result[:cache_hit_ratio] * 100).round(1)}% below 80% target"
 
         # Cleanup
         cleanup_benchmark_environment(setup_result)
@@ -225,7 +225,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
       # Run command multiple times to ensure cache works consistently
       times = []
-      5.times do |i|
+      5.times do |_i|
         GC.start
         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
 
@@ -247,7 +247,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
       # Ensure performance is consistent (low variance indicates cache is working properly)
       expect(variance).to be < avg_time * 0.2,
-        "Performance variance #{variance.round(2)}ms exceeds 20% of average #{avg_time.round(2)}ms"
+                          "Performance variance #{variance.round(2)}ms exceeds 20% of average #{avg_time.round(2)}ms"
 
       puts "\nCache Consistency Validation:"
       puts "  Average time: #{avg_time.round(2)}ms"
@@ -284,7 +284,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
       avg_ms_per_file = ms_per_file_values.sum / ms_per_file_values.length
 
       expect(max_variance).to be < avg_ms_per_file * 0.5,
-        "Performance scaling is non-linear: variance #{max_variance} exceeds 50% of average"
+                              "Performance scaling is non-linear: variance #{max_variance} exceeds 50% of average"
 
       # Log scaling results
       puts "\nScalability Results:"
@@ -303,7 +303,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
       # Monitor memory during execution
       monitor_thread = Thread.new do
-        while !result
+        until result
           memory_samples << get_memory_usage_mb
           sleep 0.1
         end
@@ -316,10 +316,10 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
       avg_memory = memory_samples.sum / memory_samples.length
 
       expect(peak_memory).to be < 200,
-        "Peak memory usage #{peak_memory}MB exceeds 200MB limit"
+                             "Peak memory usage #{peak_memory}MB exceeds 200MB limit"
 
       expect(avg_memory).to be < 100,
-        "Average memory usage #{avg_memory}MB is too high"
+                            "Average memory usage #{avg_memory}MB is too high"
 
       puts "\nMemory Usage Profile:"
       puts "  Peak: #{peak_memory.round(2)}MB"
@@ -396,7 +396,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
 
       command = Leyline::Commands::DiffCommand.new(options)
-      output = command.execute
+      command.execute
 
       end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
       after_memory = get_memory_usage_mb
@@ -480,9 +480,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     end
 
     # Apply modifications if specified
-    if scenario[:modified_percentage]
-      apply_modifications(dataset[:files], scenario[:modified_percentage])
-    end
+    apply_modifications(dataset[:files], scenario[:modified_percentage]) if scenario[:modified_percentage]
 
     {
       base_dir: base_dir,
@@ -504,11 +502,12 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
     categories.each do |cat|
       next if cat == 'core'
+
       FileUtils.mkdir_p(File.join(leyline_dir, 'bindings', 'categories', cat))
     end
 
     files = []
-    random = Random.new(42)  # Deterministic
+    random = Random.new(42) # Deterministic
 
     # Generate files with realistic distribution
     tenet_count = (file_count * 0.1).to_i
@@ -565,21 +564,21 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
                       when :small
                         random.rand(1000..3000)
                       when :large
-                        random.rand(50000..200000)
-                      else  # :mixed
+                        random.rand(50_000..200_000)
+                      else # :mixed
                         size_choice = random.rand(100)
                         if size_choice < 60
                           random.rand(1000..5000)
                         elsif size_choice < 85
-                          random.rand(5000..20000)
+                          random.rand(5000..20_000)
                         elsif size_choice < 95
-                          random.rand(20000..50000)
+                          random.rand(20_000..50_000)
                         else
-                          random.rand(50000..100000)
+                          random.rand(50_000..100_000)
                         end
                       end
 
-    base_content + ("x" * additional_size)
+    base_content + ('x' * additional_size)
   end
 
   def warm_cache(cache_dir, files)
@@ -601,7 +600,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
     # Corrupt some cache files
     Dir.glob(File.join(cache_dir, 'content', '**', '*')).sample(3).each do |file|
-      File.write(file, "CORRUPTED") if File.file?(file)
+      File.write(file, 'CORRUPTED') if File.file?(file)
     end
   end
 
@@ -629,10 +628,10 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     end
   end
 
-  def calculate_cache_hit_ratio(output)
+  def calculate_cache_hit_ratio(_output)
     # This is a simplified calculation
     # In real implementation, would extract from actual cache stats
-    0.85  # Placeholder
+    0.85 # Placeholder
   end
 
   def compile_benchmark_results(scenario_name, command, times, memory_usage, cache_metrics = {})
@@ -652,14 +651,14 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
 
   def calculate_std_deviation(values)
     mean = values.sum / values.length.to_f
-    variance = values.map { |v| (v - mean) ** 2 }.sum / values.length
+    variance = values.map { |v| (v - mean)**2 }.sum / values.length
     Math.sqrt(variance)
   end
 
   def get_memory_usage_mb
     @memory_strategy ||= detect_memory_strategy
     @memory_strategy.call
-  rescue => e
+  rescue StandardError => e
     warn "Memory measurement failed: #{e.message}" if ENV['LEYLINE_DEBUG']
     0.0
   end
@@ -701,7 +700,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     else
       unix_memory
     end
-  rescue
+  rescue StandardError
     unix_memory
   end
 
@@ -723,9 +722,9 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
     File.write('benchmark-results.json', JSON.pretty_generate(report))
 
     # Print summary
-    puts "\n" + "=" * 80
-    puts "MACRO-BENCHMARK SUMMARY"
-    puts "=" * 80
+    puts "\n" + '=' * 80
+    puts 'MACRO-BENCHMARK SUMMARY'
+    puts '=' * 80
 
     report[:summary].each do |metric, value|
       puts "#{metric}: #{value}"
@@ -735,7 +734,10 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
   end
 
   def generate_summary(results)
-    return { total_scenarios: 0, targets_met: 0, success_rate: "0%", message: "No results to summarize" } if results.empty?
+    if results.empty?
+      return { total_scenarios: 0, targets_met: 0, success_rate: '0%',
+               message: 'No results to summarize' }
+    end
 
     all_times = results.values.map { |r| r[:average_ms] }.compact
     all_memory = results.values.map { |r| r[:max_memory_mb] }.compact
@@ -752,7 +754,7 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
                         when 'diff'
                           scenario[:expected_diff_ms] || scenario[:expected_time_ms]
                         when 'update'
-                          scenario[:expected_update_ms] || 1200  # Default update expectation
+                          scenario[:expected_update_ms] || 1200 # Default update expectation
                         else
                           scenario[:expected_time_ms]
                         end
@@ -769,8 +771,8 @@ RSpec.describe 'Transparency Commands Macro-Benchmarks', type: :benchmark do
       total_scenarios: results.count,
       targets_met: target_met,
       success_rate: "#{((target_met.to_f / results.count) * 100).round(1)}%",
-      fastest_scenario: fastest_result ? fastest_result[0] : "N/A",
-      slowest_scenario: slowest_result ? slowest_result[0] : "N/A",
+      fastest_scenario: fastest_result ? fastest_result[0] : 'N/A',
+      slowest_scenario: slowest_result ? slowest_result[0] : 'N/A',
       average_time_ms: all_times.empty? ? 0 : (all_times.sum / all_times.length).round(2),
       max_memory_mb: all_memory.empty? ? 0 : all_memory.max.round(2),
       all_under_memory_limit: all_memory.all? { |m| m < 200 }

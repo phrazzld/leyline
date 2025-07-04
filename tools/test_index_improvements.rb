@@ -14,148 +14,148 @@ test_files = [
   {
     path: 'test_index/tenets/placeholder-tenet.md',
     content: <<~MARKDOWN
----
-id: placeholder-tenet
-last_modified: "2025-05-04"
----
+      ---
+      id: placeholder-tenet
+      last_modified: "2025-05-04"
+      ---
 
-# Tenet: Placeholder Tenet
+      # Tenet: Placeholder Tenet
 
-[This is placeholder text that should not appear in the index]
+      [This is placeholder text that should not appear in the index]
 
-## Core Belief
+      ## Core Belief
 
-[This is also a placeholder that should not appear]
+      [This is also a placeholder that should not appear]
 
-## Practical Guidelines
+      ## Practical Guidelines
 
-1. **Test Guideline**: This is just a test guideline.
-MARKDOWN
+      1. **Test Guideline**: This is just a test guideline.
+    MARKDOWN
   },
 
   # Tenet with real content
   {
     path: 'test_index/tenets/real-tenet.md',
     content: <<~MARKDOWN
----
-id: real-tenet
-last_modified: "2025-05-04"
----
+      ---
+      id: real-tenet
+      last_modified: "2025-05-04"
+      ---
 
-# Tenet: Real Tenet
+      # Tenet: Real Tenet
 
-This is a real tenet that should be indexed correctly.
+      This is a real tenet that should be indexed correctly.
 
-## Core Belief
+      ## Core Belief
 
-The core belief is that indexing should work correctly.
-This should not be in the index summary.
+      The core belief is that indexing should work correctly.
+      This should not be in the index summary.
 
-## Practical Guidelines
+      ## Practical Guidelines
 
-1. **Test Guideline**: This is just a test guideline.
-MARKDOWN
+      1. **Test Guideline**: This is just a test guideline.
+    MARKDOWN
   },
 
   # Tenet with placeholder main text but real core belief
   {
     path: 'test_index/tenets/mixed-tenet.md',
     content: <<~MARKDOWN
----
-id: mixed-tenet
-last_modified: "2025-05-04"
----
+      ---
+      id: mixed-tenet
+      last_modified: "2025-05-04"
+      ---
 
-# Tenet: Mixed Tenet
+      # Tenet: Mixed Tenet
 
-[This is placeholder text that should not appear in the index]
+      [This is placeholder text that should not appear in the index]
 
-## Core Belief
+      ## Core Belief
 
-This is real content that should appear in the index.
-This should not appear in the index summary.
+      This is real content that should appear in the index.
+      This should not appear in the index summary.
 
-## Practical Guidelines
+      ## Practical Guidelines
 
-1. **Test Guideline**: This is just a test guideline.
-MARKDOWN
+      1. **Test Guideline**: This is just a test guideline.
+    MARKDOWN
   },
 
   # Binding with placeholder text
   {
     path: 'test_index/bindings/placeholder-binding.md',
     content: <<~MARKDOWN
----
-id: placeholder-binding
-last_modified: "2025-05-04"
-derived_from: simplicity
-enforced_by: testing
----
+      ---
+      id: placeholder-binding
+      last_modified: "2025-05-04"
+      derived_from: simplicity
+      enforced_by: testing
+      ---
 
-# Binding: Placeholder Binding
+      # Binding: Placeholder Binding
 
-[This is placeholder text that should not appear in the index]
+      [This is placeholder text that should not appear in the index]
 
-## Rationale
+      ## Rationale
 
-[This is also a placeholder that should not appear]
+      [This is also a placeholder that should not appear]
 
-## Rule Definition
+      ## Rule Definition
 
-This is a rule definition for testing purposes.
-MARKDOWN
+      This is a rule definition for testing purposes.
+    MARKDOWN
   },
 
   # Binding with real content
   {
     path: 'test_index/bindings/real-binding.md',
     content: <<~MARKDOWN
----
-id: real-binding
-last_modified: "2025-05-04"
-derived_from: simplicity
-enforced_by: testing
----
+      ---
+      id: real-binding
+      last_modified: "2025-05-04"
+      derived_from: simplicity
+      enforced_by: testing
+      ---
 
-# Binding: Real Binding
+      # Binding: Real Binding
 
-This is a real binding that should be indexed correctly.
+      This is a real binding that should be indexed correctly.
 
-## Rationale
+      ## Rationale
 
-The rationale is that indexing should work correctly for bindings too.
-This should not be in the index summary.
+      The rationale is that indexing should work correctly for bindings too.
+      This should not be in the index summary.
 
-## Rule Definition
+      ## Rule Definition
 
-This is a rule definition for testing purposes.
-MARKDOWN
+      This is a rule definition for testing purposes.
+    MARKDOWN
   },
 
   # Binding with placeholder main text but real rationale
   {
     path: 'test_index/bindings/mixed-binding.md',
     content: <<~MARKDOWN
----
-id: mixed-binding
-last_modified: "2025-05-04"
-derived_from: simplicity
-enforced_by: testing
----
+      ---
+      id: mixed-binding
+      last_modified: "2025-05-04"
+      derived_from: simplicity
+      enforced_by: testing
+      ---
 
-# Binding: Mixed Binding
+      # Binding: Mixed Binding
 
-[This is placeholder text that should not appear in the index]
+      [This is placeholder text that should not appear in the index]
 
-## Rationale
+      ## Rationale
 
-This is real content that should appear in the index for mixed binding.
-This should not appear in the index summary.
+      This is real content that should appear in the index for mixed binding.
+      This should not appear in the index summary.
 
-## Rule Definition
+      ## Rule Definition
 
-This is a rule definition for testing purposes.
-MARKDOWN
+      This is a rule definition for testing purposes.
+    MARKDOWN
   }
 ]
 
@@ -164,7 +164,7 @@ test_files.each do |file|
   File.write(file[:path], file[:content])
 end
 
-puts "Created test files for enhanced indexing"
+puts 'Created test files for enhanced indexing'
 
 # Define the updated indexing logic
 def generate_indexes
@@ -176,37 +176,41 @@ def generate_indexes
       content = File.read(file)
 
       # Extract front-matter and first paragraph after title
-      if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
-        front_matter = YAML.safe_load($1) rescue {}
-        title = $2.strip
-        first_para = $3.strip.gsub(/\s+/, ' ')
+      next unless content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
 
-        # Skip placeholder text that's enclosed in brackets
-        if first_para =~ /^\[.*\]$/
-          # Try to find the first real paragraph in the Core Belief/Rationale section
-          if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
-            section_text = $2.strip.gsub(/\s+/, ' ')
-
-            # Skip if this is also a placeholder
-            if section_text =~ /^\[.*\]$/
-              first_para = "See document for details."
-            else
-              first_para = section_text
-            end
-          else
-            first_para = "See document for details."
-          end
-        end
-
-        # Truncate if too long
-        summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
-
-        # Add to entries
-        entries << {
-          id: front_matter['id'] || File.basename(file, '.md'),
-          summary: summary
-        }
+      front_matter = begin
+        YAML.safe_load(Regexp.last_match(1))
+      rescue StandardError
+        {}
       end
+      Regexp.last_match(2).strip
+      first_para = Regexp.last_match(3).strip.gsub(/\s+/, ' ')
+
+      # Skip placeholder text that's enclosed in brackets
+      if first_para =~ /^\[.*\]$/
+        # Try to find the first real paragraph in the Core Belief/Rationale section
+        if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
+          section_text = Regexp.last_match(2).strip.gsub(/\s+/, ' ')
+
+          # Skip if this is also a placeholder
+          first_para = if section_text =~ /^\[.*\]$/
+                         'See document for details.'
+                       else
+                         section_text
+                       end
+        else
+          first_para = 'See document for details.'
+        end
+      end
+
+      # Truncate if too long
+      summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
+
+      # Add to entries
+      entries << {
+        id: front_matter['id'] || File.basename(file, '.md'),
+        summary: summary
+      }
     end
 
     # Generate index content
@@ -243,4 +247,4 @@ puts File.read('test_index/bindings/00-index.md')
 # Clean up
 puts "\nCleaning up test files..."
 FileUtils.rm_rf('test_index')
-puts "Test complete"
+puts 'Test complete'

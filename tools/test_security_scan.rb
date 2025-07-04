@@ -10,7 +10,6 @@ require 'fileutils'
 require 'json'
 
 class TestSecurityScan < Test::Unit::TestCase
-
   def setup
     @original_dir = Dir.pwd
     @test_dir = Dir.mktmpdir('security_scan_test_')
@@ -56,13 +55,13 @@ class TestSecurityScan < Test::Unit::TestCase
     result_json = run_security_scan
     result = JSON.parse(result_json)
 
-    assert result['summary']['total_issues'] > 0, "Should detect hardcoded secrets"
+    assert result['summary']['total_issues'] > 0, 'Should detect hardcoded secrets'
 
     # Check for specific secret types
     secret_issues = result['issues'].select { |i| i['type'] == 'secrets' }
-    assert secret_issues.any? { |i| i['message'].include?('password') }, "Should detect hardcoded password"
-    assert secret_issues.any? { |i| i['message'].include?('API key') }, "Should detect hardcoded API key"
-    assert secret_issues.any? { |i| i['message'].include?('GitHub token') }, "Should detect GitHub token"
+    assert secret_issues.any? { |i| i['message'].include?('password') }, 'Should detect hardcoded password'
+    assert secret_issues.any? { |i| i['message'].include?('API key') }, 'Should detect hardcoded API key'
+    assert secret_issues.any? { |i| i['message'].include?('GitHub token') }, 'Should detect GitHub token'
   end
 
   def test_detects_shell_injection
@@ -86,15 +85,15 @@ class TestSecurityScan < Test::Unit::TestCase
     result_json = run_security_scan
     result = JSON.parse(result_json)
 
-    assert result['summary']['total_issues'] > 0, "Should detect shell injection vulnerabilities"
+    assert result['summary']['total_issues'] > 0, 'Should detect shell injection vulnerabilities'
 
     # Check for shell injection detection
     shell_issues = result['issues'].select { |i| i['type'] == 'shell_injection' }
-    assert shell_issues.length >= 3, "Should detect multiple shell injection vulnerabilities"
+    assert shell_issues.length >= 3, 'Should detect multiple shell injection vulnerabilities'
 
-    assert shell_issues.any? { |i| i['message'].include?('system()') }, "Should detect system() vulnerability"
-    assert shell_issues.any? { |i| i['message'].include?('backtick') }, "Should detect backtick vulnerability"
-    assert shell_issues.any? { |i| i['message'].include?('Open3') }, "Should detect Open3 vulnerability"
+    assert shell_issues.any? { |i| i['message'].include?('system()') }, 'Should detect system() vulnerability'
+    assert shell_issues.any? { |i| i['message'].include?('backtick') }, 'Should detect backtick vulnerability'
+    assert shell_issues.any? { |i| i['message'].include?('Open3') }, 'Should detect Open3 vulnerability'
   end
 
   def test_detects_unsafe_yaml
@@ -117,13 +116,15 @@ class TestSecurityScan < Test::Unit::TestCase
     result_json = run_security_scan
     result = JSON.parse(result_json)
 
-    assert result['summary']['total_issues'] > 0, "Should detect unsafe YAML loading"
+    assert result['summary']['total_issues'] > 0, 'Should detect unsafe YAML loading'
 
     yaml_issues = result['issues'].select { |i| i['type'] == 'unsafe_yaml' }
-    assert yaml_issues.length >= 2, "Should detect multiple YAML vulnerabilities"
+    assert yaml_issues.length >= 2, 'Should detect multiple YAML vulnerabilities'
 
-    assert yaml_issues.any? { |i| i['message'].include?('YAML.load()') }, "Should detect YAML.load vulnerability"
-    assert yaml_issues.any? { |i| i['message'].include?('YAML.load_file()') }, "Should detect YAML.load_file vulnerability"
+    assert yaml_issues.any? { |i| i['message'].include?('YAML.load()') }, 'Should detect YAML.load vulnerability'
+    assert yaml_issues.any? { |i|
+      i['message'].include?('YAML.load_file()')
+    }, 'Should detect YAML.load_file vulnerability'
   end
 
   def test_detects_path_traversal
@@ -148,10 +149,10 @@ class TestSecurityScan < Test::Unit::TestCase
     result_json = run_security_scan
     result = JSON.parse(result_json)
 
-    assert result['summary']['total_issues'] > 0, "Should detect path traversal vulnerabilities"
+    assert result['summary']['total_issues'] > 0, 'Should detect path traversal vulnerabilities'
 
     path_issues = result['issues'].select { |i| i['type'] == 'path_traversal' }
-    assert path_issues.length >= 1, "Should detect path traversal patterns"
+    assert path_issues.length >= 1, 'Should detect path traversal patterns'
   end
 
   def test_clean_file_passes_scan
@@ -183,10 +184,10 @@ class TestSecurityScan < Test::Unit::TestCase
 
     # Clean file should have no critical or high issues
     critical_issues = result['issues'].select { |i| i['severity'] == 'critical' }
-    high_issues = result['issues'].select { |i| i['severity'] == 'high' }
+    result['issues'].select { |i| i['severity'] == 'high' }
 
-    assert_equal 0, critical_issues.length, "Clean code should have no critical issues"
-    # Note: might have some medium/low issues due to defensive coding patterns
+    assert_equal 0, critical_issues.length, 'Clean code should have no critical issues'
+    # NOTE: might have some medium/low issues due to defensive coding patterns
   end
 
   def test_json_output_format
@@ -196,22 +197,22 @@ class TestSecurityScan < Test::Unit::TestCase
     result = JSON.parse(result_json)
 
     # Validate JSON structure
-    assert result.key?('summary'), "Should have summary section"
-    assert result.key?('issues'), "Should have issues section"
+    assert result.key?('summary'), 'Should have summary section'
+    assert result.key?('issues'), 'Should have issues section'
 
-    assert result['summary'].key?('files_scanned'), "Should track files scanned"
-    assert result['summary'].key?('total_issues'), "Should track total issues"
-    assert result['summary'].key?('critical_issues'), "Should track critical issues"
-    assert result['summary'].key?('high_issues'), "Should track high issues"
+    assert result['summary'].key?('files_scanned'), 'Should track files scanned'
+    assert result['summary'].key?('total_issues'), 'Should track total issues'
+    assert result['summary'].key?('critical_issues'), 'Should track critical issues'
+    assert result['summary'].key?('high_issues'), 'Should track high issues'
 
     # Validate issue structure
-    if result['issues'].any?
-      issue = result['issues'].first
-      assert issue.key?('severity'), "Issue should have severity"
-      assert issue.key?('type'), "Issue should have type"
-      assert issue.key?('message'), "Issue should have message"
-      assert issue.key?('file'), "Issue should have file"
-    end
+    return unless result['issues'].any?
+
+    issue = result['issues'].first
+    assert issue.key?('severity'), 'Issue should have severity'
+    assert issue.key?('type'), 'Issue should have type'
+    assert issue.key?('message'), 'Issue should have message'
+    assert issue.key?('file'), 'Issue should have file'
   end
 
   def test_severity_classification
@@ -226,13 +227,13 @@ class TestSecurityScan < Test::Unit::TestCase
 
     # Should classify issues by severity
     severities = result['issues'].map { |i| i['severity'] }.uniq.sort
-    assert severities.include?('high'), "Should detect high severity issues"
+    assert severities.include?('high'), 'Should detect high severity issues'
 
     # Verify severity counts match
     summary = result['summary']
     total_counted = summary['critical_issues'] + summary['high_issues'] +
-                   summary['medium_issues'] + summary['low_issues']
-    assert_equal summary['total_issues'], total_counted, "Severity counts should sum to total"
+                    summary['medium_issues'] + summary['low_issues']
+    assert_equal summary['total_issues'], total_counted, 'Severity counts should sum to total'
   end
 
   def test_scanner_handles_empty_directory
@@ -240,11 +241,11 @@ class TestSecurityScan < Test::Unit::TestCase
     result_json = run_security_scan
 
     # Should handle gracefully, not crash
-    assert !result_json.empty?, "Should produce output even with no files"
+    assert !result_json.empty?, 'Should produce output even with no files'
 
     result = JSON.parse(result_json)
-    assert_equal 0, result['summary']['files_scanned'], "Should report 0 files scanned"
-    assert_equal 0, result['summary']['total_issues'], "Should report 0 issues"
+    assert_equal 0, result['summary']['files_scanned'], 'Should report 0 files scanned'
+    assert_equal 0, result['summary']['total_issues'], 'Should report 0 issues'
   end
 
   def test_scanner_ignores_test_files
@@ -256,8 +257,7 @@ class TestSecurityScan < Test::Unit::TestCase
 
     # Should only scan regular_file.rb, not test_something.rb
     scanned_files = result['issues'].map { |i| i['file'] }.uniq
-    assert scanned_files.any? { |f| f.include?('regular_file.rb') }, "Should scan regular files"
-    assert scanned_files.none? { |f| f.include?('test_something.rb') }, "Should ignore test files"
+    assert scanned_files.any? { |f| f.include?('regular_file.rb') }, 'Should scan regular files'
+    assert scanned_files.none? { |f| f.include?('test_something.rb') }, 'Should ignore test files'
   end
-
 end

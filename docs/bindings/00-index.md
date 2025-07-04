@@ -57,22 +57,22 @@ This file contains an automatically generated list of all bindings with their on
 | [pure-functions](./core/pure-functions.md) | 0.1.0 | This binding implements our simplicity tenet by reducing complexity at its most fundamental level—predictable code execution. When a function is pu... |
 | [quality-metrics-and-monitoring](./core/quality-metrics-and-monitoring.md) | 0.1.0 | Quality metrics serve as early warning systems and progress indicators, but only when they measure outcomes that teams can act upon. Poorly chosen ... |
 | [regression-test-patterns](./core/regression-test-patterns.md) | 0.1.0 | Grug's wisdom teaches that bugs are gifts—they reveal gaps in your understanding and testing strategy. When a bug slips through your existing tests... |
-| [require-conventional-commits](./core/require-conventional-commits.md) | 0.1.0 | This binding directly implements our automation tenet by transforming commit messages |
+| [require-conventional-commits](./core/require-conventional-commits.md) | 0.1.0 | This binding implements automation through structured commit data that drives versioning, release notes, and deployment workflows. Consistent commi... |
 | [runtime-adaptability](./core/runtime-adaptability.md) | 0.1.0 | This binding implements our adaptability and reversibility tenet by creating systems that respond intelligently to changing conditions in real-time... |
-| [saying-no-effectively](./core/saying-no-effectively.md) | 0.1.0 | Grug's wisdom teaches that most complexity enters systems through human decisions, not technical limitations. The ability to say "no" effectively i... |
-| [semantic-versioning](./core/semantic-versioning.md) | 0.1.0 | This binding directly implements our explicit-over-implicit tenet by bringing clarity to |
+| [saying-no-effectively](./core/saying-no-effectively.md) | 0.1.0 | Most complexity enters systems through human decisions. Saying "no" effectively maintains simplicity while preserving relationships. Every unnecess... |
+| [semantic-versioning](./core/semantic-versioning.md) | 0.1.0 | This binding implements explicit-over-implicit by transforming version numbers into meaningful contracts. Like traffic signals enable efficient mov... |
 | [system-boundaries](./core/system-boundaries.md) | 0.1.0 | This binding implements our orthogonality tenet by creating architectural separation that prevents components from becoming entangled across differ... |
 | [technical-debt-tracking](./core/technical-debt-tracking.md) | 0.1.0 | Technical debt is like deferred maintenance on critical infrastructure - invisible debt compounds until systems fail catastrophically. Untracked sh... |
 | [test-data-management](./core/test-data-management.md) | 0.1.0 | Reliable test data is foundational to effective testing. Unreliable or poorly managed test data leads to flaky tests, difficult debugging, and fals... |
-| [test-environment-management](./core/test-environment-management.md) | 0.1.0 | Environment inconsistencies are a primary source of false test failures and production bugs. When tests pass locally but fail in CI, or when integr... |
+| [test-environment-management](./core/test-environment-management.md) | 0.1.0 | Environment inconsistencies cause false test failures and production bugs. Automated environment management enables true test isolation, parallel e... |
 | [test-pyramid-implementation](./core/test-pyramid-implementation.md) | 0.1.0 | The test pyramid creates a systematic approach to test architecture that maximizes both confidence and development velocity. The pyramid shape repr... |
 | [toolchain-selection-criteria](./core/toolchain-selection-criteria.md) | 0.1.0 | This binding implements our simplicity and maintainability tenets by establishing a framework for toolchain decisions that prevents the accumulatio... |
-| [tooling-investment](./core/tooling-investment.md) | 0.1.0 | Grug teaches that many developers spend excessive time learning new tools while never truly mastering the ones they use daily. This creates a perpe... |
+| [tooling-investment](./core/tooling-investment.md) | 0.1.0 | Tool switching has hidden costs: configuration time, learning curves, team coordination overhead, and loss of muscle memory. Deep tool knowledge cr... |
 | [unified-documentation](./core/unified-documentation.md) | 0.1.0 | This binding implements our DRY tenet by ensuring knowledge exists in exactly one authoritative place. Duplicated documentation across README files... |
-| [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding directly implements our automation tenet by transforming system telemetry from human-readable outputs into machine-readable data that ... |
+| [use-structured-logging](./core/use-structured-logging.md) | 0.1.0 | This binding transforms system telemetry into machine-readable data that powers automated monitoring, alerting, and analysis. Logs tell you what ha... |
 | [value-driven-prioritization](./core/value-driven-prioritization.md) | 0.1.0 | This binding directly implements our product-value-first tenet by establishing concrete criteria for development decisions, preventing the accumula... |
 | [version-control-workflows](./core/version-control-workflows.md) | 0.1.0 | This binding applies our automation tenet to version control collaboration, transforming ad-hoc manual processes into systematic, automated workflo... |
-| [yagni-pattern-enforcement](./core/yagni-pattern-enforcement.md) | 0.1.0 | This binding implements our simplicity tenet by attacking complexity at its source—the temptation to build more than what's actually required. YAGN... |
+| [yagni-pattern-enforcement](./core/yagni-pattern-enforcement.md) | 0.1.0 | YAGNI serves as a powerful filter that separates essential features from speculative ones, dramatically reducing cognitive overhead and maintenance... |
 
 ## Backend Bindings
 
@@ -127,15 +127,15 @@ _No frontend bindings defined yet._
 | ID | Version | Summary |
 |---|---|---|
 | [async-patterns](./categories/typescript/async-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by establishing clear patterns for asynchronous code flow in TypeScript. Async programming introduces ... |
-| [avoid-type-gymnastics](./categories/typescript/avoid-type-gymnastics.md) | 0.1.0 | Grug teaches that type systems should make development easier, not harder. TypeScript's main benefits are IDE support (autocomplete, navigation), c... |
-| [eslint-prettier-setup](./categories/typescript/eslint-prettier-setup.md) | 0.1.0 | This binding implements our automation tenet by eliminating manual code quality decisions and creating systematic barriers that enforce consistent ... |
-| [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | This binding implements DRY by using functional composition to create single, authoritative representations of knowledge reusable across different ... |
+| [avoid-type-gymnastics](./categories/typescript/avoid-type-gymnastics.md) | 0.1.0 | TypeScript's main benefits are IDE support, catching obvious mistakes, and enabling confident refactoring. These benefits come from basic typing, n... |
+| [eslint-prettier-setup](./categories/typescript/eslint-prettier-setup.md) | 0.1.0 | Automated code quality tools prevent style inconsistencies, potential errors, and maintenance issues from accumulating in the codebase. The zero-su... |
+| [functional-composition-patterns](./categories/typescript/functional-composition-patterns.md) | 0.1.0 | Functional composition patterns must establish: |
 | [modern-typescript-toolchain](./categories/typescript/modern-typescript-toolchain.md) | 0.1.0 | This binding implements our automation tenet by eliminating the cognitive overhead and friction of tool selection, configuration, and integration d... |
-| [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | This binding implements our modularity tenet by defining how to create well-bounded, purpose-driven modules in TypeScript projects. Effective modul... |
-| [no-any](./categories/typescript/no-any.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by requiring you to clearly |
+| [module-organization](./categories/typescript/module-organization.md) | 0.1.0 | Feature-focused modules create natural boundaries that align with system changes, while technical-layer modules create artificial boundaries that c... |
+| [no-any](./categories/typescript/no-any.md) | 0.1.0 | Each `any` type creates a blind spot where TypeScript can't provide guidance, intellisense help, or error checking. These blind spots spread outwar... |
 | [package-json-standards](./categories/typescript/package-json-standards.md) | 0.1.0 | This binding implements our automation tenet by establishing package.json as a security-critical configuration artifact that requires standardized ... |
 | [tanstack-query-state](./categories/typescript/tanstack-query-state.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making server state management transparent and predictable through TanStack Query's dec... |
-| [tsup-build-system](./categories/typescript/tsup-build-system.md) | 0.1.0 | This binding implements our simplicity tenet by choosing tsup as a zero-configuration build tool that eliminates the complexity demons of webpack c... |
+| [tsup-build-system](./categories/typescript/tsup-build-system.md) | 0.1.0 | Applies to all TypeScript projects producing distributable artifacts. Requirements: |
 | [type-safe-state-management](./categories/typescript/type-safe-state-management.md) | 0.1.0 | This binding implements our orthogonality tenet by creating independent, self-contained state domains that can evolve without affecting each other.... |
 | [use-pnpm-for-nodejs](./categories/typescript/use-pnpm-for-nodejs.md) | 0.1.0 | This binding implements our automation tenet by establishing a consistent, efficient package management foundation that eliminates "works on my mac... |
 | [vitest-testing-framework](./categories/typescript/vitest-testing-framework.md) | 0.1.0 | This binding implements our testability tenet by establishing a consistent, behavior-focused testing approach that enables confident refactoring an... |

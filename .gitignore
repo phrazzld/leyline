@@ -76,3 +76,10 @@ T*-summary.md
 *_analysis.md
 *_search_results.md
 **/glance.md
+
+# Prevent accidental directory creation from CLI flags
+--help/
+--version/
+-h/
+-v/
+--*/

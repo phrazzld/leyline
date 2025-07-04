@@ -12,9 +12,7 @@ Ensure test environments are consistent, reproducible, and isolated. Automate en
 
 ## Rationale
 
-Environment inconsistencies are a primary source of false test failures and production bugs. When tests pass locally but fail in CI, or when integration tests work inconsistently, the root cause is typically environmental differences rather than application logic.
-
-Automated environment management transforms environment setup from error-prone manual processes into reliable, repeatable infrastructure. This enables true test isolation, parallel test execution, and confidence that test results reflect application behavior rather than environmental quirks.
+Environment inconsistencies cause false test failures and production bugs. Automated environment management enables true test isolation, parallel execution, and confidence that results reflect application behavior, not environmental quirks.
 
 ## Rule Definition
 
@@ -30,123 +28,71 @@ Automated environment management transforms environment setup from error-prone m
 
 **SHOULD** implement test data seeding as part of environment setup.
 
-## Docker Test Environment Patterns
+## Docker Test Environment
 
 ```yaml
 # docker-compose.test.yml
 version: '3.8'
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile.test
-    environment:
-      - NODE_ENV=test
-      - DATABASE_URL=postgresql://test:test@db:5432/testdb
-    depends_on:
-      - db
-    volumes:
-      - ./coverage:/app/coverage
-
+    build: { context: ., dockerfile: Dockerfile.test }
+    environment: [ NODE_ENV=test, DATABASE_URL=postgresql://test:test@db:5432/testdb ]
+    depends_on: [db]
+    volumes: [./coverage:/app/coverage]
   db:
     image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=testdb
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-    tmpfs:
-      - /var/lib/postgresql/data
+    environment: [POSTGRES_DB=testdb, POSTGRES_USER=test, POSTGRES_PASSWORD=test]
+    tmpfs: [/var/lib/postgresql/data]
 ```
 
 ```bash
-#!/bin/bash
-# scripts/test-env.sh
-set -e
-
+# scripts/test-env.sh - setup/teardown automation
 case "$1" in
-  setup)
-    docker-compose -f docker-compose.test.yml up -d
-    timeout 30s bash -c 'until docker-compose -f docker-compose.test.yml exec db pg_isready; do sleep 1; done'
-    docker-compose -f docker-compose.test.yml exec app npm run db:migrate
-    docker-compose -f docker-compose.test.yml exec app npm run db:seed:test
-    ;;
-  teardown)
-    docker-compose -f docker-compose.test.yml down -v
-    ;;
-  *)
-    echo "Usage: $0 {setup|teardown}"
-    exit 1
-    ;;
+  setup) docker-compose -f docker-compose.test.yml up -d
+         until docker-compose -f docker-compose.test.yml exec db pg_isready; do sleep 1; done
+         docker-compose -f docker-compose.test.yml exec app npm run db:migrate db:seed:test ;;
+  teardown) docker-compose -f docker-compose.test.yml down -v ;;
 esac
 ```
 
-## CI Environment Integration
+## CI Integration
 
 ```yaml
 # .github/workflows/test.yml
 name: Test Suite
 on: [push, pull_request]
-
 jobs:
   test:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:15
-        env:
-          POSTGRES_DB: testdb
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
+        env: { POSTGRES_DB: testdb, POSTGRES_USER: test, POSTGRES_PASSWORD: test }
+        options: --health-cmd pg_isready --health-interval 10s --health-retries 5
+        ports: [5432:5432]
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Setup test database
-        run: |
-          npm run db:migrate
-          npm run db:seed:test
-        env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
-
-      - name: Run tests
-        run: npm test
-        env:
-          NODE_ENV: test
-          DATABASE_URL: postgresql://test:test@localhost:5432/testdb
+      - uses: actions/setup-node@v4
+        with: { node-version: '18', cache: 'npm' }
+      - run: npm ci
+      - run: npm run db:migrate db:seed:test
+        env: { DATABASE_URL: postgresql://test:test@localhost:5432/testdb }
+      - run: npm test
+        env: { NODE_ENV: test, DATABASE_URL: postgresql://test:test@localhost:5432/testdb }
 ```
 
-## Infrastructure as Code Patterns
+## Infrastructure as Code
 
 ```hcl
 # infrastructure/test/main.tf
 resource "aws_rds_cluster" "test_db" {
-  cluster_identifier     = "test-database"
-  engine                = "aurora-postgresql"
-  database_name         = "testdb"
-  master_username       = "testuser"
-  master_password       = var.test_db_password
-  skip_final_snapshot   = true
-
-  lifecycle {
-    prevent_destroy = false
-  }
+  cluster_identifier = "test-database"
+  engine = "aurora-postgresql"
+  database_name = "testdb"
+  master_username = "testuser"
+  master_password = var.test_db_password
+  skip_final_snapshot = true
+  lifecycle { prevent_destroy = false }
 }
 ```
 
@@ -155,54 +101,38 @@ resource "aws_rds_cluster" "test_db" {
 terraform -chdir=infrastructure/test apply -auto-approve
 DB_ENDPOINT=$(terraform -chdir=infrastructure/test output -raw database_endpoint)
 export TEST_DATABASE_URL="postgresql://testuser:${TEST_DB_PASSWORD}@${DB_ENDPOINT}:5432/testdb"
-npm run db:migrate && npm run db:seed:test
+npm run db:migrate db:seed:test
 ```
 
-## Local Development Consistency
+## Local Development
 
 ```yaml
 # docker-compose.dev.yml
 version: '3.8'
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://dev:dev@db:5432/devdb
-    volumes:
-      - .:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-
+    build: { context: ., dockerfile: Dockerfile.dev }
+    environment: [NODE_ENV=development, DATABASE_URL=postgresql://dev:dev@db:5432/devdb]
+    volumes: [.:/app, /app/node_modules]
+    ports: ["3000:3000"]
+    depends_on: [db]
   db:
     image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=devdb
-      - POSTGRES_USER=dev
-      - POSTGRES_PASSWORD=dev
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-volumes:
-  postgres_data:
+    environment: [POSTGRES_DB=devdb, POSTGRES_USER=dev, POSTGRES_PASSWORD=dev]
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
+volumes: { postgres_data: }
 ```
 
 ```bash
 # scripts/dev-setup.sh
 [ ! -f .env.local ] && cp .env.example .env.local
 docker-compose -f docker-compose.dev.yml up -d
-timeout 30s bash -c 'until docker-compose -f docker-compose.dev.yml exec db pg_isready; do sleep 1; done'
-npm install && npm run db:migrate && npm run db:seed:dev
+until docker-compose -f docker-compose.dev.yml exec db pg_isready; do sleep 1; done
+npm install && npm run db:migrate db:seed:dev
 ```
 
-## Test Data Management
+## Test Environment Helper
 
 ```typescript
 // test/helpers/environment.ts
@@ -213,7 +143,6 @@ export class TestEnvironment {
       env: { POSTGRES_DB: 'testdb', POSTGRES_USER: 'test', POSTGRES_PASSWORD: 'test' },
       tmpfs: { '/var/lib/postgresql/data': '' }
     });
-
     await this.waitForService(dbContainer, 'pg_isready');
     await this.runMigrations();
     return new TestEnvironment();
@@ -230,25 +159,16 @@ export class TestEnvironment {
     await this.database.raw('TRUNCATE TABLE users, orders, products CASCADE');
   }
 }
-```
 
-## Environment Validation
-
-```typescript
-// test/environment-validator.ts
+// Environment validation
 export async function validateTestEnvironment(): Promise<ValidationResult> {
   const checks = await Promise.all([
-    checkDatabaseConnection(),
-    checkEnvironmentVariables(),
-    checkPortAvailability()
+    checkDatabaseConnection(), checkEnvironmentVariables(), checkPortAvailability()
   ]);
-
   const failures = checks.filter(check => !check.passed);
-
   if (failures.length > 0) {
     throw new Error(`Environment validation failed:\n${failures.map(f => f.message).join('\n')}`);
   }
-
   return { valid: true, checks };
 }
 ```

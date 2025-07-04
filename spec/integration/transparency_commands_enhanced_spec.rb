@@ -85,7 +85,7 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
           end
 
           # Commands should handle detached HEAD gracefully
-          output, _ = capture_output { cli.sync(target_dir) }
+          output, = capture_output { cli.sync(target_dir) }
           expect(output).to include('Synchronizing leyline standards')
         end
       end
@@ -102,9 +102,7 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
 
             # Corrupt a git object (simulate corruption)
             git_objects = Dir.glob('.git/objects/*/*')
-            if git_objects.any?
-              File.write(git_objects.first, 'CORRUPTED DATA')
-            end
+            File.write(git_objects.first, 'CORRUPTED DATA') if git_objects.any?
           end
 
           # Should handle corruption gracefully
@@ -121,13 +119,13 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
 
           # Create read-only directory
           readonly_dir = Dir.mktmpdir('readonly')
-          FileUtils.chmod(0555, readonly_dir)
+          FileUtils.chmod(0o555, readonly_dir)
 
           output, error = capture_output { cli.sync(readonly_dir) }
           expect(output + error).to include('Error')
           expect { cli.status(readonly_dir) }.not_to raise_error
         ensure
-          FileUtils.chmod(0755, readonly_dir) if defined?(readonly_dir) && Dir.exist?(readonly_dir)
+          FileUtils.chmod(0o755, readonly_dir) if defined?(readonly_dir) && Dir.exist?(readonly_dir)
           FileUtils.rm_rf(readonly_dir) if defined?(readonly_dir)
         end
       end
@@ -143,7 +141,7 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
           FileUtils.mkdir_p(deep_path)
 
           # Should handle long paths without crashing
-          output, _ = capture_output { cli.sync(target_dir) }
+          output, = capture_output { cli.sync(target_dir) }
           expect(output).to include('Synchronizing leyline standards')
         end
 
@@ -162,7 +160,11 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
 
             special_files.each do |file|
               FileUtils.mkdir_p(File.dirname(file))
-              File.write(file, "# Test\n\nContent") rescue next
+              begin
+                File.write(file, "# Test\n\nContent")
+              rescue StandardError
+                next
+              end
             end
           end
 
@@ -195,11 +197,11 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
           end
 
           # Should recover and continue working
-          output, _ = capture_output { cli.status(target_dir) }
+          output, = capture_output { cli.status(target_dir) }
           expect(output).to include('Leyline Status Report')
 
           # Diff should still work
-          output, _ = capture_output { cli.diff(target_dir) }
+          output, = capture_output { cli.diff(target_dir) }
           expect(output).to include('Leyline Diff Report')
         end
       end
@@ -212,7 +214,7 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
           FileUtils.rm_rf(cache_dir)
 
           # Commands should still work (slower, but functional)
-          output, _ = capture_output { cli.status(target_dir) }
+          output, = capture_output { cli.status(target_dir) }
           expect(output).to include('Leyline Status Report')
         end
 
@@ -222,13 +224,13 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
           cli.sync(target_dir)
 
           # Make cache read-only
-          FileUtils.chmod(0444, cache_dir)
+          FileUtils.chmod(0o444, cache_dir)
 
           # Should fall back gracefully
-          output, _ = capture_output { cli.status(target_dir) }
+          output, = capture_output { cli.status(target_dir) }
           expect(output).to include('Leyline Status Report')
         ensure
-          FileUtils.chmod(0755, cache_dir) if Dir.exist?(cache_dir)
+          FileUtils.chmod(0o755, cache_dir) if Dir.exist?(cache_dir)
         end
       end
     end
@@ -262,13 +264,11 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
 
           3.times do |i|
             threads << Thread.new do
-              begin
-                dir = Dir.mktmpdir("concurrent-#{i}")
-                cli.sync(dir)
-                FileUtils.rm_rf(dir)
-              rescue => e
-                errors << e
-              end
+              dir = Dir.mktmpdir("concurrent-#{i}")
+              cli.sync(dir)
+              FileUtils.rm_rf(dir)
+            rescue StandardError => e
+              errors << e
             end
           end
 
@@ -405,7 +405,7 @@ RSpec.describe 'Enhanced transparency commands integration', type: :integration 
     else
       0.0
     end
-  rescue
+  rescue StandardError
     0.0
   end
 end

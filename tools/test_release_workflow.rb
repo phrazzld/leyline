@@ -51,9 +51,7 @@ class TestReleaseWorkflow < Test::Unit::TestCase
       reindex.rb
     ].each do |tool|
       source = File.join(tools_dir, tool)
-      if File.exist?(source)
-        FileUtils.cp(source, File.join('tools', tool))
-      end
+      FileUtils.cp(source, File.join('tools', tool)) if File.exist?(source)
     end
   end
 
@@ -146,7 +144,7 @@ class TestReleaseWorkflow < Test::Unit::TestCase
       # Create a small change to trigger a commit
       timestamp = Time.now.to_f.to_s
       File.write('test_change.tmp', timestamp)
-      system("git add test_change.tmp")
+      system('git add test_change.tmp')
     end
 
     # Use a temporary file for multi-line commit messages
@@ -177,7 +175,7 @@ class TestReleaseWorkflow < Test::Unit::TestCase
     data = JSON.parse(result[:output])
 
     assert_equal '0.1.0', data['current_version']
-    assert_equal '0.2.0', data['next_version']  # feat should bump minor in pre-1.0
+    assert_equal '0.2.0', data['next_version'] # feat should bump minor in pre-1.0
     assert_equal 'minor', data['bump_type']
     assert_equal 3, data['commits'].size
   end
@@ -238,19 +236,19 @@ BREAKING CHANGE: The API has been completely redesigned for better usability.')
   def test_breaking_change_detection_and_version_bump
     # Create a breaking change by adding a new tenet file
     create_commit('feat: add new foundational tenet', [
-      { path: 'docs/tenets/reliability.md', content: <<~TENET }
-        ---
-        id: reliability
-        title: Reliability
-        version: '0.2.0'
-        last_modified: '2024-01-02'
-        ---
+                    { path: 'docs/tenets/reliability.md', content: <<~TENET }
+                      ---
+                      id: reliability
+                      title: Reliability
+                      version: '0.2.0'
+                      last_modified: '2024-01-02'
+                      ---
 
-        # Reliability
+                      # Reliability
 
-        Build reliable and robust systems.
-      TENET
-    ])
+                      Build reliable and robust systems.
+                    TENET
+                  ])
 
     result = run_tool('prepare_release')
 
@@ -283,20 +281,20 @@ BREAKING CHANGE: The API has been completely redesigned for better usability.')
   def test_validation_integration
     # Create invalid front-matter to test validation
     create_commit('feat: add invalid tenet', [
-      { path: 'docs/tenets/invalid.md', content: <<~INVALID }
-        ---
-        id: invalid
-        # Missing required fields
-        ---
+                    { path: 'docs/tenets/invalid.md', content: <<~INVALID }
+                      ---
+                      id: invalid
+                      # Missing required fields
+                      ---
 
-        # Invalid Tenet
-      INVALID
-    ])
+                      # Invalid Tenet
+                    INVALID
+                  ])
 
     # Test that validation catches the error
     validation_result = run_tool('validate_front_matter')
 
-    refute validation_result[:success], "Validation should have failed for invalid front-matter"
+    refute validation_result[:success], 'Validation should have failed for invalid front-matter'
     assert_includes validation_result[:output], 'Missing required keys'
   end
 
@@ -348,7 +346,7 @@ BREAKING CHANGE: All existing APIs have been removed and replaced.')
     result = run_tool('prepare_release')
 
     # Should handle error gracefully
-    refute result[:success], "Release preparation should have failed with invalid version"
+    refute result[:success], 'Release preparation should have failed with invalid version'
     assert_includes result[:output].downcase, 'version'
   end
 
@@ -369,26 +367,26 @@ BREAKING CHANGE: All existing APIs have been removed and replaced.')
 
     threads.each(&:join)
 
-    assert results[:calculate][:success], "Concurrent version calculation failed"
-    assert results[:validate][:success], "Concurrent validation failed"
+    assert results[:calculate][:success], 'Concurrent version calculation failed'
+    assert results[:validate][:success], 'Concurrent validation failed'
   end
 
   def test_large_repository_performance
     # Create a repository with many commits and files
     100.times do |i|
       create_commit("feat: add feature #{i}", [
-        { path: "docs/bindings/core/feature-#{i}.md", content: <<~BINDING }
-          ---
-          id: feature-#{i}
-          title: Feature #{i}
-          version: '0.1.0'
-          last_modified: '2024-01-01'
-          category: core
-          ---
+                      { path: "docs/bindings/core/feature-#{i}.md", content: <<~BINDING }
+                        ---
+                        id: feature-#{i}
+                        title: Feature #{i}
+                        version: '0.1.0'
+                        last_modified: '2024-01-01'
+                        category: core
+                        ---
 
-          # Feature #{i}
-        BINDING
-      ])
+                        # Feature #{i}
+                      BINDING
+                    ])
     end
 
     start_time = Time.now
@@ -397,7 +395,7 @@ BREAKING CHANGE: All existing APIs have been removed and replaced.')
 
     duration = end_time - start_time
 
-    assert result[:success], "Release preparation failed on large repository"
+    assert result[:success], 'Release preparation failed on large repository'
     assert duration < 30, "Release preparation took too long: #{duration} seconds"
 
     # Verify the release was prepared correctly
@@ -412,7 +410,7 @@ BREAKING CHANGE: All existing APIs have been removed and replaced.')
 
     result = run_tool('prepare_release')
 
-    assert result[:success], "Release preparation failed with unicode characters"
+    assert result[:success], 'Release preparation failed with unicode characters'
 
     changelog = File.read('CHANGELOG.md')
     assert_includes changelog, '国际化'
@@ -425,15 +423,15 @@ BREAKING CHANGE: All existing APIs have been removed and replaced.')
 
     # Prepare release
     result = run_tool('prepare_release')
-    assert result[:success], "Release preparation failed"
+    assert result[:success], 'Release preparation failed'
 
     # Check that git state is clean after preparation
     git_status = `git status --porcelain`.strip
-    assert_empty git_status, "Git working directory should be clean after release preparation"
+    assert_empty git_status, 'Git working directory should be clean after release preparation'
 
     # Check that changes were committed
     last_commit = `git log -1 --pretty=format:"%s"`.strip
-    refute_includes last_commit, 'release 0.2.0'  # prepare_release shouldn't auto-commit
+    refute_includes last_commit, 'release 0.2.0' # prepare_release shouldn't auto-commit
   end
 
   # Mock GitHub API for testing release creation
@@ -444,7 +442,7 @@ BREAKING CHANGE: All existing APIs have been removed and replaced.')
     create_commits_for_release
     result = run_tool('prepare_release')
 
-    assert result[:success], "Release preparation failed"
+    assert result[:success], 'Release preparation failed'
 
     # In a real scenario, this would:
     # 1. Create a GitHub release

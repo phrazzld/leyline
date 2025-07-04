@@ -21,9 +21,9 @@ RSpec.describe Leyline::Discovery::MetadataCache, '#performance_telemetry' do
       allow(cache).to receive(:discover_document_paths).and_return(test_document_paths)
 
       # Execute operations to generate timing data
-      categories = cache.categories
-      documents = cache.documents_for_category('typescript')
-      search_results = cache.search('test')
+      cache.categories
+      cache.documents_for_category('typescript')
+      cache.search('test')
 
       # Get performance stats
       stats = cache.performance_stats
@@ -66,7 +66,7 @@ RSpec.describe Leyline::Discovery::MetadataCache, '#performance_telemetry' do
       stats[:operation_metrics].each do |operation, metrics|
         avg_time_ms = metrics[:avg_time_ms]
         expect(avg_time_ms).to be < 1000,
-          "Operation #{operation} took #{avg_time_ms}ms, target: <1000ms"
+                               "Operation #{operation} took #{avg_time_ms}ms, target: <1000ms"
       end
 
       expect(stats[:performance_summary][:performance_target_met]).to be true

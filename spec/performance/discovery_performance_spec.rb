@@ -43,7 +43,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
 
       avg_time = elapsed_time / 10.0
       expect(avg_time).to be < performance_targets[:categories_command],
-                        "Categories command took #{avg_time}s, target: <#{performance_targets[:categories_command]}s"
+                          "Categories command took #{avg_time}s, target: <#{performance_targets[:categories_command]}s"
 
       puts "Categories performance: #{(avg_time * 1000).round(1)}ms per operation"
     end
@@ -87,7 +87,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
 
       avg_time = elapsed_time / 10.0
       expect(avg_time).to be < performance_targets[:show_command],
-                        "Show command took #{avg_time}s, target: <#{performance_targets[:show_command]}s"
+                          "Show command took #{avg_time}s, target: <#{performance_targets[:show_command]}s"
 
       puts "Show performance: #{(avg_time * 1000).round(1)}ms per operation"
     end
@@ -114,7 +114,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
         end
 
         expect(elapsed_time).to be < performance_targets[:show_command],
-                               "Show command for #{size} documents took #{elapsed_time}s"
+                                "Show command for #{size} documents took #{elapsed_time}s"
 
         puts "Show #{size} documents: #{(elapsed_time * 1000).round(1)}ms"
       end
@@ -123,7 +123,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
 
   describe 'Search command performance' do
     it 'meets <1s performance target for exact search operations' do
-      search_queries = ['testing', 'performance', 'binding', 'cache', 'configuration']
+      search_queries = %w[testing performance binding cache configuration]
 
       search_queries.each do |query|
         elapsed_time = Benchmark.realtime do
@@ -132,14 +132,14 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
 
         avg_time = elapsed_time / 5.0
         expect(avg_time).to be < performance_targets[:search_command],
-                          "Search '#{query}' took #{avg_time}s, target: <#{performance_targets[:search_command]}s"
+                            "Search '#{query}' took #{avg_time}s, target: <#{performance_targets[:search_command]}s"
       end
 
-      puts "Exact search performance: meets <1s target for all queries"
+      puts 'Exact search performance: meets <1s target for all queries'
     end
 
     it 'meets <1s performance target for fuzzy search with typos' do
-      fuzzy_queries = ['tesitng', 'perfromance', 'bindng', 'cachng', 'configuraton']
+      fuzzy_queries = %w[tesitng perfromance bindng cachng configuraton]
 
       fuzzy_queries.each do |query|
         elapsed_time = Benchmark.realtime do
@@ -148,10 +148,10 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
 
         avg_time = elapsed_time / 3.0
         expect(avg_time).to be < performance_targets[:fuzzy_search],
-                          "Fuzzy search '#{query}' took #{avg_time}s, target: <#{performance_targets[:fuzzy_search]}s"
+                            "Fuzzy search '#{query}' took #{avg_time}s, target: <#{performance_targets[:fuzzy_search]}s"
       end
 
-      puts "Fuzzy search performance: meets <1s target for typo-tolerant queries"
+      puts 'Fuzzy search performance: meets <1s target for typo-tolerant queries'
     end
 
     it 'maintains performance with large result sets' do
@@ -167,11 +167,11 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
 
       elapsed_time = Benchmark.realtime do
         results = metadata_cache.search('test')
-        expect(results.length).to be > 50  # Should match many documents
+        expect(results.length).to be > 50 # Should match many documents
       end
 
       expect(elapsed_time).to be < performance_targets[:search_command],
-                             "Search with large result set took #{elapsed_time}s"
+                              "Search with large result set took #{elapsed_time}s"
 
       puts "Large result set search: #{(elapsed_time * 1000).round(1)}ms"
     end
@@ -179,19 +179,19 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
 
   describe 'Suggestion generation performance' do
     it 'meets <0.5s performance target for \"Did you mean?\" suggestions' do
-      failed_queries = ['tesng', 'perfrmance', 'cachng', 'bindng']
+      failed_queries = %w[tesng perfrmance cachng bindng]
 
       failed_queries.each do |query|
         elapsed_time = Benchmark.realtime do
           suggestions = metadata_cache.suggest_corrections(query)
-          expect(suggestions).to be_an(Array)  # Should return suggestions
+          expect(suggestions).to be_an(Array) # Should return suggestions
         end
 
         expect(elapsed_time).to be < performance_targets[:suggestion_generation],
-                               "Suggestion generation for '#{query}' took #{elapsed_time}s"
+                                "Suggestion generation for '#{query}' took #{elapsed_time}s"
       end
 
-      puts "Suggestion generation: meets <0.5s target for all failed queries"
+      puts 'Suggestion generation: meets <0.5s target for all failed queries'
     end
 
     it 'scales reasonably with vocabulary size' do
@@ -216,7 +216,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
         end
 
         expect(elapsed_time).to be < performance_targets[:suggestion_generation],
-                               "Suggestions with #{size} documents took #{elapsed_time}s"
+                                "Suggestions with #{size} documents took #{elapsed_time}s"
 
         puts "Suggestions (#{size} docs): #{(elapsed_time * 1000).round(1)}ms"
       end
@@ -235,7 +235,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
       end
 
       expect(elapsed_time).to be < performance_targets[:cache_warm_up],
-                             "Cache warm-up took #{elapsed_time}s, target: <#{performance_targets[:cache_warm_up]}s"
+                              "Cache warm-up took #{elapsed_time}s, target: <#{performance_targets[:cache_warm_up]}s"
 
       puts "Cache warm-up: #{(elapsed_time * 1000).round(1)}ms"
     end
@@ -258,7 +258,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
       puts "Cache performance improvement: #{(improvement_ratio * 100).round(1)}%"
 
       # Warm cache should be faster and meet performance targets
-      expect(warm_time).to be < cold_time  # Some improvement expected
+      expect(warm_time).to be < cold_time # Some improvement expected
       expect(warm_time).to be < performance_targets[:search_command]
 
       # Performance improvement should be meaningful (at least 10% or meets target)
@@ -291,7 +291,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
       # Verify performance summary indicates targets are met
       expect(stats[:performance_summary][:performance_target_met]).to be(true)
 
-      puts "Microsecond telemetry: All operations meet <1s performance targets"
+      puts 'Microsecond telemetry: All operations meet <1s performance targets'
     end
   end
 
@@ -307,7 +307,7 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
       }
 
       regression_thresholds = {
-        categories: 0.1,      # 100ms for categories
+        categories: 0.1, # 100ms for categories
         show: 0.1,           # 100ms for show
         exact_search: 0.2,   # 200ms for exact search
         fuzzy_search: 0.5,   # 500ms for fuzzy search
@@ -319,17 +319,17 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
         threshold = regression_thresholds[operation_name]
 
         expect(elapsed_time).to be < threshold,
-                               "REGRESSION: #{operation_name} took #{elapsed_time}s, threshold: #{threshold}s"
+                                "REGRESSION: #{operation_name} took #{elapsed_time}s, threshold: #{threshold}s"
       end
 
-      puts "Regression protection: All operations within strict performance bounds"
+      puts 'Regression protection: All operations within strict performance bounds'
     end
   end
 
   private
 
   def setup_discovery_test_dataset(document_count: 100)
-    categories = ['testing', 'performance', 'caching', 'binding', 'configuration']
+    categories = %w[testing performance caching binding configuration]
 
     document_count.times do |i|
       category = categories[i % categories.length]
@@ -364,8 +364,8 @@ RSpec.describe 'Discovery command performance regression tests', :performance do
   end
 
   def generate_random_title(seed)
-    words = ['Advanced', 'Modern', 'Comprehensive', 'Effective', 'Efficient', 'Optimal']
-    topics = ['Testing', 'Performance', 'Architecture', 'Design', 'Implementation', 'Strategy']
+    words = %w[Advanced Modern Comprehensive Effective Efficient Optimal]
+    topics = %w[Testing Performance Architecture Design Implementation Strategy]
 
     Random.srand(seed)
     "#{words.sample} #{topics.sample}"

@@ -79,15 +79,15 @@ class MetricsCollector
     pattern_key = "#{error_type}:#{component}"
     @error_patterns[pattern_key] += frequency
 
-    if structured_logging_enabled?
-      log_structured('error_pattern_recorded', {
-        error_type: error_type,
-        component: component,
-        frequency: frequency,
-        total_occurrences: @error_patterns[pattern_key],
-        context: context
-      })
-    end
+    return unless structured_logging_enabled?
+
+    log_structured('error_pattern_recorded', {
+                     error_type: error_type,
+                     component: component,
+                     frequency: frequency,
+                     total_occurrences: @error_patterns[pattern_key],
+                     context: context
+                   })
   end
 
   # Get comprehensive metrics summary
@@ -128,7 +128,7 @@ class MetricsCollector
   end
 
   # Export metrics as JSON
-  def to_json
+  def to_json(*_args)
     JSON.pretty_generate(get_metrics_summary)
   end
 
@@ -142,10 +142,10 @@ class MetricsCollector
 
     if structured_logging_enabled?
       log_structured('metrics_saved', {
-        filename: filename,
-        total_operations: @performance_data.length,
-        success_rate: calculate_success_rate
-      })
+                       filename: filename,
+                       total_operations: @performance_data.length,
+                       success_rate: calculate_success_rate
+                     })
     end
 
     filename
@@ -168,9 +168,9 @@ class MetricsCollector
     }
 
     begin
-      STDERR.puts JSON.generate(summary)
-    rescue => e
-      STDERR.puts "Warning: Metrics logging failed: #{e.message}"
+      warn JSON.generate(summary)
+    rescue StandardError => e
+      warn "Warning: Metrics logging failed: #{e.message}"
     end
   end
 
@@ -181,43 +181,49 @@ class MetricsCollector
     @error_patterns.each do |pattern, count|
       error_type, component = pattern.split(':', 2)
 
-      case error_type
-      when 'missing_field'
-        guidance << {
-          pattern: pattern,
-          occurrences: count,
-          severity: count > 5 ? 'high' : 'medium',
-          recommendation: "Add missing required field '#{component}' to YAML front-matter",
-          action: "Review field requirements in TENET_FORMATTING.md"
-        }
-      when 'invalid_format'
-        guidance << {
-          pattern: pattern,
-          occurrences: count,
-          severity: count > 3 ? 'high' : 'low',
-          recommendation: "Fix format validation for '#{component}'",
-          action: "Check format requirements and update accordingly"
-        }
-      when 'performance_degradation'
-        guidance << {
-          pattern: pattern,
-          occurrences: count,
-          severity: 'medium',
-          recommendation: "Optimize performance for '#{component}' operations",
-          action: "Consider caching, parallel processing, or algorithm improvements"
-        }
-      else
-        guidance << {
-          pattern: pattern,
-          occurrences: count,
-          severity: 'low',
-          recommendation: "Review error pattern '#{error_type}' in '#{component}'",
-          action: "Investigate root cause and implement targeted fix"
-        }
-      end
+      guidance << case error_type
+                  when 'missing_field'
+                    {
+                      pattern: pattern,
+                      occurrences: count,
+                      severity: count > 5 ? 'high' : 'medium',
+                      recommendation: "Add missing required field '#{component}' to YAML front-matter",
+                      action: 'Review field requirements in TENET_FORMATTING.md'
+                    }
+                  when 'invalid_format'
+                    {
+                      pattern: pattern,
+                      occurrences: count,
+                      severity: count > 3 ? 'high' : 'low',
+                      recommendation: "Fix format validation for '#{component}'",
+                      action: 'Check format requirements and update accordingly'
+                    }
+                  when 'performance_degradation'
+                    {
+                      pattern: pattern,
+                      occurrences: count,
+                      severity: 'medium',
+                      recommendation: "Optimize performance for '#{component}' operations",
+                      action: 'Consider caching, parallel processing, or algorithm improvements'
+                    }
+                  else
+                    {
+                      pattern: pattern,
+                      occurrences: count,
+                      severity: 'low',
+                      recommendation: "Review error pattern '#{error_type}' in '#{component}'",
+                      action: 'Investigate root cause and implement targeted fix'
+                    }
+                  end
     end
 
-    guidance.sort_by { |g| [g[:severity] == 'high' ? 0 : g[:severity] == 'medium' ? 1 : 2, -g[:occurrences]] }
+    guidance.sort_by do |g|
+      [if g[:severity] == 'high'
+         0
+       else
+         g[:severity] == 'medium' ? 1 : 2
+       end, -g[:occurrences]]
+    end
   end
 
   private
@@ -227,19 +233,17 @@ class MetricsCollector
   end
 
   def log_structured(event, data = {})
-    begin
-      log_entry = {
-        event: event,
-        correlation_id: @correlation_id,
-        timestamp: Time.now.iso8601,
-        tool: @tool_name,
-        **data
-      }
+    log_entry = {
+      event: event,
+      correlation_id: @correlation_id,
+      timestamp: Time.now.iso8601,
+      tool: @tool_name,
+      **data
+    }
 
-      STDERR.puts JSON.generate(log_entry)
-    rescue => e
-      STDERR.puts "Warning: Structured logging failed: #{e.message}"
-    end
+    warn JSON.generate(log_entry)
+  rescue StandardError => e
+    warn "Warning: Structured logging failed: #{e.message}"
   end
 
   def log_structured_timing(timing_record)
@@ -248,6 +252,7 @@ class MetricsCollector
 
   def calculate_success_rate
     return 0 if @performance_data.empty?
+
     successful = @performance_data.count { |p| p[:success] }
     (successful.to_f / @performance_data.length * 100).round(2)
   end

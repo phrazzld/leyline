@@ -27,28 +27,28 @@ $verbose = false
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: validate_typescript_bindings.rb [options]"
-  opts.separator ""
-  opts.separator "Automated validation of TypeScript binding configuration examples"
-  opts.separator ""
-  opts.separator "Options:"
+  opts.banner = 'Usage: validate_typescript_bindings.rb [options]'
+  opts.separator ''
+  opts.separator 'Automated validation of TypeScript binding configuration examples'
+  opts.separator ''
+  opts.separator 'Options:'
 
-  opts.on("-v", "--verbose", "Show detailed output from validation commands") do
+  opts.on('-v', '--verbose', 'Show detailed output from validation commands') do
     $verbose = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
 
-  opts.separator ""
-  opts.separator "Environment Variables:"
-  opts.separator "  LEYLINE_STRUCTURED_LOGGING=true  Enable JSON structured logging to STDERR"
-  opts.separator ""
-  opts.separator "Exit Codes:"
-  opts.separator "  0 - All binding configurations validated successfully"
-  opts.separator "  1 - One or more binding validations failed"
+  opts.separator ''
+  opts.separator 'Environment Variables:'
+  opts.separator '  LEYLINE_STRUCTURED_LOGGING=true  Enable JSON structured logging to STDERR'
+  opts.separator ''
+  opts.separator 'Exit Codes:'
+  opts.separator '  0 - All binding configurations validated successfully'
+  opts.separator '  1 - One or more binding validations failed'
 end.parse!
 
 # Configuration mapping for TypeScript bindings to validate
@@ -108,20 +108,20 @@ def log_structured(event, data = {})
       **data
     }
 
-    STDERR.puts JSON.generate(log_entry)
-  rescue => e
+    warn JSON.generate(log_entry)
+  rescue StandardError => e
     # Graceful degradation if structured logging fails
-    STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    warn "Warning: Structured logging failed: #{e.message}"
   end
 end
 
 # Execute a shell command with proper error handling and output capture
 def run_command(cmd, binding_name, check_type)
   log_structured('validation_command_start', {
-    binding: binding_name,
-    check: check_type,
-    command: cmd
-  })
+                   binding: binding_name,
+                   check: check_type,
+                   command: cmd
+                 })
 
   start_time = Time.now
 
@@ -136,22 +136,22 @@ def run_command(cmd, binding_name, check_type)
 
   if success
     log_structured('validation_command_success', {
-      binding: binding_name,
-      check: check_type,
-      duration_seconds: duration
-    })
-    return true
+                     binding: binding_name,
+                     check: check_type,
+                     duration_seconds: duration
+                   })
+    true
   else
     exit_code = $?.exitstatus
     log_structured('validation_command_failure', {
-      binding: binding_name,
-      check: check_type,
-      duration_seconds: duration,
-      exit_code: exit_code
-    })
+                     binding: binding_name,
+                     check: check_type,
+                     duration_seconds: duration,
+                     exit_code: exit_code
+                   })
 
     puts "    ❌ Command failed (exit code #{exit_code}): #{cmd}"
-    return false
+    false
   end
 end
 
@@ -161,15 +161,15 @@ def extract_code_block(doc_path, lang)
 
   # Handle different language aliases
   lang_patterns = case lang.downcase
-  when 'json'
-    ['json', 'jsonc']
-  when 'javascript', 'js'
-    ['javascript', 'js']
-  when 'typescript', 'ts'
-    ['typescript', 'ts']
-  else
-    [lang]
-  end
+                  when 'json'
+                    %w[json jsonc]
+                  when 'javascript', 'js'
+                    %w[javascript js]
+                  when 'typescript', 'ts'
+                    %w[typescript ts]
+                  else
+                    [lang]
+                  end
 
   # Try each language pattern
   lang_patterns.each do |pattern|
@@ -394,148 +394,143 @@ def add_default_tool_configs(dir)
   end
 
   # Default Prettier config if not present
-  unless File.exist?(File.join(dir, '.prettierrc'))
-    File.write(File.join(dir, '.prettierrc'), <<~JSON)
-      {
-        "semi": true,
-        "trailingComma": "es5",
-        "singleQuote": true,
-        "printWidth": 80,
-        "tabWidth": 2
-      }
-    JSON
-  end
+  return if File.exist?(File.join(dir, '.prettierrc'))
+
+  File.write(File.join(dir, '.prettierrc'), <<~JSON)
+    {
+      "semi": true,
+      "trailingComma": "es5",
+      "singleQuote": true,
+      "printWidth": 80,
+      "tabWidth": 2
+    }
+  JSON
 end
 
 # Main validation function for a single binding
 def validate_binding(binding)
   binding_name = binding[:name]
   log_structured('binding_validation_start', {
-    binding: binding_name,
-    doc: binding[:doc],
-    configs: binding[:configs].keys,
-    checks: binding[:checks]
-  })
+                   binding: binding_name,
+                   doc: binding[:doc],
+                   configs: binding[:configs].keys,
+                   checks: binding[:checks]
+                 })
 
   puts "\n🔍 Validating #{binding_name}..."
   start_time = Time.now
 
   Dir.mktmpdir("binding-#{binding_name}-") do |tmpdir|
     Dir.chdir(tmpdir) do
-      begin
-        # Extract and write configuration files from documentation
-        binding[:configs].each do |filename, lang|
-          puts "  📄 Extracting #{filename} from documentation..."
+      # Extract and write configuration files from documentation
+      binding[:configs].each do |filename, lang|
+        puts "  📄 Extracting #{filename} from documentation..."
 
-          begin
-            code = extract_code_block(binding[:doc], lang)
-            FileUtils.mkdir_p(File.dirname(filename))
-            File.write(filename, code)
-            puts "    ✅ #{filename} extracted successfully"
-          rescue => e
-            puts "    ⚠️  Could not extract #{filename}: #{e.message}"
-            puts "    📝 Will use default configuration for validation"
-          end
+        begin
+          code = extract_code_block(binding[:doc], lang)
+          FileUtils.mkdir_p(File.dirname(filename))
+          File.write(filename, code)
+          puts "    ✅ #{filename} extracted successfully"
+        rescue StandardError => e
+          puts "    ⚠️  Could not extract #{filename}: #{e.message}"
+          puts '    📝 Will use default configuration for validation'
         end
-
-        # Create project scaffolding
-        create_project_scaffold(tmpdir, binding_name)
-
-        # Run validation checks
-        binding[:checks].each do |check|
-          puts "  🔧 Running #{check} check..."
-
-          case check
-          when 'install'
-            success = run_command('pnpm install', binding_name, check)
-          when 'build'
-            success = run_command('pnpm run build', binding_name, check)
-          when 'test'
-            success = run_command('pnpm run test', binding_name, check)
-          when 'lint'
-            success = run_command('pnpm run lint', binding_name, check)
-          when 'format'
-            success = run_command('pnpm run format:check', binding_name, check)
-          when 'audit'
-            success = run_command('pnpm audit --audit-level=moderate', binding_name, check)
-          else
-            puts "    ⚠️  Unknown check type: #{check}"
-            success = false
-          end
-
-          unless success
-            raise "#{check.capitalize} check failed"
-          end
-        end
-
-        duration = (Time.now - start_time).round(3)
-        puts "  ✅ All checks passed for #{binding_name} (#{duration}s)"
-
-        log_structured('binding_validation_success', {
-          binding: binding_name,
-          duration_seconds: duration,
-          checks_passed: binding[:checks].length
-        })
-
-        return true
-
-      rescue => e
-        duration = (Time.now - start_time).round(3)
-        puts "  ❌ Validation failed for #{binding_name}: #{e.message}"
-
-        log_structured('binding_validation_failure', {
-          binding: binding_name,
-          duration_seconds: duration,
-          error: e.message
-        })
-
-        return false
       end
+
+      # Create project scaffolding
+      create_project_scaffold(tmpdir, binding_name)
+
+      # Run validation checks
+      binding[:checks].each do |check|
+        puts "  🔧 Running #{check} check..."
+
+        case check
+        when 'install'
+          success = run_command('pnpm install', binding_name, check)
+        when 'build'
+          success = run_command('pnpm run build', binding_name, check)
+        when 'test'
+          success = run_command('pnpm run test', binding_name, check)
+        when 'lint'
+          success = run_command('pnpm run lint', binding_name, check)
+        when 'format'
+          success = run_command('pnpm run format:check', binding_name, check)
+        when 'audit'
+          success = run_command('pnpm audit --audit-level=moderate', binding_name, check)
+        else
+          puts "    ⚠️  Unknown check type: #{check}"
+          success = false
+        end
+
+        raise "#{check.capitalize} check failed" unless success
+      end
+
+      duration = (Time.now - start_time).round(3)
+      puts "  ✅ All checks passed for #{binding_name} (#{duration}s)"
+
+      log_structured('binding_validation_success', {
+                       binding: binding_name,
+                       duration_seconds: duration,
+                       checks_passed: binding[:checks].length
+                     })
+
+      return true
+    rescue StandardError => e
+      duration = (Time.now - start_time).round(3)
+      puts "  ❌ Validation failed for #{binding_name}: #{e.message}"
+
+      log_structured('binding_validation_failure', {
+                       binding: binding_name,
+                       duration_seconds: duration,
+                       error: e.message
+                     })
+
+      return false
     end
   end
 end
 
 # Check prerequisites
 def check_prerequisites
-  puts "🔍 Checking prerequisites..."
+  puts '🔍 Checking prerequisites...'
 
   # Check Ruby
   unless system('ruby --version >/dev/null 2>&1')
-    puts "❌ Ruby not found"
+    puts '❌ Ruby not found'
     return false
   end
 
   # Check Node.js
   unless system('node --version >/dev/null 2>&1')
-    puts "❌ Node.js not found - required for TypeScript toolchain"
-    puts "   Install Node.js 18+ from https://nodejs.org/"
+    puts '❌ Node.js not found - required for TypeScript toolchain'
+    puts '   Install Node.js 18+ from https://nodejs.org/'
     return false
   end
 
   # Check pnpm
   unless system('pnpm --version >/dev/null 2>&1')
-    puts "❌ pnpm not found - required for package management"
-    puts "   Install with: npm install -g pnpm"
+    puts '❌ pnpm not found - required for package management'
+    puts '   Install with: npm install -g pnpm'
     return false
   end
 
-  puts "✅ All prerequisites available"
-  return true
+  puts '✅ All prerequisites available'
+  true
 end
 
 # Main execution function
 def main
   log_structured('typescript_validation_start', {
-    tool: 'validate_typescript_bindings',
-    bindings_count: BINDINGS_TO_VALIDATE.length,
-    verbose: $verbose
-  })
+                   tool: 'validate_typescript_bindings',
+                   bindings_count: BINDINGS_TO_VALIDATE.length,
+                   verbose: $verbose
+                 })
 
-  puts "🚀 TypeScript Binding Configuration Validation"
-  puts "=============================================="
+  puts '🚀 TypeScript Binding Configuration Validation'
+  puts '=============================================='
   puts "Correlation ID: #{$correlation_id}"
   puts "Bindings to validate: #{BINDINGS_TO_VALIDATE.length}"
-  puts ""
+  puts ''
 
   # Check prerequisites
   unless check_prerequisites
@@ -548,41 +543,39 @@ def main
 
   # Validate each binding
   BINDINGS_TO_VALIDATE.each do |binding|
-    unless validate_binding(binding)
-      failed_bindings << binding[:name]
-    end
+    failed_bindings << binding[:name] unless validate_binding(binding)
   end
 
   # Summary
   total_duration = (Time.now - start_time).round(3)
   puts "\n📊 Validation Summary"
-  puts "===================="
+  puts '===================='
 
   if failed_bindings.empty?
     puts "✅ All #{BINDINGS_TO_VALIDATE.length} TypeScript binding configurations validated successfully!"
-    puts "🎉 Configuration examples are working correctly"
+    puts '🎉 Configuration examples are working correctly'
     puts "⏱️  Total time: #{total_duration}s"
 
     log_structured('typescript_validation_success', {
-      duration_seconds: total_duration,
-      bindings_validated: BINDINGS_TO_VALIDATE.length,
-      failed_bindings: []
-    })
+                     duration_seconds: total_duration,
+                     bindings_validated: BINDINGS_TO_VALIDATE.length,
+                     failed_bindings: []
+                   })
 
     exit 0
   else
     puts "❌ #{failed_bindings.length} binding(s) failed validation:"
     failed_bindings.each { |binding| puts "   • #{binding}" }
-    puts ""
-    puts "💡 Review the error messages above and fix the configuration issues"
+    puts ''
+    puts '💡 Review the error messages above and fix the configuration issues'
     puts "⏱️  Total time: #{total_duration}s"
 
     log_structured('typescript_validation_failure', {
-      duration_seconds: total_duration,
-      bindings_validated: BINDINGS_TO_VALIDATE.length,
-      failed_bindings: failed_bindings,
-      failed_count: failed_bindings.length
-    })
+                     duration_seconds: total_duration,
+                     bindings_validated: BINDINGS_TO_VALIDATE.length,
+                     failed_bindings: failed_bindings,
+                     failed_count: failed_bindings.length
+                   })
 
     exit 1
   end

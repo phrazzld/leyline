@@ -12,378 +12,186 @@ Implement comprehensive automated code quality enforcement using ESLint for lint
 
 ## Rationale
 
-This binding implements our automation tenet by eliminating manual code quality decisions and creating systematic barriers that enforce consistent standards without requiring developer memory or discipline. Just as automated testing prevents bugs from reaching production, automated code quality tools prevent style inconsistencies, potential errors, and maintenance issues from accumulating in the codebase.
-
-Think of ESLint and Prettier as quality control inspectors on a manufacturing line—they catch defects immediately when the context is fresh and fixes are simple, rather than allowing problems to compound and become expensive to resolve later. When quality tools are properly automated with zero tolerance for suppressions, they transform from annoying interruptions into trusted guardians that enable confident refactoring and rapid development.
-
-The zero-suppression policy implements our explicit-over-implicit tenet by making all code quality decisions visible and forcing developers to address root causes rather than hiding problems through suppressions. This approach prevents the gradual erosion of code quality that occurs when suppressions become normalized, ensures that all team members follow the same standards, and maintains the long-term health of the codebase.
+Automated code quality tools prevent style inconsistencies, potential errors, and maintenance issues from accumulating in the codebase. The zero-suppression policy forces developers to address root causes rather than hiding problems through suppressions, preventing gradual quality erosion and maintaining long-term codebase health.
 
 ## Rule Definition
 
-This rule applies to all TypeScript projects and establishes comprehensive automated code quality enforcement:
-
 **Zero-Suppression Policy:**
-- **Prohibited Suppressions**: No `eslint-disable`, `prettier-ignore`, or similar directives without documented architectural justification
-- **Root Cause Resolution**: Quality violations must be fixed through code improvement, rule configuration, or legitimate exceptions
-- **Visible Decision Making**: All configuration decisions and rare exceptions must be documented and reviewable
+- No `eslint-disable`, `prettier-ignore` without documented architectural justification
+- Fix violations through code improvement, rule configuration, or legitimate exceptions
+- All configuration decisions and exceptions must be documented
 
 **Automated Integration:**
-- **Pre-commit Enforcement**: Quality violations block commits at the git hook level
-- **Fast Feedback**: Quality checks complete within 10 seconds for typical changesets
-- **Automatic Remediation**: Formatting and fixable linting issues auto-correct during pre-commit
-- **CI Validation**: Comprehensive quality validation in continuous integration pipeline
+- Pre-commit enforcement blocks quality violations
+- Quality checks complete within 10 seconds
+- Auto-correct formatting and fixable linting issues
+- CI validation in continuous integration pipeline
 
 **Configuration Standards:**
-- **Workspace-Level Configuration**: Shared ESLint/Prettier configuration across monorepo packages
-- **TypeScript Integration**: Full TypeScript parser and rule integration for type-aware linting
-- **Security-First Rules**: ESLint security plugins enabled with strict enforcement
-- **Team Standards**: Consistent formatting and style rules across all projects
+- Shared ESLint/Prettier configuration across monorepo packages
+- TypeScript parser with type-aware linting
+- ESLint security plugins with strict enforcement
+- Consistent formatting and style rules
 
-## Practical Implementation
+## Implementation
 
-1. **Unified Configuration Setup**: Establish workspace-root configuration that all packages inherit:
-   ```typescript
-   // eslint.config.js - Modern flat config format
-   import typescript from '@typescript-eslint/eslint-plugin';
-   import typescriptParser from '@typescript-eslint/parser';
-   import security from 'eslint-plugin-security';
-   import prettier from 'eslint-plugin-prettier';
+### ESLint Configuration
+```typescript
+// eslint.config.js - Modern flat config
+import typescript from '@typescript-eslint/eslint-plugin';
+import typescriptParser from '@typescript-eslint/parser';
+import security from 'eslint-plugin-security';
 
-   export default [
-     {
-       files: ['**/*.{ts,tsx}'],
-       languageOptions: {
-         parser: typescriptParser,
-         parserOptions: {
-           ecmaVersion: 'latest',
-           sourceType: 'module',
-           project: './tsconfig.json'
-         }
-       },
-       plugins: {
-         '@typescript-eslint': typescript,
-         'security': security,
-         'prettier': prettier
-       },
-       rules: {
-         // Type safety (zero tolerance)
-         '@typescript-eslint/no-explicit-any': 'error',
-         '@typescript-eslint/no-unsafe-assignment': 'error',
-         '@typescript-eslint/no-unsafe-call': 'error',
-         '@typescript-eslint/strict-boolean-expressions': 'error',
+export default [{
+  files: ['**/*.{ts,tsx}'],
+  languageOptions: { parser: typescriptParser, parserOptions: { project: './tsconfig.json' } },
+  plugins: { '@typescript-eslint': typescript, 'security': security },
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-unsafe-assignment': 'error',
+    'security/detect-object-injection': 'error',
+    'no-console': 'error',
+    'prefer-const': 'error',
+    'prettier/prettier': 'error'
+  }
+}];
+```
 
-         // Security enforcement
-         'security/detect-object-injection': 'error',
-         'security/detect-eval-with-expression': 'error',
-         'security/detect-non-literal-regexp': 'error',
+### Prettier Configuration
+```json
+// .prettierrc
+{ "semi": true, "trailingComma": "es5", "singleQuote": true, "printWidth": 80, "tabWidth": 2 }
+```
 
-         // Code quality
-         'no-console': 'error',
-         'no-debugger': 'error',
-         'prefer-const': 'error',
-         'no-var': 'error',
+### Pre-commit Hooks
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: local
+    hooks:
+      - id: quality-check
+        name: 📊 Quality Check
+        entry: bash -c 'pnpm lint:fix && pnpm format && pnpm lint'
+        language: system
+        files: \.(ts|tsx)$
+        stages: [commit]
+```
 
-         // Prettier integration
-         'prettier/prettier': 'error'
-       }
-     }
-   ];
-   ```
+### Package Scripts & Dependencies
+```json
+{
+  "scripts": {
+    "lint": "eslint src/ --max-warnings=0",
+    "lint:fix": "eslint src/ --fix --max-warnings=0",
+    "format": "prettier --write src/"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0", "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "eslint-plugin-security": "^2.1.0", "prettier": "^3.2.0"
+  }
+}
+```
 
-2. **Prettier Configuration**: Standard formatting rules optimized for readability and consistency:
-   ```json
-   // .prettierrc
-   {
-     "semi": true,
-     "trailingComma": "es5",
-     "singleQuote": true,
-     "printWidth": 80,
-     "tabWidth": 2,
-     "useTabs": false,
-     "endOfLine": "lf",
-     "bracketSpacing": true,
-     "arrowParens": "avoid"
-   }
-   ```
+### CI Integration
+```yaml
+# .github/workflows/quality.yml
+name: Code Quality
+on: [push, pull_request]
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint && pnpm format:check
+```
 
-3. **Pre-commit Hook Integration**: Fast, comprehensive quality validation with auto-fixing:
-   ```yaml
-   # .pre-commit-config.yaml
-   repos:
-     - repo: local
-       hooks:
-         - id: eslint-fix
-           name: 🔧 ESLint - Auto-fix issues
-           entry: pnpm eslint --fix
-           language: system
-           files: \.(ts|tsx)$
-           stages: [commit]
+### IDE Setup
+```json
+// .vscode/settings.json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": { "source.fixAll.eslint": true }
+}
+```
 
-         - id: prettier-format
-           name: ✨ Prettier - Format code
-           entry: pnpm prettier --write
-           language: system
-           files: \.(ts|tsx|json|md)$
-           stages: [commit]
+## Zero-Suppression Policy
 
-         - id: eslint-check
-           name: 📊 ESLint - Validate quality
-           entry: pnpm eslint --max-warnings=0
-           language: system
-           files: \.(ts|tsx)$
-           stages: [commit]
-           pass_filenames: false
-   ```
-
-4. **Package.json Scripts**: Consistent commands across all projects with comprehensive validation:
-   ```json
-   {
-     "scripts": {
-       "lint": "eslint src/ --max-warnings=0",
-       "lint:fix": "eslint src/ --fix --max-warnings=0",
-       "format": "prettier --write src/",
-       "format:check": "prettier --check src/",
-       "quality:check": "pnpm run lint && pnpm run format:check",
-       "quality:fix": "pnpm run lint:fix && pnpm run format"
-     },
-     "devDependencies": {
-       "eslint": "^8.57.0",
-       "@typescript-eslint/eslint-plugin": "^7.0.0",
-       "@typescript-eslint/parser": "^7.0.0",
-       "eslint-plugin-security": "^2.1.0",
-       "eslint-plugin-prettier": "^5.1.0",
-       "prettier": "^3.2.0"
-     }
-   }
-   ```
-
-5. **CI Pipeline Integration**: Comprehensive quality validation with clear failure reporting:
-   ```yaml
-   # .github/workflows/quality.yml
-   name: Code Quality Validation
-
-   on: [push, pull_request]
-
-   jobs:
-     quality:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: actions/checkout@v4
-
-         - name: Setup pnpm
-           uses: pnpm/action-setup@v4
-           with:
-             version: 10
-
-         - name: Install dependencies
-           run: pnpm install --frozen-lockfile
-
-         - name: ESLint validation
-           run: pnpm lint
-
-         - name: Prettier validation
-           run: pnpm format:check
-
-         - name: Report quality metrics
-           run: |
-             echo "## Code Quality Report" >> $GITHUB_STEP_SUMMARY
-             echo "- ✅ ESLint: No violations detected" >> $GITHUB_STEP_SUMMARY
-             echo "- ✅ Prettier: All files properly formatted" >> $GITHUB_STEP_SUMMARY
-   ```
-
-6. **IDE Integration**: Consistent development experience with real-time feedback:
-   ```json
-   // .vscode/settings.json
-   {
-     "editor.formatOnSave": true,
-     "editor.defaultFormatter": "esbenp.prettier-vscode",
-     "editor.codeActionsOnSave": {
-       "source.fixAll.eslint": true
-     },
-     "eslint.validate": [
-       "typescript",
-       "typescriptreact"
-     ],
-     "typescript.preferences.quoteStyle": "single"
-   }
-   ```
-
-## Zero-Suppression Implementation
-
-The zero-suppression policy requires addressing quality violations through proper solutions rather than suppressions:
-
-**Approved Approaches for Quality Violations:**
-
-1. **Code Improvement**: Refactor code to eliminate the underlying issue
-   ```typescript
-   // ❌ SUPPRESSION APPROACH
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   const result: any = processData(input);
-
-   // ✅ IMPROVEMENT APPROACH
-   interface ProcessResult {
-     data: string[];
-     status: 'success' | 'error';
-   }
-   const result: ProcessResult = processData(input);
-   ```
-
-2. **Rule Configuration**: Adjust rules at the configuration level when appropriate
-   ```typescript
-   // eslint.config.js - Project-specific rule adjustment
-   export default [
-     {
-       rules: {
-         // Disable for test files where console.log is acceptable
-         'no-console': 'off'
-       },
-       files: ['**/*.test.ts', '**/*.spec.ts']
-     }
-   ];
-   ```
-
+**Approved Approaches:**
+1. **Code Improvement**: Refactor to eliminate underlying issues
+2. **Rule Configuration**: Adjust rules at configuration level for specific contexts
 3. **Architectural Exceptions**: Document rare cases requiring suppressions
-   ```typescript
-   // Only for integration with external libraries that require any types
-   // Approved in ADR-2024-03: Legacy API integration requirements
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   const legacyResult = externalLibrary.process(data as any);
-   ```
 
-**Forbidden Suppression Patterns:**
-- Inline `eslint-disable` comments without architectural documentation
-- File-level `prettier-ignore` for convenience
-- Global rule disabling to avoid refactoring effort
+```typescript
+// ❌ SUPPRESSION: eslint-disable-next-line @typescript-eslint/no-explicit-any
+const result: any = processData(input);
+
+// ✅ IMPROVEMENT: Proper typing
+interface ProcessResult { data: string[]; status: 'success' | 'error'; }
+const result: ProcessResult = processData(input);
+
+// ✅ CONFIGURATION: Test-specific rules
+// eslint.config.js
+export default [{ files: ['**/*.test.ts'], rules: { 'no-console': 'off' } }];
+
+// ✅ DOCUMENTED EXCEPTION: Legacy integration only
+// Approved in ADR-2024-03: Legacy API integration requirements
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const legacyResult = externalLibrary.process(data as any);
+```
+
+**Forbidden Patterns:**
+- Inline suppressions without documentation
+- File-level ignores for convenience
+- Global rule disabling to avoid refactoring
 - Temporary suppressions that become permanent
 
 ## Examples
 
 ```typescript
-// ❌ BAD: Suppression to avoid fixing code quality issues
+// ❌ BAD: Suppressions and poor typing
 function processUser(data: any) {
   // eslint-disable-next-line no-console
   console.log('Processing user');
-
   // prettier-ignore
   const result = { id: data.id,name: data.name,email: data.email };
-
   return result;
 }
 
 // ✅ GOOD: Proper types and structured logging
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-}
-
+interface UserData { id: string; name: string; email: string; }
 function processUser(data: UserData): UserData {
   logger.info('Processing user', { userId: data.id });
-
-  const result: UserData = {
-    id: data.id,
-    name: data.name,
-    email: data.email,
-  };
-
-  return result;
+  return { id: data.id, name: data.name, email: data.email };
 }
-```
-
-```typescript
-// ❌ BAD: Configuration that allows quality violations
-// eslint.config.js
-export default [
-  {
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'warn', // Allows any types
-      'no-console': 'off', // Disables console checking globally
-      'prettier/prettier': 'warn' // Makes formatting optional
-    }
-  }
-];
-
-// ✅ GOOD: Strict configuration with appropriate exceptions
-// eslint.config.js
-export default [
-  {
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'error',
-      'no-console': 'error',
-      'prettier/prettier': 'error'
-    }
-  },
-  {
-    // Specific exceptions for test files only
-    files: ['**/*.test.ts'],
-    rules: {
-      'no-console': 'off' // Tests may use console for debugging
-    }
-  }
-];
 ```
 
 ```bash
-# ❌ BAD: Development workflow that bypasses quality checks
-git add .
-git commit -m "quick fix" --no-verify
-git push
+# ❌ BAD: Bypass quality checks
+git commit --no-verify
 
-# ✅ GOOD: Quality-enforced development workflow
-pnpm quality:fix  # Auto-fix formatting and linting
-git add .
-git commit -m "fix: resolve user authentication issue"
-# Pre-commit hooks automatically validate quality
-git push
+# ✅ GOOD: Quality-enforced workflow
+pnpm quality:fix && git add . && git commit -m "fix: resolve issue"
 ```
 
-## Performance Optimization
+## Performance & Related Bindings
 
-Ensure quality checks don't impede development velocity:
+**Performance Optimization:**
+- Use TypeScript project references for faster parsing
+- Focus on high-impact rules, disable expensive low-value rules
+- Run ESLint only on changed files during pre-commit
 
 ```typescript
-// eslint.config.js - Performance optimization
-export default [
-  {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      parserOptions: {
-        // Use TypeScript project references for faster parsing
-        project: true,
-        tsconfigRootDir: import.meta.dirname,
-      }
-    },
-    rules: {
-      // Focus on high-impact rules that prevent real issues
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
-
-      // Disable expensive rules that provide minimal value
-      '@typescript-eslint/prefer-readonly-parameter-types': 'off'
-    }
+// eslint.config.js - Performance config
+export default [{
+  languageOptions: { parserOptions: { project: true } },
+  rules: {
+    '@typescript-eslint/no-floating-promises': 'error',
+    '@typescript-eslint/prefer-readonly-parameter-types': 'off' // Disable expensive rule
   }
-];
+}];
 ```
 
-```yaml
-# .pre-commit-config.yaml - Fast execution configuration
-repos:
-  - repo: local
-    hooks:
-      - id: eslint-changed
-        name: 📊 ESLint - Changed files only
-        entry: bash -c 'git diff --cached --name-only --diff-filter=ACM | grep -E "\.(ts|tsx)$" | xargs eslint --max-warnings=0'
-        language: system
-        stages: [commit]
-        pass_filenames: false
-```
-
-## Related Bindings
-
-- [git-hooks-automation.md](../../core/git-hooks-automation.md): This binding extends git hooks automation by implementing ESLint/Prettier as essential quality gates. Both bindings work together to create comprehensive pre-commit validation that catches issues before they reach the repository.
-
-- [no-lint-suppression.md](../../core/no-lint-suppression.md): The zero-suppression policy directly implements the no-lint-suppression binding's principles by requiring documented justification for any quality check bypasses and encouraging root cause resolution over suppression.
-
-- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This binding implements the code quality component of the unified TypeScript toolchain, providing the ESLint/Prettier automation that complements Vitest testing, tsup building, and pnpm package management.
-
-- [automated-quality-gates.md](../../core/automated-quality-gates.md): ESLint/Prettier automation serves as a foundational quality gate that prevents style and basic correctness issues from entering the development pipeline, supporting the tiered enforcement strategy with fast feedback and automatic remediation.
+**Related:** git-hooks-automation (pre-commit gates), no-lint-suppression (zero-suppression policy), modern-typescript-toolchain (unified toolchain), automated-quality-gates (quality gate strategy)

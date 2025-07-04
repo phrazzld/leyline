@@ -43,8 +43,8 @@ module Leyline
         File.delete(temp_file) if File.exist?(temp_file)
 
         Cache::CacheErrorHandler.handle_error(e, 'save_sync_state', {
-          state_file: @state_file_path
-        })
+                                                state_file: @state_file_path
+                                              })
         false
       end
     end
@@ -64,8 +64,8 @@ module Leyline
         state
       rescue StandardError => e
         Cache::CacheErrorHandler.handle_error(e, 'load_sync_state', {
-          state_file: @state_file_path
-        })
+                                                state_file: @state_file_path
+                                              })
         nil
       end
     end
@@ -85,8 +85,8 @@ module Leyline
         true
       rescue StandardError => e
         Cache::CacheErrorHandler.handle_error(e, 'clear_sync_state', {
-          state_file: @state_file_path
-        })
+                                                state_file: @state_file_path
+                                              })
         false
       end
     end
@@ -107,9 +107,7 @@ module Leyline
     end
 
     # Get state file path (useful for debugging)
-    def state_file_path
-      @state_file_path
-    end
+    attr_reader :state_file_path
 
     # Compare current files against sync state manifest
     # Returns comparison data or nil if no valid state
@@ -135,9 +133,9 @@ module Leyline
     private
 
     def validate_metadata!(metadata)
-      raise SyncStateError, "Metadata cannot be nil" if metadata.nil?
-      raise SyncStateError, "Categories must be an array" unless metadata[:categories].is_a?(Array)
-      raise SyncStateError, "Manifest must be a hash" unless metadata[:manifest].is_a?(Hash)
+      raise SyncStateError, 'Metadata cannot be nil' if metadata.nil?
+      raise SyncStateError, 'Categories must be an array' unless metadata[:categories].is_a?(Array)
+      raise SyncStateError, 'Manifest must be a hash' unless metadata[:manifest].is_a?(Hash)
 
       # Validate manifest values are strings (SHA256 hashes)
       metadata[:manifest].each do |file, hash|
@@ -170,16 +168,16 @@ module Leyline
     end
 
     def validate_state_structure!(state)
-      raise SyncStateError, "Invalid state structure" unless state.is_a?(Hash)
-      raise SyncStateError, "Missing version" unless state['version']
-      raise SyncStateError, "Missing timestamp" unless state['timestamp']
-      raise SyncStateError, "Missing categories" unless state['categories'].is_a?(Array)
-      raise SyncStateError, "Missing manifest" unless state['manifest'].is_a?(Hash)
+      raise SyncStateError, 'Invalid state structure' unless state.is_a?(Hash)
+      raise SyncStateError, 'Missing version' unless state['version']
+      raise SyncStateError, 'Missing timestamp' unless state['timestamp']
+      raise SyncStateError, 'Missing categories' unless state['categories'].is_a?(Array)
+      raise SyncStateError, 'Missing manifest' unless state['manifest'].is_a?(Hash)
 
       # Validate schema version compatibility
-      if state['version'] > SCHEMA_VERSION
-        raise SyncStateError, "Incompatible state version #{state['version']} (expected <= #{SCHEMA_VERSION})"
-      end
+      return unless state['version'] > SCHEMA_VERSION
+
+      raise SyncStateError, "Incompatible state version #{state['version']} (expected <= #{SCHEMA_VERSION})"
     end
 
     def ensure_cache_directory
@@ -189,8 +187,8 @@ module Leyline
         FileUtils.mkdir_p(@cache_dir)
       rescue StandardError => e
         Cache::CacheErrorHandler.handle_error(e, 'ensure_cache_directory', {
-          cache_dir: @cache_dir
-        })
+                                                cache_dir: @cache_dir
+                                              })
         raise SyncStateError, "Failed to create cache directory: #{e.message}"
       end
     end
@@ -200,9 +198,7 @@ module Leyline
 
       base_manifest.each do |file_path, base_hash|
         current_hash = current_manifest[file_path]
-        if current_hash && current_hash != base_hash
-          modified << file_path
-        end
+        modified << file_path if current_hash && current_hash != base_hash
       end
 
       modified
@@ -213,9 +209,7 @@ module Leyline
 
       base_manifest.each do |file_path, base_hash|
         current_hash = current_manifest[file_path]
-        if current_hash && current_hash == base_hash
-          unchanged << file_path
-        end
+        unchanged << file_path if current_hash && current_hash == base_hash
       end
 
       unchanged

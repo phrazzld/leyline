@@ -29,10 +29,7 @@ class YAMLLineTracker
       result[:data] = Psych.safe_load(front_matter_text, permitted_classes: [Date, Time])
 
       # Build line mapping for successful parse
-      if result[:data].is_a?(Hash)
-        result[:line_map] = build_line_map(front_matter_text, result[:data])
-      end
-
+      result[:line_map] = build_line_map(front_matter_text, result[:data]) if result[:data].is_a?(Hash)
     rescue Psych::SyntaxError => e
       # Capture syntax error with line/column information
       result[:errors] << {
@@ -42,21 +39,19 @@ class YAMLLineTracker
         message: "YAML syntax error: #{e.message}",
         suggestion: "Check YAML syntax around line #{e.line}. Common issues: unquoted colons, incorrect indentation, missing quotes around strings with special characters."
       }
-    rescue => e
+    rescue StandardError => e
       # Catch any other parsing errors
       result[:errors] << {
         type: 'yaml_parse',
         line: nil,
         column: nil,
         message: "YAML parsing failed: #{e.message}",
-        suggestion: "Ensure the content is valid YAML format between --- delimiters."
+        suggestion: 'Ensure the content is valid YAML format between --- delimiters.'
       }
     end
 
     result
   end
-
-  private
 
   # Build a mapping of top-level YAML keys to their line numbers
   #
@@ -71,18 +66,16 @@ class YAMLLineTracker
 
     # Scan each line to find top-level keys
     lines.each_with_index do |line, index|
-      line_number = index + 1  # Line numbers are 1-based
+      line_number = index + 1 # Line numbers are 1-based
 
       # Look for top-level key patterns (key: value or key:)
       # Must be at start of line (no indentation for top-level keys)
-      if line =~ /^([a-zA-Z_][a-zA-Z0-9_-]*)\s*:/
-        key_name = $1
+      next unless line =~ /^([a-zA-Z_][a-zA-Z0-9_-]*)\s*:/
 
-        # Only map keys that exist in the parsed data
-        if parsed_data.key?(key_name)
-          line_map[key_name] = line_number
-        end
-      end
+      key_name = ::Regexp.last_match(1)
+
+      # Only map keys that exist in the parsed data
+      line_map[key_name] = line_number if parsed_data.key?(key_name)
     end
 
     line_map

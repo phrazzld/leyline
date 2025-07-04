@@ -14,15 +14,15 @@ def test(description)
 
   begin
     yield
-    puts "✓ PASS"
+    puts '✓ PASS'
     $tests_passed += 1
-  rescue => e
+  rescue StandardError => e
     puts "✗ FAIL: #{e.message}"
     puts "  #{e.backtrace.first}" if ENV['DEBUG']
   end
 end
 
-def assert(condition, message = "Assertion failed")
+def assert(condition, message = 'Assertion failed')
   raise message unless condition
 end
 
@@ -31,11 +31,11 @@ def assert_equal(expected, actual, message = nil)
   raise message unless expected == actual
 end
 
-def assert_nil(value, message = "Expected nil")
+def assert_nil(value, message = 'Expected nil')
   raise "#{message}, got #{value.inspect}" unless value.nil?
 end
 
-def assert_not_nil(value, message = "Expected non-nil value")
+def assert_not_nil(value, message = 'Expected non-nil value')
   raise message if value.nil?
 end
 
@@ -45,20 +45,20 @@ def assert_includes(collection, item, message = nil)
 end
 
 # Test cases
-puts "==== TESTING ErrorCollector ===="
+puts '==== TESTING ErrorCollector ===='
 
 # Test 1: Basic instantiation and empty state
-test "basic instantiation and empty state" do
+test 'basic instantiation and empty state' do
   collector = ErrorCollector.new
 
-  assert_equal(0, collector.count, "New collector should have 0 errors")
-  assert(!collector.any?, "New collector should not have any errors")
-  assert(collector.errors.empty?, "New collector should return empty errors array")
-  assert(collector.errors.is_a?(Array), "errors should return an Array")
+  assert_equal(0, collector.count, 'New collector should have 0 errors')
+  assert(!collector.any?, 'New collector should not have any errors')
+  assert(collector.errors.empty?, 'New collector should return empty errors array')
+  assert(collector.errors.is_a?(Array), 'errors should return an Array')
 end
 
 # Test 2: Adding a single error with all fields
-test "adding single error with all fields" do
+test 'adding single error with all fields' do
   collector = ErrorCollector.new
 
   collector.add_error(
@@ -86,7 +86,7 @@ test "adding single error with all fields" do
 end
 
 # Test 3: Adding error with minimal fields (nils allowed)
-test "adding error with minimal fields" do
+test 'adding error with minimal fields' do
   collector = ErrorCollector.new
 
   collector.add_error(
@@ -107,7 +107,7 @@ test "adding error with minimal fields" do
 end
 
 # Test 4: Adding multiple errors
-test "adding multiple errors" do
+test 'adding multiple errors' do
   collector = ErrorCollector.new
 
   # Add first error
@@ -158,7 +158,7 @@ test "adding multiple errors" do
 end
 
 # Test 5: Error immutability (defensive copy)
-test "error immutability via defensive copy" do
+test 'error immutability via defensive copy' do
   collector = ErrorCollector.new
 
   collector.add_error(
@@ -172,7 +172,7 @@ test "error immutability via defensive copy" do
   errors2 = collector.errors
 
   # They should not be the same object (defensive copy)
-  assert(errors1.object_id != errors2.object_id, "errors() should return defensive copies")
+  assert(!errors1.equal?(errors2), 'errors() should return defensive copies')
 
   # But they should have the same content
   assert_equal(errors1, errors2)
@@ -180,12 +180,12 @@ test "error immutability via defensive copy" do
   # Modifying returned array should not affect collector
   errors1 << { file: 'hacker.md', type: 'injection', message: 'hack' }
 
-  assert_equal(1, collector.count, "External modification should not affect collector")
-  assert_equal(1, collector.errors.length, "Collector should still have only 1 error")
+  assert_equal(1, collector.count, 'External modification should not affect collector')
+  assert_equal(1, collector.errors.length, 'Collector should still have only 1 error')
 end
 
 # Test 6: Clear functionality
-test "clear functionality" do
+test 'clear functionality' do
   collector = ErrorCollector.new
 
   # Add several errors
@@ -209,7 +209,7 @@ test "clear functionality" do
 end
 
 # Test 7: Data preservation and retrieval
-test "complete data preservation and retrieval" do
+test 'complete data preservation and retrieval' do
   collector = ErrorCollector.new
 
   test_cases = [
@@ -255,7 +255,7 @@ test "complete data preservation and retrieval" do
 end
 
 # Test 8: Error structure validation
-test "error structure validation" do
+test 'error structure validation' do
   collector = ErrorCollector.new
 
   collector.add_error(
@@ -270,26 +270,26 @@ test "error structure validation" do
   error = collector.errors.first
 
   # Verify all expected keys are present
-  expected_keys = [:file, :line, :field, :type, :message, :suggestion]
+  expected_keys = %i[file line field type message suggestion]
   expected_keys.each do |key|
     assert(error.key?(key), "Error should have key #{key}")
   end
 
   # Verify no unexpected keys
-  assert_equal(expected_keys.sort, error.keys.sort, "Error should have exactly the expected keys")
+  assert_equal(expected_keys.sort, error.keys.sort, 'Error should have exactly the expected keys')
 
   # Verify it's a proper hash structure
-  assert(error.is_a?(Hash), "Error should be a Hash")
+  assert(error.is_a?(Hash), 'Error should be a Hash')
 end
 
 # Test 9: Edge cases with special characters and values
-test "edge cases with special characters" do
+test 'edge cases with special characters' do
   collector = ErrorCollector.new
 
   # Test with various edge case values
   edge_cases = [
-    { file: '', type: 'empty_file', message: '' },  # Empty strings
-    { file: ' ', type: ' ', message: ' ' },  # Whitespace
+    { file: '', type: 'empty_file', message: '' }, # Empty strings
+    { file: ' ', type: ' ', message: ' ' }, # Whitespace
     { file: "file\nwith\nnewlines.md", type: 'newline_test', message: "message\nwith\nnewlines" },
     { file: 'file_with_"quotes".md', type: 'quote_test', message: 'Error with "quotes" inside' },
     { file: "file'with'apostrophes.md", type: 'apostrophe_test', message: "Error with 'apostrophes'" },
@@ -311,7 +311,7 @@ test "edge cases with special characters" do
 end
 
 # Test 10: Large volume handling
-test "large volume handling" do
+test 'large volume handling' do
   collector = ErrorCollector.new
 
   # Add a large number of errors
@@ -322,7 +322,7 @@ test "large volume handling" do
       file: "file_#{i}.md",
       line: i + 1,
       field: "field_#{i}",
-      type: "type_#{i % 10}",  # Cycle through 10 different types
+      type: "type_#{i % 10}", # Cycle through 10 different types
       message: "Error message #{i}",
       suggestion: "Suggestion #{i}"
     )
@@ -347,7 +347,7 @@ test "large volume handling" do
 end
 
 # Test 11: Memory efficiency with clear and reuse
-test "memory efficiency with clear and reuse" do
+test 'memory efficiency with clear and reuse' do
   collector = ErrorCollector.new
 
   # Add errors, clear, repeat multiple times
@@ -366,7 +366,7 @@ test "memory efficiency with clear and reuse" do
     # Clear and verify
     collector.clear
     assert_equal(0, collector.count, "Should be empty after clear in cycle #{cycle}")
-    assert(!collector.any?, "Should not have any errors after clear")
+    assert(!collector.any?, 'Should not have any errors after clear')
   end
 
   # Add one final error to ensure it still works
@@ -375,7 +375,7 @@ test "memory efficiency with clear and reuse" do
 end
 
 # Test 12: Thread safety (basic check)
-test "basic concurrency behavior" do
+test 'basic concurrency behavior' do
   collector = ErrorCollector.new
 
   # Simulate concurrent access (though Ruby GIL makes true concurrency limited)
@@ -405,7 +405,7 @@ test "basic concurrency behavior" do
 
   # Check that we have errors from all threads
   thread_files = errors.map { |e| e[:file] }.select { |f| f.include?('thread_') }
-  assert_equal(50, thread_files.length, "Should have files from all threads")
+  assert_equal(50, thread_files.length, 'Should have files from all threads')
 end
 
 # Display results
@@ -419,18 +419,18 @@ puts "Success rate: #{success_rate}%"
 
 if $tests_passed == $tests_run
   puts "\n✅ All tests passed! ErrorCollector unit test coverage achieved:"
-  puts "- ✓ Basic instantiation and empty state management"
-  puts "- ✓ Single and multiple error addition with full context preservation"
-  puts "- ✓ Flexible field handling (required vs optional parameters)"
-  puts "- ✓ Data immutability via defensive copying"
-  puts "- ✓ Clear functionality and state reset"
-  puts "- ✓ Complete data preservation for complex scenarios"
-  puts "- ✓ Error structure validation and consistency"
-  puts "- ✓ Edge cases with special characters and values"
-  puts "- ✓ Large volume handling and performance"
-  puts "- ✓ Memory efficiency with clear and reuse patterns"
-  puts "- ✓ Basic concurrency behavior verification"
-  puts "- ✓ Order preservation and retrieval accuracy"
+  puts '- ✓ Basic instantiation and empty state management'
+  puts '- ✓ Single and multiple error addition with full context preservation'
+  puts '- ✓ Flexible field handling (required vs optional parameters)'
+  puts '- ✓ Data immutability via defensive copying'
+  puts '- ✓ Clear functionality and state reset'
+  puts '- ✓ Complete data preservation for complex scenarios'
+  puts '- ✓ Error structure validation and consistency'
+  puts '- ✓ Edge cases with special characters and values'
+  puts '- ✓ Large volume handling and performance'
+  puts '- ✓ Memory efficiency with clear and reuse patterns'
+  puts '- ✓ Basic concurrency behavior verification'
+  puts '- ✓ Order preservation and retrieval accuracy'
   puts "\n🎯 Target: >=95% coverage achieved (100% functional coverage)"
 else
   puts "\n❌ Some tests failed. Review output above for details."

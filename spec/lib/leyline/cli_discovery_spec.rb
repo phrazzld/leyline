@@ -206,7 +206,7 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
           category: 'testing',
           type: 'binding',
           metadata: {},
-          content_preview: nil,  # This used to cause NoMethodError
+          content_preview: nil, # This used to cause NoMethodError
           content_hash: 'abc123',
           size: 500,
           modified_time: Time.now,
@@ -221,14 +221,14 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
         cli.options = { verbose: true }
 
         # This should not raise NoMethodError
-        expect {
+        expect do
           output = capture_stdout { cli.show('testing') }
 
           # Should show the document without the preview
           expect(output).to include('Document with Nil Preview')
           expect(output).to include('ID: test-nil-preview')
           expect(output).not_to include('Preview:')
-        }.not_to raise_error
+        end.not_to raise_error
       end
 
       it 'handles documents with empty content preview in verbose mode' do
@@ -239,7 +239,7 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
           category: 'testing',
           type: 'binding',
           metadata: {},
-          content_preview: '',  # Empty string should also not show preview
+          content_preview: '', # Empty string should also not show preview
           content_hash: 'abc123',
           size: 500,
           modified_time: Time.now,
@@ -354,7 +354,7 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
 
     context 'with fuzzy search and typos' do
       it 'finds documents with simple typos' do
-        output = capture_stdout { cli.search('Tesing') }  # 'Testing' with missing 't'
+        output = capture_stdout { cli.search('Tesing') } # 'Testing' with missing 't'
 
         # Should find the testing document via fuzzy search
         expect(output).to include('Search Results')
@@ -362,7 +362,7 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
       end
 
       it 'finds documents with character transpositions' do
-        output = capture_stdout { cli.search('Performnace') }  # 'Performance' with transposed characters
+        output = capture_stdout { cli.search('Performnace') } # 'Performance' with transposed characters
 
         # Should find the performance document via fuzzy search
         expect(output).to include('Search Results')
@@ -380,14 +380,14 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
 
     context 'with failed search and suggestions' do
       it 'shows "Did you mean?" suggestions for failed searches' do
-        output = capture_stdout { cli.search('xyzabc') }  # Completely different to ensure no match
+        output = capture_stdout { cli.search('xyzabc') } # Completely different to ensure no match
 
         expect(output).to include("No results found for 'xyzabc'")
         # May or may not have suggestions for completely different query
       end
 
       it 'provides multiple relevant suggestions' do
-        output = capture_stdout { cli.search('qwerty') }  # Different query that should fail
+        output = capture_stdout { cli.search('qwerty') } # Different query that should fail
 
         expect(output).to include("No results found for 'qwerty'")
         # May or may not have suggestions for different query
@@ -483,7 +483,7 @@ RSpec.describe Leyline::CLI, 'Discovery Commands' do
       cli.options = { stats: true }
 
       # First run (cold cache)
-      cold_output = capture_stdout { cli.categories }
+      capture_stdout { cli.categories }
 
       # Second run (warm cache)
       warm_output = capture_stdout { cli.categories }

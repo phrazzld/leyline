@@ -17,26 +17,26 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
     # Test all original usage patterns that existed before discovery commands
     let(:original_sync_patterns) do
       [
-        [],                                      # Default sync
+        [], # Default sync
         ['.'],                                  # Sync current directory
         ['--categories', 'core'],               # Category filtering
-        ['--categories', 'typescript,go'],     # Multiple categories
+        ['--categories', 'typescript,go'], # Multiple categories
         ['--force'],                            # Force overwrite
         ['--verbose'],                          # Verbose output
         ['--dry-run'],                          # Dry run mode
-        ['--force', '--verbose'],              # Combined flags
-        ['--categories', 'typescript', '--force', '--verbose'],  # Full combination
-        [temp_project_dir],                     # Custom path
-        [temp_project_dir, '--categories', 'core'],  # Path with options
-        [temp_project_dir, '--categories', 'typescript', '--force', '--verbose']  # Full path combination
+        ['--force', '--verbose'], # Combined flags
+        ['--categories', 'typescript', '--force', '--verbose'], # Full combination
+        [temp_project_dir], # Custom path
+        [temp_project_dir, '--categories', 'core'], # Path with options
+        [temp_project_dir, '--categories', 'typescript', '--force', '--verbose'] # Full path combination
       ]
     end
 
     it 'executes all original sync patterns without breaking' do
       original_sync_patterns.each do |args|
-        expect {
+        expect do
           capture_stdout_and_exit { described_class.start(['sync'] + args) }
-        }.not_to raise_error, "Pattern 'leyline sync #{args.join(' ')}' should not break"
+        end.not_to raise_error, "Pattern 'leyline sync #{args.join(' ')}' should not break"
       end
     end
 
@@ -57,11 +57,20 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
       }
 
       original_aliases.each do |short_flag, long_flag|
-        short_output = capture_stdout { cli.options = { categories: ['core'] }; cli.sync if short_flag == '-c' }
-        long_output = capture_stdout { cli.options = { categories: ['core'] }; cli.sync if long_flag == '--categories' }
+        capture_stdout do
+          cli.options = { categories: ['core'] }
+          cli.sync if short_flag == '-c'
+        end
+        capture_stdout do
+          cli.options = { categories: ['core'] }
+          cli.sync if long_flag == '--categories'
+        end
 
         # Both should work (specific behavior tested elsewhere)
-        expect { cli.options = {}; cli.sync }.not_to raise_error
+        expect do
+          cli.options = {}
+          cli.sync
+        end.not_to raise_error
       end
     end
   end
@@ -211,7 +220,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
   describe 'Discovery Commands Non-Interference' do
     it 'ensures discovery commands do not affect sync behavior' do
       # Capture baseline sync behavior
-      baseline_output = capture_stdout { cli.sync }
+      capture_stdout { cli.sync }
 
       # Run discovery commands
       capture_stdout { cli.categories }
@@ -230,7 +239,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
       help_output = capture_stdout { described_class.start(['help']) }
 
       # All commands should be listed
-      expected_commands = ['categories', 'help', 'search', 'show', 'sync', 'version']
+      expected_commands = %w[categories help search show sync version]
       expected_commands.each do |command|
         expect(help_output).to include(command)
       end
@@ -240,7 +249,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
   describe 'Performance Flag Isolation' do
     it 'ensures performance flags do not change functional behavior' do
       # Baseline sync without performance flags
-      baseline_output = capture_stdout { cli.sync }
+      capture_stdout { cli.sync }
 
       # Sync with stats flag should include baseline output plus stats
       cli.options = { stats: true }
@@ -287,7 +296,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
   describe 'Cross-Platform Compatibility' do
     it 'handles path separators consistently' do
       # Test with different path styles (will be normalized internally)
-      windows_style = temp_project_dir.gsub('/', '\\') if temp_project_dir.include?('/')
+      temp_project_dir.gsub('/', '\\') if temp_project_dir.include?('/')
       unix_style = temp_project_dir
 
       expect { cli.sync(unix_style) }.not_to raise_error
@@ -353,7 +362,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
   describe 'Integration Pattern Validation' do
     it 'supports CI/CD pipeline patterns' do
       # Common CI pattern: set -e (exit on error)
-      ENV['SET_E_SIMULATION'] = 'true'  # Simulate set -e behavior
+      ENV['SET_E_SIMULATION'] = 'true' # Simulate set -e behavior
 
       begin
         # Should not raise exceptions that would break CI scripts

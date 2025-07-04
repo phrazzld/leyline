@@ -16,21 +16,21 @@ $options = {
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: generate_submodule_config.rb [options]"
+  opts.banner = 'Usage: generate_submodule_config.rb [options]'
 
-  opts.on("--from DIR", "Directory containing copied standards") do |dir|
+  opts.on('--from DIR', 'Directory containing copied standards') do |dir|
     $options[:from_directory] = dir
   end
 
-  opts.on("-o", "--output FILE", "Output submodule config file path") do |file|
+  opts.on('-o', '--output FILE', 'Output submodule config file path') do |file|
     $options[:output_file] = file
   end
 
-  opts.on("--verbose", "Verbose output") do
+  opts.on('--verbose', 'Verbose output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -75,7 +75,7 @@ def analyze_standards_directory(standards_dir)
 
     if Dir.exist?(core_dir)
       analysis['binding_categories'] << 'core'
-      log_verbose("Found core bindings")
+      log_verbose('Found core bindings')
     end
 
     if Dir.exist?(categories_dir)
@@ -87,7 +87,7 @@ def analyze_standards_directory(standards_dir)
       binding_files = Dir.glob("#{bindings_dir}/*.md")
       if binding_files.any?
         analysis['binding_categories'] << 'core'
-        log_verbose("Found flat binding structure, assuming core category")
+        log_verbose('Found flat binding structure, assuming core category')
       end
     end
   end
@@ -189,15 +189,13 @@ def main
   log_info("Submodule configuration written to #{$options[:output_file]}")
 
   # Provide next steps
-  puts ""
-  puts "Next steps to complete migration from direct copy to git submodule:"
-  puts "1. Add Leyline as a submodule: git submodule add https://github.com/phrazzld/leyline.git leyline"
-  puts "2. Initialize submodule: git submodule update --init --recursive"
-  puts "3. Copy validation workflow: cp leyline/examples/consumer-git-submodule/.github/workflows/leyline-validation.yml .github/workflows/"
+  puts ''
+  puts 'Next steps to complete migration from direct copy to git submodule:'
+  puts '1. Add Leyline as a submodule: git submodule add https://github.com/phrazzld/leyline.git leyline'
+  puts '2. Initialize submodule: git submodule update --init --recursive'
+  puts '3. Copy validation workflow: cp leyline/examples/consumer-git-submodule/.github/workflows/leyline-validation.yml .github/workflows/'
   puts "4. Remove copied standards: rm -rf #{standards_dir}"
-  puts "5. Test submodule integration with: ruby leyline/tools/validate_front_matter.rb"
+  puts '5. Test submodule integration with: ruby leyline/tools/validate_front_matter.rb'
 end
 
-if __FILE__ == $0
-  main
-end
+main if __FILE__ == $0

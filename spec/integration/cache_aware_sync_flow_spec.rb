@@ -155,12 +155,12 @@ RSpec.describe 'Cache-aware sync flow integration', type: :integration do
     CONTENT
   end
 
-  def capture_stdout_and_measure_time
+  def capture_stdout_and_measure_time(&block)
     original_stdout = $stdout
     captured_output = StringIO.new
     $stdout = captured_output
 
-    time_taken = Benchmark.realtime { yield }
+    time_taken = Benchmark.realtime(&block)
 
     [captured_output.string, time_taken]
   ensure
@@ -169,7 +169,7 @@ RSpec.describe 'Cache-aware sync flow integration', type: :integration do
 
   def mock_git_client_to_use_local_repo
     # Mock git client to use our local test repository instead of fetching from remote
-    allow_any_instance_of(Leyline::Sync::GitClient).to receive(:fetch_version) do |instance, remote_url, branch|
+    allow_any_instance_of(Leyline::Sync::GitClient).to receive(:fetch_version) do |instance, _remote_url, _branch|
       # Copy content from our test repo to the git client's working directory
       working_dir = instance.instance_variable_get(:@working_directory)
       if working_dir && Dir.exist?(working_dir)
@@ -197,7 +197,8 @@ RSpec.describe 'Cache-aware sync flow integration', type: :integration do
 
       # Verify files were copied
       expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'tenets', 'simplicity.md'))).to be true
-      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'core', 'automated-quality-gates.md'))).to be true
+      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'core',
+                                   'automated-quality-gates.md'))).to be true
 
       # Test warm cache (second sync)
       warm_output, warm_time = capture_stdout_and_measure_time do
@@ -223,14 +224,12 @@ RSpec.describe 'Cache-aware sync flow integration', type: :integration do
       cache_indicators = [
         'serving from cache',
         'cache hit ratio',
-        'skipped',
+        'skipped'
       ]
 
       has_cache_indicator = cache_indicators.any? { |indicator| second_sync_output.include?(indicator) }
 
-      unless has_cache_indicator
-        puts "Expected cache usage indicators in output, but got: #{warm_output}"
-      end
+      puts "Expected cache usage indicators in output, but got: #{warm_output}" unless has_cache_indicator
 
       expect(has_cache_indicator).to be true
     end
@@ -286,19 +285,23 @@ RSpec.describe 'Cache-aware sync flow integration', type: :integration do
 
       puts "Output1: #{output1}" if output1.empty?
       # Don't require specific output format, just verify files are created
-      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'typescript', 'modern-typescript-toolchain.md'))).to be true
+      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'typescript',
+                                   'modern-typescript-toolchain.md'))).to be true
 
       # Second sync with typescript + go categories (partial cache)
       output2, _time2 = capture_stdout_and_measure_time do
-        cli.invoke(:sync, [target_dir], { categories: ['typescript', 'go'], verbose: true })
+        cli.invoke(:sync, [target_dir], { categories: %w[typescript go], verbose: true })
       end
 
       puts "Output2: #{output2}" if output2.empty?
-      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'go', 'error-wrapping.md'))).to be true
+      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'go',
+                                   'error-wrapping.md'))).to be true
 
       # Verify both category files exist
-      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'typescript', 'modern-typescript-toolchain.md'))).to be true
-      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'go', 'error-wrapping.md'))).to be true
+      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'typescript',
+                                   'modern-typescript-toolchain.md'))).to be true
+      expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'bindings', 'categories', 'go',
+                                   'error-wrapping.md'))).to be true
     end
   end
 
@@ -367,7 +370,7 @@ RSpec.describe 'Cache-aware sync flow integration', type: :integration do
 
       # Simulate cache corruption by making cache directory read-only
       cache_content_dir = File.join(cache_dir, 'content')
-      File.chmod(0444, cache_content_dir) if Dir.exist?(cache_content_dir)
+      File.chmod(0o444, cache_content_dir) if Dir.exist?(cache_content_dir)
 
       begin
         # Second sync should still succeed despite cache issues
@@ -381,7 +384,7 @@ RSpec.describe 'Cache-aware sync flow integration', type: :integration do
         expect(File.exist?(File.join(target_dir, 'docs', 'leyline', 'tenets', 'simplicity.md'))).to be true
       ensure
         # Restore permissions for cleanup
-        File.chmod(0755, cache_content_dir) if Dir.exist?(cache_content_dir)
+        File.chmod(0o755, cache_content_dir) if Dir.exist?(cache_content_dir)
       end
     end
   end

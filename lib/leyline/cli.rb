@@ -37,13 +37,13 @@ module Leyline
     def version
       puts VERSION
 
-      if options[:verbose]
-        puts "\nSystem Information:"
-        puts "  Ruby version: #{RUBY_VERSION}"
-        puts "  Platform: #{RUBY_PLATFORM}"
-        puts "  Cache directory: #{ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')}"
-        puts "  Git available: #{system('which git > /dev/null 2>&1') ? 'Yes' : 'No'}"
-      end
+      return unless options[:verbose]
+
+      puts "\nSystem Information:"
+      puts "  Ruby version: #{RUBY_VERSION}"
+      puts "  Platform: #{RUBY_PLATFORM}"
+      puts "  Cache directory: #{ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')}"
+      puts "  Git available: #{system('which git > /dev/null 2>&1') ? 'Yes' : 'No'}"
     end
 
     desc 'categories', 'List all available categories for synchronization'
@@ -211,7 +211,14 @@ module Leyline
                   desc: 'Output status in JSON format',
                   aliases: '--json'
     def status(path = '.')
-      perform_transparency_command(:status, options.merge(path: path))
+      # Validate path to prevent flag-like paths
+      if path.start_with?('-')
+        puts "Error: Invalid path '#{path}'. Path cannot start with a dash."
+        puts "Did you mean to use 'leyline help status' for help?"
+        exit 1
+      end
+
+      perform_transparency_command(:status, options.to_h.merge(path: path))
     end
 
     desc 'diff [PATH]', 'Show differences between local and remote leyline standards'
@@ -257,9 +264,16 @@ module Leyline
                   type: :string,
                   desc: 'Output format (text, json)',
                   default: 'text',
-                  enum: ['text', 'json']
+                  enum: %w[text json]
     def diff(path = '.')
-      perform_transparency_command(:diff, options.merge(path: path))
+      # Validate path to prevent flag-like paths
+      if path.start_with?('-')
+        puts "Error: Invalid path '#{path}'. Path cannot start with a dash."
+        puts "Did you mean to use 'leyline help diff' for help?"
+        exit 1
+      end
+
+      perform_transparency_command(:diff, options.to_h.merge(path: path))
     end
 
     desc 'update [PATH]', 'Preview and apply leyline updates with conflict detection'
@@ -317,7 +331,14 @@ module Leyline
                   desc: 'Show cache performance statistics',
                   aliases: '--stats'
     def update(path = '.')
-      perform_transparency_command(:update, options.merge(path: path))
+      # Validate path to prevent flag-like paths
+      if path.start_with?('-')
+        puts "Error: Invalid path '#{path}'. Path cannot start with a dash."
+        puts "Did you mean to use 'leyline help update' for help?"
+        exit 1
+      end
+
+      perform_transparency_command(:update, options.to_h.merge(path: path))
     end
 
     desc 'sync [PATH]', 'Synchronize leyline standards to target directory'
@@ -389,6 +410,13 @@ module Leyline
                   desc: 'Show detailed cache and performance statistics',
                   aliases: '--stats'
     def sync(path = '.')
+      # Validate path to prevent accidental flag-like directory creation
+      if path.start_with?('-')
+        puts "Error: Invalid path '#{path}'. Path cannot start with a dash."
+        puts "Did you mean to use 'leyline help sync' for help?"
+        exit 1
+      end
+
       # Pre-process categories to handle comma-separated values
       processed_options = options.dup
       if processed_options[:categories].is_a?(Array) &&
@@ -413,12 +441,12 @@ module Leyline
       normalized_categories = CliOptions.normalize_categories(categories) || ['core']
 
       puts "Categories: #{normalized_categories.join(', ')}" unless normalized_categories.empty?
-      puts "Options: #{options.select { |k, v| v }.keys.join(', ')}" if options.any? { |_, v| v }
+      puts "Options: #{options.select { |_k, v| v }.keys.join(', ')}" if options.any? { |_, v| v }
 
       # Perform the actual sync
       begin
         perform_sync(target_path, normalized_categories, options)
-      rescue => e
+      rescue StandardError => e
         puts "Error during sync: #{e.message}"
         exit 1
       end
@@ -472,7 +500,7 @@ module Leyline
         begin
           warming_started = metadata_cache.warm_cache_in_background
           puts '🔄 Starting cache warm-up in background...' if verbose && warming_started
-        rescue => e
+        rescue StandardError => e
           # Warming failures should not break the command
           puts "Warning: Cache warming failed: #{e.message}" if verbose
         end
@@ -489,18 +517,13 @@ module Leyline
         end
 
         # Show performance statistics if requested
-        if show_stats
-          display_discovery_stats(metadata_cache, start_time)
-        end
-
-      rescue => e
+        display_discovery_stats(metadata_cache, start_time) if show_stats
+      rescue StandardError => e
         puts "Error during #{command}: #{e.message}"
         puts e.backtrace if verbose
         exit 1
       end
     end
-
-
 
     def execute_show_command(metadata_cache, options)
       category = options[:category]
@@ -524,9 +547,7 @@ module Leyline
         puts "  Type: #{doc[:type]}"
         puts "  Path: #{doc[:path]}" if verbose
 
-        if verbose && doc[:content_preview] && !doc[:content_preview].empty?
-          puts "  Preview: #{doc[:content_preview]}"
-        end
+        puts "  Preview: #{doc[:content_preview]}" if verbose && doc[:content_preview] && !doc[:content_preview].empty?
 
         puts
       end
@@ -572,37 +593,34 @@ module Leyline
       end
 
       # Show truncation notice if applicable
-      if total_results > limit
-        puts "Showing #{limit} of #{total_results} results. Use --limit to see more."
-      end
+      return unless total_results > limit
+
+      puts "Showing #{limit} of #{total_results} results. Use --limit to see more."
     end
 
     def create_file_cache_if_needed(verbose)
       # Reuse existing cache creation logic but don't fail if cache unavailable
-      begin
-        cache = Cache::FileCache.new
 
-        if verbose && cache
-          health = cache.health_status
-          unless health[:healthy]
-            puts 'Warning: Cache health issues detected (continuing anyway)'
-          end
-        end
+      cache = Cache::FileCache.new
 
-        cache
-      rescue => e
-        puts "Warning: Cache unavailable (#{e.message}), using slower fallback" if verbose
-        nil
+      if verbose && cache
+        health = cache.health_status
+        puts 'Warning: Cache health issues detected (continuing anyway)' unless health[:healthy]
       end
+
+      cache
+    rescue StandardError => e
+      puts "Warning: Cache unavailable (#{e.message}), using slower fallback" if verbose
+      nil
     end
 
     def display_discovery_stats(metadata_cache, start_time)
       total_time = Time.now - start_time
       cache_stats = metadata_cache.performance_stats
 
-      puts "\n" + '='*50
+      puts "\n" + '=' * 50
       puts 'DISCOVERY PERFORMANCE STATISTICS'
-      puts '='*50
+      puts '=' * 50
 
       puts 'Command Performance:'
       puts "  Total time: #{total_time.round(3)}s"
@@ -636,11 +654,11 @@ module Leyline
         puts "  All targets met: #{summary[:performance_target_met] ? '✅' : '❌'}"
       end
 
-      if cache_stats[:scan_count] > 0
-        puts "\nCache Operations:"
-        puts "  Scan operations: #{cache_stats[:scan_count]}"
-        puts "  Last scan: #{cache_stats[:last_scan]&.strftime('%H:%M:%S') || 'never'}"
-      end
+      return unless cache_stats[:scan_count] > 0
+
+      puts "\nCache Operations:"
+      puts "  Scan operations: #{cache_stats[:scan_count]}"
+      puts "  Last scan: #{cache_stats[:last_scan]&.strftime('%H:%M:%S') || 'never'}"
     end
 
     def format_search_header(query, shown_count, total_count, limit)
@@ -669,16 +687,14 @@ module Leyline
       end
 
       # Verbose mode: Additional context
-      if verbose
-        display_verbose_search_details(doc, result, score)
-      end
+      display_verbose_search_details(doc, result, score) if verbose
 
       puts
     end
 
     def format_result_number(number)
       # Add visual hierarchy with consistent numbering
-      sprintf('%2d.', number)
+      format('%2d.', number)
     end
 
     def format_result_metadata(category, type, id, score, verbose)
@@ -731,13 +747,13 @@ module Leyline
       end
     end
 
-    def display_verbose_search_details(doc, result, score)
+    def display_verbose_search_details(doc, _result, _score)
       # Additional context in verbose mode
       puts "   Path: #{doc[:path]}" if doc[:path]
 
       # Show match details if available
       if doc[:metadata] && doc[:metadata].any?
-        metadata_preview = doc[:metadata].select { |k, v| k.to_s != 'content' }
+        metadata_preview = doc[:metadata].select { |k, _v| k.to_s != 'content' }
                                          .first(3)
                                          .map { |k, v| "#{k}: #{v}" }
                                          .join(', ')
@@ -745,9 +761,9 @@ module Leyline
       end
 
       # Show timing if document has scan time
-      if doc[:scan_time]
-        puts "   Last updated: #{doc[:scan_time].strftime('%Y-%m-%d %H:%M')}"
-      end
+      return unless doc[:scan_time]
+
+      puts "   Last updated: #{doc[:scan_time].strftime('%Y-%m-%d %H:%M')}"
     end
 
     def format_bytes(bytes)
@@ -788,7 +804,7 @@ module Leyline
               end
             end
           end
-        rescue => e
+        rescue StandardError => e
           # Log cache initialization failure but continue without cache
           puts "Warning: Cache initialization failed: #{e.message}" if verbose
           puts 'Continuing without cache optimization...' if verbose
@@ -823,7 +839,7 @@ module Leyline
 
         # Point to the docs subdirectory in temp_dir to avoid double nesting
         source_docs_dir = File.join(temp_dir, 'docs')
-      rescue => e
+      rescue StandardError => e
         # Clean up and re-raise git errors
         git_client&.cleanup
         raise e
@@ -840,10 +856,7 @@ module Leyline
         report_sync_results(results, verbose, stats: show_stats ? stats : nil, cache: cache)
 
         # Save sync state for status/diff/update commands
-        if results[:errors].empty?
-          save_sync_state(leyline_target, categories, cache)
-        end
-
+        save_sync_state(leyline_target, categories, cache) if results[:errors].empty?
       ensure
         # Clean up temp directory
         git_client&.cleanup if temp_dir
@@ -859,7 +872,7 @@ module Leyline
 
       # Add category-specific bindings
       categories.each do |category|
-        unless category == 'core'  # Skip core since we always include it above
+        unless category == 'core' # Skip core since we always include it above
           paths << "docs/bindings/categories/#{category}/"
         end
       end
@@ -874,9 +887,7 @@ module Leyline
 
       puts "Sync completed: #{copied_count} files copied, #{skipped_count} files skipped"
 
-      if error_count > 0
-        puts "#{error_count} errors occurred during sync"
-      end
+      puts "#{error_count} errors occurred during sync" if error_count > 0
 
       if verbose && copied_count > 0
         puts "\nCopied files:"
@@ -894,17 +905,17 @@ module Leyline
       end
 
       # Display cache statistics if requested
-      if stats
-        puts "\n" + '='*50
-        puts 'CACHE STATISTICS'
-        puts '='*50
+      return unless stats
 
-        cache_directory_stats = cache&.directory_stats || {}
-        puts stats.format_stats(cache_directory_stats)
-      end
+      puts "\n" + '=' * 50
+      puts 'CACHE STATISTICS'
+      puts '=' * 50
+
+      cache_directory_stats = cache&.directory_stats || {}
+      puts stats.format_stats(cache_directory_stats)
     end
 
-    def save_sync_state(leyline_target, categories, cache)
+    def save_sync_state(leyline_target, categories, _cache)
       # Save sync state for future status/diff/update commands
       cache_dir = ENV['LEYLINE_CACHE_DIR'] || File.expand_path('~/.cache/leyline')
       cache_dir = File.expand_path(cache_dir)
@@ -920,11 +931,11 @@ module Leyline
 
       # Save state with current timestamp and version
       sync_state.save_sync_state({
-        categories: categories,
-        manifest: manifest,
-        leyline_version: VERSION,
-        timestamp: Time.now.to_s
-      })
+                                   categories: categories,
+                                   manifest: manifest,
+                                   leyline_version: VERSION,
+                                   timestamp: Time.now.to_s
+                                 })
     end
 
     def perform_transparency_command(command, options)
@@ -944,6 +955,14 @@ module Leyline
       # Expand and validate path
       target_path = File.expand_path(processed_options[:path] || '.')
 
+      # Validate parent directory exists (similar to sync command)
+      parent_dir = File.dirname(target_path)
+      unless Dir.exist?(parent_dir)
+        puts "Error: Parent directory does not exist: #{parent_dir}"
+        puts 'Please ensure the parent directory exists before running this command.'
+        exit 1
+      end
+
       begin
         # Initialize shared infrastructure
         file_cache = create_file_cache_if_needed(processed_options[:verbose])
@@ -962,11 +981,8 @@ module Leyline
         end
 
         # Show performance statistics if requested
-        if processed_options[:stats]
-          display_transparency_stats(file_cache, start_time)
-        end
-
-      rescue => e
+        display_transparency_stats(file_cache, start_time) if processed_options[:stats]
+      rescue StandardError => e
         puts "Error during #{command}: #{e.message}"
         puts e.backtrace if processed_options[:verbose]
         exit 1
@@ -974,7 +990,8 @@ module Leyline
     end
 
     def preprocess_transparency_options(options)
-      processed = options.dup
+      # Convert Thor options to regular hash
+      processed = options.to_h.dup
 
       # Handle comma-separated categories (consistent with sync)
       if processed[:categories].is_a?(Array) &&
@@ -988,9 +1005,7 @@ module Leyline
 
     def validate_transparency_options(command, options)
       # Common validations using existing patterns
-      if options[:categories]
-        CliOptions.normalize_categories(options[:categories])
-      end
+      CliOptions.normalize_categories(options[:categories]) if options[:categories]
 
       # Command-specific validations
       case command
@@ -1002,7 +1017,7 @@ module Leyline
     def validate_format_option(format)
       return true if format.nil?
 
-      valid_formats = ['text', 'json']
+      valid_formats = %w[text json]
       unless valid_formats.include?(format)
         raise CliOptions::ValidationError, "Invalid format '#{format}'. Valid formats: #{valid_formats.join(', ')}"
       end
@@ -1010,10 +1025,10 @@ module Leyline
       true
     end
 
-    def execute_status_command(target_path, options, cache)
+    def execute_status_command(target_path, options, _cache)
       require_relative 'commands/status_command'
 
-      command_options = options.merge(
+      command_options = options.to_h.merge(
         directory: target_path,
         cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
       )
@@ -1022,10 +1037,10 @@ module Leyline
       status_command.execute
     end
 
-    def execute_diff_command(target_path, options, cache)
+    def execute_diff_command(target_path, options, _cache)
       require_relative 'commands/diff_command'
 
-      command_options = options.merge(
+      command_options = options.to_h.merge(
         directory: target_path,
         cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
       )
@@ -1034,10 +1049,10 @@ module Leyline
       diff_command.execute
     end
 
-    def execute_update_command(target_path, options, cache)
+    def execute_update_command(target_path, options, _cache)
       require_relative 'commands/update_command'
 
-      command_options = options.merge(
+      command_options = options.to_h.merge(
         directory: target_path,
         cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
       )
@@ -1049,26 +1064,26 @@ module Leyline
     def display_transparency_stats(cache, start_time)
       total_time = Time.now - start_time
 
-      puts "\n" + '='*50
+      puts "\n" + '=' * 50
       puts 'TRANSPARENCY COMMAND PERFORMANCE'
-      puts '='*50
+      puts '=' * 50
 
       puts "Execution Time: #{total_time.round(3)}s"
       puts "Target Met: #{total_time < 2.0 ? '✅' : '❌'} (<2s)"
 
-      if cache&.respond_to?(:directory_stats)
-        stats = cache.directory_stats
-        puts "\nCache Performance:"
-        puts "  Directory: #{stats[:path]}"
-        puts "  Files: #{stats[:file_count]}"
-        puts "  Size: #{format_bytes(stats[:size])}"
-        puts "  Utilization: #{stats[:utilization_percent]}%"
-      end
+      return unless cache&.respond_to?(:directory_stats)
+
+      stats = cache.directory_stats
+      puts "\nCache Performance:"
+      puts "  Directory: #{stats[:path]}"
+      puts "  Files: #{stats[:file_count]}"
+      puts "  Size: #{format_bytes(stats[:size])}"
+      puts "  Utilization: #{stats[:utilization_percent]}%"
     end
 
     def display_comprehensive_help
       puts 'LEYLINE CLI - Development Standards Synchronization'
-      puts '='*60
+      puts '=' * 60
       puts
       puts 'Leyline helps you synchronize and manage development standards across'
       puts 'your projects, providing transparency into changes and updates.'

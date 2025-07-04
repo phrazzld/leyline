@@ -9,7 +9,7 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
   let(:temp_dir) { Dir.mktmpdir('performance-benchmark') }
 
   # Performance targets from Leyline requirements
-  # Using constants from BenchmarkHelpers module instead of redefining
+  TARGET_PERFORMANCE_MS = BenchmarkHelpers::TARGET_PERFORMANCE_MS
 
   before(:all) do
     # Create comprehensive test document structure for realistic performance testing
@@ -39,9 +39,9 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
         min_time_ms = execution_times.min
 
         expect(avg_time_ms).to be < TARGET_PERFORMANCE_MS,
-          "Average categories time #{avg_time_ms}ms exceeds target #{TARGET_PERFORMANCE_MS}ms"
+                               "Average categories time #{avg_time_ms}ms exceeds target #{TARGET_PERFORMANCE_MS}ms"
         expect(max_time_ms).to be < TARGET_PERFORMANCE_MS * 1.5,
-          "Maximum categories time #{max_time_ms}ms exceeds acceptable variance"
+                               "Maximum categories time #{max_time_ms}ms exceeds acceptable variance"
 
         # Log performance metrics
         log_performance_results('categories', execution_times, avg_time_ms, min_time_ms, max_time_ms)
@@ -60,7 +60,7 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
         # Handle case where operations are so fast that variance is minimal
         if avg_time > 0
           expect(std_deviation).to be < avg_time * 0.5,
-            "Performance variance too high: #{std_deviation}ms std dev for #{avg_time}ms average"
+                                   "Performance variance too high: #{std_deviation}ms std dev for #{avg_time}ms average"
         else
           # If operations are sub-millisecond, variance test passes
           expect(std_deviation).to be >= 0
@@ -81,9 +81,9 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
         max_time_ms = execution_times.max
 
         expect(avg_time_ms).to be < TARGET_PERFORMANCE_MS,
-          "Average show time #{avg_time_ms}ms exceeds target #{TARGET_PERFORMANCE_MS}ms"
+                               "Average show time #{avg_time_ms}ms exceeds target #{TARGET_PERFORMANCE_MS}ms"
         expect(max_time_ms).to be < TARGET_PERFORMANCE_MS * 1.5,
-          "Maximum show time #{max_time_ms}ms exceeds acceptable variance"
+                               "Maximum show time #{max_time_ms}ms exceeds acceptable variance"
 
         log_performance_results('show', execution_times, avg_time_ms, execution_times.min, max_time_ms)
       end
@@ -103,8 +103,8 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
           expected_max_time = [TARGET_PERFORMANCE_MS, document_count * 50].min
 
           expect(avg_time).to be < expected_max_time,
-            "Category '#{category}' (#{document_count} docs) took #{avg_time}ms, " \
-            "expected <#{expected_max_time}ms"
+                              "Category '#{category}' (#{document_count} docs) took #{avg_time}ms, " \
+                              "expected <#{expected_max_time}ms"
         end
       end
     end
@@ -114,7 +114,7 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
         # Warm cache
         cache.categories
 
-        test_queries = ['test', 'performance', 'cache', 'typescript', 'binding']
+        test_queries = %w[test performance cache typescript binding]
 
         test_queries.each do |query|
           execution_times = benchmark_operation(10) { cache.search(query) }
@@ -123,9 +123,9 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
           max_time_ms = execution_times.max
 
           expect(avg_time_ms).to be < TARGET_PERFORMANCE_MS,
-            "Average search time for '#{query}' #{avg_time_ms}ms exceeds target #{TARGET_PERFORMANCE_MS}ms"
+                                 "Average search time for '#{query}' #{avg_time_ms}ms exceeds target #{TARGET_PERFORMANCE_MS}ms"
           expect(max_time_ms).to be < TARGET_PERFORMANCE_MS * 2,
-            "Maximum search time for '#{query}' #{max_time_ms}ms exceeds acceptable variance"
+                                 "Maximum search time for '#{query}' #{max_time_ms}ms exceeds acceptable variance"
 
           log_performance_results("search-#{query}", execution_times, avg_time_ms, execution_times.min, max_time_ms)
         end
@@ -146,7 +146,7 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
 
           # Complex queries get slightly more time but still must be under target
           expect(avg_time).to be < TARGET_PERFORMANCE_MS,
-            "Complex search '#{query}' took #{avg_time}ms, exceeds target #{TARGET_PERFORMANCE_MS}ms"
+                              "Complex search '#{query}' took #{avg_time}ms, exceeds target #{TARGET_PERFORMANCE_MS}ms"
         end
       end
     end
@@ -170,13 +170,13 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
 
       # The hit ratio calculation is based on file change detection, not memory cache
       # For this test, we verify that the cache infrastructure is working
-      expect(stats[:document_count]).to be > 0, "No documents cached"
-      expect(stats[:category_count]).to be > 0, "No categories cached"
-      expect(stats[:scan_count]).to be > 0, "No cache scans performed"
+      expect(stats[:document_count]).to be > 0, 'No documents cached'
+      expect(stats[:category_count]).to be > 0, 'No categories cached'
+      expect(stats[:scan_count]).to be > 0, 'No cache scans performed'
 
       # Since we're using a mock file system, the hit ratio might be 100% or 0%
       # The important thing is that the cache infrastructure is working
-      expect(hit_ratio).to be >= 0, "Hit ratio should be non-negative"
+      expect(hit_ratio).to be >= 0, 'Hit ratio should be non-negative'
 
       puts "Cache performance: #{(hit_ratio * 100).round(1)}% hit ratio, #{stats[:document_count]} docs, #{stats[:scan_count]} scans"
     end
@@ -189,9 +189,7 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
       # Wait for warming to complete
       timeout = 10 # seconds
       start_wait = Time.now
-      while !cache.cache_warm? && (Time.now - start_wait) < timeout
-        sleep 0.1
-      end
+      sleep 0.1 while !cache.cache_warm? && (Time.now - start_wait) < timeout
 
       warming_time = Time.now - warming_start
 
@@ -204,7 +202,7 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
       avg_time = execution_times.sum / execution_times.length
 
       expect(avg_time).to be < TARGET_PERFORMANCE_MS / 2,
-        "Post-warming performance #{avg_time}ms should be significantly faster"
+                          "Post-warming performance #{avg_time}ms should be significantly faster"
     end
   end
 
@@ -227,16 +225,16 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
 
       # Compression should not significantly degrade performance
       expect(compressed_avg).to be < TARGET_PERFORMANCE_MS,
-        "Compressed cache performance #{compressed_avg}ms exceeds target"
+                                "Compressed cache performance #{compressed_avg}ms exceeds target"
 
       # Handle division by zero for very fast operations
       if uncompressed_avg > 0
         performance_degradation = (compressed_avg - uncompressed_avg) / uncompressed_avg
         expect(performance_degradation).to be < 0.5,
-          "Compression degrades performance by #{(performance_degradation * 100).round(1)}%, expected <50%"
+                                           "Compression degrades performance by #{(performance_degradation * 100).round(1)}%, expected <50%"
       else
         # If uncompressed operations are sub-millisecond, just ensure compressed is still fast
-        expect(compressed_avg).to be < 10, "Compressed operations should be fast when uncompressed are sub-millisecond"
+        expect(compressed_avg).to be < 10, 'Compressed operations should be fast when uncompressed are sub-millisecond'
       end
 
       # Verify compression is working
@@ -253,14 +251,14 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
     paths = []
 
     # Create realistic document structure
-    categories = ['typescript', 'go', 'rust', 'python', 'core', 'frontend', 'backend']
+    categories = %w[typescript go rust python core frontend backend]
 
     categories.each do |category|
       category_dir = File.join(temp_dir, 'docs', 'bindings', 'categories', category)
       FileUtils.mkdir_p(category_dir)
 
       # Create 5-10 documents per category for realistic performance testing
-      doc_count = 5 + rand(6) # 5-10 documents
+      doc_count = rand(5..10) # 5-10 documents
 
       doc_count.times do |i|
         doc_path = File.join(category_dir, "#{category}-binding-#{i + 1}.md")
@@ -291,7 +289,7 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
       id: #{category}-binding-#{number}
       last_modified: '2025-06-22'
       version: '0.1.0'
-      priority: #{['high', 'medium', 'low'].sample}
+      priority: #{%w[high medium low].sample}
       tags: [#{category}, performance, testing]
       ---
 
@@ -364,11 +362,11 @@ RSpec.describe 'Discovery Performance Benchmark', type: :performance do
   end
 
   def calculate_standard_deviation(values, mean)
-    variance = values.map { |v| (v - mean) ** 2 }.sum / values.length
+    variance = values.map { |v| (v - mean)**2 }.sum / values.length
     Math.sqrt(variance)
   end
 
-  def log_performance_results(operation, times, avg, min, max)
+  def log_performance_results(operation, _times, avg, min, max)
     puts "\n[PERFORMANCE] #{operation}:"
     puts "  Average: #{avg.round(2)}ms"
     puts "  Range: #{min.round(2)}ms - #{max.round(2)}ms"

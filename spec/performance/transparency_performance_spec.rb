@@ -62,7 +62,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
 
           expect(p50).to be < 1.5, "Status median time #{p50.round(2)}s should be <1.5s"
           expect(p95).to be < performance_targets[:status_command],
-                "Status P95 time #{p95.round(2)}s should be <#{performance_targets[:status_command]}s"
+                         "Status P95 time #{p95.round(2)}s should be <#{performance_targets[:status_command]}s"
 
           log_performance_metrics('status', samples)
         end
@@ -79,7 +79,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
 
           p95 = percentile(samples, 95)
           expect(p95).to be < performance_targets[:diff_command],
-                "Diff P95 time #{p95.round(2)}s should be <#{performance_targets[:diff_command]}s"
+                         "Diff P95 time #{p95.round(2)}s should be <#{performance_targets[:diff_command]}s"
 
           log_performance_metrics('diff', samples)
         end
@@ -97,7 +97,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
 
         p95 = percentile(samples, 95)
         expect(p95).to be < performance_targets[:update_command],
-              "Update preview P95 time #{p95.round(2)}s should be <#{performance_targets[:update_command]}s"
+                       "Update preview P95 time #{p95.round(2)}s should be <#{performance_targets[:update_command]}s"
 
         log_performance_metrics('update_preview', samples)
       end
@@ -119,7 +119,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
 
       # In test environment, just verify the cache mechanism works (doesn't crash)
       expect(cache_efficiency).to be > -1.0,
-            "Cache efficiency #{(cache_efficiency * 100).round(1)}% - cache mechanism functioning"
+                                  "Cache efficiency #{(cache_efficiency * 100).round(1)}% - cache mechanism functioning"
 
       puts "Cache Performance: #{(cache_efficiency * 100).round(1)}% improvement on second run"
     end
@@ -144,7 +144,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
         peak_memory_delta = [memory_after_status, memory_after_diff].max - memory_before
 
         expect(peak_memory_delta).to be < performance_targets[:memory_limit_mb],
-              "Peak memory usage #{peak_memory_delta.round(1)}MB should be <#{performance_targets[:memory_limit_mb]}MB with #{file_count} files"
+                                     "Peak memory usage #{peak_memory_delta.round(1)}MB should be <#{performance_targets[:memory_limit_mb]}MB with #{file_count} files"
 
         puts "Memory scaling for #{file_count} files: #{peak_memory_delta.round(1)}MB peak delta"
       end
@@ -174,10 +174,10 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
 
       # Should still work, just slower
       expect(degraded_p50).to be < performance_targets[:status_command] * 1.5,
-            "Degraded performance #{degraded_p50.round(2)}s should be <#{(performance_targets[:status_command] * 1.5).round(1)}s"
+                              "Degraded performance #{degraded_p50.round(2)}s should be <#{(performance_targets[:status_command] * 1.5).round(1)}s"
 
       expect(degradation_ratio).to be < 3.0,
-            "Performance degradation #{degradation_ratio.round(1)}x should be <3x slower"
+                                   "Performance degradation #{degradation_ratio.round(1)}x should be <3x slower"
 
       puts "Cache corruption impact: #{degradation_ratio.round(1)}x slower"
     end
@@ -191,7 +191,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
       end
 
       # Store baseline (in real usage, this would be from previous runs)
-      baseline_p95 = percentile(baseline_samples, 95)
+      percentile(baseline_samples, 95)
 
       # Simulate regression by adding artificial delay (demonstrate capability)
       # Use 25% regression to exceed our 20% threshold
@@ -226,7 +226,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
       # Validate concurrent performance
       max_concurrent_time = results.max
       expect(max_concurrent_time).to be < performance_targets[:status_command] * 1.5,
-            "Concurrent access time #{max_concurrent_time.round(2)}s should be reasonable"
+                                     "Concurrent access time #{max_concurrent_time.round(2)}s should be reasonable"
 
       puts "Concurrent access performance: max #{max_concurrent_time.round(2)}s"
     end
@@ -260,7 +260,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
     docs_dir = File.join(temp_source_dir, 'docs', 'leyline')
 
     # Create realistic distribution
-    categories = ['core', 'typescript', 'go', 'rust', 'python', 'java', 'csharp']
+    categories = %w[core typescript go rust python java csharp]
     files_per_category = file_count / categories.length
 
     # Tenets (15% of total)
@@ -305,7 +305,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
 
     count.times do |i|
       File.write(File.join(category_dir, "#{category}-binding-#{i}.md"),
-                generate_file_content("#{category}-binding-#{i}", 1024))
+                 generate_file_content("#{category}-binding-#{i}", 1024))
     end
   end
 
@@ -448,7 +448,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
     else
       `ps -o rss= -p #{Process.pid}`.to_i / 1024.0
     end
-  rescue
+  rescue StandardError
     0.0
   end
 
@@ -511,7 +511,7 @@ RSpec.describe 'Transparency Commands Performance Benchmarks', :performance do
 
     begin
       block.call
-    rescue SystemExit => e
+    rescue SystemExit
       # CLI commands may call exit
     ensure
       $stdout = original_stdout

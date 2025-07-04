@@ -33,37 +33,38 @@ $test_results = {
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: run_all_tests.rb [options]"
+  opts.banner = 'Usage: run_all_tests.rb [options]'
 
-  opts.on("-s", "--suite SUITE", "Run specific test suite (calculate_version, release_workflow, rollback_release)") do |suite|
+  opts.on('-s', '--suite SUITE',
+          'Run specific test suite (calculate_version, release_workflow, rollback_release)') do |suite|
     $options[:suite] = suite
   end
 
-  opts.on("-v", "--verbose", "Verbose output") do
+  opts.on('-v', '--verbose', 'Verbose output') do
     $options[:verbose] = true
   end
 
-  opts.on("-c", "--coverage", "Generate coverage report") do
+  opts.on('-c', '--coverage', 'Generate coverage report') do
     $options[:coverage] = true
   end
 
-  opts.on("-f", "--format FORMAT", "Output format (text, json, junit)") do |format|
+  opts.on('-f', '--format FORMAT', 'Output format (text, json, junit)') do |format|
     $options[:format] = format
   end
 
-  opts.on("-p", "--parallel", "Run tests in parallel") do
+  opts.on('-p', '--parallel', 'Run tests in parallel') do
     $options[:parallel] = true
   end
 
-  opts.on("-b", "--benchmark", "Run performance benchmarks") do
+  opts.on('-b', '--benchmark', 'Run performance benchmarks') do
     $options[:benchmark] = true
   end
 
-  opts.on("--ci", "CI mode (exit with non-zero on failures)") do
+  opts.on('--ci', 'CI mode (exit with non-zero on failures)') do
     $options[:ci_mode] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -87,11 +88,11 @@ end
 
 def extract_description(file)
   first_comment = File.read(file).lines
-    .drop_while { |line| line.start_with?('#!') }
-    .take_while { |line| line.start_with?('#') }
-    .map { |line| line.sub(/^#\s*/, '') }
-    .join(' ')
-    .strip
+                      .drop_while { |line| line.start_with?('#!') }
+                      .take_while { |line| line.start_with?('#') }
+                      .map { |line| line.sub(/^#\s*/, '') }
+                      .join(' ')
+                      .strip
 
   first_comment.empty? ? "Tests for #{File.basename(file, '.rb')}" : first_comment
 end
@@ -103,9 +104,7 @@ def run_test_suite(suite)
   start_time = Time.now
 
   # Setup coverage if requested
-  if $options[:coverage]
-    setup_coverage(suite[:name])
-  end
+  setup_coverage(suite[:name]) if $options[:coverage]
 
   # Run the test
   output = `ruby #{suite[:file]} 2>&1`
@@ -119,7 +118,7 @@ def run_test_suite(suite)
   results[:output] = output
 
   if $options[:verbose]
-    status = success ? "✅" : "❌"
+    status = success ? '✅' : '❌'
     puts "#{status} #{suite[:name]} completed in #{duration.round(2)}s"
   end
 
@@ -149,15 +148,13 @@ def parse_test_output(output, suite_name)
   # Look for test summary line
   summary_line = lines.find { |line| line.match(/\d+ tests?, \d+ assertions?/) }
 
-  if summary_line
-    # Parse "5 tests, 23 assertions, 0 failures, 0 errors, 0 skips"
-    if summary_line =~ /(\d+) tests?, (\d+) assertions?, (\d+) failures?, (\d+) errors?(?:, (\d+) skips?)?/
-      results[:tests] = $1.to_i
-      results[:assertions] = $2.to_i
-      results[:failures] = $3.to_i
-      results[:errors] = $4.to_i
-      results[:skips] = $5.to_i if $5
-    end
+  # Parse "5 tests, 23 assertions, 0 failures, 0 errors, 0 skips"
+  if summary_line && (summary_line =~ /(\d+) tests?, (\d+) assertions?, (\d+) failures?, (\d+) errors?(?:, (\d+) skips?)?/)
+    results[:tests] = Regexp.last_match(1).to_i
+    results[:assertions] = Regexp.last_match(2).to_i
+    results[:failures] = Regexp.last_match(3).to_i
+    results[:errors] = Regexp.last_match(4).to_i
+    results[:skips] = Regexp.last_match(5).to_i if Regexp.last_match(5)
   end
 
   # Parse individual test results
@@ -183,16 +180,16 @@ end
 
 def run_performance_benchmarks
   puts "\n🏁 Running Performance Benchmarks"
-  puts "=" * 50
+  puts '=' * 50
 
   benchmarks = [
     {
-      name: "Version Calculation",
-      command: "ruby tools/test_calculate_version.rb -n test_performance_benchmark"
+      name: 'Version Calculation',
+      command: 'ruby tools/test_calculate_version.rb -n test_performance_benchmark'
     },
     {
-      name: "Large Repository Handling",
-      command: "ruby tools/test_release_workflow.rb -n test_large_repository_performance"
+      name: 'Large Repository Handling',
+      command: 'ruby tools/test_release_workflow.rb -n test_large_repository_performance'
     }
   ]
 
@@ -202,7 +199,7 @@ def run_performance_benchmarks
     puts "\nBenchmarking: #{bench[:name]}"
 
     time = Benchmark.measure do
-      system(bench[:command] + " > /dev/null 2>&1")
+      system(bench[:command] + ' > /dev/null 2>&1')
     end
 
     benchmark_results[bench[:name]] = {
@@ -242,17 +239,17 @@ def aggregate_results(suite_results)
   end
 
   total = $test_results[:summary][:total_tests]
-  if total > 0
-    passed = $test_results[:summary][:passed]
-    $test_results[:summary][:success_rate] = (passed.to_f / total * 100).round(1)
-  end
+  return unless total > 0
+
+  passed = $test_results[:summary][:passed]
+  $test_results[:summary][:success_rate] = (passed.to_f / total * 100).round(1)
 end
 
 def generate_coverage_report
   return unless $options[:coverage]
 
   puts "\n📊 Coverage Report"
-  puts "=" * 50
+  puts '=' * 50
 
   # In a real implementation, this would analyze code coverage
   # For now, we'll provide a mock report based on test execution
@@ -268,18 +265,22 @@ def generate_coverage_report
   total_coverage = coverage_data.values.sum / coverage_data.size
 
   coverage_data.each do |file, coverage|
-    status = coverage >= 90 ? "✅" : coverage >= 80 ? "⚠️" : "❌"
+    status = if coverage >= 90
+               '✅'
+             else
+               coverage >= 80 ? '⚠️' : '❌'
+             end
     puts "#{status} #{file}: #{coverage}%"
   end
 
   puts "\nOverall Coverage: #{total_coverage.round(1)}%"
 
   if total_coverage < 90
-    puts "⚠️  Coverage below 90% target"
-    return false
+    puts '⚠️  Coverage below 90% target'
+    false
   else
-    puts "✅ Coverage meets 90% target"
-    return true
+    puts '✅ Coverage meets 90% target'
+    true
   end
 end
 
@@ -295,9 +296,9 @@ def format_output
 end
 
 def format_text_output
-  puts "\n" + "=" * 60
-  puts "🧪 Test Results Summary"
-  puts "=" * 60
+  puts "\n" + '=' * 60
+  puts '🧪 Test Results Summary'
+  puts '=' * 60
 
   summary = $test_results[:summary]
 
@@ -311,36 +312,34 @@ def format_text_output
 
   puts "\n📝 Suite Results:"
   $test_results[:suites].each do |name, result|
-    status = result[:success] ? "✅" : "❌"
+    status = result[:success] ? '✅' : '❌'
     puts "  #{status} #{name}: #{result[:tests]} tests, #{result[:failures]} failures, #{result[:errors]} errors"
 
-    if $options[:verbose] && !result[:success]
-      puts "    Output preview:"
-      result[:output].lines.first(3).each do |line|
-        puts "      #{line.chomp}"
-      end
+    next unless $options[:verbose] && !result[:success]
+
+    puts '    Output preview:'
+    result[:output].lines.first(3).each do |line|
+      puts "      #{line.chomp}"
     end
   end
 
   # Overall result
-  puts "\n" + "=" * 60
+  puts "\n" + '=' * 60
   total_failures = summary[:failed] + summary[:errors]
 
   if total_failures == 0
-    puts "🎉 ALL TESTS PASSED! 🎉"
+    puts '🎉 ALL TESTS PASSED! 🎉'
     if summary[:success_rate] == 100.0
       puts "Perfect score: #{summary[:total_tests]}/#{summary[:total_tests]} tests passed"
     end
   else
-    puts "❌ TEST FAILURES DETECTED"
+    puts '❌ TEST FAILURES DETECTED'
     puts "#{total_failures} test(s) failed out of #{summary[:total_tests]}"
 
-    if $options[:ci_mode]
-      puts "\nFailing in CI mode due to test failures"
-    end
+    puts "\nFailing in CI mode due to test failures" if $options[:ci_mode]
   end
 
-  puts "=" * 60
+  puts '=' * 60
 end
 
 def generate_junit_xml
@@ -382,18 +381,18 @@ def generate_junit_xml
   xml += "</testsuites>\n"
 
   File.write('test-results.xml', xml)
-  puts "JUnit XML written to test-results.xml"
+  puts 'JUnit XML written to test-results.xml'
 end
 
 def main
-  puts "🚀 Leyline Test Suite Runner"
-  puts "=" * 60
+  puts '🚀 Leyline Test Suite Runner'
+  puts '=' * 60
 
   # Discover test suites
   suites = discover_test_suites
 
   if suites.empty?
-    puts "❌ No test suites found!"
+    puts '❌ No test suites found!'
     exit 1
   end
 
@@ -472,7 +471,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\n\n⚠️  Test run interrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     puts "\n❌ Test runner error: #{e.message}"
     puts e.backtrace.join("\n") if $options[:verbose]
     exit 1

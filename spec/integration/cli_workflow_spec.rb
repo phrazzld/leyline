@@ -89,7 +89,7 @@ RSpec.describe 'CLI Workflow Integration', type: :integration do
         it 'detects modified files' do
           # Modify a local file
           clarity_path = File.join(test_dir, 'docs/leyline/tenets/clarity.md')
-          File.write(clarity_path, "# Modified content")
+          File.write(clarity_path, '# Modified content')
 
           output = capture_output { cli.invoke(:status, [test_dir]) }
 
@@ -103,7 +103,7 @@ RSpec.describe 'CLI Workflow Integration', type: :integration do
         it 'detects added files' do
           # Add a new file
           new_file_path = File.join(test_dir, 'docs/leyline/tenets/new.md')
-          File.write(new_file_path, "# New tenet")
+          File.write(new_file_path, '# New tenet')
 
           output = capture_output { cli.invoke(:status, [test_dir]) }
 
@@ -214,7 +214,7 @@ RSpec.describe 'CLI Workflow Integration', type: :integration do
     $stdout = StringIO.new
     block.call
     $stdout.string
-  rescue SystemExit => e
+  rescue SystemExit
     # Some commands exit, capture output anyway
     $stdout.string
   ensure

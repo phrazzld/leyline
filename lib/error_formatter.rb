@@ -24,7 +24,7 @@ class ErrorFormatter
   # @param file_contents [Hash, nil] Optional mapping of file paths to their content for context snippets
   # @return [String] Formatted error output ready for display
   def render(errors, file_contents = nil)
-    return "" if errors.empty?
+    return '' if errors.empty?
 
     output = []
 
@@ -36,17 +36,17 @@ class ErrorFormatter
     file_count = errors_by_file.keys.length
 
     output << format_header(error_count, file_count)
-    output << ""
+    output << ''
 
     # Render each file's errors
     errors_by_file.each do |file, file_errors|
       file_content = file_contents && file_contents[file]
       output << format_file_section(file, file_errors, file_content)
-      output << ""
+      output << ''
     end
 
     # Remove trailing empty line
-    output.pop if output.last == ""
+    output.pop if output.last == ''
 
     output.join("\n")
   end
@@ -99,8 +99,8 @@ class ErrorFormatter
   # @param file_count [Integer] Number of files with errors
   # @return [String] Formatted header
   def format_header(error_count, file_count)
-    error_text = error_count == 1 ? "error" : "errors"
-    file_text = file_count == 1 ? "file" : "files"
+    error_text = error_count == 1 ? 'error' : 'errors'
+    file_text = file_count == 1 ? 'file' : 'files'
 
     header = "Validation failed with #{error_count} #{error_text} in #{file_count} #{file_text}:"
     colorize(header, :red)
@@ -136,7 +136,7 @@ class ErrorFormatter
     output = []
 
     # Error indicator and message
-    indicator = @use_colors ? "  ✗" : "  [ERROR]"
+    indicator = @use_colors ? '  ✗' : '  [ERROR]'
     output << "#{colorize(indicator, :red)} #{error[:message]}"
 
     # Location information (line and field if available)
@@ -159,14 +159,14 @@ class ErrorFormatter
     if error[:line] && file_content
       context_snippet = format_context_snippet(error[:line], file_content)
       unless context_snippet.empty?
-        output << ""
+        output << ''
         output += context_snippet
       end
     end
 
     # Suggestion (if available)
     if error[:suggestion] && !error[:suggestion].empty?
-      suggestion_header = "    suggestion:"
+      suggestion_header = '    suggestion:'
       output << colorize(suggestion_header, :cyan)
 
       # Handle multi-line suggestions with proper indentation
@@ -205,7 +205,7 @@ class ErrorFormatter
     context_lines = []
 
     # Add context header
-    context_lines << colorize("    context:", :blue)
+    context_lines << colorize('    context:', :blue)
 
     # Format each line in the context
     (start_index..end_index).each do |i|
@@ -213,16 +213,14 @@ class ErrorFormatter
       line_content = lines[i]
 
       # Truncate very long lines to keep output readable
-      if line_content.length > 80
-        line_content = line_content[0..76] + "..."
-      end
+      line_content = line_content[0..76] + '...' if line_content.length > 80
 
       # Format line number with padding
-      line_num_str = sprintf("%3d", line_number)
+      line_num_str = format('%3d', line_number)
 
       if i == error_index
         # Highlight the error line
-        indicator = @use_colors ? "→" : ">"
+        indicator = @use_colors ? '→' : '>'
         line_prefix = "      #{colorize(line_num_str, :red)} #{colorize(indicator, :red)} "
         formatted_line = "#{line_prefix}#{colorize(line_content, :red)}"
       else

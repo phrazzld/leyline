@@ -9,7 +9,7 @@ FileUtils.cp('docs/templates/binding_template.md', 'bindings/test_binding_templa
 
 begin
   # Run validation
-  puts "Testing templates against validation..."
+  puts 'Testing templates against validation...'
   system('ruby tools/validate_front_matter.rb')
   status = $?.exitstatus
 

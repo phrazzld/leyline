@@ -8,17 +8,19 @@ def build_binding_map
   binding_map = {}
 
   # Map core bindings
-  Dir.glob("docs/bindings/core/*.md").each do |path|
-    next if path.end_with?("00-index.md")
-    name = File.basename(path, ".md")
+  Dir.glob('docs/bindings/core/*.md').each do |path|
+    next if path.end_with?('00-index.md')
+
+    name = File.basename(path, '.md')
     binding_map[name] = path
   end
 
   # Map category bindings
-  Dir.glob("docs/bindings/categories/*/*.md").each do |path|
-    next if path.end_with?("00-index.md")
-    name = File.basename(path, ".md")
-    category = path.split("/")[-2]
+  Dir.glob('docs/bindings/categories/*/*.md').each do |path|
+    next if path.end_with?('00-index.md')
+
+    name = File.basename(path, '.md')
+    category = path.split('/')[-2]
 
     # Store both with and without prefixes
     binding_map[name] = path
@@ -35,10 +37,10 @@ end
 # Fix links in markdown files
 def fix_links(binding_map)
   # Find all markdown files
-  markdown_files = Dir.glob("**/*.md").reject do |file|
-    file.start_with?("venv/") ||
-    file.start_with?("node_modules/") ||
-    file.start_with?("site/")
+  markdown_files = Dir.glob('**/*.md').reject do |file|
+    file.start_with?('venv/') ||
+      file.start_with?('node_modules/') ||
+      file.start_with?('site/')
   end
 
   puts "Processing #{markdown_files.size} markdown files"
@@ -59,7 +61,7 @@ def fix_links(binding_map)
     # Fix absolute binding links: /bindings/X.md -> new path from mapping
     if content.match(%r{(?<!\./)\]/bindings/([a-z0-9-]+\.md)})
       content.gsub!(%r{(?<!\./)\]/bindings/([a-z0-9-]+\.md)}i) do |match|
-        binding_name = $1.sub(".md", "")
+        binding_name = Regexp.last_match(1).sub('.md', '')
         if binding_map[binding_name]
           "](#{binding_map[binding_name]})"
         else
@@ -72,8 +74,8 @@ def fix_links(binding_map)
 
     # Fix relative links between bindings (files in docs/bindings/core and docs/bindings/categories/*)
     binding_directories = [
-      "docs/bindings/core",
-      *Dir.glob("docs/bindings/categories/*")
+      'docs/bindings/core',
+      *Dir.glob('docs/bindings/categories/*')
     ]
 
     if binding_directories.any? { |dir| file.start_with?(dir) }
@@ -81,14 +83,14 @@ def fix_links(binding_map)
 
       # Fix relative links to tenets from bindings
       if content.match(%r{\]\(\.\./tenets/([a-z0-9-]+\.md)\)})
-        content.gsub!(%r{\]\(\.\./tenets/([a-z0-9-]+\.md)\)}, "](../../docs/tenets/\\1)")
+        content.gsub!(%r{\]\(\.\./tenets/([a-z0-9-]+\.md)\)}, '](../../docs/tenets/\\1)')
         updated = true
       end
 
       # Fix relative links to bindings
       content.gsub!(%r{\]\(docs/bindings/([^)]+)\)}) do |match|
         puts "  Fixed absolute binding path in #{file}: #{match}"
-        "](../../docs/bindings/#{$1})"
+        "](../../docs/bindings/#{Regexp.last_match(1)})"
       end
 
       # Fix simple relative bindings like "](name.md)"
@@ -102,7 +104,7 @@ def fix_links(binding_map)
       # Fix directory-based references like "./name.md"
       if content.match(%r{\]\(\./([a-z0-9-]+)\.md\)})
         content.gsub!(%r{\]\(\./([a-z0-9-]+)\.md\)}) do |match|
-          name = $1
+          name = Regexp.last_match(1)
           if binding_map[name]
             "](../../#{binding_map[name]})"
           else
@@ -115,11 +117,11 @@ def fix_links(binding_map)
     end
 
     # Write back if updated
-    if content != original
-      File.write(file, content)
-      fixed_files += 1
-      puts "Updated links in #{file}"
-    end
+    next unless content != original
+
+    File.write(file, content)
+    fixed_files += 1
+    puts "Updated links in #{file}"
   end
 
   puts "Fixed links in #{fixed_files} files"
@@ -128,4 +130,4 @@ end
 # Main execution
 binding_map = build_binding_map
 fix_links(binding_map)
-puts "Cross-references fixed!"
+puts 'Cross-references fixed!'

@@ -11,7 +11,7 @@ RSpec.describe Leyline::SyncState do
   let(:sync_state) { described_class.new(temp_cache_dir) }
   let(:valid_metadata) do
     {
-      categories: ['core', 'typescript'],
+      categories: %w[core typescript],
       manifest: {
         'tenets/clarity.md' => 'a' * 64,
         'bindings/core/naming.md' => 'b' * 64
@@ -75,7 +75,7 @@ RSpec.describe Leyline::SyncState do
       expect(state_data['version']).to eq(1)
       expect(state_data['timestamp']).to be_a(String)
       expect(state_data['leyline_version']).to eq('2.1.0')
-      expect(state_data['categories']).to eq(['core', 'typescript'])
+      expect(state_data['categories']).to eq(%w[core typescript])
       expect(state_data['manifest']).to eq(valid_metadata[:manifest])
     end
 
@@ -100,32 +100,32 @@ RSpec.describe Leyline::SyncState do
 
     context 'validation errors' do
       it 'rejects nil metadata' do
-        expect {
+        expect do
           sync_state.save_sync_state(nil)
-        }.to raise_error(Leyline::SyncState::SyncStateError, 'Metadata cannot be nil')
+        end.to raise_error(Leyline::SyncState::SyncStateError, 'Metadata cannot be nil')
       end
 
       it 'rejects invalid categories' do
         invalid_metadata = valid_metadata.merge(categories: 'not_array')
-        expect {
+        expect do
           sync_state.save_sync_state(invalid_metadata)
-        }.to raise_error(Leyline::SyncState::SyncStateError, 'Categories must be an array')
+        end.to raise_error(Leyline::SyncState::SyncStateError, 'Categories must be an array')
       end
 
       it 'rejects invalid manifest' do
         invalid_metadata = valid_metadata.merge(manifest: 'not_hash')
-        expect {
+        expect do
           sync_state.save_sync_state(invalid_metadata)
-        }.to raise_error(Leyline::SyncState::SyncStateError, 'Manifest must be a hash')
+        end.to raise_error(Leyline::SyncState::SyncStateError, 'Manifest must be a hash')
       end
 
       it 'rejects invalid SHA256 hashes' do
         invalid_metadata = valid_metadata.merge(
           manifest: { 'file.md' => 'invalid_hash' }
         )
-        expect {
+        expect do
           sync_state.save_sync_state(invalid_metadata)
-        }.to raise_error(Leyline::SyncState::SyncStateError, /Invalid hash for file/)
+        end.to raise_error(Leyline::SyncState::SyncStateError, /Invalid hash for file/)
       end
     end
 
@@ -162,7 +162,7 @@ RSpec.describe Leyline::SyncState do
       loaded_state = sync_state.load_sync_state
 
       expect(loaded_state).to be_a(Hash)
-      expect(loaded_state['categories']).to eq(['core', 'typescript'])
+      expect(loaded_state['categories']).to eq(%w[core typescript])
       expect(loaded_state['manifest']).to eq(valid_metadata[:manifest])
     end
 
@@ -331,7 +331,7 @@ RSpec.describe Leyline::SyncState do
 
       expect(comparison[:base_timestamp]).to be_a(String)
       expect(comparison[:base_version]).to eq('2.1.0')
-      expect(comparison[:base_categories]).to eq(['core', 'typescript'])
+      expect(comparison[:base_categories]).to eq(%w[core typescript])
     end
 
     it 'returns nil when no valid state exists' do
@@ -368,9 +368,9 @@ RSpec.describe Leyline::SyncState do
       state = described_class.new(invalid_dir)
 
       # Should call CacheErrorHandler.handle_error and then raise SyncStateError
-      expect {
+      expect do
         state.save_sync_state(valid_metadata)
-      }.to raise_error(Leyline::SyncState::SyncStateError, /Failed to create cache directory/)
+      end.to raise_error(Leyline::SyncState::SyncStateError, /Failed to create cache directory/)
 
       # Restore permissions for cleanup
       File.chmod(0o755, readonly_parent)

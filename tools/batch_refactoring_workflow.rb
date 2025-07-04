@@ -18,8 +18,8 @@ class BatchRefactoringWorkflow
   end
 
   def run_workflow(tier = nil)
-    puts "🚀 BATCH REFACTORING WORKFLOW"
-    puts "=" * 40
+    puts '🚀 BATCH REFACTORING WORKFLOW'
+    puts '=' * 40
     puts
 
     log("Starting batch refactoring workflow for tier: #{tier || 'all'}")
@@ -28,7 +28,7 @@ class BatchRefactoringWorkflow
     documents_to_process = load_priority_documents(tier)
 
     if documents_to_process.empty?
-      puts "No documents found for processing."
+      puts 'No documents found for processing.'
       return
     end
 
@@ -48,7 +48,7 @@ class BatchRefactoringWorkflow
     # Run validation suite
     run_validation_suite
 
-    puts "✅ Batch refactoring workflow completed!"
+    puts '✅ Batch refactoring workflow completed!'
     puts "📊 Check #{@log_file} for detailed results"
   end
 
@@ -104,9 +104,9 @@ class BatchRefactoringWorkflow
     documents = []
     target_files.each do |filename|
       file_paths = Dir.glob([
-        "docs/tenets/#{filename}",
-        "docs/bindings/**/**/#{filename}"
-      ])
+                              "docs/tenets/#{filename}",
+                              "docs/bindings/**/**/#{filename}"
+                            ])
 
       if file_paths.any?
         file_path = file_paths.first
@@ -126,22 +126,22 @@ class BatchRefactoringWorkflow
 
   def categorize_document(file_path)
     case file_path
-    when /\/typescript\// then 'TypeScript'
-    when /\/python\// then 'Python'
-    when /\/go\// then 'Go'
-    when /\/rust\// then 'Rust'
-    when /\/database\// then 'Database'
-    when /\/security\// then 'Security'
-    when /\/frontend\//, /\/react\// then 'Frontend'
-    when /\/core\// then 'Core'
-    when /\/tenets\// then 'Tenets'
+    when %r{/typescript/} then 'TypeScript'
+    when %r{/python/} then 'Python'
+    when %r{/go/} then 'Go'
+    when %r{/rust/} then 'Rust'
+    when %r{/database/} then 'Database'
+    when %r{/security/} then 'Security'
+    when %r{/frontend/}, %r{/react/} then 'Frontend'
+    when %r{/core/} then 'Core'
+    when %r{/tenets/} then 'Tenets'
     else 'Other'
     end
   end
 
   def count_lines(file_path)
     File.readlines(file_path).count
-  rescue => e
+  rescue StandardError => e
     log("Error counting lines for #{file_path}: #{e.message}")
     0
   end
@@ -153,42 +153,42 @@ class BatchRefactoringWorkflow
     begin
       # Pre-refactoring state
       original_lines = doc_info[:current_lines]
-      original_size = File.size(doc_info[:path])
+      File.size(doc_info[:path])
 
       # Create backup
       backup_path = create_backup(doc_info[:path])
 
       # Validate current state
-      if !validate_document_structure(doc_info[:path])
+      unless validate_document_structure(doc_info[:path])
         log("❌ Pre-validation failed for #{doc_info[:filename]}")
         @results[:failed] += 1
         return
       end
 
       # Apply refactoring template
-      puts "  📝 Applying refactoring template..."
+      puts '  📝 Applying refactoring template...'
       refactoring_notes = apply_refactoring_guidance(doc_info)
 
       # Manual intervention point
       puts "  ⏸️  Ready for manual refactoring of #{doc_info[:filename]}"
       puts "     Original: #{original_lines} lines"
-      puts "     Target: ≤400 lines (≤150 for tenets)"
+      puts '     Target: ≤400 lines (≤150 for tenets)'
       puts "     Category: #{doc_info[:category]}"
       puts "     Backup created: #{backup_path}"
       puts
-      puts "  🎯 Key Strategies:"
+      puts '  🎯 Key Strategies:'
       refactoring_notes[:key_strategies].each { |strategy| puts "     • #{strategy}" }
       puts
-      puts "  ✅ Proven Techniques (CVF001-CVF010 experience):"
+      puts '  ✅ Proven Techniques (CVF001-CVF010 experience):'
       refactoring_notes[:proven_techniques].each { |technique| puts "     • #{technique}" }
       puts
-      puts "  👉 Apply refactoring manually, then press Enter to continue..."
+      puts '  👉 Apply refactoring manually, then press Enter to continue...'
 
       # Wait for user to complete manual refactoring
       STDIN.gets
 
       # Post-refactoring validation
-      puts "  🔍 Validating refactored document..."
+      puts '  🔍 Validating refactored document...'
 
       if validate_post_refactoring(doc_info[:path], original_lines)
         new_lines = count_lines(doc_info[:path])
@@ -220,16 +220,15 @@ class BatchRefactoringWorkflow
 
       else
         @results[:failed] += 1
-        puts "  ❌ Post-validation failed"
+        puts '  ❌ Post-validation failed'
 
         # Restore from backup
         FileUtils.cp(backup_path, doc_info[:path])
-        puts "  🔄 Restored from backup"
+        puts '  🔄 Restored from backup'
 
         log("FAILED: #{doc_info[:filename]} - validation failed, restored from backup")
       end
-
-    rescue => e
+    rescue StandardError => e
       @results[:failed] += 1
       puts "  💥 Error processing #{doc_info[:filename]}: #{e.message}"
       log("ERROR: #{doc_info[:filename]} - #{e.message}")
@@ -238,7 +237,7 @@ class BatchRefactoringWorkflow
       backup_path = "#{doc_info[:path]}.backup"
       if File.exist?(backup_path)
         FileUtils.cp(backup_path, doc_info[:path])
-        puts "  🔄 Restored from backup"
+        puts '  🔄 Restored from backup'
       end
     end
   end
@@ -251,7 +250,7 @@ class BatchRefactoringWorkflow
 
   def validate_document_structure(file_path)
     # Run existing YAML validation
-    output = `ruby #{@tools_dir}/validate_front_matter.rb -f "#{file_path}" 2>&1`
+    `ruby #{@tools_dir}/validate_front_matter.rb -f "#{file_path}" 2>&1`
     $?.success?
   end
 
@@ -269,38 +268,36 @@ class BatchRefactoringWorkflow
     end
 
     if analysis[:verbose_sections] > 3
-      strategies << "Condense verbose rationale sections - target 2-3 paragraphs maximum (6-8 lines total)"
+      strategies << 'Condense verbose rationale sections - target 2-3 paragraphs maximum (6-8 lines total)'
     end
 
     if analysis[:tool_configs] > 2
-      strategies << "Remove tool-specific configurations - focus on principles over implementation details"
+      strategies << 'Remove tool-specific configurations - focus on principles over implementation details'
     end
 
-    if analysis[:step_by_step] > 5
-      strategies << "Simplify rule definitions to bullet points - avoid prose explanations"
-    end
+    strategies << 'Simplify rule definitions to bullet points - avoid prose explanations' if analysis[:step_by_step] > 5
 
     # Enhanced guidance based on successful refactoring patterns
     if content.include?('## Examples') && content.scan(/```\w+/).length > 6
-      strategies << "Reduce to single comprehensive example (one bad/good pair maximum, 15-30 lines good example)"
+      strategies << 'Reduce to single comprehensive example (one bad/good pair maximum, 15-30 lines good example)'
     end
 
     if content.scan(/^- .*:.*\..*\..*\./).length > 10
-      strategies << "Streamline related bindings section - focus on essential relationships only"
+      strategies << 'Streamline related bindings section - focus on essential relationships only'
     end
 
     # Common implementation challenges guidance
-    strategies << "EDITING TIP: Use precise string matching for replacements - pay attention to exact formatting and indentation"
+    strategies << 'EDITING TIP: Use precise string matching for replacements - pay attention to exact formatting and indentation'
 
     {
       key_strategies: strategies,
       target_reduction: estimate_reduction_potential(analysis, doc_info[:current_lines]),
       focus_areas: analysis[:focus_areas],
       proven_techniques: [
-        "Most effective: Condense verbose rationale sections",
-        "Highly effective: Single comprehensive examples",
-        "Effective: Convert prose rules to bullet points",
-        "Essential: Maintain cross-reference integrity"
+        'Most effective: Condense verbose rationale sections',
+        'Highly effective: Single comprehensive examples',
+        'Effective: Convert prose rules to bullet points',
+        'Essential: Maintain cross-reference integrity'
       ]
     }
   end
@@ -364,16 +361,14 @@ class BatchRefactoringWorkflow
 
     # Check for trailing whitespace (common pre-commit hook issue)
     if lines.any? { |line| line.end_with?(' ') || line.end_with?("\t") }
-      puts "    ⚠️  Warning: Trailing whitespace detected - pre-commit hooks will fix this"
+      puts '    ⚠️  Warning: Trailing whitespace detected - pre-commit hooks will fix this'
     end
 
     # Check that file ends with newline
-    unless content.end_with?("\n")
-      puts "    ⚠️  Warning: File should end with newline - pre-commit hooks will fix this"
-    end
+    puts '    ⚠️  Warning: File should end with newline - pre-commit hooks will fix this' unless content.end_with?("\n")
 
     # Validate that refactoring preserved cross-reference format
-    broken_refs = content.scan(/\[([^\]]+)\]\(([^)]+)\)/).select do |text, url|
+    broken_refs = content.scan(/\[([^\]]+)\]\(([^)]+)\)/).select do |_text, url|
       url.include?('../') && !url.start_with?('http') && url.include?('undefined')
     end
 
@@ -387,8 +382,8 @@ class BatchRefactoringWorkflow
 
   def generate_summary_report
     puts
-    puts "📊 REFACTORING SUMMARY REPORT"
-    puts "=" * 40
+    puts '📊 REFACTORING SUMMARY REPORT'
+    puts '=' * 40
     puts "Documents processed: #{@results[:processed]}"
     puts "Successful: #{@results[:successful]}"
     puts "Failed: #{@results[:failed]}"
@@ -396,7 +391,7 @@ class BatchRefactoringWorkflow
     puts
 
     if @results[:documents].any?
-      puts "📋 Document Results:"
+      puts '📋 Document Results:'
       @results[:documents].each do |doc|
         status_icon = doc[:status] == 'SUCCESS' ? '✅' : '❌'
         puts "  #{status_icon} #{doc[:filename]}: #{doc[:lines_reduced]} lines (#{doc[:reduction_percentage]}%)"
@@ -409,30 +404,30 @@ class BatchRefactoringWorkflow
   end
 
   def run_validation_suite
-    puts "🔍 Running comprehensive validation suite..."
+    puts '🔍 Running comprehensive validation suite...'
 
     # Run document length validation
-    puts "  Checking document lengths..."
+    puts '  Checking document lengths...'
     length_result = system("ruby #{@tools_dir}/check_document_length.rb")
 
     # Run YAML front-matter validation
-    puts "  Validating YAML front-matter..."
+    puts '  Validating YAML front-matter...'
     yaml_result = system("ruby #{@tools_dir}/validate_front_matter.rb")
 
     # Run cross-reference validation
-    puts "  Checking cross-references..."
+    puts '  Checking cross-references...'
     xref_result = system("ruby #{@tools_dir}/fix_cross_references.rb")
 
     # Run index regeneration
-    puts "  Regenerating indexes..."
+    puts '  Regenerating indexes...'
     index_result = system("ruby #{@tools_dir}/reindex.rb --strict")
 
     all_passed = length_result && yaml_result && xref_result && index_result
 
     if all_passed
-      puts "  ✅ All validation checks passed!"
+      puts '  ✅ All validation checks passed!'
     else
-      puts "  ❌ Some validation checks failed - review output above"
+      puts '  ❌ Some validation checks failed - review output above'
     end
 
     log("Validation suite completed: #{all_passed ? 'PASSED' : 'FAILED'}")
@@ -450,30 +445,30 @@ end
 if __FILE__ == $0
   tier = ARGV[0]
 
-  puts "🎯 Leyline Document Refactoring Workflow"
+  puts '🎯 Leyline Document Refactoring Workflow'
   puts
 
   if tier
     puts "Processing tier: #{tier}"
   else
-    puts "Processing all tiers (use argument to specify: 1, 2, 3)"
+    puts 'Processing all tiers (use argument to specify: 1, 2, 3)'
   end
 
-  puts "This workflow will:"
-  puts "  1. Analyze documents for verbosity patterns"
-  puts "  2. Create backups before refactoring"
-  puts "  3. Provide refactoring guidance"
-  puts "  4. Wait for manual refactoring"
-  puts "  5. Validate results"
-  puts "  6. Run comprehensive validation suite"
+  puts 'This workflow will:'
+  puts '  1. Analyze documents for verbosity patterns'
+  puts '  2. Create backups before refactoring'
+  puts '  3. Provide refactoring guidance'
+  puts '  4. Wait for manual refactoring'
+  puts '  5. Validate results'
+  puts '  6. Run comprehensive validation suite'
   puts
-  puts "Continue? (y/N)"
+  puts 'Continue? (y/N)'
 
   response = STDIN.gets.chomp.downcase
-  if response == 'y' || response == 'yes'
+  if %w[y yes].include?(response)
     workflow = BatchRefactoringWorkflow.new
     workflow.run_workflow(tier)
   else
-    puts "Aborted."
+    puts 'Aborted.'
   end
 end

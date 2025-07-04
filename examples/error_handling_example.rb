@@ -79,7 +79,7 @@ class ExampleCommand
       end
     else
       puts "Error: #{error.message}"
-      puts "Run with --verbose for recovery suggestions"
+      puts 'Run with --verbose for recovery suggestions'
     end
 
     exit 1
@@ -93,7 +93,7 @@ class ExampleCommand
 end
 
 # Run examples
-puts "=== Example 1: Git Not Available Error ==="
+puts '=== Example 1: Git Not Available Error ==='
 handle_git_error
 
 puts "\n=== Example 2: Git Command Error ==="

@@ -104,18 +104,18 @@ RSpec.describe 'Cache optional parameters validation' do
         allow(cli).to receive(:options).and_return({})
 
         # Should use defaults without crashing
-        expect {
+        expect do
           # Mock perform_sync to avoid actual git operations
           allow(cli).to receive(:perform_sync).and_return(true)
           cli.sync
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
 
     context 'nil vs false flag handling' do
       it 'treats nil no_cache as false (cache enabled)' do
         allow(cli).to receive(:options).and_return({ no_cache: nil })
-        allow(cli).to receive(:perform_sync) do |path, categories, options|
+        allow(cli).to receive(:perform_sync) do |_path, _categories, options|
           # no_cache nil should default to false (cache enabled)
           expect(options[:no_cache] || false).to eq(false)
         end
@@ -125,7 +125,7 @@ RSpec.describe 'Cache optional parameters validation' do
 
       it 'treats nil force_git as false' do
         allow(cli).to receive(:options).and_return({ force_git: nil })
-        allow(cli).to receive(:perform_sync) do |path, categories, options|
+        allow(cli).to receive(:perform_sync) do |_path, _categories, options|
           # force_git nil should default to false
           expect(options[:force_git] || false).to eq(false)
         end
@@ -135,7 +135,7 @@ RSpec.describe 'Cache optional parameters validation' do
 
       it 'treats nil stats as false' do
         allow(cli).to receive(:options).and_return({ stats: nil })
-        allow(cli).to receive(:perform_sync) do |path, categories, options|
+        allow(cli).to receive(:perform_sync) do |_path, _categories, options|
           # stats nil should default to false
           expect(options[:stats] || false).to eq(false)
         end

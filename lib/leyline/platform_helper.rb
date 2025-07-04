@@ -39,7 +39,7 @@ module Leyline
       end
 
       # Check if filesystem is case-sensitive
-      def case_sensitive_filesystem?(path = '.')
+      def case_sensitive_filesystem?(_path = '.')
         return @case_sensitive if defined?(@case_sensitive)
 
         Dir.mktmpdir do |tmpdir|
@@ -50,7 +50,7 @@ module Leyline
           alt_path = File.join(tmpdir, 'casesensitivetest')
           @case_sensitive = !File.exist?(alt_path)
         end
-      rescue
+      rescue StandardError
         # Assume case-sensitive if we can't determine
         @case_sensitive = true
       end
@@ -60,20 +60,18 @@ module Leyline
         normalized = path.to_s
 
         # Handle Windows path separators
-        if windows?
-          normalized = normalized.tr('/', '\\')
-        else
-          normalized = normalized.tr('\\', '/')
-        end
+        normalized = if windows?
+                       normalized.tr('/', '\\')
+                     else
+                       normalized.tr('\\', '/')
+                     end
 
         # Remove redundant separators
         normalized = normalized.squeeze('/')
         normalized = normalized.squeeze('\\') if windows?
 
         # Handle Unicode normalization (important for macOS)
-        if macos?
-          normalized = normalized.unicode_normalize(:nfc)
-        end
+        normalized = normalized.unicode_normalize(:nfc) if macos?
 
         normalized
       end
@@ -85,7 +83,7 @@ module Leyline
         if windows?
           # Windows reserved names
           reserved = %w[CON PRN AUX NUL COM1 COM2 COM3 COM4 COM5 COM6 COM7
-                       COM8 COM9 LPT1 LPT2 LPT3 LPT4 LPT5 LPT6 LPT7 LPT8 LPT9]
+                        COM8 COM9 LPT1 LPT2 LPT3 LPT4 LPT5 LPT6 LPT7 LPT8 LPT9]
 
           base_name = File.basename(filename, '.*').upcase
           return false if reserved.include?(base_name)
@@ -94,7 +92,7 @@ module Leyline
           return false if filename =~ /[<>:"|?*]/
 
           # Trailing dots and spaces
-          return false if filename =~ /[\. ]$/
+          return false if filename =~ /[. ]$/
         end
 
         # Path traversal
@@ -120,7 +118,7 @@ module Leyline
           # Linux can handle more
           [cpu_count, 8].min
         end
-      rescue
+      rescue StandardError
         # Conservative fallback
         2
       end
@@ -165,22 +163,22 @@ module Leyline
           # Unix-style file locking
           with_unix_file_lock(path, &block)
         end
-      rescue Errno::EACCES => e
+      rescue Errno::EACCES
         raise Leyline::FileSystemError.new(
-          "Cannot acquire lock - permission denied",
+          'Cannot acquire lock - permission denied',
           reason: :permission_denied,
           path: path,
           platform: current_platform
         )
-      rescue Errno::ENOSPC => e
+      rescue Errno::ENOSPC
         raise Leyline::CacheOperationError.new(
-          "Cannot create lock file - no space left on device",
+          'Cannot create lock file - no space left on device',
           operation: :disk_full,
           path: path
         )
-      rescue Errno::EROFS => e
+      rescue Errno::EROFS
         raise Leyline::FileSystemError.new(
-          "Cannot create lock file - filesystem is read-only",
+          'Cannot create lock file - filesystem is read-only',
           reason: :read_only_filesystem,
           path: path
         )
@@ -204,10 +202,10 @@ module Leyline
         return @containerized if defined?(@containerized)
 
         @containerized = File.exist?('/.dockerenv') ||
-                        File.exist?('/run/.containerenv') ||
-                        (File.exist?('/proc/1/cgroup') &&
-                         File.read('/proc/1/cgroup').include?('docker'))
-      rescue
+                         File.exist?('/run/.containerenv') ||
+                         (File.exist?('/proc/1/cgroup') &&
+                          File.read('/proc/1/cgroup').include?('docker'))
+      rescue StandardError
         @containerized = false
       end
 
@@ -230,31 +228,27 @@ module Leyline
             total: parts[1].to_i * 1024,
             percent_free: (100 - parts[4].to_i)
           }
-        else
-          nil
         end
-      rescue
+      rescue StandardError
         nil
       end
 
       private
 
-      def with_windows_file_lock(path, &block)
+      def with_windows_file_lock(path)
         # Windows requires special handling for file locks
         lock_file = "#{path}.lock"
         acquired = false
 
         10.times do
-          begin
-            File.open(lock_file, File::CREAT | File::EXCL | File::WRONLY) do |f|
-              acquired = true
-              yield
-            end
-            break
-          rescue Errno::EEXIST
-            # Lock exists, wait and retry
-            sleep(0.1)
+          File.open(lock_file, File::CREAT | File::EXCL | File::WRONLY) do |_f|
+            acquired = true
+            yield
           end
+          break
+        rescue Errno::EEXIST
+          # Lock exists, wait and retry
+          sleep(0.1)
         end
 
         raise "Could not acquire lock on #{path}" unless acquired
@@ -262,7 +256,7 @@ module Leyline
         File.delete(lock_file) if acquired && File.exist?(lock_file)
       end
 
-      def with_unix_file_lock(path, &block)
+      def with_unix_file_lock(path)
         File.open("#{path}.lock", File::CREAT) do |f|
           f.flock(File::LOCK_EX)
           yield

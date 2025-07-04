@@ -19,13 +19,13 @@ RSpec.describe Leyline::CLI do
       allow(metadata_cache).to receive(:documents_for_category).and_return([])
       allow(metadata_cache).to receive(:search).and_return([])
       allow(metadata_cache).to receive(:performance_stats).and_return({
-        hit_ratio: 0.8,
-        memory_usage: 1024,
-        document_count: 10,
-        category_count: 2,
-        scan_count: 1,
-        last_scan: Time.now
-      })
+                                                                        hit_ratio: 0.8,
+                                                                        memory_usage: 1024,
+                                                                        document_count: 10,
+                                                                        category_count: 2,
+                                                                        scan_count: 1,
+                                                                        last_scan: Time.now
+                                                                      })
     end
 
     describe 'cache warm-up integration' do

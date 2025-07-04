@@ -15,15 +15,15 @@ def test(description)
 
   begin
     yield
-    puts "✓ PASS"
+    puts '✓ PASS'
     $tests_passed += 1
-  rescue => e
+  rescue StandardError => e
     puts "✗ FAIL: #{e.message}"
     puts "  #{e.backtrace.first}" if ENV['DEBUG']
   end
 end
 
-def assert(condition, message = "Assertion failed")
+def assert(condition, message = 'Assertion failed')
   raise message unless condition
 end
 
@@ -32,11 +32,11 @@ def assert_equal(expected, actual, message = nil)
   raise message unless expected == actual
 end
 
-def assert_nil(value, message = "Expected nil")
+def assert_nil(value, message = 'Expected nil')
   raise "#{message}, got #{value.inspect}" unless value.nil?
 end
 
-def assert_not_nil(value, message = "Expected non-nil value")
+def assert_not_nil(value, message = 'Expected non-nil value')
   raise message if value.nil?
 end
 
@@ -85,10 +85,10 @@ def create_test_errors
 end
 
 # Test cases
-puts "==== TESTING ErrorFormatter ===="
+puts '==== TESTING ErrorFormatter ===='
 
 # Test 1: Basic instantiation
-test "basic instantiation" do
+test 'basic instantiation' do
   formatter = ErrorFormatter.new
   assert_not_nil(formatter)
 
@@ -97,83 +97,83 @@ test "basic instantiation" do
 end
 
 # Test 2: Empty errors handling
-test "empty errors handling" do
+test 'empty errors handling' do
   formatter = ErrorFormatter.new
 
   result = formatter.render([])
-  assert_equal("", result, "Should return empty string for no errors")
+  assert_equal('', result, 'Should return empty string for no errors')
 
   result = formatter.render([], {})
-  assert_equal("", result, "Should return empty string with file contents but no errors")
+  assert_equal('', result, 'Should return empty string with file contents but no errors')
 end
 
 # Test 3: Basic error rendering without file content
-test "basic error rendering without file content" do
+test 'basic error rendering without file content' do
   formatter = ErrorFormatter.new
   errors = create_test_errors
 
   result = formatter.render(errors)
 
   assert_not_nil(result)
-  assert(result.length > 0, "Should produce non-empty output")
-  assert_includes(result, "Invalid ID format")
-  assert_includes(result, "Invalid date format")
-  assert_includes(result, "Missing required fields")
+  assert(result.length > 0, 'Should produce non-empty output')
+  assert_includes(result, 'Invalid ID format')
+  assert_includes(result, 'Invalid date format')
+  assert_includes(result, 'Missing required fields')
 end
 
 # Test 4: File grouping functionality
-test "file grouping functionality" do
+test 'file grouping functionality' do
   formatter = ErrorFormatter.new
   errors = create_test_errors
 
   result = formatter.render(errors)
 
   # Should group errors by file
-  assert_includes(result, "/path/to/file1.md:")
-  assert_includes(result, "/path/to/file2.md:")
+  assert_includes(result, '/path/to/file1.md:')
+  assert_includes(result, '/path/to/file2.md:')
 
   # file1.md should appear before file2.md (alphabetical sorting)
-  file1_pos = result.index("/path/to/file1.md:")
-  file2_pos = result.index("/path/to/file2.md:")
-  assert(file1_pos < file2_pos, "Files should be sorted alphabetically")
+  file1_pos = result.index('/path/to/file1.md:')
+  file2_pos = result.index('/path/to/file2.md:')
+  assert(file1_pos < file2_pos, 'Files should be sorted alphabetically')
 end
 
 # Test 5: Error message formatting
-test "error message formatting" do
+test 'error message formatting' do
   formatter = ErrorFormatter.new
   errors = create_test_errors
 
   result = formatter.render(errors)
 
   # Should include error indicators
-  error_indicators = result.scan(/\[ERROR\]|\✗/)
-  assert(error_indicators.length >= 3, "Should have error indicators for each error")
+  error_indicators = result.scan(/\[ERROR\]|✗/)
+  assert(error_indicators.length >= 3, 'Should have error indicators for each error')
 
   # Should include line numbers and field names where available
-  assert_includes(result, "line 5")
-  assert_includes(result, "line 8")
+  assert_includes(result, 'line 5')
+  assert_includes(result, 'line 8')
   assert_includes(result, "field 'id'")
   assert_includes(result, "field 'date'")
 
   # Should include suggestions
-  assert_includes(result, "suggestion:")
-  assert_includes(result, "Use lowercase letters and hyphens only")
-  assert_includes(result, "Use YYYY-MM-DD format")
+  assert_includes(result, 'suggestion:')
+  assert_includes(result, 'Use lowercase letters and hyphens only')
+  assert_includes(result, 'Use YYYY-MM-DD format')
 end
 
 # Test 6: TTY detection and colorization
-test "TTY detection and colorization" do
-  # Note: This test checks the logic but actual TTY detection depends on environment
+test 'TTY detection and colorization' do
+  # NOTE: This test checks the logic but actual TTY detection depends on environment
   formatter = ErrorFormatter.new
 
   # Test colorize method directly
   # In non-TTY environment (like this test), should not add colors
-  colored_text = formatter.send(:colorize, "test", :red)
+  colored_text = formatter.send(:colorize, 'test', :red)
 
   # Should either be plain text (non-TTY) or include ANSI codes (TTY)
-  if colored_text == "test"
+  if colored_text == 'test'
     # Non-TTY mode - should be plain text
-    assert_equal("test", colored_text)
+    assert_equal('test', colored_text)
   else
     # TTY mode - should include ANSI escape codes
     assert_includes(colored_text, "\e[")
@@ -181,7 +181,7 @@ test "TTY detection and colorization" do
 end
 
 # Test 7: NO_COLOR environment variable handling
-test "NO_COLOR environment variable handling" do
+test 'NO_COLOR environment variable handling' do
   # Save original value
   original_no_color = ENV['NO_COLOR']
 
@@ -191,14 +191,13 @@ test "NO_COLOR environment variable handling" do
     formatter = ErrorFormatter.new
 
     # Should not use colors when NO_COLOR is set
-    colored_text = formatter.send(:colorize, "test", :red)
-    assert_equal("test", colored_text, "Should not colorize when NO_COLOR is set")
+    colored_text = formatter.send(:colorize, 'test', :red)
+    assert_equal('test', colored_text, 'Should not colorize when NO_COLOR is set')
 
     # Test with NO_COLOR empty (should still use colors if TTY)
     ENV['NO_COLOR'] = ''
-    formatter = ErrorFormatter.new
+    ErrorFormatter.new
     # Don't test colorization here as it depends on TTY status
-
   ensure
     # Restore original value
     ENV['NO_COLOR'] = original_no_color
@@ -206,22 +205,22 @@ test "NO_COLOR environment variable handling" do
 end
 
 # Test 8: Error header formatting
-test "error header formatting" do
+test 'error header formatting' do
   formatter = ErrorFormatter.new
 
   # Test with single error
   single_error = [create_test_errors.first]
   result = formatter.render(single_error)
-  assert_includes(result, "1 error in 1 file")
+  assert_includes(result, '1 error in 1 file')
 
   # Test with multiple errors
   multiple_errors = create_test_errors
   result = formatter.render(multiple_errors)
-  assert_includes(result, "3 errors in 2 files")
+  assert_includes(result, '3 errors in 2 files')
 end
 
 # Test 9: Context snippet generation
-test "context snippet generation" do
+test 'context snippet generation' do
   formatter = ErrorFormatter.new
   file_content = <<~CONTENT
     line 1
@@ -240,24 +239,24 @@ test "context snippet generation" do
     suggestion: 'Fix the test'
   }]
 
-  file_contents = {'/test/file.md' => file_content}
+  file_contents = { '/test/file.md' => file_content }
   result = formatter.render(errors, file_contents)
 
   # Should include context snippet
-  assert_includes(result, "context:")
-  assert_includes(result, "line 1")
-  assert_includes(result, "line 2")
-  assert_includes(result, "line 3 - error here")
-  assert_includes(result, "line 4")
-  assert_includes(result, "line 5")
+  assert_includes(result, 'context:')
+  assert_includes(result, 'line 1')
+  assert_includes(result, 'line 2')
+  assert_includes(result, 'line 3 - error here')
+  assert_includes(result, 'line 4')
+  assert_includes(result, 'line 5')
 
   # Should highlight error line
   error_line_indicators = result.scan(/[>→]/)
-  assert(error_line_indicators.length >= 1, "Should highlight error line")
+  assert(error_line_indicators.length >= 1, 'Should highlight error line')
 end
 
 # Test 10: Context snippet edge cases
-test "context snippet edge cases" do
+test 'context snippet edge cases' do
   formatter = ErrorFormatter.new
 
   # Test error at beginning of file
@@ -271,9 +270,9 @@ test "context snippet edge cases" do
     suggestion: 'Fix it'
   }]
 
-  result = formatter.render(errors, {'/test/file.md' => file_content})
-  assert_includes(result, "context:")
-  assert_includes(result, "line 1")
+  result = formatter.render(errors, { '/test/file.md' => file_content })
+  assert_includes(result, 'context:')
+  assert_includes(result, 'line 1')
 
   # Test error at end of file
   errors = [{
@@ -285,9 +284,9 @@ test "context snippet edge cases" do
     suggestion: 'Fix it'
   }]
 
-  result = formatter.render(errors, {'/test/file.md' => file_content})
-  assert_includes(result, "context:")
-  assert_includes(result, "line 3")
+  result = formatter.render(errors, { '/test/file.md' => file_content })
+  assert_includes(result, 'context:')
+  assert_includes(result, 'line 3')
 
   # Test with invalid line number
   errors = [{
@@ -299,16 +298,16 @@ test "context snippet edge cases" do
     suggestion: 'Fix it'
   }]
 
-  result = formatter.render(errors, {'/test/file.md' => file_content})
+  result = formatter.render(errors, { '/test/file.md' => file_content })
   # Should not crash and should not include context for invalid line
-  assert_not_includes(result, "context:")
+  assert_not_includes(result, 'context:')
 end
 
 # Test 11: Long line truncation in context
-test "long line truncation in context" do
+test 'long line truncation in context' do
   formatter = ErrorFormatter.new
 
-  long_line = 'x' * 100  # Longer than 80 character limit
+  long_line = 'x' * 100 # Longer than 80 character limit
   file_content = "short line\n#{long_line}\nother line"
 
   errors = [{
@@ -320,16 +319,16 @@ test "long line truncation in context" do
     suggestion: 'Fix it'
   }]
 
-  result = formatter.render(errors, {'/test/file.md' => file_content})
+  result = formatter.render(errors, { '/test/file.md' => file_content })
 
   # Should truncate long lines with "..."
-  assert_includes(result, "...")
+  assert_includes(result, '...')
   # Should not include the full long line
   assert_not_includes(result, long_line)
 end
 
 # Test 12: No context when file content not provided
-test "no context when file content not provided" do
+test 'no context when file content not provided' do
   formatter = ErrorFormatter.new
 
   errors = [{
@@ -343,19 +342,19 @@ test "no context when file content not provided" do
 
   # Render without file contents
   result = formatter.render(errors)
-  assert_not_includes(result, "context:")
+  assert_not_includes(result, 'context:')
 
   # Render with empty file contents map
   result = formatter.render(errors, {})
-  assert_not_includes(result, "context:")
+  assert_not_includes(result, 'context:')
 
   # Render with file contents map but missing this file
-  result = formatter.render(errors, {'/other/file.md' => 'content'})
-  assert_not_includes(result, "context:")
+  result = formatter.render(errors, { '/other/file.md' => 'content' })
+  assert_not_includes(result, 'context:')
 end
 
 # Test 13: Multiple errors in same file
-test "multiple errors in same file" do
+test 'multiple errors in same file' do
   formatter = ErrorFormatter.new
 
   errors = [
@@ -381,17 +380,17 @@ test "multiple errors in same file" do
 
   # Should group under single file header
   file_headers = result.scan(%r{/test/file\.md:})
-  assert_equal(1, file_headers.length, "Should have single file header")
+  assert_equal(1, file_headers.length, 'Should have single file header')
 
   # Should include both errors
-  assert_includes(result, "First error")
-  assert_includes(result, "Second error")
-  assert_includes(result, "Fix first")
-  assert_includes(result, "Fix second")
+  assert_includes(result, 'First error')
+  assert_includes(result, 'Second error')
+  assert_includes(result, 'Fix first')
+  assert_includes(result, 'Fix second')
 end
 
 # Test 14: Suggestion formatting
-test "suggestion formatting" do
+test 'suggestion formatting' do
   formatter = ErrorFormatter.new
 
   # Test single-line suggestion
@@ -405,8 +404,8 @@ test "suggestion formatting" do
   }]
 
   result = formatter.render(errors)
-  assert_includes(result, "suggestion:")
-  assert_includes(result, "Single line suggestion")
+  assert_includes(result, 'suggestion:')
+  assert_includes(result, 'Single line suggestion')
 
   # Test multi-line suggestion
   errors = [{
@@ -419,14 +418,14 @@ test "suggestion formatting" do
   }]
 
   result = formatter.render(errors)
-  assert_includes(result, "suggestion:")
-  assert_includes(result, "Line 1")
-  assert_includes(result, "Line 2")
-  assert_includes(result, "Line 3")
+  assert_includes(result, 'suggestion:')
+  assert_includes(result, 'Line 1')
+  assert_includes(result, 'Line 2')
+  assert_includes(result, 'Line 3')
 end
 
 # Test 15: Error without suggestion
-test "error without suggestion" do
+test 'error without suggestion' do
   formatter = ErrorFormatter.new
 
   errors = [{
@@ -441,17 +440,17 @@ test "error without suggestion" do
   result = formatter.render(errors)
 
   # Should include error message but not suggestion section
-  assert_includes(result, "Test error")
-  assert_not_includes(result, "suggestion:")
+  assert_includes(result, 'Test error')
+  assert_not_includes(result, 'suggestion:')
 
   # Test with empty suggestion
   errors[0][:suggestion] = ''
   result = formatter.render(errors)
-  assert_not_includes(result, "suggestion:")
+  assert_not_includes(result, 'suggestion:')
 end
 
 # Test 16: Error structure validation
-test "error structure validation" do
+test 'error structure validation' do
   formatter = ErrorFormatter.new
 
   # Should handle minimal error structure
@@ -462,11 +461,11 @@ test "error structure validation" do
   }]
 
   result = formatter.render(minimal_error)
-  assert_includes(result, "Minimal error")
-  assert_includes(result, "/test/file.md:")
+  assert_includes(result, 'Minimal error')
+  assert_includes(result, '/test/file.md:')
 
   # Should not crash on missing optional fields
-  assert_not_includes(result, "line nil")
+  assert_not_includes(result, 'line nil')
   assert_not_includes(result, "field 'nil'")
 end
 
@@ -481,20 +480,20 @@ puts "Success rate: #{success_rate}%"
 
 if $tests_passed == $tests_run
   puts "\n✅ All tests passed! ErrorFormatter unit test coverage achieved:"
-  puts "- ✓ Basic instantiation and empty error handling"
-  puts "- ✓ File grouping and alphabetical sorting"
-  puts "- ✓ Error message formatting with line numbers and fields"
-  puts "- ✓ TTY detection and colorization logic"
-  puts "- ✓ NO_COLOR environment variable support"
-  puts "- ✓ Error header formatting (singular/plural)"
-  puts "- ✓ Context snippet generation for various line positions"
-  puts "- ✓ Context snippet edge cases (start/end of file, invalid lines)"
-  puts "- ✓ Long line truncation in context snippets"
-  puts "- ✓ Backward compatibility without file content"
-  puts "- ✓ Multiple errors in same file grouping"
-  puts "- ✓ Single and multi-line suggestion formatting"
-  puts "- ✓ Error handling without suggestions"
-  puts "- ✓ Minimal error structure handling"
+  puts '- ✓ Basic instantiation and empty error handling'
+  puts '- ✓ File grouping and alphabetical sorting'
+  puts '- ✓ Error message formatting with line numbers and fields'
+  puts '- ✓ TTY detection and colorization logic'
+  puts '- ✓ NO_COLOR environment variable support'
+  puts '- ✓ Error header formatting (singular/plural)'
+  puts '- ✓ Context snippet generation for various line positions'
+  puts '- ✓ Context snippet edge cases (start/end of file, invalid lines)'
+  puts '- ✓ Long line truncation in context snippets'
+  puts '- ✓ Backward compatibility without file content'
+  puts '- ✓ Multiple errors in same file grouping'
+  puts '- ✓ Single and multi-line suggestion formatting'
+  puts '- ✓ Error handling without suggestions'
+  puts '- ✓ Minimal error structure handling'
   puts "\n🎯 Target: >=95% coverage achieved (100% functional coverage)"
 else
   puts "\n❌ Some tests failed. Review output above for details."

@@ -12,9 +12,7 @@ All systems must implement the three pillars of observability: structured logs, 
 
 ## Rationale
 
-This binding directly implements our automation tenet by transforming system telemetry from human-readable outputs into machine-readable data that powers automated monitoring, alerting, and analysis. When you implement comprehensive observability, you create a multidimensional, queryable model of your system's behavior that enables automated tooling to detect patterns, identify anomalies, and pinpoint root causes without human intervention.
-
-Each observability pillar provides unique insights: logs tell you what happened and why, metrics show you how often and how much, and traces reveal the journey and relationships between components. Together, they create a complete story that enables rapid troubleshooting and optimization in distributed systems.
+This binding transforms system telemetry into machine-readable data that powers automated monitoring, alerting, and analysis. Logs tell you what happened, metrics show frequency and magnitude, traces reveal component relationships. Together, they enable rapid troubleshooting in distributed systems.
 
 ## Rule Definition
 
@@ -57,41 +55,26 @@ Each observability pillar provides unique insights: logs tell you what happened 
 
 ## Implementation Guide
 
-### 1. Setting Up Structured Logging
+### 1. Structured Logging
 
 ```typescript
 // observability.ts
 import { AsyncLocalStorage } from 'async_hooks';
 
 interface LogContext {
-  timestamp: string;
-  level: 'ERROR' | 'WARN' | 'INFO' | 'DEBUG';
-  message: string;
-  service: string;
-  correlation_id: string;
-  component: string;
-  metadata?: Record<string, unknown>;
+  timestamp: string; level: 'ERROR' | 'WARN' | 'INFO' | 'DEBUG'; message: string;
+  service: string; correlation_id: string; component: string; metadata?: Record<string, unknown>;
 }
 
 class StructuredLogger {
   private contextStorage = new AsyncLocalStorage<{ correlationId: string }>();
-  private serviceName: string;
+  constructor(private serviceName: string) {}
 
-  constructor(serviceName: string) {
-    this.serviceName = serviceName;
-  }
-
-  private createLogEntry(level: LogContext['level'], message: string,
-                        component: string, metadata?: Record<string, unknown>): LogContext {
+  private createLogEntry(level: LogContext['level'], message: string, component: string, metadata?: Record<string, unknown>): LogContext {
     const context = this.contextStorage.getStore();
     return {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      service: this.serviceName,
-      correlation_id: context?.correlationId || 'unknown',
-      component,
-      ...(metadata && { metadata })
+      timestamp: new Date().toISOString(), level, message, service: this.serviceName,
+      correlation_id: context?.correlationId || 'unknown', component, ...(metadata && { metadata })
     };
   }
 
@@ -100,11 +83,9 @@ class StructuredLogger {
   }
 
   error(message: string, component: string, error?: Error, metadata?: Record<string, unknown>) {
-    const logData = this.createLogEntry('ERROR', message, component, {
-      ...metadata,
-      ...(error && { error: { name: error.name, message: error.message, stack: error.stack }})
-    });
-    console.log(JSON.stringify(logData));
+    console.log(JSON.stringify(this.createLogEntry('ERROR', message, component, {
+      ...metadata, ...(error && { error: { name: error.name, message: error.message, stack: error.stack }})
+    })));
   }
 
   withCorrelation<T>(correlationId: string, fn: () => T): T {
@@ -113,7 +94,7 @@ class StructuredLogger {
 }
 ```
 
-### 2. Implementing Metrics Collection
+### 2. Metrics Collection
 
 ```typescript
 // metrics.ts
@@ -126,25 +107,16 @@ class ServiceMetrics {
 
   constructor(serviceName: string) {
     this.requestsTotal = new Counter({
-      name: 'http_requests_total',
-      help: 'Total HTTP requests',
-      labelNames: ['service', 'method', 'status_code'],
-      registers: [register]
+      name: 'http_requests_total', help: 'Total HTTP requests',
+      labelNames: ['service', 'method', 'status_code'], registers: [register]
     });
-
     this.requestDuration = new Histogram({
-      name: 'http_request_duration_seconds',
-      help: 'HTTP request duration in seconds',
-      labelNames: ['service', 'method', 'status_code'],
-      buckets: [0.1, 0.5, 1, 2, 5],
-      registers: [register]
+      name: 'http_request_duration_seconds', help: 'HTTP request duration in seconds',
+      labelNames: ['service', 'method', 'status_code'], buckets: [0.1, 0.5, 1, 2, 5], registers: [register]
     });
-
     this.activeConnections = new Gauge({
-      name: 'active_connections',
-      help: 'Number of active connections',
-      labelNames: ['service'],
-      registers: [register]
+      name: 'active_connections', help: 'Number of active connections',
+      labelNames: ['service'], registers: [register]
     });
   }
 
@@ -160,79 +132,48 @@ class ServiceMetrics {
 }
 ```
 
-### 3. Adding Distributed Tracing
+### 3. Distributed Tracing & Unified Interface
 
 ```typescript
-// tracing.ts
+// tracing.ts + unified-observability.ts
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { trace } from '@opentelemetry/api';
 
-// Initialize tracing
-const sdk = new NodeSDK({
-  serviceName: 'user-service',
-  // instrumentations auto-discovered
-});
+const sdk = new NodeSDK({ serviceName: 'user-service' });
 sdk.start();
 
 class TracingService {
   private tracer = trace.getTracer('user-service');
-
   async processRequest(correlationId: string, operation: string, fn: () => Promise<any>) {
     return this.tracer.startActiveSpan(operation, {
-      attributes: {
-        'service.name': 'user-service',
-        'operation.name': operation,
-        'correlation.id': correlationId
-      }
+      attributes: { 'service.name': 'user-service', 'operation.name': operation, 'correlation.id': correlationId }
     }, async (span) => {
       try {
         const result = await fn();
-        span.setStatus({ code: 2 }); // SUCCESS
+        span.setStatus({ code: 2 });
         return result;
       } catch (error) {
-        span.setStatus({ code: 3, message: error.message }); // ERROR
+        span.setStatus({ code: 3, message: error.message });
         span.recordException(error);
         throw error;
-      } finally {
-        span.end();
-      }
+      } finally { span.end(); }
     });
   }
 }
-```
-
-### 4. Unified Observability Interface
-
-```typescript
-// unified-observability.ts
 export class ObservabilityService {
-  constructor(
-    private logger: StructuredLogger,
-    private metrics: ServiceMetrics,
-    private tracing: TracingService
-  ) {}
-
-  async handleRequest(correlationId: string, method: string, operation: string,
-                     handler: () => Promise<any>) {
+  constructor(private logger: StructuredLogger, private metrics: ServiceMetrics, private tracing: TracingService) {}
+  async handleRequest(correlationId: string, method: string, operation: string, handler: () => Promise<any>) {
     const startTime = Date.now();
-
     return this.logger.withCorrelation(correlationId, async () => {
       this.logger.info(`Starting ${operation}`, 'request-handler', { method });
-
       return this.tracing.processRequest(correlationId, operation, async () => {
         try {
           const result = await handler();
-          const duration = (Date.now() - startTime) / 1000;
-
-          this.metrics.recordRequest(method, 200, duration);
-          this.logger.info(`Completed ${operation}`, 'request-handler', {
-            duration_ms: Date.now() - startTime
-          });
-
+          this.metrics.recordRequest(method, 200, (Date.now() - startTime) / 1000);
+          this.logger.info(`Completed ${operation}`, 'request-handler', { duration_ms: Date.now() - startTime });
           return result;
         } catch (error) {
-          const duration = (Date.now() - startTime) / 1000;
-          this.metrics.recordRequest(method, 500, duration);
+          this.metrics.recordRequest(method, 500, (Date.now() - startTime) / 1000);
           this.logger.error(`Failed ${operation}`, 'request-handler', error);
           throw error;
         }
@@ -244,38 +185,10 @@ export class ObservabilityService {
 
 ## Examples
 
-### ✅ Do This
-```typescript
-// Correlated observability signals
-logger.info('User authenticated successfully', 'auth-service', { userId: '123' });
-metrics.recordRequest('POST', 200, 0.45);
-// Trace span automatically correlates with same correlation_id
-```
+**✅ Do:** `logger.info('User authenticated', 'auth-service', { userId: '123' }); metrics.recordRequest('POST', 200, 0.45);`
+**❌ Don't:** `console.log('User login at ' + new Date()); metrics.inc('logins'); // No context, no tracing`
 
-### ❌ Not This
-```typescript
-// Uncorrelated signals
-console.log('User login at ' + new Date() + ' status: success');
-metrics.inc('logins'); // No context
-// No tracing participation
-```
+## Performance & References
 
-## Performance Considerations
-
-**Sampling**: Use trace sampling (1-10%) for high-traffic services to reduce overhead.
-
-**Async Logging**: Use non-blocking log writes to prevent performance impact.
-
-**Metric Aggregation**: Pre-aggregate high-cardinality metrics to reduce storage costs.
-
-## Related Standards
-
-- [context-propagation](../../docs/bindings/core/context-propagation.md): Provides context management patterns that support observability correlation
-- [automated-quality-gates](../../docs/bindings/core/automated-quality-gates.md): Quality gates that validate observability implementation
-- [fail-fast-validation](../../docs/bindings/core/fail-fast-validation.md): Validation patterns that benefit from comprehensive observability
-
-## References
-
-- [OpenTelemetry Specification](https://opentelemetry.io/docs/specs/)
-- [Prometheus Best Practices](https://prometheus.io/docs/practices/)
-- [The Three Pillars of Observability](https://peter.bourgon.org/blog/2017/02/21/metrics-tracing-and-logging.html)
+**Performance:** Use trace sampling (1-10%), non-blocking log writes, pre-aggregate high-cardinality metrics
+**References:** [OpenTelemetry Specification](https://opentelemetry.io/docs/specs/), [Prometheus Best Practices](https://prometheus.io/docs/practices/)

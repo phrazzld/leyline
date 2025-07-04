@@ -21,7 +21,7 @@ module Leyline
     # Returns hash with added, modified, removed files
     def compare_with_remote(local_path, category)
       raise ComparisonError, "Local path does not exist: #{local_path}" unless Dir.exist?(local_path)
-      raise ComparisonError, "Category cannot be nil or empty" if category.nil? || category.strip.empty?
+      raise ComparisonError, 'Category cannot be nil or empty' if category.nil? || category.strip.empty?
 
       local_files = discover_local_files(local_path, category)
       remote_files = discover_remote_files(category)
@@ -47,9 +47,7 @@ module Leyline
         current_hash = content_hash(file_path)
         base_hash = base_manifest[file_path]
 
-        if base_hash.nil? || current_hash != base_hash
-          modifications << file_path
-        end
+        modifications << file_path if base_hash.nil? || current_hash != base_hash
       end
 
       modifications
@@ -73,16 +71,16 @@ module Leyline
           modified_time_a: File.mtime(file_a),
           modified_time_b: File.mtime(file_b)
         }
-      rescue Errno::EACCES => e
+      rescue Errno::EACCES
         raise ComparisonFailedError.new(
-          "Permission denied comparing files",
+          'Permission denied comparing files',
           reason: :permission_denied,
           file_a: file_a,
           file_b: file_b
         )
-      rescue Encoding::InvalidByteSequenceError => e
+      rescue Encoding::InvalidByteSequenceError
         raise ComparisonFailedError.new(
-          "File encoding error during comparison",
+          'File encoding error during comparison',
           reason: :encoding_error,
           file_a: file_a,
           file_b: file_b
@@ -109,7 +107,7 @@ module Leyline
           else
             warn "Warning: Could not hash file #{file_path}: #{e.message}"
           end
-        rescue => e
+        rescue StandardError => e
           # Skip files that can't be read but don't fail entire operation
           warn "Warning: Could not hash file #{file_path}: #{e.message}"
         end
@@ -125,9 +123,9 @@ module Leyline
       return true if file_a == file_b
 
       # Handle platform-specific path normalization
-      if PlatformHelper.windows?
+      if PlatformHelper.windows? && (file_a.downcase == file_b.downcase)
         # Windows: case-insensitive comparison
-        return true if file_a.downcase == file_b.downcase
+        return true
       end
 
       # Quick size check first
@@ -138,7 +136,7 @@ module Leyline
       hash_b = content_hash(file_b)
 
       hash_a == hash_b
-    rescue => e
+    rescue StandardError
       # If we can't read files for comparison, assume they're different
       false
     end
@@ -155,44 +153,42 @@ module Leyline
       if @cache
         begin
           @cache.put(content)
-        rescue => e
+        rescue StandardError => e
           # Cache errors should not interrupt file comparison
           # Error is already logged by FileCache
         end
       end
 
       hash
-    rescue Errno::ENOENT => e
+    rescue Errno::ENOENT
       raise ComparisonFailedError.new(
         file_path, nil,
         reason: :file_not_found
       )
-    rescue Errno::EACCES => e
+    rescue Errno::EACCES
       raise ComparisonFailedError.new(
         file_path, nil,
         reason: :permission_denied
       )
-    rescue Errno::EMFILE, Errno::ENFILE => e
+    rescue Errno::EMFILE, Errno::ENFILE
       raise ComparisonFailedError.new(
         file_path, nil,
         reason: :too_many_files,
         suggestion: 'Close other applications or increase file descriptor limit'
       )
-    rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError => e
+    rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError
       raise ComparisonFailedError.new(
         file_path, nil,
         reason: :encoding_error
       )
     rescue IOError => e
-      if e.message.include?('closed stream')
-        raise ComparisonFailedError.new(
-          file_path, nil,
-          reason: :concurrent_modification
-        )
-      else
-        raise ComparisonError, "Failed to read file #{file_path}: #{e.message}"
-      end
-    rescue => e
+      raise ComparisonError, "Failed to read file #{file_path}: #{e.message}" unless e.message.include?('closed stream')
+
+      raise ComparisonFailedError.new(
+        file_path, nil,
+        reason: :concurrent_modification
+      )
+    rescue StandardError => e
       raise ComparisonError, "Failed to read file #{file_path}: #{e.message}"
     end
 
@@ -215,13 +211,13 @@ module Leyline
       end
 
       files
-    rescue => e
+    rescue StandardError => e
       raise ComparisonError, "Failed to discover local files: #{e.message}"
     end
 
     # Discover remote files for a specific category (placeholder)
     # This will be implemented when transparency commands need remote comparison
-    def discover_remote_files(category)
+    def discover_remote_files(_category)
       # TODO: Implement remote file discovery using GitClient
       # For now, return empty hash to support testing and initial implementation
       {}
@@ -236,9 +232,7 @@ module Leyline
       patterns << 'bindings/core/**/*.md'
 
       # Add category-specific bindings
-      unless category == 'core'
-        patterns << "bindings/categories/#{category}/**/*.md"
-      end
+      patterns << "bindings/categories/#{category}/**/*.md" unless category == 'core'
 
       patterns
     end
@@ -249,9 +243,7 @@ module Leyline
 
       local_files.each do |file_path, local_hash|
         remote_hash = remote_files[file_path]
-        if remote_hash && local_hash != remote_hash
-          modified << file_path
-        end
+        modified << file_path if remote_hash && local_hash != remote_hash
       end
 
       modified
@@ -263,9 +255,7 @@ module Leyline
 
       local_files.each do |file_path, local_hash|
         remote_hash = remote_files[file_path]
-        if remote_hash && local_hash == remote_hash
-          unchanged << file_path
-        end
+        unchanged << file_path if remote_hash && local_hash == remote_hash
       end
 
       unchanged

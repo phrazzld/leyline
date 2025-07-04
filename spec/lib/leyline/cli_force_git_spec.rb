@@ -37,23 +37,23 @@ RSpec.describe Leyline::CLI do
     context 'flag combination validation' do
       it 'allows --force-git with --verbose' do
         options = { force_git: true, verbose: true }
-        expect {
+        expect do
           Leyline::CliOptions.validate_sync_options(options, '.')
-        }.not_to raise_error
+        end.not_to raise_error
       end
 
       it 'allows --force-git with --no-cache' do
         options = { force_git: true, no_cache: true }
-        expect {
+        expect do
           Leyline::CliOptions.validate_sync_options(options, '.')
-        }.not_to raise_error
+        end.not_to raise_error
       end
 
       it 'allows --force-git with --force' do
         options = { force_git: true, force: true }
-        expect {
+        expect do
           Leyline::CliOptions.validate_sync_options(options, '.')
-        }.not_to raise_error
+        end.not_to raise_error
       end
     end
 

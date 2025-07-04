@@ -21,7 +21,7 @@ RSpec.describe 'Discovery Performance Validation', type: :integration do
 
       expect(categories).to be_an(Array)
       expect(categories_time).to be < TARGET_PERFORMANCE_MS,
-        "Categories command took #{categories_time}ms, exceeds #{TARGET_PERFORMANCE_MS}ms target"
+                                 "Categories command took #{categories_time}ms, exceeds #{TARGET_PERFORMANCE_MS}ms target"
 
       # Show command (test first category if available)
       if categories.any?
@@ -31,7 +31,7 @@ RSpec.describe 'Discovery Performance Validation', type: :integration do
 
         expect(documents).to be_an(Array)
         expect(show_time).to be < TARGET_PERFORMANCE_MS,
-          "Show command took #{show_time}ms, exceeds #{TARGET_PERFORMANCE_MS}ms target"
+                             "Show command took #{show_time}ms, exceeds #{TARGET_PERFORMANCE_MS}ms target"
       end
 
       # Search command
@@ -41,7 +41,7 @@ RSpec.describe 'Discovery Performance Validation', type: :integration do
 
       expect(results).to be_an(Array)
       expect(search_time).to be < TARGET_PERFORMANCE_MS,
-        "Search command took #{search_time}ms, exceeds #{TARGET_PERFORMANCE_MS}ms target"
+                             "Search command took #{search_time}ms, exceeds #{TARGET_PERFORMANCE_MS}ms target"
 
       # Log performance for CI monitoring
       puts "\n[PERFORMANCE VALIDATION] All targets met:"

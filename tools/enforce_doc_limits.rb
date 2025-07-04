@@ -49,9 +49,7 @@ class DocLimitEnforcer
     content = File.read(file_path)
 
     # Skip YAML front matter
-    if content.start_with?('---')
-      content = content.split('---', 3)[2] || ''
-    end
+    content = content.split('---', 3)[2] || '' if content.start_with?('---')
 
     # Count non-empty lines
     content.lines.reject { |line| line.strip.empty? }.count
@@ -59,7 +57,7 @@ class DocLimitEnforcer
 
   def report_results
     if @violations.empty? && @warnings.empty?
-      puts "✅ All documents within limits!" unless @verbose
+      puts '✅ All documents within limits!' unless @verbose
       exit 0
     end
 
@@ -70,18 +68,18 @@ class DocLimitEnforcer
       end
     end
 
-    if @violations.any?
-      puts "\n❌ Violations (exceeding limits):"
-      @violations.each do |v|
-        puts "  #{v[:file]}: #{v[:lines]} lines (limit: #{v[:limit]})"
-      end
+    return unless @violations.any?
 
-      puts "\nSummary:"
-      puts "  #{@violations.count} files exceed limits"
-      puts "  #{@warnings.count} files approaching limits"
-
-      exit 1
+    puts "\n❌ Violations (exceeding limits):"
+    @violations.each do |v|
+      puts "  #{v[:file]}: #{v[:lines]} lines (limit: #{v[:limit]})"
     end
+
+    puts "\nSummary:"
+    puts "  #{@violations.count} files exceed limits"
+    puts "  #{@warnings.count} files approaching limits"
+
+    exit 1
   end
 end
 

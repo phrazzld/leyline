@@ -18,8 +18,8 @@ module Leyline
     # Subclasses should override to provide specific recovery suggestions
     def recovery_suggestions
       [
-        "Run the command with --verbose for more detailed error information",
-        "Check the Leyline documentation for troubleshooting guidance"
+        'Run the command with --verbose for more detailed error information',
+        'Check the Leyline documentation for troubleshooting guidance'
       ]
     end
 
@@ -28,10 +28,10 @@ module Leyline
       suggestions = []
       case platform
       when :windows
-        suggestions << "Ensure Windows Defender is not blocking file operations"
-        suggestions << "Try running as Administrator if permission errors occur"
+        suggestions << 'Ensure Windows Defender is not blocking file operations'
+        suggestions << 'Try running as Administrator if permission errors occur'
       when :macos
-        suggestions << "Check System Preferences > Security & Privacy for file access permissions"
+        suggestions << 'Check System Preferences > Security & Privacy for file access permissions'
         suggestions << "Use 'sudo' if administrative access is required"
       when :linux
         suggestions << "Check file permissions with 'ls -la'"
@@ -60,7 +60,7 @@ module Leyline
       parts << "Operation: #{@operation}" if @operation
 
       if @context.any?
-        context_info = @context.map { |k, v| "#{k}: #{v}" }.join(", ")
+        context_info = @context.map { |k, v| "#{k}: #{v}" }.join(', ')
         parts << "Context: #{context_info}"
       end
 
@@ -69,15 +69,15 @@ module Leyline
 
     def platform
       @platform ||= case RUBY_PLATFORM
-                   when /win32|win64|\.NET|windows|cygwin|mingw32/i
-                     :windows
-                   when /darwin|mac os/i
-                     :macos
-                   when /linux/i
-                     :linux
-                   else
-                     :unknown
-                   end
+                    when /win32|win64|\.NET|windows|cygwin|mingw32/i
+                      :windows
+                    when /darwin|mac os/i
+                      :macos
+                    when /linux/i
+                      :linux
+                    else
+                      :unknown
+                    end
     end
   end
 
@@ -94,15 +94,15 @@ module Leyline
 
     def recovery_suggestions
       base_suggestions = [
-        "Review conflicts carefully before proceeding",
+        'Review conflicts carefully before proceeding',
         "Use 'leyline diff' to see exact differences",
-        "Create backups of important local modifications"
+        'Create backups of important local modifications'
       ]
 
       resolution_suggestions = [
-        "Use --force to override local changes with remote versions",
-        "Manually merge conflicts in affected files",
-        "Use --dry-run to preview changes without applying them"
+        'Use --force to override local changes with remote versions',
+        'Manually merge conflicts in affected files',
+        'Use --dry-run to preview changes without applying them'
       ]
 
       base_suggestions + resolution_suggestions
@@ -120,7 +120,7 @@ module Leyline
 
     def build_conflict_message
       count = @conflicts.size
-      paths = conflicted_paths.first(3).join(", ")
+      paths = conflicted_paths.first(3).join(', ')
 
       message = "#{count} conflict#{'s' if count > 1} detected"
       message += " in: #{paths}"
@@ -133,7 +133,7 @@ module Leyline
   class InvalidSyncStateError < LeylineError
     attr_reader :state_file, :validation_errors
 
-    def initialize(message = "Sync state is invalid or corrupted", state_file: nil, validation_errors: [], **options)
+    def initialize(message = 'Sync state is invalid or corrupted', state_file: nil, validation_errors: [], **options)
       @state_file = state_file
       @validation_errors = validation_errors
       super(message, category: :sync_state, context: { state_file: state_file }, **options)
@@ -142,21 +142,19 @@ module Leyline
     def recovery_suggestions
       suggestions = [
         "Run 'leyline sync --force' to rebuild sync state from scratch",
-        "Verify cache directory permissions are correct"
+        'Verify cache directory permissions are correct'
       ]
 
       if @state_file
         suggestions << "Delete corrupted state file: rm '#{@state_file}'"
-        suggestions << "Check disk space in cache directory"
+        suggestions << 'Check disk space in cache directory'
       end
 
-      if @validation_errors.any?
-        suggestions << "Validation errors found: #{@validation_errors.join(', ')}"
-      end
+      suggestions << "Validation errors found: #{@validation_errors.join(', ')}" if @validation_errors.any?
 
       suggestions + [
-        "Clear entire cache if problems persist: rm -rf ~/.cache/leyline",
-        "Check for concurrent leyline processes that might be corrupting state"
+        'Clear entire cache if problems persist: rm -rf ~/.cache/leyline',
+        'Check for concurrent leyline processes that might be corrupting state'
       ]
     end
   end
@@ -177,29 +175,29 @@ module Leyline
     end
 
     def recovery_suggestions
-      suggestions = ["Verify both files exist and are readable"]
+      suggestions = ['Verify both files exist and are readable']
 
       if @reason
         reason_lower = @reason.downcase
         if reason_lower.include?('permission')
           suggestions += [
             "Check file permissions: ls -la '#{@file_a}' '#{@file_b}'",
-            "Ensure you have read access to both files"
+            'Ensure you have read access to both files'
           ]
         elsif reason_lower.include?('encoding')
           suggestions += [
-            "Files may have encoding issues - ensure they are UTF-8",
+            'Files may have encoding issues - ensure they are UTF-8',
             "Use 'file' command to check file types: file '#{@file_a}'"
           ]
         elsif reason_lower.include?('size') || reason_lower.include?('too large')
           suggestions += [
-            "One of the files may be too large for comparison",
-            "Check available memory and disk space"
+            'One of the files may be too large for comparison',
+            'Check available memory and disk space'
           ]
         elsif reason_lower.include?('lock')
           suggestions += [
-            "Files may be locked by another process",
-            "Wait for other processes to complete and retry"
+            'Files may be locked by another process',
+            'Wait for other processes to complete and retry'
           ]
         end
       end
@@ -218,7 +216,8 @@ module Leyline
       @operation_type = operation_type
       @http_status = http_status
 
-      super(message, category: :remote_access, context: { url: url, operation_type: operation_type, http_status: http_status }, **options)
+      super(message, category: :remote_access, context: { url: url, operation_type: operation_type,
+                                                          http_status: http_status }, **options)
     end
 
     def recovery_suggestions
@@ -227,35 +226,33 @@ module Leyline
       case @http_status
       when 401, 403
         suggestions += [
-          "Check authentication credentials",
-          "Verify you have access to the repository",
-          "Update git credentials if using HTTPS"
+          'Check authentication credentials',
+          'Verify you have access to the repository',
+          'Update git credentials if using HTTPS'
         ]
       when 404
         suggestions += [
-          "Verify the repository URL is correct",
-          "Check if the repository exists and is accessible"
+          'Verify the repository URL is correct',
+          'Check if the repository exists and is accessible'
         ]
       when 408, 502, 503, 504
         suggestions += [
-          "Network or server issue - retry in a few minutes",
-          "Check your internet connection"
+          'Network or server issue - retry in a few minutes',
+          'Check your internet connection'
         ]
       when 429
         suggestions += [
-          "Rate limited - wait before retrying",
+          'Rate limited - wait before retrying',
           "Check if you're making too many requests"
         ]
       end
 
       suggestions += [
-        "Check firewall and proxy settings",
-        "Try using a different network connection"
+        'Check firewall and proxy settings',
+        'Try using a different network connection'
       ]
 
-      if @url
-        suggestions << "Verify DNS resolution: nslookup #{extract_domain(@url)}"
-      end
+      suggestions << "Verify DNS resolution: nslookup #{extract_domain(@url)}" if @url
 
       suggestions.compact
     end
@@ -264,6 +261,7 @@ module Leyline
 
     def extract_domain(url)
       return nil unless url
+
       URI.parse(url).host
     rescue URI::InvalidURIError
       nil
@@ -278,9 +276,9 @@ module Leyline
 
     def recovery_suggestions
       [
-        "Clear the cache directory: rm -rf ~/.cache/leyline",
-        "Run sync with --no-cache flag to bypass cache",
-        "Check cache directory permissions and available disk space"
+        'Clear the cache directory: rm -rf ~/.cache/leyline',
+        'Run sync with --no-cache flag to bypass cache',
+        'Check cache directory permissions and available disk space'
       ]
     end
   end
@@ -304,27 +302,25 @@ module Leyline
       when :write, :put
         suggestions += [
           "Check available disk space: #{@disk_space_available || 'unknown'}",
-          "Clean up old cache files: leyline cache clean"
+          'Clean up old cache files: leyline cache clean'
         ]
 
-        if @cache_path
-          suggestions << "Verify cache directory permissions: ls -la '#{File.dirname(@cache_path)}'"
-        end
+        suggestions << "Verify cache directory permissions: ls -la '#{File.dirname(@cache_path)}'" if @cache_path
       when :read, :get
         suggestions += [
-          "Cache may be corrupted - try clearing it: rm -rf ~/.cache/leyline",
-          "Check file permissions on cache directory"
+          'Cache may be corrupted - try clearing it: rm -rf ~/.cache/leyline',
+          'Check file permissions on cache directory'
         ]
       when :delete
         suggestions += [
-          "Check if files are locked by another process",
-          "Verify you have write permissions to cache directory"
+          'Check if files are locked by another process',
+          'Verify you have write permissions to cache directory'
         ]
       end
 
       suggestions += [
-        "Try running with a different cache directory: LEYLINE_CACHE_DIR=/tmp/leyline-cache",
-        "Check for concurrent leyline processes using the same cache"
+        'Try running with a different cache directory: LEYLINE_CACHE_DIR=/tmp/leyline-cache',
+        'Check for concurrent leyline processes using the same cache'
       ]
 
       suggestions + platform_specific_suggestions
@@ -360,20 +356,20 @@ module Leyline
       case @reason
       when :permission_denied
         suggestions += [
-          "Ensure you have appropriate access rights",
-          "Try running with elevated privileges if necessary"
+          'Ensure you have appropriate access rights',
+          'Try running with elevated privileges if necessary'
         ]
         suggestions << "Check file permissions: ls -la '#{@path}'" if @path
       when :read_only_filesystem
         suggestions += [
-          "Filesystem is mounted read-only",
-          "Remount filesystem with write permissions if possible"
+          'Filesystem is mounted read-only',
+          'Remount filesystem with write permissions if possible'
         ]
         suggestions << "Check mount options: mount | grep '#{@path}'" if @path
       when :disk_full
         suggestions += [
-          "Free up disk space",
-          "Remove unnecessary files or move to another location"
+          'Free up disk space',
+          'Remove unnecessary files or move to another location'
         ]
         suggestions << "Check disk usage: df -h '#{@path}'" if @path
       end
@@ -401,29 +397,29 @@ module Leyline
         case @stderr_output.downcase
         when /permission denied|access denied/
           suggestions += [
-            "Check git repository permissions",
-            "Verify SSH key or authentication credentials",
-            "Ensure git user has appropriate access rights"
+            'Check git repository permissions',
+            'Verify SSH key or authentication credentials',
+            'Ensure git user has appropriate access rights'
           ]
         when /not found|does not exist/
           suggestions += [
-            "Verify the repository URL is correct",
-            "Check if the repository exists and is accessible",
-            "Ensure the branch or tag exists"
+            'Verify the repository URL is correct',
+            'Check if the repository exists and is accessible',
+            'Ensure the branch or tag exists'
           ]
         when /network|connection/
           suggestions += [
-            "Check internet connection",
-            "Verify DNS resolution for git host",
-            "Check firewall and proxy settings"
+            'Check internet connection',
+            'Verify DNS resolution for git host',
+            'Check firewall and proxy settings'
           ]
         end
       end
 
       suggestions += [
-        "Verify git is installed and in PATH",
-        "Check git configuration: git config --list",
-        "Try running the git command manually for more details"
+        'Verify git is installed and in PATH',
+        'Check git configuration: git config --list',
+        'Try running the git command manually for more details'
       ]
 
       suggestions
@@ -438,7 +434,8 @@ module Leyline
       @platform_operation = platform_operation
       @platform_type = platform
 
-      super(message, category: :platform, context: { platform_operation: platform_operation, platform_type: @platform_type }, **options)
+      super(message, category: :platform, context: { platform_operation: platform_operation,
+                                                     platform_type: @platform_type }, **options)
     end
 
     def recovery_suggestions
@@ -449,14 +446,14 @@ module Leyline
         case platform
         when :windows
           suggestions += [
-            "Close any programs that might be using the files",
-            "Check Windows Resource Monitor for file handles",
-            "Try restarting if files remain locked"
+            'Close any programs that might be using the files',
+            'Check Windows Resource Monitor for file handles',
+            'Try restarting if files remain locked'
           ]
         when :macos, :linux
           suggestions += [
             "Check for processes using the files: lsof '#{@context[:file_path]}'",
-            "Wait for other processes to complete",
+            'Wait for other processes to complete',
             "Use 'fuser' to identify blocking processes"
           ]
         end
@@ -464,19 +461,19 @@ module Leyline
         case platform
         when :windows
           suggestions += [
-            "Run Command Prompt as Administrator",
-            "Check file properties > Security tab for permissions",
+            'Run Command Prompt as Administrator',
+            'Check file properties > Security tab for permissions',
             "Use 'icacls' command to modify permissions"
           ]
         when :macos
           suggestions += [
             "Use 'chmod' to fix permissions: chmod 644 filename",
-            "Check System Preferences > Security & Privacy",
+            'Check System Preferences > Security & Privacy',
             "Use 'sudo' for administrative operations"
           ]
         when :linux
           suggestions += [
-            "Check permissions: ls -la filename",
+            'Check permissions: ls -la filename',
             "Use 'chmod' to fix permissions: chmod 644 filename",
             "Use 'sudo' for administrative operations"
           ]
@@ -522,7 +519,7 @@ module Leyline
       private
 
       def display_conflict_error(error)
-        warn "⚠️  Conflicts detected:"
+        warn '⚠️  Conflicts detected:'
         warn error.message
         warn "\n🔧 Resolution steps:"
         error.recovery_suggestions.each_with_index do |suggestion, i|
@@ -531,7 +528,7 @@ module Leyline
       end
 
       def display_sync_state_error(error)
-        warn "❌ Sync state error:"
+        warn '❌ Sync state error:'
         warn error.message
         warn "\n🔧 Recovery steps:"
         error.recovery_suggestions.each_with_index do |suggestion, i|
@@ -540,40 +537,40 @@ module Leyline
       end
 
       def display_comparison_error(error)
-        warn "❌ File comparison failed:"
+        warn '❌ File comparison failed:'
         warn error.message
         warn "\n🔧 Possible solutions:"
         error.recovery_suggestions.each { |s| warn "  • #{s}" }
       end
 
       def display_remote_access_error(error)
-        warn "🌐 Remote access failed:"
+        warn '🌐 Remote access failed:'
         warn error.message
         warn "\n🔧 Network troubleshooting:"
         error.recovery_suggestions.each { |s| warn "  • #{s}" }
       end
 
       def display_cache_error(error)
-        warn "💾 Cache operation failed:"
+        warn '💾 Cache operation failed:'
         warn error.message
         warn "\n🔧 Cache recovery:"
         error.recovery_suggestions.each { |s| warn "  • #{s}" }
       end
 
       def display_platform_error(error)
-        warn "🖥️  Platform-specific error:"
+        warn '🖥️  Platform-specific error:'
         warn error.message
         warn "\n🔧 Platform solutions:"
         error.recovery_suggestions.each { |s| warn "  • #{s}" }
       end
 
       def display_generic_error(error)
-        warn "❌ Operation failed:"
+        warn '❌ Operation failed:'
         warn error.message
-        if error.respond_to?(:recovery_suggestions) && error.recovery_suggestions.any?
-          warn "\n🔧 Suggestions:"
-          error.recovery_suggestions.each { |s| warn "  • #{s}" }
-        end
+        return unless error.respond_to?(:recovery_suggestions) && error.recovery_suggestions.any?
+
+        warn "\n🔧 Suggestions:"
+        error.recovery_suggestions.each { |s| warn "  • #{s}" }
       end
     end
   end

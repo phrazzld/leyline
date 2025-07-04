@@ -200,7 +200,7 @@ RSpec.describe Leyline::Discovery::DocumentScanner do
 
         result = scanner.scan_document(file_path)
         expect(result[:title]).to eq(expected_title),
-          "Expected filename '#{filename}' to produce title '#{expected_title}' but got '#{result[:title]}'"
+                                  "Expected filename '#{filename}' to produce title '#{expected_title}' but got '#{result[:title]}'"
 
         File.delete(file_path)
       end

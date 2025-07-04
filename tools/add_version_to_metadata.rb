@@ -73,6 +73,7 @@ class VersionMigrator
     Dir.glob(File.join(path, '**', '*.md')).sort.each do |file|
       # Skip index files
       next if File.basename(file).start_with?('00-')
+
       process_file(file)
     end
   end
@@ -92,7 +93,7 @@ class VersionMigrator
 
       # Check if file has YAML front-matter
       unless content.start_with?("---\n")
-        puts "  SKIP: No YAML front-matter found" if options[:verbose]
+        puts '  SKIP: No YAML front-matter found' if options[:verbose]
         stats[:files_skipped] += 1
         return
       end
@@ -100,18 +101,18 @@ class VersionMigrator
       # Extract YAML front-matter and rest of content
       parts = content.split(/^---\s*$/m, 3)
       if parts.length < 3
-        puts "  ERROR: Invalid YAML front-matter format"
+        puts '  ERROR: Invalid YAML front-matter format'
         stats[:errors] += 1
         return
       end
 
       yaml_content = parts[1]
-      rest_content = "---" + parts[2]
+      rest_content = '---' + parts[2]
 
       # Parse YAML to check for version field
       begin
         yaml_data = YAML.safe_load(yaml_content)
-      rescue => e
+      rescue StandardError => e
         puts "  ERROR: Failed to parse YAML: #{e.message}"
         stats[:errors] += 1
         return
@@ -138,8 +139,7 @@ class VersionMigrator
       end
 
       stats[:files_updated] += 1
-
-    rescue => e
+    rescue StandardError => e
       puts "  ERROR: #{e.message}"
       puts e.backtrace.join("\n") if options[:verbose]
       stats[:errors] += 1
@@ -168,9 +168,9 @@ class VersionMigrator
 
   def show_diff(original, updated)
     puts "\n  Original YAML:"
-    puts "  " + original.strip.split("\n").join("\n  ")
+    puts '  ' + original.strip.split("\n").join("\n  ")
     puts "\n  Updated YAML:"
-    puts "  " + updated.strip.split("\n").join("\n  ")
+    puts '  ' + updated.strip.split("\n").join("\n  ")
   end
 
   def print_summary
@@ -187,12 +187,10 @@ class VersionMigrator
       puts "\nERROR: Migration completed with errors"
     elsif stats[:files_updated] == 0
       puts "\nNo files needed updating"
+    elsif options[:dry_run]
+      puts "\nDRY RUN completed. Use without --dry-run to apply changes."
     else
-      if options[:dry_run]
-        puts "\nDRY RUN completed. Use without --dry-run to apply changes."
-      else
-        puts "\nMigration completed successfully!"
-      end
+      puts "\nMigration completed successfully!"
     end
   end
 end
@@ -204,25 +202,25 @@ options = {
 }
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: add_version_to_metadata.rb [options]"
+  opts.banner = 'Usage: add_version_to_metadata.rb [options]'
 
-  opts.on("--dry-run", "Show what would be changed without making changes") do
+  opts.on('--dry-run', 'Show what would be changed without making changes') do
     options[:dry_run] = true
   end
 
-  opts.on("-f", "--file FILE", "Process a single file") do |file|
+  opts.on('-f', '--file FILE', 'Process a single file') do |file|
     options[:file] = file
   end
 
-  opts.on("-p", "--path PATH", "Process all .md files in a directory (recursive)") do |path|
+  opts.on('-p', '--path PATH', 'Process all .md files in a directory (recursive)') do |path|
     options[:path] = path
   end
 
-  opts.on("-v", "--verbose", "Show detailed processing information") do
+  opts.on('-v', '--verbose', 'Show detailed processing information') do
     options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit
   end
