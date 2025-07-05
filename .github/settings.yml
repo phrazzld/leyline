@@ -1,0 +1,121 @@
+# Repository configuration for leyline
+# This file configures repository settings via the probot/settings GitHub App
+# Documentation: https://github.com/probot/settings
+
+repository:
+  # Repository metadata
+  name: leyline
+  description: "A centralized system for defining and enforcing development principles through tenets and bindings"
+  homepage: https://github.com/phrazzld/leyline
+  topics:
+    - development-principles
+    - documentation
+    - engineering-standards
+    - best-practices
+    - automation
+
+  # Repository features
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  has_downloads: true
+
+  # Default branch
+  default_branch: master
+
+  # Merge options
+  allow_squash_merge: true
+  allow_merge_commit: true
+  allow_rebase_merge: true
+  delete_branch_on_merge: true
+
+# Branch protection rules
+branches:
+  - name: master
+    protection:
+      # Pull request reviews (disabled for solo maintainer)
+      required_pull_request_reviews: null
+
+      # Required status checks
+      required_status_checks:
+        strict: true
+        checks:
+          # Content validation workflow (document length enforcement)
+          - context: "validate"
+            app_id: 15368  # GitHub Actions app ID
+
+          # CI workflow (markdown linting and validation)
+          - context: "lint-docs"
+            app_id: 15368  # GitHub Actions app ID
+
+      # Additional protection settings
+      enforce_admins: false
+      allow_force_pushes: false
+      allow_deletions: false
+      block_creations: false
+
+      # Require conversations to be resolved
+      required_conversation_resolution: true
+
+      # Linear history (optional - can be disabled if rebase-heavy workflow preferred)
+      required_linear_history: false
+
+# Team and collaborator permissions (if applicable)
+# teams:
+#   - name: maintainers
+#     permission: admin
+#   - name: contributors
+#     permission: push
+
+# Labels for issue and PR management
+# Note: Core content labels are managed via .github/labels.yml
+# This section adds supplementary labels for workflow management
+labels:
+  # Priority labels
+  - name: "priority: high"
+    color: "d73a4a"
+    description: "High priority issue or PR"
+
+  - name: "priority: medium"
+    color: "fbca04"
+    description: "Medium priority issue or PR"
+
+  - name: "priority: low"
+    color: "0075ca"
+    description: "Low priority issue or PR"
+
+  # Status labels for workflow management
+  - name: "status: needs review"
+    color: "fbca04"
+    description: "PR awaiting review"
+
+  - name: "status: work in progress"
+    color: "0052cc"
+    description: "PR or issue being actively worked on"
+
+  - name: "status: blocked"
+    color: "b60205"
+    description: "Blocked on external dependency"
+
+  - name: "status: ready to merge"
+    color: "0e8a16"
+    description: "PR approved and ready for merge"
+
+  # Validation-specific labels
+  - name: "validation: failed"
+    color: "d73a4a"
+    description: "PR failed required status checks"
+
+  - name: "validation: warning"
+    color: "fbca04"
+    description: "PR has validation warnings"
+
+# Milestones for project tracking
+milestones:
+  - title: "Documentation Conciseness"
+    description: "Make all documents concise for AI agent consumption"
+    state: open
+
+  - title: "CI Integration"
+    description: "Complete integration of enforcement into CI/CD pipeline"
+    state: open
