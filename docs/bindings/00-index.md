@@ -94,8 +94,8 @@ _No backend bindings defined yet._
 | [csharp-async-patterns](./categories/csharp/csharp-async-patterns.md) | 0.1.0 | ## Rationale |
 | [modern-csharp-toolchain](./categories/csharp/modern-csharp-toolchain.md) | 0.1.0 | Use a standardized, integrated set of modern tools for all C# projects: .NET 8.0+ SDK with SDK-style projects, xUnit for testing, Central Package M... |
 | [nullable-reference-types](./categories/csharp/nullable-reference-types.md) | 0.1.0 | This binding implements our strict null checking tenet by leveraging C#'s nullable reference types feature to eliminate entire classes of runtime e... |
-| [pattern-matching](./categories/csharp/pattern-matching.md) | 0.1.0 | This binding implements our clarity tenet by leveraging C#'s pattern matching to create more expressive, safer code that clearly communicates inten... |
-| [record-types-and-immutability](./categories/csharp/record-types-and-immutability.md) | 0.1.0 | This binding implements our immutable-by-default tenet by leveraging C#'s record types and modern immutability features to create safer, more predi... |
+| [pattern-matching](./categories/csharp/pattern-matching.md) | 0.1.0 | This binding implements our clarity tenet by leveraging C#'s pattern matching to create more expressive, safer code. Traditional if-else chains and... |
+| [record-types-and-immutability](./categories/csharp/record-types-and-immutability.md) | 0.1.0 | This binding implements our immutable-by-default tenet using C#'s record types to create safer, more predictable code. Mutable state causes race co... |
 
 ## Frontend Bindings
 
@@ -108,7 +108,7 @@ _No frontend bindings defined yet._
 | [concurrency-patterns](./categories/go/concurrency-patterns.md) | 0.1.0 | This binding implements our simplicity tenet by preventing uncontrolled concurrency complexity. Each `go` statement creates potential non-determini... |
 | [dependency-injection-patterns](./categories/go/dependency-injection-patterns.md) | 0.1.0 | This binding implements our orthogonality tenet by using Go's interface system to create truly independent components that can be developed, tested... |
 | [embrace-boring-code](./categories/go/embrace-boring-code.md) | 0.1.0 | Go was designed with grug's philosophy in mind: simple, readable, boring code that gets the job done. The language deliberately omits features that... |
-| [error-context-propagation](./categories/go/error-context-propagation.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by preventing the decay of error information quality over time. When errors lose context as th... |
+| [error-context-propagation](./categories/go/error-context-propagation.md) | 0.1.0 | This binding implements our fix-broken-windows tenet by preventing error information decay. When errors lose context as they bubble up, debugging b... |
 | [error-wrapping](./categories/go/error-wrapping.md) | 0.1.0 | This binding implements our explicit-over-implicit tenet by making error context and |
 | [interface-design](./categories/go/interface-design.md) | 0.1.0 | This binding directly implements our testability tenet by enabling clean, flexible testing without over-mocking. When interfaces are small and defi... |
 | [package-design](./categories/go/package-design.md) | 0.1.0 | This binding implements our modularity tenet by establishing clear, well-defined boundaries for Go code organization. Package design is the primary... |
@@ -188,12 +188,12 @@ _No frontend bindings defined yet._
 | [feature-flag-driven-development](./categories/git/feature-flag-driven-development.md) | 0.1.0 | This binding directly implements our distributed Git workflows tenet by solving one of the fundamental challenges of distributed development: how t... |
 | [git-backup-strategy](./categories/git/git-backup-strategy.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by applying data durability principles to version control. While Git's distributed na... |
 | [git-monitoring-metrics](./categories/git/git-monitoring-metrics.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by bringing production-grade observability to version control operations. While we me... |
-| [git-performance-optimization](./categories/git/git-performance-optimization.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by recognizing that performance is a feature, not a luxury. When Git operations are s... |
+| [git-performance-optimization](./categories/git/git-performance-optimization.md) | 0.1.0 | This binding implements our Git reliability engineering tenet by treating performance as a critical feature. Slow Git operations destroy developer ... |
 | [git-implementation-roadmap](./categories/git/implementation-roadmap.md) | 0.1.0 | The Git category now contains: |
-| [large-repository-patterns](./categories/git/large-repository-patterns.md) | 0.1.0 | This binding implements our distributed Git workflows tenet by addressing the unique challenges of scale. As repositories grow—whether through accu... |
+| [large-repository-patterns](./categories/git/large-repository-patterns.md) | 0.1.0 | This binding implements our distributed Git workflows tenet by addressing scale challenges. As repositories grow, traditional Git workflows break d... |
 | [linear-history-optimization](./categories/git/linear-history-optimization.md) | 0.1.0 | This binding maximizes the performance and utility of Git's content-addressable model by maintaining simple, linear commit graphs. Complex merge-he... |
 | [merge-strategy-selection](./categories/git/merge-strategy-selection.md) | 0.1.0 | Git provides multiple strategies for integrating changes—merge, rebase, squash—each with distinct effects on repository history and performance. Ch... |
-| [pull-request-workflow](./categories/git/pull-request-workflow.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by establishing streamlined, automated pull request workflows. Just as Rails recognized ... |
+| [pull-request-workflow](./categories/git/pull-request-workflow.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by establishing streamlined, automated pull request workflows. Manual PR processes creat... |
 | [repository-performance-standards](./categories/git/repository-performance-standards.md) | 0.1.0 | Git's performance characteristics change dramatically with repository size, history length, and usage patterns. A repository that performs well wit... |
 | [trunk-based-development](./categories/git/trunk-based-development.md) | 0.1.0 | This binding implements our Git workflow conventions tenet by establishing trunk-based development as the default branching strategy. Just as Rails... |
 

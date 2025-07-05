@@ -12,11 +12,9 @@ Use Go's interface system and constructor patterns to create loosely coupled, te
 
 ## Rationale
 
-This binding implements our orthogonality tenet by using Go's interface system to create truly independent components that can be developed, tested, and modified without affecting each other. Dependency injection is fundamental to building maintainable systems because it allows you to compose functionality from independent parts while keeping those parts loosely coupled.
+This binding implements our orthogonality tenet by using Go's interface system to create truly independent components that can be developed, tested, and modified without affecting each other. Dependency injection allows you to compose functionality from independent parts while keeping those parts loosely coupled.
 
-Like building with standardized electrical components, each Go struct declares what interfaces it needs without caring about specific implementations. A LED light strip declares "I need 12V DC power" through its connector interface, but doesn't care whether that power comes from a wall adapter, battery pack, or solar panel. This flexibility allows you to swap power sources without rewiring, test with a bench power supply, and combine components in ways the original designers never imagined.
-
-Without dependency injection, your components become hardwired like appliances permanently connected to specific outlets. Moving requires rewiring the house, testing requires access to exact outlets, and if outlets break, appliances become useless. Go's interface system provides standardized "plugs and sockets" that allow components to connect without hardwiring, enabling the flexibility and testability that orthogonal design requires.
+Like electrical components with standardized connectors, Go structs declare needed interfaces without caring about specific implementations. This flexibility enables swapping implementations, easy testing, and component reuse. Without dependency injection, components become hardwired together, making testing difficult and changes expensive.
 
 ## Rule Definition
 
@@ -45,15 +43,12 @@ What this explicitly prohibits:
 
 ## Practical Implementation
 
-1. **Define Consumer-Driven Interfaces**: Create small, focused interfaces that
-   represent only the capabilities each component actually needs.
+1. **Define Consumer-Driven Interfaces**: Create small, focused interfaces for each capability.
 
    ```go
-   // Consumer-driven interfaces for user service
    type UserRepository interface {
-       GetByID(ctx context.Context, id string) (*User, error)
        Create(ctx context.Context, user *User) error
-       Update(ctx context.Context, user *User) error
+       GetByID(ctx context.Context, id string) (*User, error)
    }
 
    type NotificationSender interface {
@@ -62,62 +57,39 @@ What this explicitly prohibits:
 
    type PasswordHasher interface {
        Hash(password string) (string, error)
-       Verify(password, hash string) error
    }
 
-   // Service depends only on interfaces it needs
    type UserService struct {
        repo   UserRepository
        notify NotificationSender
        hasher PasswordHasher
    }
 
-   // Constructor injection makes all dependencies explicit
-   func NewUserService(
-       repo UserRepository,
-       notify NotificationSender,
-       hasher PasswordHasher,
-   ) *UserService {
-       return &UserService{
-           repo:   repo,
-           notify: notify,
-           hasher: hasher,
-       }
+   func NewUserService(repo UserRepository, notify NotificationSender, hasher PasswordHasher) *UserService {
+       return &UserService{repo: repo, notify: notify, hasher: hasher}
    }
 
    func (s *UserService) RegisterUser(ctx context.Context, email, password string) error {
-       // Hash password
        hashedPassword, err := s.hasher.Hash(password)
        if err != nil {
            return fmt.Errorf("password hashing failed: %w", err)
        }
 
-       // Create user
-       user := &User{
-           ID:       generateID(),
-           Email:    email,
-           Password: hashedPassword,
-       }
-
+       user := &User{ID: generateID(), Email: email, Password: hashedPassword}
        if err := s.repo.Create(ctx, user); err != nil {
            return fmt.Errorf("user creation failed: %w", err)
        }
 
-       // Send welcome email
        if err := s.notify.SendWelcomeEmail(ctx, user); err != nil {
-           // Log error but don't fail registration
            log.Printf("Failed to send welcome email: %v", err)
        }
-
        return nil
    }
    ```
 
-2. **Implement Provider Structs**: Create concrete implementations that satisfy
-   the interfaces defined by consumers.
+2. **Implement Provider Structs**: Create concrete implementations.
 
    ```go
-   // Database implementation of UserRepository
    type PostgresUserRepository struct {
        db *sql.DB
    }
@@ -126,176 +98,59 @@ What this explicitly prohibits:
        return &PostgresUserRepository{db: db}
    }
 
-   func (r *PostgresUserRepository) GetByID(ctx context.Context, id string) (*User, error) {
-       var user User
-       err := r.db.QueryRowContext(ctx,
-           "SELECT id, email, password FROM users WHERE id = $1", id,
-       ).Scan(&user.ID, &user.Email, &user.Password)
-
-       if err == sql.ErrNoRows {
-           return nil, nil
-       }
-       if err != nil {
-           return nil, fmt.Errorf("database query failed: %w", err)
-       }
-
-       return &user, nil
-   }
-
    func (r *PostgresUserRepository) Create(ctx context.Context, user *User) error {
        _, err := r.db.ExecContext(ctx,
            "INSERT INTO users (id, email, password) VALUES ($1, $2, $3)",
-           user.ID, user.Email, user.Password,
-       )
-       if err != nil {
-           return fmt.Errorf("database insert failed: %w", err)
-       }
-       return nil
+           user.ID, user.Email, user.Password)
+       return err
    }
 
-   // Email implementation of NotificationSender
    type EmailNotificationSender struct {
        client EmailClient
    }
 
-   func NewEmailNotificationSender(client EmailClient) *EmailNotificationSender {
-       return &EmailNotificationSender{client: client}
-   }
-
    func (e *EmailNotificationSender) SendWelcomeEmail(ctx context.Context, user *User) error {
        return e.client.SendEmail(ctx, EmailMessage{
-           To:      user.Email,
-           Subject: "Welcome!",
-           Body:    "Welcome to our service!",
+           To: user.Email, Subject: "Welcome!", Body: "Welcome to our service!",
        })
-   }
-
-   // Bcrypt implementation of PasswordHasher
-   type BcryptPasswordHasher struct {
-       cost int
-   }
-
-   func NewBcryptPasswordHasher(cost int) *BcryptPasswordHasher {
-       return &BcryptPasswordHasher{cost: cost}
-   }
-
-   func (b *BcryptPasswordHasher) Hash(password string) (string, error) {
-       hash, err := bcrypt.GenerateFromPassword([]byte(password), b.cost)
-       if err != nil {
-           return "", fmt.Errorf("bcrypt hash generation failed: %w", err)
-       }
-       return string(hash), nil
-   }
-
-   func (b *BcryptPasswordHasher) Verify(password, hash string) error {
-       return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
    }
    ```
 
-3. **Wire Dependencies in Main Function**: Compose the application by creating
-   all dependencies and injecting them through constructors.
+3. **Wire Dependencies**: Compose application by injecting dependencies through constructors.
 
    ```go
    func main() {
-       // Initialize infrastructure dependencies
-       db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-       if err != nil {
-           log.Fatal("Failed to connect to database:", err)
-       }
+       db, _ := sql.Open("postgres", os.Getenv("DATABASE_URL"))
        defer db.Close()
 
-       emailClient := NewSMTPEmailClient(os.Getenv("SMTP_HOST"))
-
-       // Create implementations
        userRepo := NewPostgresUserRepository(db)
-       notificationSender := NewEmailNotificationSender(emailClient)
+       emailSender := NewEmailNotificationSender(NewSMTPClient())
        passwordHasher := NewBcryptPasswordHasher(12)
 
-       // Inject dependencies into service
-       userService := NewUserService(userRepo, notificationSender, passwordHasher)
-
-       // Create HTTP handler with service dependency
+       userService := NewUserService(userRepo, emailSender, passwordHasher)
        userHandler := NewUserHandler(userService)
 
-       // Start server
        http.Handle("/users", userHandler)
        log.Fatal(http.ListenAndServe(":8080", nil))
-   }
-
-   // HTTP handler depends on service interface
-   type UserHandler struct {
-       service UserRegistrar
-   }
-
-   type UserRegistrar interface {
-       RegisterUser(ctx context.Context, email, password string) error
-   }
-
-   func NewUserHandler(service UserRegistrar) *UserHandler {
-       return &UserHandler{service: service}
-   }
-
-   func (h *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-       if r.Method != http.MethodPost {
-           http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-           return
-       }
-
-       var req struct {
-           Email    string `json:"email"`
-           Password string `json:"password"`
-       }
-
-       if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-           http.Error(w, "Invalid JSON", http.StatusBadRequest)
-           return
-       }
-
-       if err := h.service.RegisterUser(r.Context(), req.Email, req.Password); err != nil {
-           http.Error(w, "Registration failed", http.StatusInternalServerError)
-           return
-       }
-
-       w.WriteHeader(http.StatusCreated)
    }
    ```
 
 ## Examples
 
 ```go
-// ❌ BAD: Direct dependencies, untestable, tightly coupled
+// ❌ BAD: Direct dependencies, untestable
 type UserService struct {
-    // Direct dependency on concrete types
     db     *sql.DB
     mailer *smtp.Client
 }
 
 func NewUserService() *UserService {
-    // Hidden dependencies, makes testing impossible
-    db, _ := sql.Open("postgres", "production-db-url")
-    mailer, _ := smtp.Dial("smtp.production.com:587")
-
-    return &UserService{
-        db:     db,
-        mailer: mailer,
-    }
+    db, _ := sql.Open("postgres", "production-db-url") // Hidden dependency
+    mailer, _ := smtp.Dial("smtp.production.com:587")  // Hard to test
+    return &UserService{db: db, mailer: mailer}
 }
 
-func (s *UserService) CreateUser(email string) error {
-    // Directly using concrete implementations
-    _, err := s.db.Exec("INSERT INTO users (email) VALUES (?)", email)
-    if err != nil {
-        return err
-    }
-
-    // Tightly coupled to SMTP implementation
-    msg := "Welcome!"
-    return s.mailer.Mail(email, msg)
-}
-```
-
-```go
-// ✅ GOOD: Interface-based dependencies, testable, loosely coupled
+// ✅ GOOD: Interface-based dependencies, testable
 type UserRepository interface {
     Create(ctx context.Context, user *User) error
 }
@@ -309,40 +164,15 @@ type UserService struct {
     sender EmailSender
 }
 
-// All dependencies explicitly declared and injected
 func NewUserService(repo UserRepository, sender EmailSender) *UserService {
-    return &UserService{
-        repo:   repo,
-        sender: sender,
-    }
+    return &UserService{repo: repo, sender: sender} // Dependencies explicit
 }
 
-func (s *UserService) CreateUser(ctx context.Context, email string) error {
-    user := &User{Email: email}
-
-    if err := s.repo.Create(ctx, user); err != nil {
-        return fmt.Errorf("failed to create user: %w", err)
-    }
-
-    if err := s.sender.SendWelcome(ctx, email); err != nil {
-        // Log but don't fail the operation
-        log.Printf("Failed to send welcome email: %v", err)
-    }
-
-    return nil
-}
-
-// Easy to test with mock implementations
-func TestUserService_CreateUser(t *testing.T) {
-    mockRepo := &MockUserRepository{}
-    mockSender := &MockEmailSender{}
-
-    service := NewUserService(mockRepo, mockSender)
-
+// Easy to test with mocks
+func TestUserService(t *testing.T) {
+    service := NewUserService(&MockRepo{}, &MockSender{})
     err := service.CreateUser(context.Background(), "test@example.com")
     assert.NoError(t, err)
-    assert.True(t, mockRepo.CreateCalled)
-    assert.True(t, mockSender.SendWelcomeCalled)
 }
 ```
 
