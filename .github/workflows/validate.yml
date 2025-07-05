@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ master, main ]
 
+# Cancel in-progress runs on the same PR to save resources
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -147,15 +152,58 @@ jobs:
         fi
         echo "✅ Essential validation completed successfully"
 
-    - name: Document length validation
+    - name: Document length enforcement
       run: |
-        echo "📏 Validating document length limits"
-        ruby tools/check_document_length.rb -v
-        if [ $? -ne 0 ]; then
-          echo "::error::Document length validation failed!"
+        echo "::group::📏 Validating document length limits"
+        echo "Checking that tenets ≤100 lines (warn) / ≤150 lines (fail)"
+        echo "Checking that bindings ≤200 lines (warn) / ≤300 lines (fail)"
+        echo "Content lines only (excluding YAML front-matter and empty lines)"
+        echo ""
+
+        # Run enforcement script and capture output
+        if ruby tools/enforce_doc_limits.rb --verbose > /tmp/doc_limits.log 2>&1; then
+          echo "✅ All documents within limits!"
+
+          # Show summary in collapsible group
+          echo "::group::✅ Document Length Summary"
+          cat /tmp/doc_limits.log
+          echo "::endgroup::"
+
+          # Add success to job summary
+          echo "### 📏 Document Length Validation: ✅ PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "All documents are within the specified limits." >> $GITHUB_STEP_SUMMARY
+
+        else
+          echo "::endgroup::"
+          echo "❌ Document length violations found!"
+
+          # Parse output to create annotations for specific files
+          while IFS= read -r line; do
+            if [[ $line =~ ^[[:space:]]*([^:]+):[[:space:]]*([0-9]+)[[:space:]]*lines[[:space:]]*\(.*limit.*([0-9]+)\) ]]; then
+              file="${BASH_REMATCH[1]}"
+              actual="${BASH_REMATCH[2]}"
+              limit="${BASH_REMATCH[3]}"
+              if [[ $line =~ "warn at" ]]; then
+                echo "::warning file=${file}::Document length warning: ${actual} lines (approaching ${limit} line limit)"
+              else
+                echo "::error file=${file}::Document length violation: ${actual} lines (exceeds ${limit} line limit)"
+              fi
+            fi
+          done < /tmp/doc_limits.log
+
+          # Add failure summary
+          echo "### 📏 Document Length Validation: ❌ FAILED" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/doc_limits.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Fix**: Reduce document length to meet limits:" >> $GITHUB_STEP_SUMMARY
+          echo "- Tenets: ≤100 lines (content)" >> $GITHUB_STEP_SUMMARY
+          echo "- Bindings: ≤200 lines (content)" >> $GITHUB_STEP_SUMMARY
+
           exit 1
         fi
-        echo "✅ Document length validation completed successfully"
+        echo "::endgroup::"
 
     # Python code validation disabled - documentation examples don't need strict production validation
     # - name: Validate Python code examples
