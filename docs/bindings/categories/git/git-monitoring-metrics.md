@@ -12,11 +12,9 @@ Implement comprehensive monitoring for Git operations, treating version control 
 
 ## Rationale
 
-This binding implements our Git reliability engineering tenet by bringing production-grade observability to version control operations. While we meticulously monitor our applications' response times and error rates, Git operations often remain unmeasured despite their critical impact on developer productivity. A slow git clone or frequent merge conflicts can waste more engineering hours than many production incidents, yet these issues often go undetected until developers complain.
+Git operations remain unmeasured despite critical impact on developer productivity. Slow clones or frequent conflicts waste more engineering hours than many production incidents, yet go undetected until developers complain.
 
-By monitoring Git like a production service, we transform version control from an assumed utility into a measured, optimized system. This means tracking metrics that matter: clone times, fetch latency, push success rates, and conflict frequency. When you know your p95 clone time has increased from 30 seconds to 3 minutes, you can investigate and fix the issue before it impacts every new team member's onboarding experience.
-
-Think of Git monitoring as preventive healthcare for your development pipeline. Just as we monitor CPU usage and memory consumption to prevent outages, monitoring Git operations prevents the gradual degradation that slowly kills developer productivity. The metrics become a shared language for discussing Git performance: instead of vague complaints about "Git being slow," teams can point to specific metrics and trends that justify infrastructure investments or process improvements.
+Monitoring Git like a production service transforms version control into a measured, optimized system. Track metrics that matter: clone times, push success rates, conflict frequency. Metrics become a shared language for Git performance discussions, replacing vague complaints with specific data.
 
 ## Rule Definition
 
@@ -50,243 +48,112 @@ Git monitoring must treat version control as a tier-1 service with comprehensive
 
 ## Practical Implementation
 
-1. **Instrument Git Operations**: Add comprehensive metrics collection to Git infrastructure:
+1. **Instrument Git Operations**:
    ```python
-   # Git operation metrics collector
    from prometheus_client import Histogram, Counter, Gauge
-   import time
-   import subprocess
+   import time, subprocess
 
-   # Define metrics
-   git_operation_duration = Histogram(
-       'git_operation_duration_seconds',
-       'Duration of Git operations',
-       ['operation', 'repository', 'result']
-   )
-
-   git_operation_total = Counter(
-       'git_operation_total',
-       'Total Git operations',
-       ['operation', 'repository', 'result']
-   )
-
-   repository_size_bytes = Gauge(
-       'git_repository_size_bytes',
-       'Size of Git repository',
-       ['repository']
-   )
+   git_operation_duration = Histogram('git_operation_duration_seconds', 'Duration of Git operations', ['operation', 'repository', 'result'])
+   git_operation_total = Counter('git_operation_total', 'Total Git operations', ['operation', 'repository', 'result'])
+   repository_size_bytes = Gauge('git_repository_size_bytes', 'Size of Git repository', ['repository'])
 
    def track_git_operation(operation, repository, command):
-       start_time = time.time()
+       start = time.time()
        try:
            result = subprocess.run(command, capture_output=True, check=True)
            status = 'success'
        except subprocess.CalledProcessError as e:
-           status = 'failure'
-           result = e
+           status, result = 'failure', e
        finally:
-           duration = time.time() - start_time
-           git_operation_duration.labels(
-               operation=operation,
-               repository=repository,
-               result=status
-           ).observe(duration)
-           git_operation_total.labels(
-               operation=operation,
-               repository=repository,
-               result=status
-           ).inc()
+           duration = time.time() - start
+           git_operation_duration.labels(operation, repository, status).observe(duration)
+           git_operation_total.labels(operation, repository, status).inc()
        return result
    ```
 
-2. **Create Git Performance Dashboards**: Build Grafana dashboards for Git observability:
+2. **Git Performance Dashboards**:
    ```json
    {
-     "dashboard": {
-       "title": "Git Operations SLO Dashboard",
-       "panels": [
-         {
-           "title": "Clone Time by Repository (p95)",
-           "targets": [{
-             "expr": "histogram_quantile(0.95, git_operation_duration_seconds{operation='clone'})"
-           }]
-         },
-         {
-           "title": "Push Success Rate",
-           "targets": [{
-             "expr": "rate(git_operation_total{operation='push',result='success'}[5m]) / rate(git_operation_total{operation='push'}[5m])"
-           }]
-         },
-         {
-           "title": "Repository Growth Rate",
-           "targets": [{
-             "expr": "rate(git_repository_size_bytes[1d])"
-           }]
-         },
-         {
-           "title": "Merge Conflict Rate",
-           "targets": [{
-             "expr": "rate(git_merge_conflicts_total[1h]) / rate(git_merge_attempts_total[1h])"
-           }]
-         }
-       ]
-     }
+     "panels": [
+       {"title": "Clone Time (p95)", "expr": "histogram_quantile(0.95, git_operation_duration_seconds{operation='clone'})"},
+       {"title": "Push Success Rate", "expr": "rate(git_operation_total{operation='push',result='success'}[5m]) / rate(git_operation_total{operation='push'}[5m])"},
+       {"title": "Repository Growth", "expr": "rate(git_repository_size_bytes[1d])"},
+       {"title": "Conflict Rate", "expr": "rate(git_merge_conflicts_total[1h]) / rate(git_merge_attempts_total[1h])"}
+     ]
    }
    ```
 
-3. **Implement SLO-Based Alerts**: Create actionable alerts based on Git SLOs:
+3. **SLO-Based Alerts**:
    ```yaml
-   # Prometheus alerting rules for Git SLOs
    groups:
    - name: git_slo_alerts
      rules:
      - alert: GitCloneSLOViolation
-       expr: |
-         histogram_quantile(0.95,
-           rate(git_operation_duration_seconds_bucket{operation="clone"}[5m])
-         ) > 60
+       expr: histogram_quantile(0.95, rate(git_operation_duration_seconds_bucket{operation="clone"}[5m])) > 60
        for: 10m
-       labels:
-         severity: warning
-         team: platform
-       annotations:
-         summary: "Git clone p95 latency is {{ $value }}s (SLO: <60s)"
-         runbook: "https://wiki.company.com/runbooks/git-performance"
-
+       annotations: {summary: "Git clone p95 latency {{ $value }}s (SLO: <60s)"}
      - alert: GitPushFailureRate
-       expr: |
-         rate(git_operation_total{operation="push",result="failure"}[5m]) /
-         rate(git_operation_total{operation="push"}[5m]) > 0.01
+       expr: rate(git_operation_total{operation="push",result="failure"}[5m]) / rate(git_operation_total{operation="push"}[5m]) > 0.01
        for: 5m
-       labels:
-         severity: critical
-         team: platform
-       annotations:
-         summary: "Git push failure rate is {{ $value | humanizePercentage }}"
-
-     - alert: GitRepositoryGrowthRate
-       expr: |
-         rate(git_repository_size_bytes[1d]) /
-         git_repository_size_bytes > 0.1
+       annotations: {summary: "Git push failure rate {{ $value | humanizePercentage }}"}
+     - alert: GitRepositoryGrowth
+       expr: rate(git_repository_size_bytes[1d]) / git_repository_size_bytes > 0.1
        for: 1h
-       annotations:
-         summary: "Repository {{ $labels.repository }} growing >10% daily"
+       annotations: {summary: "Repository {{ $labels.repository }} growing >10% daily"}
    ```
 
-4. **Track Workflow Metrics**: Monitor team workflow patterns:
+4. **Workflow Metrics**:
    ```sql
-   -- Git workflow analytics
    CREATE VIEW git_workflow_metrics AS
-   SELECT
-     DATE_TRUNC('week', created_at) as week,
-     COUNT(DISTINCT pull_request_id) as total_prs,
-     AVG(CASE WHEN has_conflict THEN 1 ELSE 0 END) as conflict_rate,
-     AVG(EXTRACT(EPOCH FROM (merged_at - created_at))/3600) as avg_pr_lifetime_hours,
-     AVG(commits_count) as avg_commits_per_pr,
-     AVG(files_changed) as avg_files_per_pr
-   FROM pull_requests
-   WHERE created_at > NOW() - INTERVAL '90 days'
-   GROUP BY week
-   ORDER BY week DESC;
+   SELECT DATE_TRUNC('week', created_at) as week,
+          COUNT(DISTINCT pull_request_id) as total_prs,
+          AVG(CASE WHEN has_conflict THEN 1 ELSE 0 END) as conflict_rate,
+          AVG(EXTRACT(EPOCH FROM (merged_at - created_at))/3600) as avg_pr_lifetime_hours
+   FROM pull_requests WHERE created_at > NOW() - INTERVAL '90 days'
+   GROUP BY week ORDER BY week DESC;
    ```
 
-5. **Implement Continuous Optimization**: Use metrics to drive improvements:
+5. **Continuous Optimization**:
    ```python
-   # Automated Git optimization based on metrics
    def optimize_repository(repo_path, metrics):
-       optimizations_applied = []
-
-       # Check if aggressive GC needed
+       optimizations = []
        if metrics['loose_objects'] > 10000:
            subprocess.run(['git', 'gc', '--aggressive'], cwd=repo_path)
-           optimizations_applied.append('aggressive_gc')
-
-       # Check if partial clone would help
+           optimizations.append('aggressive_gc')
        if metrics['repository_size'] > 5_000_000_000:  # 5GB
-           recommend_partial_clone(repo_path)
-           optimizations_applied.append('partial_clone_recommended')
-
-       # Check if LFS needed for large files
-       large_files = find_large_files(repo_path, min_size=100_000_000)
-       if large_files:
-           recommend_lfs_migration(large_files)
-           optimizations_applied.append('lfs_migration_recommended')
-
-       return optimizations_applied
+           optimizations.append('partial_clone_recommended')
+       if find_large_files(repo_path, 100_000_000):  # 100MB+
+           optimizations.append('lfs_migration_recommended')
+       return optimizations
    ```
 
 ## Examples
 
 ```yaml
-# ❌ BAD: No Git monitoring
-# Developers complain about "Git being slow"
-# No data on actual performance
-# Can't identify trends or degradation
-# Reactive fixes after major incidents
-
-# ✅ GOOD: Comprehensive Git observability
+# ❌ BAD: No Git monitoring, reactive fixes
+# ✅ GOOD: Comprehensive observability
 metrics:
-  - name: git_clone_duration_p95
-    value: 45s
-    slo: <60s
-    status: healthy
-
-  - name: git_push_success_rate
-    value: 99.7%
-    slo: >99%
-    status: healthy
-
-  - name: merge_conflict_rate
-    value: 3.2%
-    slo: <5%
-    status: healthy
+  git_clone_duration_p95: {value: 45s, slo: <60s, status: healthy}
+  git_push_success_rate: {value: 99.7%, slo: >99%, status: healthy}
+  merge_conflict_rate: {value: 3.2%, slo: <5%, status: healthy}
 
 alerts:
   - Clone performance degrading (p95: 45s → 52s over 7d)
-  - Repository main-app growth rate high (15% this week)
+  - Repository growth rate high (15% this week)
 ```
 
 ```bash
-# ❌ BAD: Manual performance checking
-time git clone https://git.company.com/main-app
-# 2m 31s - "Seems slow, oh well"
-
-# ✅ GOOD: Automated performance tracking
-# Every Git operation automatically tracked
+# ❌ BAD: Manual checking - "Seems slow, oh well"
+# ✅ GOOD: Every operation tracked, alerts triggered
 git clone https://git.company.com/main-app
-# Metrics recorded:
-# - git_operation_duration_seconds{operation="clone",repository="main-app"}: 151s
-# - git_clone_size_bytes{repository="main-app"}: 2.3GB
-# - git_clone_objects_count{repository="main-app"}: 1.2M
-# Alert triggered: Clone time exceeds SLO
-```
-
-```python
-# ❌ BAD: No workflow metrics
-# "Are we getting more conflicts lately?"
-# "I feel like PRs are taking longer to merge"
-# No data to confirm or deny perceptions
-
-# ✅ GOOD: Data-driven workflow optimization
-workflow_report = {
-    "conflict_rate_trend": "↑ 3.2% → 4.8% over 30d",
-    "pr_lifetime_trend": "↑ 18h → 26h over 30d",
-    "recommendations": [
-        "Conflict hotspots: /src/api/routes.ts (12 conflicts)",
-        "Long-lived branches: feature-x (14 days)",
-        "Consider smaller PRs: avg 45 files changed"
-    ]
-}
+# Metrics: duration=151s, size=2.3GB, objects=1.2M
+# Alert: Clone time exceeds SLO
 ```
 
 ## Related Bindings
 
-- [git-backup-strategy.md](git-backup-strategy.md): Backup health metrics are essential components of Git reliability monitoring. Track backup success rates, duration, and storage usage as key reliability indicators.
-
-- [automated-rollback-procedures.md](automated-rollback-procedures.md): Git metrics inform rollback decisions by tracking deployment correlation with performance degradation or error rates.
-
-- [distributed-conflict-resolution.md](distributed-conflict-resolution.md): Conflict metrics identify patterns and hotspots that inform better code organization and ownership boundaries.
-
-- [use-structured-logging.md](../../core/use-structured-logging.md): Structured logging from Git operations enables detailed analysis and correlation with performance metrics.
-
-- [quality-metrics-and-monitoring.md](../../core/quality-metrics-and-monitoring.md): Git metrics are part of overall engineering quality metrics, providing insight into development velocity and friction points.
+- [git-backup-strategy.md](git-backup-strategy.md): Track backup success rates and duration as reliability indicators
+- [automated-rollback-procedures.md](automated-rollback-procedures.md): Metrics inform rollback decisions
+- [distributed-conflict-resolution.md](distributed-conflict-resolution.md): Conflict metrics identify patterns and hotspots
+- [use-structured-logging.md](../../core/use-structured-logging.md): Structured logging enables detailed analysis
+- [quality-metrics-and-monitoring.md](../../core/quality-metrics-and-monitoring.md): Git metrics provide development velocity insights
