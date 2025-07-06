@@ -12,7 +12,7 @@ Recognize specific code smells and patterns that indicate complexity demons have
 
 ## Rationale
 
-The complexity demon is cunning—it disguises itself as "necessary abstraction," "future-proofing," and "enterprise architecture." This binding provides concrete patterns to identify when the demon has taken hold. Each pattern includes specific detection criteria, measurable thresholds, and targeted remediation strategies.
+Complexity accumulates through specific patterns that disguise themselves as necessary abstractions. This binding provides concrete detection criteria, measurable thresholds, and remediation strategies for common complexity demons.
 
 ## Rule Definition
 
@@ -39,11 +39,8 @@ function processOrder(orderId: string, customerId: string, paymentMethod: string
 
 // ✅ SIMPLE: Group related parameters
 interface OrderRequest {
-  orderId: string;
-  customerId: string;
-  payment: PaymentInfo;
-  shipping: ShippingInfo;
-  options: OrderOptions;
+  orderId: string; customerId: string; payment: PaymentInfo;
+  shipping: ShippingInfo; options: OrderOptions;
 }
 function processOrder(request: OrderRequest) { /* ... */ }
 ```
@@ -85,29 +82,19 @@ function validateUser(user: User): boolean {
 
 **Example:**
 ```typescript
-// ❌ COMPLEXITY DEMON: God class handling everything
+// ❌ COMPLEXITY DEMON: God class with 20+ methods
 class UserManager {
   createUser() { /* ... */ }
   validateUser() { /* ... */ }
   authenticateUser() { /* ... */ }
   updateUserProfile() { /* ... */ }
-  uploadUserAvatar() { /* ... */ }
-  generateUserReport() { /* ... */ }
   // ... 17 more methods
 }
 
 // ✅ SIMPLE: Single responsibility classes
-class UserCreator {
-  createUser() { /* ... */ }
-  validateUser() { /* ... */ }
-}
-class UserAuthenticator {
-  authenticateUser() { /* ... */ }
-}
-class UserProfileManager {
-  updateUserProfile() { /* ... */ }
-  uploadUserAvatar() { /* ... */ }
-}
+class UserCreator { createUser() { /* ... */ } }
+class UserAuthenticator { authenticateUser() { /* ... */ } }
+class UserProfileManager { updateUserProfile() { /* ... */ } }
 ```
 
 ### 4. Configuration Explosion Pattern
@@ -116,26 +103,18 @@ class UserProfileManager {
 
 **Example:**
 ```yaml
-# ❌ COMPLEXITY DEMON: Configuration explosion (52 options, 5 levels deep)
+# ❌ COMPLEXITY DEMON: Deep nested configuration
 app:
   database:
     connection:
-      pool:
-        min: 5
-        max: 20
-        idle: 1000
-        acquire: 60000
-      retry:
-        attempts: 3
-        delay: 1000
-        backoff: exponential
+      pool: { min: 5, max: 20, idle: 1000 }
+      retry: { attempts: 3, delay: 1000 }
 # ... 47 more options
 
 # ✅ SIMPLE: Essential configuration only
 app:
   database_url: "postgres://..."
   cache_enabled: true
-  debug: false
 ```
 
 ### 5. Abstract Factory Factory Pattern
@@ -144,27 +123,21 @@ app:
 
 **Example:**
 ```typescript
-// ❌ COMPLEXITY DEMON: Unnecessary abstraction layers
+// ❌ COMPLEXITY DEMON: Unnecessary abstraction
 interface NotificationSenderFactory {
   createSender(): NotificationSender;
 }
 class EmailNotificationSenderFactory implements NotificationSenderFactory {
-  createSender(): EmailNotificationSender {
-    return new EmailNotificationSender();
-  }
+  createSender(): EmailNotificationSender { return new EmailNotificationSender(); }
 }
 
 // ✅ SIMPLE: Direct implementation
-class EmailSender {
-  send(message: string): void {
-    // Send email
-  }
-}
+class EmailSender { send(message: string): void { /* Send email */ } }
 ```
 
 ### 6. Boolean Trap Pattern
 
-**Detection:** Functions with 3+ boolean parameters, method calls with unclear boolean literals
+**Detection:** Functions with 3+ boolean parameters, unclear boolean literals in calls
 
 **Example:**
 ```typescript
@@ -190,8 +163,7 @@ function createUser(email: string, options: UserCreationOptions) { /* ... */ }
 ```typescript
 // ❌ COMPLEXITY DEMON: Magic numbers
 function calculatePrice(basePrice: number, userType: string): number {
-  if (userType === 'premium') price *= 0.85; // What is 0.85?
-  return Math.round(price * 1.08); // What is 1.08?
+  return userType === 'premium' ? basePrice * 0.85 * 1.08 : basePrice * 1.08;
 }
 
 // ✅ SIMPLE: Named constants
@@ -205,15 +177,13 @@ const TAX_RATE = 0.08;
 
 **Example:**
 ```typescript
-// ❌ COMPLEXITY DEMON: Nested async complexity
+// ❌ COMPLEXITY DEMON: Callback pyramid
 function processOrder(orderId: string, callback: Function) {
   fetchOrder(orderId, (order) => {
     validateOrder(order, (isValid) => {
       if (isValid) {
         processPayment(order.payment, (result) => {
-          updateInventory(order.items, () => {
-            callback(null, { success: true });
-          });
+          updateInventory(order.items, () => callback(null, { success: true }));
         });
       }
     });
@@ -234,62 +204,44 @@ async function processOrder(orderId: string): Promise<ProcessResult> {
 
 ### Automated Detection Thresholds
 
-| Metric | Threshold | Detection Method |
-|--------|-----------|------------------|
-| **Cyclomatic Complexity** | > 10 | ESLint complexity rule |
+| Metric | Threshold | Tool |
+|--------|-----------|------|
+| **Cyclomatic Complexity** | > 10 | ESLint |
 | **Function Length** | > 50 lines | Static analysis |
-| **Parameter Count** | > 3 parameters | Linting rules |
+| **Parameter Count** | > 3 parameters | Linting |
 | **Nesting Depth** | > 3 levels | AST analysis |
 | **Class Methods** | > 12 methods | Static analysis |
-| **File Length** | > 300 lines | File metrics |
-| **Boolean Parameters** | > 2 booleans | Custom linting |
-| **Magic Numbers** | > 2 per function | Pattern detection |
+| **Boolean Parameters** | > 2 booleans | Custom rules |
 
-### Manual Review Indicators
-
-**Immediate Red Flags:**
+### Manual Review Red Flags
 - "This is complex, but..." justifications
-- Code requiring extensive comments to explain
-- Functions that can't be unit tested easily
-- Classes changing for multiple reasons
-- Configuration needing documentation
+- Code requiring extensive comments
 
 ## Refactoring Strategies by Priority
 
-### Priority 1: High-Impact, Low-Risk
-1. **Extract Named Constants** (Magic Numbers)
-2. **Add Early Returns** (Deep Nesting)
-3. **Group Parameters** (Parameter Explosion)
-4. **Replace Boolean Traps** (Boolean Parameters)
+### Quick Wins (High-Impact, Low-Risk)
+1. **Extract Named Constants** - Replace magic numbers
+2. **Add Early Returns** - Flatten deep nesting
+3. **Group Parameters** - Use objects for 4+ parameters
+4. **Replace Boolean Traps** - Use explicit options
 
-### Priority 2: Medium-Impact
-5. **Extract Small Functions** (God Objects)
-6. **Simplify Error Handling** (Async Complexity)
-7. **Use Template Strings** (String Operations)
-8. **Flatten Async Code** (Callback Pyramids)
-
-### Priority 3: Architectural
-9. **Remove Unnecessary Abstractions** (Factory Factories)
-10. **Consolidate Configuration** (Configuration Explosion)
+### Architectural Improvements
+5. **Extract Small Functions** - Break up god objects
+6. **Flatten Async Code** - Use async/await patterns
+7. **Remove Unnecessary Abstractions** - Delete factory factories
 
 ## Success Metrics
 
-**Code Health Indicators:**
-- Complexity metrics trending downward over time
+**Code Health:**
+- Complexity metrics trending downward
 - Faster code review cycles
 - Reduced bug density in refactored areas
-- Improved test coverage due to testable code
-
-**Team Productivity:**
-- Reduced time to understand unfamiliar code
-- Faster onboarding for new team members
-- More confident refactoring by all team members
+- Reduced time to understand code
+- Faster onboarding for new members
 
 ## Implementation Strategy
 
-### Automated Detection Setup
-
-**ESLint Configuration:**
+### Automated Detection
 ```json
 {
   "rules": {
@@ -301,23 +253,12 @@ async function processOrder(orderId: string): Promise<ProcessResult> {
 }
 ```
 
-**Pre-commit Hooks:**
-- Run complexity analysis on changed files
-- Fail builds that exceed thresholds
-- Generate complexity reports for review
-
 ### Team Adoption Process
-
-1. **Establish Baselines:** Measure current complexity metrics
-2. **Set Targets:** Define improvement goals for each metric
-3. **Automate Detection:** Add linting rules and CI checks
-4. **Review Training:** Teach team to spot patterns in code review
-5. **Iterate:** Adjust thresholds based on team capability
+1. **Establish Baselines** - Measure current metrics
+2. **Automate Detection** - Add linting and CI checks
 
 ## Related Patterns
 
-**Simplicity Above All:** These patterns provide concrete ways to identify when the complexity demon has violated simplicity principles.
+**Simplicity Above All:** These patterns identify when complexity demons violate simplicity principles.
 
-**Avoid Premature Abstraction:** Many patterns (Abstract Factory Factories) result from abstracting too early before understanding real requirements.
-
-**Natural Refactoring Points:** Use these patterns to identify when code has "settled" enough to reveal natural boundaries for refactoring.
+**Avoid Premature Abstraction:** Many patterns result from premature abstraction.

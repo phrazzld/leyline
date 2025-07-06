@@ -65,7 +65,7 @@ module Leyline
 
       def gather_status_information
         sync_state = SyncState.new(@cache_dir)
-        file_comparator = FileComparator.new(cache: file_cache, base_directory: @base_directory)
+        FileComparator.new(cache: file_cache, base_directory: @base_directory)
 
         # Get current file state
         current_files = discover_current_files
@@ -75,20 +75,20 @@ module Leyline
         current_manifest = {}
         current_files.each do |relative_path|
           full_path = File.join(leyline_path, relative_path)
-          if File.exist?(full_path)
-            begin
-              content = File.read(full_path)
-              current_manifest[relative_path] = Digest::SHA256.hexdigest(content)
-            rescue Errno::EACCES => e
-              # Skip files we can't read but note in verbose mode
-              warn "Warning: Cannot read #{relative_path}: #{e.message}" if @options[:verbose]
-            rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError => e
-              # Handle encoding errors gracefully
-              raise Leyline::ComparisonFailedError.new(
-                relative_path, nil,
-                reason: :encoding_error
-              )
-            end
+          next unless File.exist?(full_path)
+
+          begin
+            content = File.read(full_path)
+            current_manifest[relative_path] = Digest::SHA256.hexdigest(content)
+          rescue Errno::EACCES => e
+            # Skip files we can't read but note in verbose mode
+            warn "Warning: Cannot read #{relative_path}: #{e.message}" if @options[:verbose]
+          rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError
+            # Handle encoding errors gracefully
+            raise Leyline::ComparisonFailedError.new(
+              relative_path, nil,
+              reason: :encoding_error
+            )
           end
         end
 
@@ -181,7 +181,7 @@ module Leyline
         return { percentage: 0, status: 'no_sync_state' } if comparison.nil?
 
         total_files = comparison[:added].size + comparison[:modified].size +
-                     comparison[:removed].size + comparison[:unchanged].size
+                      comparison[:removed].size + comparison[:unchanged].size
 
         return { percentage: 100, status: 'perfect' } if total_files == 0
 
@@ -215,6 +215,7 @@ module Leyline
           search_path = File.join(leyline_path, pattern)
           Dir.glob(search_path).each do |file_path|
             next unless File.file?(file_path)
+
             # Store relative path from leyline directory
             relative_path = file_path.sub("#{leyline_path}/", '')
             files << relative_path
@@ -229,6 +230,7 @@ module Leyline
 
         categories.each do |category|
           next if category == 'core'
+
           patterns << "bindings/categories/#{category}/**/*.md"
         end
 
@@ -254,9 +256,7 @@ module Leyline
           next if entry.start_with?('.')
 
           category_path = File.join(bindings_path, entry)
-          if Dir.exist?(category_path)
-            categories << entry
-          end
+          categories << entry if Dir.exist?(category_path)
         end
 
         categories.sort
@@ -286,8 +286,8 @@ module Leyline
       end
 
       def output_human_readable(status_data)
-        puts "Leyline Status Report"
-        puts "===================="
+        puts 'Leyline Status Report'
+        puts '===================='
         puts
 
         output_version_info(status_data)
@@ -301,10 +301,10 @@ module Leyline
 
         output_file_summary_info(status_data[:file_summary])
 
-        if @options[:verbose]
-          puts
-          output_performance_info(status_data[:performance])
-        end
+        return unless @options[:verbose]
+
+        puts
+        output_performance_info(status_data[:performance])
       end
 
       def output_version_info(status_data)
@@ -314,7 +314,7 @@ module Leyline
       end
 
       def output_sync_state_info(sync_state)
-        puts "Sync State:"
+        puts 'Sync State:'
 
         if sync_state[:exists]
           puts "  ✓ State exists (#{format_age(sync_state[:state_age_seconds])} ago)"
@@ -327,10 +327,10 @@ module Leyline
       end
 
       def output_local_changes_info(changes)
-        puts "Local Changes:"
+        puts 'Local Changes:'
 
         if changes[:total_changes] == 0
-          puts "  ✓ No local changes detected"
+          puts '  ✓ No local changes detected'
         else
           puts "  #{changes[:total_changes]} change(s) detected:"
 
@@ -355,11 +355,11 @@ module Leyline
       end
 
       def output_file_summary_info(summary)
-        puts "File Summary:"
+        puts 'File Summary:'
         puts "  Total files: #{summary[:total_files]}"
 
         unless summary[:by_category].empty?
-          puts "  By category:"
+          puts '  By category:'
           summary[:by_category].each do |category, count|
             puts "    #{category}: #{count} files"
           end
@@ -377,7 +377,7 @@ module Leyline
       end
 
       def output_performance_info(performance)
-        puts "Performance:"
+        puts 'Performance:'
         puts "  Execution time: #{performance[:execution_time_ms]}ms"
         puts "  Cache enabled: #{performance[:cache_enabled] ? 'Yes' : 'No'}"
       end
@@ -389,48 +389,48 @@ module Leyline
           "#{seconds.round}s"
         elsif seconds < 3600
           "#{(seconds / 60).round}m"
-        elsif seconds < 86400
+        elsif seconds < 86_400
           "#{(seconds / 3600).round}h"
         else
-          "#{(seconds / 86400).round}d"
+          "#{(seconds / 86_400).round}d"
         end
       end
 
       def handle_error(error)
         # Convert standard errors to Leyline errors with recovery guidance
         leyline_error = case error
-        when Leyline::LeylineError
-          error
-        when Errno::EACCES, Errno::EPERM
-          path = nil
-          begin
-            path = error.message.match(/- (.+)$/)[1] if error.message
-          rescue
-            # Ignore extraction errors
-          end
+                        when Leyline::LeylineError
+                          error
+                        when Errno::EACCES, Errno::EPERM
+                          path = nil
+                          begin
+                            path = error.message.match(/- (.+)$/)[1] if error.message
+                          rescue StandardError
+                            # Ignore extraction errors
+                          end
 
-          Leyline::FileSystemError.new(
-            "Permission denied accessing files",
-            reason: :permission_denied,
-            path: path
-          )
-        when Errno::ENOENT
-          StatusError.new("Leyline directory not found")
-        when Errno::ENOSPC
-          Leyline::CacheOperationError.new(
-            "No space left on device",
-            operation: :disk_full,
-            cache_dir: @cache_dir
-          )
-        when JSON::ParserError
-          Leyline::InvalidSyncStateError.new(
-            "Sync state file is corrupted",
-            file: File.join(@cache_dir, 'sync_state.yaml'),
-            platform: detect_platform
-          )
-        else
-          StatusError.new(error.message)
-        end
+                          Leyline::FileSystemError.new(
+                            'Permission denied accessing files',
+                            reason: :permission_denied,
+                            path: path
+                          )
+                        when Errno::ENOENT
+                          StatusError.new('Leyline directory not found')
+                        when Errno::ENOSPC
+                          Leyline::CacheOperationError.new(
+                            'No space left on device',
+                            operation: :disk_full,
+                            cache_dir: @cache_dir
+                          )
+                        when JSON::ParserError
+                          Leyline::InvalidSyncStateError.new(
+                            'Sync state file is corrupted',
+                            file: File.join(@cache_dir, 'sync_state.yaml'),
+                            platform: detect_platform
+                          )
+                        else
+                          StatusError.new(error.message)
+                        end
 
         # Output error with recovery suggestions
         output_error_with_recovery(leyline_error)
@@ -453,7 +453,7 @@ module Leyline
           warn "  Context: #{error.context.inspect}" if error.context.any?
           if error.respond_to?(:cause) && error.cause
             warn "  Original error: #{error.cause.class} - #{error.cause.message}"
-            warn "  Backtrace:"
+            warn '  Backtrace:'
             error.cause.backtrace.first(5).each { |line| warn "    #{line}" }
           end
         else

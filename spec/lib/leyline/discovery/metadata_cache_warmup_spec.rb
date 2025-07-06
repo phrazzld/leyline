@@ -16,8 +16,8 @@ RSpec.describe Leyline::Discovery::MetadataCache do
         result = cache.warm_cache_in_background
         elapsed = Time.now - start_time
 
-        expect(elapsed).to be < 0.1  # Should return in under 100ms
-        expect(result).to be(true).or be(false)  # Boolean return indicating success/failure to start
+        expect(elapsed).to be < 0.1 # Should return in under 100ms
+        expect(result).to be(true).or be(false) # Boolean return indicating success/failure to start
       end
 
       it 'returns true when warming starts successfully' do
@@ -26,8 +26,8 @@ RSpec.describe Leyline::Discovery::MetadataCache do
       end
 
       it 'returns false when warming is already in progress' do
-        cache.warm_cache_in_background  # Start first warming
-        result = cache.warm_cache_in_background  # Try to start second warming
+        cache.warm_cache_in_background # Start first warming
+        result = cache.warm_cache_in_background # Try to start second warming
         expect(result).to be false
       end
 
@@ -93,6 +93,7 @@ RSpec.describe Leyline::Discovery::MetadataCache do
     start_time = Time.now
     while Time.now - start_time < timeout
       return true if yield
+
       sleep interval
     end
     false

@@ -15,7 +15,6 @@ require 'shellwords'
 require 'open3'
 
 module SecurityUtils
-
   # Security error for validation failures
   class SecurityError < StandardError; end
 
@@ -27,7 +26,7 @@ module SecurityUtils
     return false if version.match?(/[\x00-\x1F\x7F]/)
 
     # Allow only semantic version format: X.Y.Z with optional pre-release/build
-    pattern = /^\d+\.\d+\.\d+(?:-[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*)?(?:\+[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*)?$/
+    pattern = /^\d+\.\d+\.\d+(?:-[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)?(?:\+[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)?$/
     return false unless version.match?(pattern)
 
     # Reject consecutive dots in pre-release/build
@@ -48,11 +47,11 @@ module SecurityUtils
 
     # Git refs can contain: letters, numbers, /, -, ., _
     # Cannot start with /, -, or contain consecutive dots or end with .lock
-    pattern = /^[a-zA-Z0-9][a-zA-Z0-9\/_\-\.]*[a-zA-Z0-9]$/
+    pattern = %r{^[a-zA-Z0-9][a-zA-Z0-9/_\-.]*[a-zA-Z0-9]$}
     return false unless ref.match?(pattern)
     return false if ref.include?('..')
     return false if ref.end_with?('.lock')
-    return false if ref.length > 250  # Git ref name limit
+    return false if ref.length > 250 # Git ref name limit
 
     true
   end
@@ -79,7 +78,7 @@ module SecurityUtils
     return false if path.include?('%2e') || path.include?('%2f') || path.include?('%5c')
 
     # Only allow safe characters: letters, numbers, -, _, ., /
-    return false unless path.match?(/^[a-zA-Z0-9\-_\.\/]+$/)
+    return false unless path.match?(%r{^[a-zA-Z0-9\-_./]+$})
 
     # Length check
     return false if path.length > 1000
@@ -95,7 +94,7 @@ module SecurityUtils
     return false if message.match?(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/)
 
     # Length check to prevent DoS
-    return false if message.length > 10000
+    return false if message.length > 10_000
 
     true
   end
@@ -107,27 +106,27 @@ module SecurityUtils
     # Remove null bytes and control characters including newlines for safety
     # Convert newlines to spaces for single-line output safety
     str.gsub(/[\x00-\x1F\x7F]/, ' ')
-       .gsub(/\s+/, ' ')  # Collapse multiple spaces
+       .gsub(/\s+/, ' ') # Collapse multiple spaces
        .strip
   end
 
   # Execute shell command safely with proper escaping
   def self.safe_system(*args)
-    raise SecurityError, "No command provided" if args.empty?
+    raise SecurityError, 'No command provided' if args.empty?
 
     # Use array form to prevent shell injection
     # Do not use string interpolation or shell metacharacters
     begin
       result = system(*args)
       { success: result, exit_code: $?.exitstatus }
-    rescue => e
+    rescue StandardError => e
       raise SecurityError, "Command execution failed: #{e.message}"
     end
   end
 
   # Execute shell command and capture output safely
   def self.safe_capture(*args)
-    raise SecurityError, "No command provided" if args.empty?
+    raise SecurityError, 'No command provided' if args.empty?
 
     begin
       stdout, stderr, status = Open3.capture3(*args)
@@ -137,15 +136,15 @@ module SecurityUtils
         success: status.success?,
         exit_code: status.exitstatus
       }
-    rescue => e
+    rescue StandardError => e
       raise SecurityError, "Command capture failed: #{e.message}"
     end
   end
 
   # Safe git command execution with validation
   def self.safe_git_command(command, *args)
-    raise SecurityError, "Invalid git command" unless command.is_a?(String)
-    raise SecurityError, "Git command too long" if command.length > 100
+    raise SecurityError, 'Invalid git command' unless command.is_a?(String)
+    raise SecurityError, 'Git command too long' if command.length > 100
 
     # Validate that it's a legitimate git command
     allowed_commands = %w[
@@ -155,13 +154,12 @@ module SecurityUtils
     ]
 
     base_command = command.split.first
-    unless allowed_commands.include?(base_command)
-      raise SecurityError, "Git command '#{base_command}' not allowed"
-    end
+    raise SecurityError, "Git command '#{base_command}' not allowed" unless allowed_commands.include?(base_command)
 
     # Validate all arguments
     args.each do |arg|
-      next if arg.is_a?(String) && arg.match?(/^[a-zA-Z0-9\-_\.\/=:@\+\s]*$/)
+      next if arg.is_a?(String) && arg.match?(%r{^[a-zA-Z0-9\-_./=:@+\s]*$})
+
       raise SecurityError, "Invalid git command argument: #{arg}"
     end
 
@@ -180,7 +178,7 @@ module SecurityUtils
       /^github_pat_[a-zA-Z0-9_]{82}$/,   # Fine-grained personal access token
       /^ghs_[a-zA-Z0-9]{36}$/,           # Server-to-server token
       /^gho_[a-zA-Z0-9]{36}$/,           # OAuth token
-      /^ghu_[a-zA-Z0-9]{36}$/,           # User-to-server token
+      /^ghu_[a-zA-Z0-9]{36}$/ # User-to-server token
     ]
 
     patterns.any? { |pattern| token.match?(pattern) }
@@ -192,23 +190,21 @@ module SecurityUtils
     current_time = Time.now.to_i
 
     # Clean up old entries
-    @rate_limits.delete_if { |k, v| current_time - v[:start] > window }
+    @rate_limits.delete_if { |_k, v| current_time - v[:start] > window }
 
     # Initialize or update counter
     @rate_limits[key] ||= { count: 0, start: current_time }
     @rate_limits[key][:count] += 1
 
-    if @rate_limits[key][:count] > max_calls
-      raise SecurityError, "Rate limit exceeded for #{key}"
-    end
+    raise SecurityError, "Rate limit exceeded for #{key}" if @rate_limits[key][:count] > max_calls
 
     true
   end
 
   # Secure file operations
   def self.safe_file_read(path, max_size: 10_000_000) # 10MB limit
-    raise SecurityError, "Invalid file path" unless validate_file_path(path)
-    raise SecurityError, "File does not exist" unless File.exist?(path)
+    raise SecurityError, 'Invalid file path' unless validate_file_path(path)
+    raise SecurityError, 'File does not exist' unless File.exist?(path)
 
     size = File.size(path)
     raise SecurityError, "File too large: #{size} bytes" if size > max_size
@@ -216,14 +212,14 @@ module SecurityUtils
     File.read(path)
   rescue Errno::EACCES
     raise SecurityError, "Access denied to file: #{path}"
-  rescue => e
+  rescue StandardError => e
     raise SecurityError, "File read error: #{e.message}"
   end
 
   # Secure file write with atomic operation
   def self.safe_file_write(path, content, max_size: 10_000_000)
-    raise SecurityError, "Invalid file path" unless validate_file_path(path)
-    raise SecurityError, "Content too large" if content.length > max_size
+    raise SecurityError, 'Invalid file path' unless validate_file_path(path)
+    raise SecurityError, 'Content too large' if content.length > max_size
 
     # Write to temporary file first, then move (atomic operation)
     temp_path = "#{path}.tmp.#{Process.pid}"
@@ -231,7 +227,7 @@ module SecurityUtils
     begin
       File.write(temp_path, content)
       File.rename(temp_path, path)
-    rescue => e
+    rescue StandardError => e
       File.delete(temp_path) if File.exist?(temp_path)
       raise SecurityError, "File write error: #{e.message}"
     end
@@ -244,5 +240,4 @@ module SecurityUtils
 
     puts "[SECURITY] #{timestamp} - #{event}: #{sanitized_details}" if ENV['SECURITY_LOGGING']
   end
-
 end

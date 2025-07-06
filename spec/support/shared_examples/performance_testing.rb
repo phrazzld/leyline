@@ -32,7 +32,7 @@ RSpec.shared_examples 'reliable performance measurement' do |command_name, comma
 end
 
 RSpec.shared_examples 'scalable performance characteristics' do |command_name, &command_block|
-  it "maintains scalable performance as data size increases" do
+  it 'maintains scalable performance as data size increases' do
     file_counts = [25, 50, 100, 200]
     scalability_measurements = []
 
@@ -54,7 +54,7 @@ RSpec.shared_examples 'scalable performance characteristics' do |command_name, &
 end
 
 RSpec.shared_examples 'statistical regression detection' do |command_name, &command_block|
-  it "detects performance regressions using statistical methods" do
+  it 'detects performance regressions using statistical methods' do
     # Establish current baseline
     current_metrics = measure_command_with_statistics(command_name, &command_block)
 
@@ -90,7 +90,7 @@ def measure_command_with_statistics(command_name, iterations: 8, warmup: 2, &blo
     begin
       result = block.call
       success_count += 1 if result && result[:success] != false
-    rescue => e
+    rescue StandardError
       # Record failure but continue measurement
     end
 
@@ -130,14 +130,16 @@ end
 
 def percentile(sorted_array, percentile)
   return 0 if sorted_array.empty?
+
   index = (percentile / 100.0 * (sorted_array.length - 1)).round
   sorted_array[index]
 end
 
 def standard_deviation(values)
   return 0 if values.length <= 1
+
   mean = values.sum / values.length.to_f
-  variance = values.sum { |v| (v - mean) ** 2 } / values.length.to_f
+  variance = values.sum { |v| (v - mean)**2 } / values.length.to_f
   Math.sqrt(variance)
 end
 
@@ -148,28 +150,28 @@ def current_process_memory_mb
     # Linux fallback
     `ps -o rss= -p #{Process.pid}`.to_i / 1024.0
   end
-rescue
+rescue StandardError
   0.0
 end
 
 def validate_statistical_reliability(metrics, command_name)
   expect(metrics[:success_rate]).to be >= performance_thresholds[:minimum_success_rate],
-    "#{command_name}: Success rate #{(metrics[:success_rate] * 100).round(1)}% below threshold"
+                                    "#{command_name}: Success rate #{(metrics[:success_rate] * 100).round(1)}% below threshold"
 
   expect(metrics[:sample_size]).to be >= 5,
-    "#{command_name}: Sample size #{metrics[:sample_size]} too small for statistical reliability"
+                                   "#{command_name}: Sample size #{metrics[:sample_size]} too small for statistical reliability"
 
   # Coefficient of variation should indicate reasonable consistency
   expect(metrics[:coefficient_of_variation]).to be < 2.0,
-    "#{command_name}: Performance too variable (CV: #{metrics[:coefficient_of_variation].round(3)})"
+                                                "#{command_name}: Performance too variable (CV: #{metrics[:coefficient_of_variation].round(3)})"
 end
 
 def validate_performance_characteristics(metrics, command_name)
   expect(metrics[:p95_seconds]).to be < performance_thresholds[:maximum_p95_seconds],
-    "#{command_name}: P95 time #{metrics[:p95_seconds].round(3)}s exceeds threshold"
+                                   "#{command_name}: P95 time #{metrics[:p95_seconds].round(3)}s exceeds threshold"
 
   expect(metrics[:p95_memory_mb]).to be < performance_thresholds[:maximum_memory_mb],
-    "#{command_name}: P95 memory #{metrics[:p95_memory_mb].round(1)}MB exceeds threshold"
+                                     "#{command_name}: P95 memory #{metrics[:p95_memory_mb].round(1)}MB exceeds threshold"
 
   puts "✅ #{command_name}: P95=#{(metrics[:p95_seconds] * 1000).round(1)}ms, " \
        "Memory=#{metrics[:median_memory_mb].round(1)}MB, " \
@@ -201,7 +203,7 @@ def validate_scalability_pattern(measurements, command_name)
   scaling_factor = time_ratio / file_ratio
 
   expect(scaling_factor).to be < 2.0,
-    "#{command_name}: Scaling factor #{scaling_factor.round(2)} indicates poor scalability"
+                            "#{command_name}: Scaling factor #{scaling_factor.round(2)} indicates poor scalability"
 
   puts "✅ #{command_name} scalability: #{scaling_factor.round(2)}x factor " \
        "(#{file_ratio.round(1)}x files → #{time_ratio.round(1)}x time)"
@@ -237,10 +239,10 @@ def validate_regression_detection_accuracy(analysis, command_name)
   end
 
   expect(analysis[:confidence_level]).to eq('high').or eq('medium'),
-    "#{command_name}: Statistical confidence too low for reliable regression detection"
+                                                       "#{command_name}: Statistical confidence too low for reliable regression detection"
 end
 
-def create_historical_baseline_for(command_name)
+def create_historical_baseline_for(_command_name)
   # Mock historical data for regression testing
   {
     median_seconds: 0.4,

@@ -34,45 +34,45 @@ $warnings = []
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: copy-leyline-standards.rb [options]"
+  opts.banner = 'Usage: copy-leyline-standards.rb [options]'
 
-  opts.on("-c", "--config FILE", "Configuration file path") do |file|
+  opts.on('-c', '--config FILE', 'Configuration file path') do |file|
     $options[:config_file] = file
   end
 
-  opts.on("-i", "--interactive", "Interactive mode for selecting standards") do
+  opts.on('-i', '--interactive', 'Interactive mode for selecting standards') do
     $options[:interactive] = true
   end
 
-  opts.on("-o", "--output DIR", "Output directory") do |dir|
+  opts.on('-o', '--output DIR', 'Output directory') do |dir|
     $options[:output_override] = dir
   end
 
-  opts.on("-v", "--version VERSION", "Leyline version to copy from") do |version|
+  opts.on('-v', '--version VERSION', 'Leyline version to copy from') do |version|
     $options[:version_override] = version
   end
 
-  opts.on("--verbose", "Verbose output") do
+  opts.on('--verbose', 'Verbose output') do
     $options[:verbose] = true
   end
 
-  opts.on("--dry-run", "Show what would be done without making changes") do
+  opts.on('--dry-run', 'Show what would be done without making changes') do
     $options[:dry_run] = true
   end
 
-  opts.on("--update", "Update previously copied standards") do
+  opts.on('--update', 'Update previously copied standards') do
     $options[:update] = true
   end
 
-  opts.on("--check-updates", "Check for available updates") do
+  opts.on('--check-updates', 'Check for available updates') do
     $options[:check_updates] = true
   end
 
-  opts.on("--force", "Force operation even with warnings") do
+  opts.on('--force', 'Force operation even with warnings') do
     $options[:force] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -118,9 +118,7 @@ end
 def load_configuration
   config_file = $options[:config_file]
 
-  if $options[:interactive]
-    return run_interactive_selection
-  end
+  return run_interactive_selection if $options[:interactive]
 
   unless File.exist?(config_file)
     log_error("Configuration file not found: #{config_file}")
@@ -131,18 +129,18 @@ def load_configuration
   begin
     config = YAML.load_file(config_file)
     log_verbose("Loaded configuration from #{config_file}")
-    return config
-  rescue => e
+    config
+  rescue StandardError => e
     log_error("Failed to load configuration: #{e.message}")
-    return nil
+    nil
   end
 end
 
 # Interactive mode for selecting standards
 def run_interactive_selection
-  log_info("Running interactive selection mode...")
+  log_info('Running interactive selection mode...')
 
-  config = {
+  {
     'leyline_version' => prompt_for_version,
     'output_directory' => prompt_for_output_directory,
     'tenets' => prompt_for_tenets,
@@ -153,30 +151,28 @@ def run_interactive_selection
       'track_sources' => true
     }
   }
-
-  return config
 end
 
 def prompt_for_version
-  print "Enter Leyline version to copy from (e.g., v0.1.5): "
+  print 'Enter Leyline version to copy from (e.g., v0.1.5): '
   version = gets.chomp
-  version.empty? ? "v0.1.5" : version
+  version.empty? ? 'v0.1.5' : version
 end
 
 def prompt_for_output_directory
-  print "Enter output directory (default: docs/standards): "
+  print 'Enter output directory (default: docs/standards): '
   dir = gets.chomp
-  dir.empty? ? "docs/standards" : dir
+  dir.empty? ? 'docs/standards' : dir
 end
 
 def prompt_for_tenets
-  log_info("Available tenets:")
+  log_info('Available tenets:')
   available_tenets = get_available_tenets
   available_tenets.each_with_index do |tenet, i|
     puts "  #{i + 1}. #{tenet}"
   end
 
-  print "Enter tenet numbers (comma-separated, e.g., 1,2,3): "
+  print 'Enter tenet numbers (comma-separated, e.g., 1,2,3): '
   selections = gets.chomp.split(',').map(&:strip).map(&:to_i)
 
   selected_tenets = selections.map { |i| available_tenets[i - 1] }.compact
@@ -185,13 +181,13 @@ def prompt_for_tenets
 end
 
 def prompt_for_binding_categories
-  log_info("Available binding categories:")
+  log_info('Available binding categories:')
   available_categories = get_available_binding_categories
   available_categories.each_with_index do |category, i|
     puts "  #{i + 1}. #{category}"
   end
 
-  print "Enter category numbers (comma-separated, e.g., 1,2): "
+  print 'Enter category numbers (comma-separated, e.g., 1,2): '
   selections = gets.chomp.split(',').map(&:strip).map(&:to_i)
 
   selected_categories = selections.map { |i| available_categories[i - 1] }.compact
@@ -223,7 +219,7 @@ end
 
 # Fetch content from Leyline repository
 def fetch_leyline_content(version, path)
-  base_url = "https://raw.githubusercontent.com/phrazzld/leyline"
+  base_url = 'https://raw.githubusercontent.com/phrazzld/leyline'
   url = "#{base_url}/#{version}/#{path}"
 
   log_verbose("Fetching: #{url}")
@@ -232,15 +228,13 @@ def fetch_leyline_content(version, path)
     uri = URI(url)
     response = Net::HTTP.get_response(uri)
 
-    if response.code == '200'
-      return response.body
-    else
-      log_error("Failed to fetch #{path}: HTTP #{response.code}")
-      return nil
-    end
-  rescue => e
+    return response.body if response.code == '200'
+
+    log_error("Failed to fetch #{path}: HTTP #{response.code}")
+    nil
+  rescue StandardError => e
     log_error("Network error fetching #{path}: #{e.message}")
-    return nil
+    nil
   end
 end
 
@@ -260,9 +254,7 @@ def copy_standard(config, type, name, source_path, dest_path)
   return false unless content
 
   # Apply customizations if configured
-  if config['customization']
-    content = apply_customizations(content, config['customization'], type, name)
-  end
+  content = apply_customizations(content, config['customization'], type, name) if config['customization']
 
   # Ensure output directory exists
   FileUtils.mkdir_p(File.dirname(dest_path))
@@ -273,19 +265,17 @@ def copy_standard(config, type, name, source_path, dest_path)
     log_verbose("Written: #{dest_path}")
 
     # Track the copy if tracking is enabled
-    if config['tracking']
-      track_copied_file(config, version, source_path, dest_path, content)
-    end
+    track_copied_file(config, version, source_path, dest_path, content) if config['tracking']
 
-    return true
-  rescue => e
+    true
+  rescue StandardError => e
     log_error("Failed to write #{dest_path}: #{e.message}")
-    return false
+    false
   end
 end
 
 # Apply customizations to content
-def apply_customizations(content, customization, type, name)
+def apply_customizations(content, customization, _type, _name)
   result = content.dup
 
   # Apply text replacements
@@ -329,28 +319,28 @@ def apply_customizations(content, customization, type, name)
     end
   end
 
-  return result
+  result
 end
 
 # Track copied file information
-def track_copied_file(config, version, source_path, dest_path, content)
+def track_copied_file(_config, version, source_path, dest_path, content)
   tracking_file = '.leyline-tracking.yml'
 
   # Load existing tracking data
   tracking_data = if File.exist?(tracking_file)
-    YAML.load_file(tracking_file)
-  else
-    {
-      'tracking_version' => '1.0',
-      'standards' => {}
-    }
-  end
+                    YAML.load_file(tracking_file)
+                  else
+                    {
+                      'tracking_version' => '1.0',
+                      'standards' => {}
+                    }
+                  end
 
   # Calculate checksum
   checksum = Digest::SHA256.hexdigest(content)
 
   # Store tracking information
-  relative_dest = dest_path.sub(/^#{Regexp.escape(Dir.pwd)}\//, '')
+  relative_dest = dest_path.sub(%r{^#{Regexp.escape(Dir.pwd)}/}, '')
   source_url = "https://github.com/phrazzld/leyline/blob/#{version}/#{source_path}"
 
   tracking_data['last_updated'] = Time.now.utc.iso8601
@@ -382,13 +372,11 @@ def copy_tenets(config, tenets)
     source_path = "docs/tenets/#{tenet}.md"
     dest_path = File.join(tenets_dir, "#{tenet}.md")
 
-    if copy_standard(config, 'tenet', tenet, source_path, dest_path)
-      success_count += 1
-    end
+    success_count += 1 if copy_standard(config, 'tenet', tenet, source_path, dest_path)
   end
 
   log_info("Copied #{success_count}/#{tenets.size} tenets")
-  return success_count == tenets.size
+  success_count == tenets.size
 end
 
 # Copy binding categories
@@ -406,9 +394,7 @@ def copy_binding_categories(config, categories)
         source_path = "docs/bindings/core/#{binding}.md"
         dest_path = File.join(output_dir, 'bindings', 'core', "#{binding}.md")
 
-        if copy_standard(config, 'binding', "core/#{binding}", source_path, dest_path)
-          success_count += 1
-        end
+        success_count += 1 if copy_standard(config, 'binding', "core/#{binding}", source_path, dest_path)
       end
     else
       # Copy category-specific bindings
@@ -417,15 +403,13 @@ def copy_binding_categories(config, categories)
         source_path = "docs/bindings/categories/#{category}/#{binding}.md"
         dest_path = File.join(output_dir, 'bindings', category, "#{binding}.md")
 
-        if copy_standard(config, 'binding', "#{category}/#{binding}", source_path, dest_path)
-          success_count += 1
-        end
+        success_count += 1 if copy_standard(config, 'binding', "#{category}/#{binding}", source_path, dest_path)
       end
     end
   end
 
   log_info("Copied #{success_count} bindings from #{categories.size} categories")
-  return success_count > 0
+  success_count > 0
 end
 
 # Get list of core bindings (in real implementation, fetch from repository)
@@ -451,7 +435,7 @@ def get_category_bindings(category)
   when 'frontend'
     %w[state-management web-accessibility]
   when 'backend'
-    %w[]  # Would be populated from actual repository
+    %w[] # Would be populated from actual repository
   else
     []
   end
@@ -473,12 +457,12 @@ def generate_index(config)
   begin
     File.write(index_path, index_content)
     log_info("Generated index: #{index_path}")
-  rescue => e
+  rescue StandardError => e
     log_error("Failed to generate index: #{e.message}")
   end
 end
 
-def generate_index_content(config, output_dir)
+def generate_index_content(config, _output_dir)
   content = "# Development Standards\n\n"
   content += "This directory contains development standards copied from Leyline.\n\n"
 
@@ -521,16 +505,16 @@ def generate_index_content(config, output_dir)
   content += "ruby scripts/copy-leyline-standards.rb --update --version v0.2.0\n"
   content += "```\n"
 
-  return content
+  content
 end
 
 # Check for updates
 def check_for_updates
-  log_info("Checking for available updates...")
+  log_info('Checking for available updates...')
 
   tracking_file = '.leyline-tracking.yml'
   unless File.exist?(tracking_file)
-    log_warning("No tracking file found - no standards to check")
+    log_warning('No tracking file found - no standards to check')
     return
   end
 
@@ -540,15 +524,13 @@ def check_for_updates
   log_info("Current version: #{current_version}")
 
   # In a real implementation, this would check GitHub releases API
-  log_info("Latest version: v0.2.0")
-  log_info("Updates available: Use --update --version v0.2.0 to update")
+  log_info('Latest version: v0.2.0')
+  log_info('Updates available: Use --update --version v0.2.0 to update')
 end
 
 # Main execution
 def main
-  if $options[:dry_run]
-    log_info("=== DRY RUN MODE - No changes will be made ===")
-  end
+  log_info('=== DRY RUN MODE - No changes will be made ===') if $options[:dry_run]
 
   if $options[:check_updates]
     check_for_updates
@@ -559,22 +541,18 @@ def main
   config = load_configuration
   exit_with_summary if config.nil?
 
-  log_info("Starting standards copy operation...")
+  log_info('Starting standards copy operation...')
 
   # Copy tenets
-  if config['tenets']
-    copy_tenets(config, config['tenets'])
-  end
+  copy_tenets(config, config['tenets']) if config['tenets']
 
   # Copy binding categories
-  if config['binding_categories']
-    copy_binding_categories(config, config['binding_categories'])
-  end
+  copy_binding_categories(config, config['binding_categories']) if config['binding_categories']
 
   # Copy specific bindings
   if config['specific_bindings']
     # Implementation would handle individual binding copy
-    log_info("Specific bindings copying not yet implemented")
+    log_info('Specific bindings copying not yet implemented')
   end
 
   # Generate index if requested
@@ -590,7 +568,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nInterrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     log_error("Unexpected error: #{e.message}")
     log_error("Backtrace: #{e.backtrace.join("\n")}")
     exit 1

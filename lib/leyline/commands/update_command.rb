@@ -63,22 +63,22 @@ module Leyline
           case type
           when :both_modified
             [
-              "Keep local version (no action needed)",
-              "Use remote version (run with --force)",
-              "Merge manually (recommended for critical files)"
+              'Keep local version (no action needed)',
+              'Use remote version (run with --force)',
+              'Merge manually (recommended for critical files)'
             ]
           when :local_added_remote_modified
             [
-              "Keep local addition",
-              "Replace with remote version (--force)"
+              'Keep local addition',
+              'Replace with remote version (--force)'
             ]
           when :local_modified_remote_removed
             [
-              "Keep local changes",
-              "Remove file to match remote (--force)"
+              'Keep local changes',
+              'Remove file to match remote (--force)'
             ]
           else
-            ["Manual resolution required"]
+            ['Manual resolution required']
           end
         end
       end
@@ -110,7 +110,7 @@ module Leyline
           # Step 4: Check for conflicts
           if update_plan.conflicted? && !@options[:force]
             show_conflict_resolution(update_plan)
-            raise ConflictDetectedError, "Conflicts detected. Use --force to override or resolve manually."
+            raise ConflictDetectedError, 'Conflicts detected. Use --force to override or resolve manually.'
           end
 
           # Step 5: Apply updates if safe
@@ -239,7 +239,7 @@ module Leyline
       end
 
       def build_summary(changes, conflicts)
-        return "No changes available" unless changes
+        return 'No changes available' unless changes
 
         summary = {
           total_changes: changes[:added].size + changes[:modified].size + changes[:removed].size,
@@ -250,60 +250,58 @@ module Leyline
         }
 
         summary[:status] = if conflicts.any?
-                            "Updates available with conflicts"
-                          elsif summary[:total_changes] > 0
-                            "Updates available"
-                          else
-                            "Up to date"
-                          end
+                             'Updates available with conflicts'
+                           elsif summary[:total_changes] > 0
+                             'Updates available'
+                           else
+                             'Up to date'
+                           end
 
         summary
       end
 
       def show_preview(plan)
-        puts "Leyline Update Preview"
-        puts "====================="
+        puts 'Leyline Update Preview'
+        puts '====================='
         puts
 
         puts "Status: #{plan.summary[:status]}"
 
         if plan.total_changes == 0
-          puts "✓ Already synchronized with remote standards"
+          puts '✓ Already synchronized with remote standards'
           return
         end
 
-        puts "Changes to apply:"
+        puts 'Changes to apply:'
         puts "  Files to add: #{plan.summary[:added]}"
         puts "  Files to update: #{plan.summary[:modified]}"
         puts "  Files to remove: #{plan.summary[:removed]}"
 
-        if plan.conflicted?
-          puts "  ⚠️  Conflicts detected: #{plan.summary[:conflicts]}"
-        end
+        puts "  ⚠️  Conflicts detected: #{plan.summary[:conflicts]}" if plan.conflicted?
 
         puts
 
         # Show file lists
         show_change_details(plan.changes) if @options[:verbose] || plan.total_changes < 20
 
-        if plan.conflicted?
-          puts "⚠️  Conflicts found - see details below"
-        end
+        return unless plan.conflicted?
+
+        puts '⚠️  Conflicts found - see details below'
       end
 
       def show_change_details(changes)
         unless changes[:added].empty?
-          puts "Files to add:"
+          puts 'Files to add:'
           changes[:added].each { |file| puts "  + #{file}" }
         end
 
         unless changes[:modified].empty?
-          puts "Files to update:"
+          puts 'Files to update:'
           changes[:modified].each { |file| puts "  ~ #{file}" }
         end
 
         unless changes[:removed].empty?
-          puts "Files to remove:"
+          puts 'Files to remove:'
           changes[:removed].each { |file| puts "  - #{file}" }
         end
 
@@ -312,35 +310,35 @@ module Leyline
 
       def show_conflict_resolution(plan)
         puts "\n🚨 Conflict Resolution Required"
-        puts "================================"
+        puts '================================'
         puts
 
         plan.conflicts.each_with_index do |conflict, index|
           puts "#{index + 1}. #{conflict.path}"
           puts "   Issue: #{format_conflict_type(conflict.type)}"
-          puts "   Options:"
+          puts '   Options:'
           conflict.resolution_options.each { |option| puts "     • #{option}" }
           puts
         end
 
-        puts "💡 Resolution Tips:"
-        puts "   • Review conflicts carefully before using --force"
+        puts '💡 Resolution Tips:'
+        puts '   • Review conflicts carefully before using --force'
         puts "   • Use 'leyline diff' to see exact changes"
-        puts "   • Back up important local modifications"
-        puts "   • Consider merging critical files manually"
+        puts '   • Back up important local modifications'
+        puts '   • Consider merging critical files manually'
         puts
       end
 
       def format_conflict_type(type)
         case type
         when :both_modified
-          "File modified both locally and remotely"
+          'File modified both locally and remotely'
         when :local_added_remote_modified
-          "File added locally but modified remotely"
+          'File added locally but modified remotely'
         when :local_modified_remote_removed
-          "File modified locally but removed remotely"
+          'File modified locally but removed remotely'
         else
-          "Unknown conflict type"
+          'Unknown conflict type'
         end
       end
 
@@ -360,9 +358,7 @@ module Leyline
 
           # Ensure we have the leyline subdirectory in remote_docs
           remote_leyline = File.join(remote_docs, 'leyline')
-          if Dir.exist?(remote_leyline)
-            remote_docs = remote_leyline
-          end
+          remote_docs = remote_leyline if Dir.exist?(remote_leyline)
 
           file_syncer = Sync::FileSyncer.new(remote_docs, target_docs, cache: file_cache)
           sync_results = file_syncer.sync(force: @options[:force], verbose: @options[:verbose])
@@ -385,10 +381,10 @@ module Leyline
         current_manifest = file_comparator.create_manifest(current_files)
 
         sync_state.save_sync_state({
-          categories: plan.metadata[:categories],
-          manifest: current_manifest,
-          leyline_version: VERSION
-        })
+                                     categories: plan.metadata[:categories],
+                                     manifest: current_manifest,
+                                     leyline_version: VERSION
+                                   })
       end
 
       def show_completion(results, elapsed_time)
@@ -398,10 +394,10 @@ module Leyline
         puts "   Errors: #{results[:errors].size}"
         puts "   Duration: #{(elapsed_time * 1000).round(2)}ms"
 
-        if results[:errors].any? && @options[:verbose]
-          puts "\nErrors encountered:"
-          results[:errors].each { |error| puts "  ⚠️  #{error}" }
-        end
+        return unless results[:errors].any? && @options[:verbose]
+
+        puts "\nErrors encountered:"
+        results[:errors].each { |error| puts "  ⚠️  #{error}" }
       end
 
       def fetch_remote_content_for_comparison
@@ -418,21 +414,20 @@ module Leyline
             git_client.fetch_version('https://github.com/phrazzld/leyline-standards.git', 'master')
           rescue Sync::GitClient::GitCommandError => e
             # Fallback for development/testing
-            if Dir.exist?(File.join(@base_directory, '.git'))
-              current_repo_docs = File.join(@base_directory, 'docs')
-              if Dir.exist?(current_repo_docs)
-                FileUtils.cp_r(current_repo_docs, temp_dir)
-              else
-                raise UpdateError, "No leyline content found locally and failed to fetch remote: #{e.message}"
-              end
-            else
-              raise UpdateError, "Failed to fetch remote content: #{e.message}"
+            unless Dir.exist?(File.join(@base_directory, '.git'))
+              raise UpdateError.new("Failed to fetch remote content: #{e.message}")
             end
+
+            current_repo_docs = File.join(@base_directory, 'docs')
+            unless Dir.exist?(current_repo_docs)
+              raise UpdateError.new("No leyline content found locally and failed to fetch remote: #{e.message}")
+            end
+
+            FileUtils.cp_r(current_repo_docs, temp_dir)
           end
 
           remote_docs_path = File.join(temp_dir, 'docs')
           yield remote_docs_path if Dir.exist?(remote_docs_path)
-
         ensure
           git_client.cleanup if git_client
           FileUtils.rm_rf(temp_dir) if Dir.exist?(temp_dir)
@@ -449,15 +444,14 @@ module Leyline
           sparse_paths.each { |path| git_client.add_sparse_paths([path]) }
 
           git_client.fetch_version('https://github.com/phrazzld/leyline-standards.git', 'master')
-
         rescue Sync::GitClient::GitCommandError => e
           # Fallback for development
-          if Dir.exist?(File.join(@base_directory, '.git'))
-            current_repo_docs = File.join(@base_directory, 'docs')
-            FileUtils.cp_r(current_repo_docs, target_dir) if Dir.exist?(current_repo_docs)
-          else
-            raise UpdateError, "Failed to fetch remote content for update: #{e.message}"
+          unless Dir.exist?(File.join(@base_directory, '.git'))
+            raise UpdateError.new("Failed to fetch remote content for update: #{e.message}")
           end
+
+          current_repo_docs = File.join(@base_directory, 'docs')
+          FileUtils.cp_r(current_repo_docs, target_dir) if Dir.exist?(current_repo_docs)
         ensure
           git_client.cleanup if git_client
         end
@@ -477,6 +471,7 @@ module Leyline
           search_path = File.join(leyline_path, pattern)
           Dir.glob(search_path).each do |file_path|
             next unless File.file?(file_path)
+
             files << file_path
           end
         end
@@ -495,6 +490,7 @@ module Leyline
           search_path = File.join(remote_docs_path, pattern)
           Dir.glob(search_path).each do |file_path|
             next unless File.file?(file_path)
+
             files << file_path
           end
         end
@@ -507,6 +503,7 @@ module Leyline
 
         categories.each do |category|
           next if category == 'core'
+
           patterns << "bindings/categories/#{category}/**/*.md"
         end
 
@@ -519,6 +516,7 @@ module Leyline
 
         categories.each do |category|
           next if category == 'core'
+
           paths << "docs/bindings/categories/#{category}/"
         end
 
@@ -543,9 +541,7 @@ module Leyline
           next if entry.start_with?('.')
 
           category_path = File.join(bindings_path, entry)
-          if Dir.exist?(category_path)
-            categories << entry
-          end
+          categories << entry if Dir.exist?(category_path)
         end
 
         categories.sort
@@ -591,59 +587,59 @@ module Leyline
       def handle_error(error)
         # Convert standard errors to Leyline errors with recovery guidance
         leyline_error = case error
-        when Leyline::LeylineError
-          error
-        when ConflictDetectedError
-          # Conflict errors are already handled in show_conflict_resolution
-          return
-        when Errno::EACCES, Errno::EPERM
-          path = nil
-          begin
-            path = error.message.match(/- (.+)$/)[1] if error.message
-          rescue
-            # Ignore extraction errors
-          end
+                        when Leyline::LeylineError
+                          error
+                        when ConflictDetectedError
+                          # Conflict errors are already handled in show_conflict_resolution
+                          return
+                        when Errno::EACCES, Errno::EPERM
+                          path = nil
+                          begin
+                            path = error.message.match(/- (.+)$/)[1] if error.message
+                          rescue StandardError
+                            # Ignore extraction errors
+                          end
 
-          Leyline::FileSystemError.new(
-            "Permission denied during update",
-            reason: :permission_denied,
-            path: path
-          )
-        when Errno::ENOENT
-          UpdateError.new("Leyline directory not found")
-        when Errno::ENOSPC
-          Leyline::CacheOperationError.new(
-            "No space left on device for update operations",
-            operation: :disk_full,
-            cache_dir: @cache_dir
-          )
-        when Errno::EROFS
-          Leyline::FileSystemError.new(
-            "Filesystem is read-only",
-            reason: :read_only_filesystem,
-            path: @base_directory
-          )
-        when Leyline::Sync::GitClient::GitNotAvailableError
-          Leyline::RemoteAccessError.new(
-            "Git binary not found",
-            reason: :git_not_installed
-          )
-        when Leyline::Sync::GitClient::GitCommandError
-          handle_git_command_error(error)
-        when Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
-          Leyline::RemoteAccessError.new(
-            "Network timeout while fetching updates",
-            reason: :network_timeout,
-            url: 'https://github.com/phrazzld/leyline.git'
-          )
-        when Interrupt
-          Leyline::LeylineError.new(
-            "Update cancelled by user",
-            signal: 'SIGINT'
-          )
-        else
-          UpdateError.new(error.message)
-        end
+                          Leyline::FileSystemError.new(
+                            'Permission denied during update',
+                            reason: :permission_denied,
+                            path: path
+                          )
+                        when Errno::ENOENT
+                          UpdateError.new('Leyline directory not found')
+                        when Errno::ENOSPC
+                          Leyline::CacheOperationError.new(
+                            'No space left on device for update operations',
+                            operation: :disk_full,
+                            cache_dir: @cache_dir
+                          )
+                        when Errno::EROFS
+                          Leyline::FileSystemError.new(
+                            'Filesystem is read-only',
+                            reason: :read_only_filesystem,
+                            path: @base_directory
+                          )
+                        when Leyline::Sync::GitClient::GitNotAvailableError
+                          Leyline::RemoteAccessError.new(
+                            'Git binary not found',
+                            reason: :git_not_installed
+                          )
+                        when Leyline::Sync::GitClient::GitCommandError
+                          handle_git_command_error(error)
+                        when Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
+                          Leyline::RemoteAccessError.new(
+                            'Network timeout while fetching updates',
+                            reason: :network_timeout,
+                            url: 'https://github.com/phrazzld/leyline.git'
+                          )
+                        when Interrupt
+                          Leyline::LeylineError.new(
+                            'Update cancelled by user',
+                            signal: 'SIGINT'
+                          )
+                        else
+                          UpdateError.new(error.message)
+                        end
 
         # Output error with recovery suggestions
         output_error_with_recovery(leyline_error)
@@ -652,23 +648,23 @@ module Leyline
       def handle_git_command_error(error)
         if error.message.include?('authentication')
           Leyline::RemoteAccessError.new(
-            "Git authentication failed",
+            'Git authentication failed',
             reason: :authentication_failed,
             repository: 'phrazzld/leyline'
           )
         elsif error.message.include?('could not resolve host')
           Leyline::RemoteAccessError.new(
-            "Cannot reach GitHub - check network connection",
+            'Cannot reach GitHub - check network connection',
             reason: :network_timeout
           )
         elsif error.message.include?('repository not found')
           Leyline::RemoteAccessError.new(
-            "Leyline repository not accessible",
+            'Leyline repository not accessible',
             reason: :repository_not_found
           )
         elsif error.message.include?('merge conflict')
           Leyline::ConflictDetectedError.new(
-            "Git merge conflict detected",
+            'Git merge conflict detected',
             operation: 'update',
             suggestion: 'Use --force to overwrite or resolve manually'
           )
@@ -696,9 +692,9 @@ module Leyline
         platform = detect_platform
         if platform == 'windows' && error.error_type == :filesystem
           warn "\nWindows-specific tips:"
-          warn "  - Run as Administrator if permission denied"
-          warn "  - Check if files are locked by another process"
-          warn "  - Disable antivirus temporarily if blocking"
+          warn '  - Run as Administrator if permission denied'
+          warn '  - Check if files are locked by another process'
+          warn '  - Disable antivirus temporarily if blocking'
         end
 
         if @options[:verbose]
@@ -708,7 +704,7 @@ module Leyline
           warn "  Context: #{error.context.inspect}" if error.context.any?
           if error.respond_to?(:cause) && error.cause
             warn "  Original error: #{error.cause.class} - #{error.cause.message}"
-            warn "  Backtrace:"
+            warn '  Backtrace:'
             error.cause.backtrace.first(5).each { |line| warn "    #{line}" }
           end
         else

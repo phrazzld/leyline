@@ -27,37 +27,37 @@ $actions_taken = []
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: rollback_release.rb [options]"
+  opts.banner = 'Usage: rollback_release.rb [options]'
 
-  opts.on("-v", "--version VERSION", "Version to rollback (e.g., v0.2.0)") do |version|
+  opts.on('-v', '--version VERSION', 'Version to rollback (e.g., v0.2.0)') do |version|
     $options[:version] = version
   end
 
-  opts.on("--dry-run", "Show what would be done without making changes") do
+  opts.on('--dry-run', 'Show what would be done without making changes') do
     $options[:dry_run] = true
   end
 
-  opts.on("--force", "Force rollback even with warnings") do
+  opts.on('--force', 'Force rollback even with warnings') do
     $options[:force] = true
   end
 
-  opts.on("--no-issue", "Skip creating rollback notification issue") do
+  opts.on('--no-issue', 'Skip creating rollback notification issue') do
     $options[:create_issue] = false
   end
 
-  opts.on("--repo REPO", "GitHub repository (owner/name)") do |repo|
+  opts.on('--repo REPO', 'GitHub repository (owner/name)') do |repo|
     $options[:repo] = repo
   end
 
-  opts.on("--token TOKEN", "GitHub token (or set GITHUB_TOKEN env var)") do |token|
+  opts.on('--token TOKEN', 'GitHub token (or set GITHUB_TOKEN env var)') do |token|
     $options[:github_token] = token
   end
 
-  opts.on("--verbose", "Verbose output") do
+  opts.on('--verbose', 'Verbose output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -98,9 +98,7 @@ def detect_repo_info
   # Try to detect from git remote
   if File.exist?('.git')
     remote_url = `git config --get remote.origin.url 2>/dev/null`.strip
-    if remote_url =~ /github\.com[:\/]([^\/]+)\/(.+?)(\.git)?$/
-      return "#{$1}/#{$2}"
-    end
+    return "#{Regexp.last_match(1)}/#{Regexp.last_match(2)}" if remote_url =~ %r{github\.com[:/]([^/]+)/(.+?)(\.git)?$}
   end
 
   nil
@@ -121,11 +119,9 @@ def get_previous_version(current_version)
   tags = `git tag -l 'v*' | sort -V`.strip.split("\n")
 
   current_index = tags.index(current_version)
-  if current_index && current_index > 0
-    return tags[current_index - 1]
-  end
+  return tags[current_index - 1] if current_index && current_index > 0
 
-  log_warning("Could not determine previous version")
+  log_warning('Could not determine previous version')
   nil
 end
 
@@ -141,7 +137,7 @@ def revert_version_file(previous_version)
   return if $options[:dry_run]
 
   unless File.exist?('VERSION')
-    log_error("VERSION file not found")
+    log_error('VERSION file not found')
     return false
   end
 
@@ -154,12 +150,12 @@ def revert_version_file(previous_version)
 end
 
 # Revert CHANGELOG.md
-def revert_changelog(version, previous_version)
+def revert_changelog(version, _previous_version)
   log_action("Revert CHANGELOG.md to remove #{version} entry")
   return if $options[:dry_run]
 
   unless File.exist?('CHANGELOG.md')
-    log_warning("CHANGELOG.md not found")
+    log_warning('CHANGELOG.md not found')
     return true
   end
 
@@ -198,7 +194,7 @@ def delete_git_tag(version)
   system("git tag -d #{version} 2>/dev/null")
 
   # Try to delete remote tag if origin exists
-  if system("git remote get-url origin >/dev/null 2>&1")
+  if system('git remote get-url origin >/dev/null 2>&1')
     if system("git push origin :refs/tags/#{version} 2>&1")
       log_info("Deleted git tag #{version} (local and remote)")
     else
@@ -229,7 +225,7 @@ def delete_github_release(client, repo, version)
       log_warning("GitHub release #{version} not found")
       true
     end
-  rescue => e
+  rescue StandardError => e
     log_error("Failed to delete GitHub release: #{e.message}")
     false
   end
@@ -237,7 +233,7 @@ end
 
 # Create rollback notification issue
 def create_rollback_issue(client, repo, version, previous_version, reason = nil)
-  log_action("Create rollback notification issue")
+  log_action('Create rollback notification issue')
   return if $options[:dry_run]
 
   title = "🔄 Release Rollback: #{version}"
@@ -270,17 +266,17 @@ def create_rollback_issue(client, repo, version, previous_version, reason = nil)
     ### For Consumers
     If you have already updated to #{version}, please revert to #{previous_version || 'the previous version'}.
 
-    #{reason ? "### Rollback Reason\n#{reason}" : ""}
+    #{reason ? "### Rollback Reason\n#{reason}" : ''}
 
     ---
     *This issue was automatically created by the rollback system.*
   BODY
 
   begin
-    issue = client.create_issue(repo, title, body, labels: ['rollback', 'release'])
+    issue = client.create_issue(repo, title, body, labels: %w[rollback release])
     log_info("Created rollback notification issue ##{issue.number}")
     true
-  rescue => e
+  rescue StandardError => e
     log_error("Failed to create rollback issue: #{e.message}")
     false
   end
@@ -288,7 +284,7 @@ end
 
 # Verify rollback success
 def verify_rollback(version, previous_version)
-  log_info("Verifying rollback success")
+  log_info('Verifying rollback success')
 
   errors = []
 
@@ -301,27 +297,23 @@ def verify_rollback(version, previous_version)
       errors << "VERSION file shows #{current_version}, expected #{expected_version}"
     end
   else
-    errors << "VERSION file missing"
+    errors << 'VERSION file missing'
   end
 
   # Check git tag doesn't exist
-  if system("git rev-parse #{version} >/dev/null 2>&1")
-    errors << "Git tag #{version} still exists"
-  end
+  errors << "Git tag #{version} still exists" if system("git rev-parse #{version} >/dev/null 2>&1")
 
   # Check CHANGELOG doesn't contain version
   if File.exist?('CHANGELOG.md')
     content = File.read('CHANGELOG.md')
-    if content.include?(version.gsub(/^v/, ''))
-      log_warning("CHANGELOG.md may still contain references to #{version}")
-    end
+    log_warning("CHANGELOG.md may still contain references to #{version}") if content.include?(version.gsub(/^v/, ''))
   end
 
   if errors.any?
     errors.each { |error| log_error("Verification failed: #{error}") }
     false
   else
-    log_info("Rollback verification passed")
+    log_info('Rollback verification passed')
     true
   end
 end
@@ -330,13 +322,11 @@ end
 def perform_rollback
   # Validate inputs
   unless $options[:version]
-    log_error("Version to rollback is required (use --version)")
+    log_error('Version to rollback is required (use --version)')
     return false
   end
 
-  unless validate_version($options[:version])
-    return false
-  end
+  return false unless validate_version($options[:version])
 
   version = $options[:version]
   version = "v#{version}" unless version.start_with?('v')
@@ -346,18 +336,16 @@ def perform_rollback
   # Detect repository
   repo = detect_repo_info
   unless repo
-    log_error("Could not detect GitHub repository. Use --repo option.")
+    log_error('Could not detect GitHub repository. Use --repo option.')
     return false
   end
   log_verbose("Repository: #{repo}")
 
   # Get previous version
   previous_version = get_previous_version(version)
-  unless previous_version
-    unless $options[:force]
-      log_error("Could not determine previous version. Use --force to continue anyway.")
-      return false
-    end
+  if !previous_version && !$options[:force]
+    log_error('Could not determine previous version. Use --force to continue anyway.')
+    return false
   end
   log_info("Previous version: #{previous_version || 'unknown'}")
 
@@ -367,13 +355,13 @@ def perform_rollback
     begin
       github_client = Octokit::Client.new(access_token: $options[:github_token])
       github_client.user # Test authentication
-      log_verbose("GitHub authentication successful")
-    rescue => e
+      log_verbose('GitHub authentication successful')
+    rescue StandardError => e
       log_error("GitHub authentication failed: #{e.message}")
       return false unless $options[:force]
     end
   elsif !$options[:dry_run] && !$options[:github_token]
-    log_warning("No GitHub token provided. Skipping GitHub operations.")
+    log_warning('No GitHub token provided. Skipping GitHub operations.')
   end
 
   # Perform rollback steps
@@ -383,7 +371,7 @@ def perform_rollback
   if previous_version
     success &&= revert_version_file(previous_version)
   else
-    log_warning("Skipping VERSION file revert (no previous version)")
+    log_warning('Skipping VERSION file revert (no previous version)')
   end
 
   # 2. Revert CHANGELOG.md
@@ -393,9 +381,7 @@ def perform_rollback
   success &&= delete_git_tag(version)
 
   # 4. Delete GitHub release
-  if github_client
-    success &&= delete_github_release(github_client, repo, version)
-  end
+  success &&= delete_github_release(github_client, repo, version) if github_client
 
   # 5. Create rollback notification issue
   if github_client && $options[:create_issue] && !$options[:dry_run]
@@ -403,16 +389,14 @@ def perform_rollback
   end
 
   # 6. Verify rollback
-  if !$options[:dry_run] && previous_version
-    verify_rollback(version, previous_version)
-  end
+  verify_rollback(version, previous_version) if !$options[:dry_run] && previous_version
 
   success
 end
 
 # Exit with summary
 def exit_with_summary(success)
-  puts "\n" + "="*60
+  puts "\n" + '=' * 60
 
   if $warnings.any?
     puts "\n#{$warnings.size} warning(s):"
@@ -426,7 +410,7 @@ def exit_with_summary(success)
 
   if $options[:dry_run]
     puts "\nDRY RUN SUMMARY - No changes were made"
-    puts "Actions that would be taken:"
+    puts 'Actions that would be taken:'
     $actions_taken.each { |action| puts "  - #{action}" }
   elsif success
     puts "\n✅ Rollback completed successfully"
@@ -445,7 +429,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nInterrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     log_error("Unexpected error: #{e.message}")
     log_error("Backtrace: #{e.backtrace.join("\n")}") if $options[:verbose]
     exit 1

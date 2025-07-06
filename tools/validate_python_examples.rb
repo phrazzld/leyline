@@ -24,7 +24,7 @@ require_relative '../lib/metrics_collector'
 PYTHON_DIR = 'docs/bindings/categories/python'
 FLAKE8_CONFIG = [
   '--max-line-length=88',
-  '--extend-ignore=E203,W503',  # Compatible with black formatter
+  '--extend-ignore=E203,W503', # Compatible with black formatter
   '--exclude=.git,__pycache__,venv'
 ]
 MYPY_CONFIG = [
@@ -63,11 +63,12 @@ class PythonCodeValidator
   end
 
   def validate_file(file_path)
-    @metrics_collector.start_timer(operation: "validate_file")
+    @metrics_collector.start_timer(operation: 'validate_file')
 
     unless File.exist?(file_path)
-      add_error(file_path, 0, "File not found")
-      @metrics_collector.end_timer(operation: "validate_file", success: false, metadata: { file: file_path, error: "file_not_found" })
+      add_error(file_path, 0, 'File not found')
+      @metrics_collector.end_timer(operation: 'validate_file', success: false,
+                                   metadata: { file: file_path, error: 'file_not_found' })
       return false
     end
 
@@ -77,8 +78,9 @@ class PythonCodeValidator
     code_blocks = extract_python_code_blocks(content, file_path)
 
     if code_blocks.empty?
-      puts "  No Python code blocks found" if @verbose
-      @metrics_collector.end_timer(operation: "validate_file", success: true, metadata: { file: file_path, code_blocks: 0 })
+      puts '  No Python code blocks found' if @verbose
+      @metrics_collector.end_timer(operation: 'validate_file', success: true,
+                                   metadata: { file: file_path, code_blocks: 0 })
       return true
     end
 
@@ -89,11 +91,11 @@ class PythonCodeValidator
       success = validate_code_block(block, file_path, index + 1) && success
     end
 
-    @metrics_collector.end_timer(operation: "validate_file", success: success, metadata: {
-      file: file_path,
-      code_blocks: code_blocks.length,
-      errors: @error_collector.count
-    })
+    @metrics_collector.end_timer(operation: 'validate_file', success: success, metadata: {
+                                   file: file_path,
+                                   code_blocks: code_blocks.length,
+                                   errors: @error_collector.count
+                                 })
 
     success
   end
@@ -114,7 +116,7 @@ class PythonCodeValidator
         current_block = []
       elsif line.strip == '```' && in_python_block
         in_python_block = false
-        if !current_block.empty?
+        unless current_block.empty?
           blocks << {
             code: current_block.join,
             start_line: block_start_line,
@@ -128,9 +130,7 @@ class PythonCodeValidator
     end
 
     # Handle unclosed block
-    if in_python_block && !current_block.empty?
-      add_error(file_path, block_start_line, "Unclosed Python code block")
-    end
+    add_error(file_path, block_start_line, 'Unclosed Python code block') if in_python_block && !current_block.empty?
 
     blocks
   end
@@ -163,11 +163,11 @@ class PythonCodeValidator
     result = run_command(cmd)
 
     if result[:success]
-      puts "    ✓ flake8 passed" if @verbose
-      return true
+      puts '    ✓ flake8 passed' if @verbose
+      true
     else
       parse_flake8_errors(result[:output], original_file, start_line, block_number)
-      return false
+      false
     end
   end
 
@@ -176,11 +176,11 @@ class PythonCodeValidator
     result = run_command(cmd)
 
     if result[:success]
-      puts "    ✓ mypy passed" if @verbose
-      return true
+      puts '    ✓ mypy passed' if @verbose
+      true
     else
       parse_mypy_errors(result[:output], original_file, start_line, block_number)
-      return false
+      false
     end
   end
 
@@ -192,29 +192,29 @@ class PythonCodeValidator
 
   def parse_flake8_errors(output, original_file, start_line, block_number)
     output.lines.each do |line|
-      if line.match(/^.+:(\d+):(\d+):\s*(.+)$/)
-        error_line = $1.to_i
-        column = $2.to_i
-        message = $3.strip
-        actual_line = start_line + error_line - 1
-        add_error(original_file, actual_line, "flake8 (block #{block_number}): #{message}", column)
-      end
+      next unless line.match(/^.+:(\d+):(\d+):\s*(.+)$/)
+
+      error_line = ::Regexp.last_match(1).to_i
+      column = ::Regexp.last_match(2).to_i
+      message = ::Regexp.last_match(3).strip
+      actual_line = start_line + error_line - 1
+      add_error(original_file, actual_line, "flake8 (block #{block_number}): #{message}", column)
     end
   end
 
   def parse_mypy_errors(output, original_file, start_line, block_number)
     output.lines.each do |line|
       if line.match(/^.+:(\d+):(\d+):\s*(.+):\s*(.+)$/)
-        error_line = $1.to_i
-        column = $2.to_i
-        severity = $3.strip
-        message = $4.strip
+        error_line = ::Regexp.last_match(1).to_i
+        column = ::Regexp.last_match(2).to_i
+        severity = ::Regexp.last_match(3).strip
+        message = ::Regexp.last_match(4).strip
         actual_line = start_line + error_line - 1
         add_error(original_file, actual_line, "mypy (block #{block_number}) #{severity}: #{message}", column)
       elsif line.match(/^.+:(\d+):\s*(.+):\s*(.+)$/)
-        error_line = $1.to_i
-        severity = $2.strip
-        message = $3.strip
+        error_line = ::Regexp.last_match(1).to_i
+        severity = ::Regexp.last_match(2).strip
+        message = ::Regexp.last_match(3).strip
         actual_line = start_line + error_line - 1
         add_error(original_file, actual_line, "mypy (block #{block_number}) #{severity}: #{message}")
       end
@@ -224,13 +224,13 @@ class PythonCodeValidator
   def add_error(file, line, message, column = nil)
     # Determine error type from message
     error_type = case message
-    when /flake8/
-      'python_lint_error'
-    when /mypy/
-      'python_type_error'
-    else
-      'python_validation_error'
-    end
+                 when /flake8/
+                   'python_lint_error'
+                 when /mypy/
+                   'python_type_error'
+                 else
+                   'python_validation_error'
+                 end
 
     # Structured error tracking
     @error_collector.add_error(
@@ -270,7 +270,7 @@ class PythonCodeValidator
     begin
       metrics_file = @metrics_collector.save_metrics
       puts "📊 Metrics saved to #{metrics_file}" if @verbose
-    rescue => e
+    rescue StandardError => e
       puts "⚠️ Failed to save metrics: #{e.message}" if @verbose
     end
   end
@@ -283,8 +283,6 @@ class PythonCodeValidator
     @error_collector.any?
   end
 
-  private
-
   def log_structured_start
     return unless ENV['LEYLINE_STRUCTURED_LOGGING'] == 'true'
 
@@ -296,28 +294,28 @@ class PythonCodeValidator
         tool: 'validate_python_examples',
         python_dir: PYTHON_DIR
       }
-      STDERR.puts JSON.generate(start_log)
-    rescue => e
-      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+      warn JSON.generate(start_log)
+    rescue StandardError => e
+      warn "Warning: Structured logging failed: #{e.message}"
     end
   end
 
   def generate_suggestion(message)
     case message
     when /line too long/
-      "Consider breaking long lines or using a line formatter like Black"
+      'Consider breaking long lines or using a line formatter like Black'
     when /undefined name/
-      "Check variable names and imports"
+      'Check variable names and imports'
     when /imported but unused/
       "Remove unused import or add '# noqa: F401' if intentionally unused"
     when /missing whitespace/
-      "Add proper whitespace around operators"
+      'Add proper whitespace around operators'
     when /type.*error/i
-      "Review type annotations and ensure correct types are used"
+      'Review type annotations and ensure correct types are used'
     when /syntax error/i
-      "Check Python syntax - missing colons, brackets, or indentation"
+      'Check Python syntax - missing colons, brackets, or indentation'
     else
-      "Review Python code formatting and syntax"
+      'Review Python code formatting and syntax'
     end
   end
 end
@@ -328,15 +326,13 @@ def check_dependencies
   missing = []
 
   tools.each do |tool|
-    unless system("which #{tool} > /dev/null 2>&1")
-      missing << tool
-    end
+    missing << tool unless system("which #{tool} > /dev/null 2>&1")
   end
 
   unless missing.empty?
     puts "❌ Missing required tools: #{missing.join(', ')}"
-    puts "Please install them using:"
-    puts "  pip install flake8 mypy"
+    puts 'Please install them using:'
+    puts '  pip install flake8 mypy'
     return false
   end
 
@@ -370,15 +366,15 @@ if __FILE__ == $0
 
   begin
     success = if options[:file]
-      validator.validate_file(options[:file])
-    else
-      validator.validate_all_files
-    end
+                validator.validate_file(options[:file])
+              else
+                validator.validate_all_files
+              end
 
     validator.report_errors
 
     if success && !validator.has_errors?
-      puts "✅ All Python code examples are valid" unless options[:file] && !options[:verbose]
+      puts '✅ All Python code examples are valid' unless options[:file] && !options[:verbose]
       exit 0
     else
       exit 1

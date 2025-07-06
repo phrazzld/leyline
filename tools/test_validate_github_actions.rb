@@ -22,16 +22,16 @@ def test_case(description)
   print "Testing: #{description}... "
   begin
     yield
-    puts "✅ PASSED"
+    puts '✅ PASSED'
     $test_successes += 1
-  rescue => e
+  rescue StandardError => e
     puts "❌ FAILED: #{e.message}"
     puts "  #{e.backtrace.first}" if $verbose
     $test_failures += 1
   end
 end
 
-def assert(condition, message = "Assertion failed")
+def assert(condition, message = 'Assertion failed')
   raise message unless condition
 end
 
@@ -50,15 +50,15 @@ end
 
 # Test Cases
 
-puts "🧪 GitHub Actions Validation Tool Test Suite"
-puts "============================================"
-puts ""
+puts '🧪 GitHub Actions Validation Tool Test Suite'
+puts '============================================'
+puts ''
 
 # Test 1: Database Loading
-test_case("Load deprecation database") do
+test_case('Load deprecation database') do
   database = load_deprecation_database
-  assert database.is_a?(Hash), "Database should be a hash"
-  assert database.keys.length > 0, "Database should contain entries"
+  assert database.is_a?(Hash), 'Database should be a hash'
+  assert database.keys.length > 0, 'Database should contain entries'
 
   # Verify expected structure
   database.each do |action, info|
@@ -66,12 +66,12 @@ test_case("Load deprecation database") do
     assert info.key?('reason'), "Entry #{action} missing reason"
     assert info.key?('upgrade_to'), "Entry #{action} missing upgrade_to"
     assert info.key?('severity'), "Entry #{action} missing severity"
-    assert ['high', 'medium', 'low'].include?(info['severity']), "Invalid severity for #{action}"
+    assert %w[high medium low].include?(info['severity']), "Invalid severity for #{action}"
   end
 end
 
 # Test 2: Valid Workflow Parsing
-test_case("Parse valid workflow file") do
+test_case('Parse valid workflow file') do
   workflow_content = <<~YAML
     name: Test Workflow
     on: [push]
@@ -88,13 +88,13 @@ test_case("Parse valid workflow file") do
 
   create_test_workflow(workflow_content) do |file|
     workflow = parse_workflow_file(file)
-    assert workflow.is_a?(Hash), "Should parse valid YAML"
-    assert workflow['name'] == 'Test Workflow', "Should preserve workflow name"
+    assert workflow.is_a?(Hash), 'Should parse valid YAML'
+    assert workflow['name'] == 'Test Workflow', 'Should preserve workflow name'
   end
 end
 
 # Test 3: Invalid YAML Handling
-test_case("Handle invalid YAML gracefully") do
+test_case('Handle invalid YAML gracefully') do
   invalid_yaml = <<~YAML
     name: Test Workflow
     on: [push
@@ -104,12 +104,12 @@ test_case("Handle invalid YAML gracefully") do
 
   create_test_workflow(invalid_yaml) do |file|
     workflow = parse_workflow_file(file)
-    assert workflow.nil?, "Should return nil for invalid YAML"
+    assert workflow.nil?, 'Should return nil for invalid YAML'
   end
 end
 
 # Test 4: Action Extraction
-test_case("Extract actions from workflow") do
+test_case('Extract actions from workflow') do
   workflow_content = <<~YAML
     name: Multi-Action Workflow
     on: [push]
@@ -133,34 +133,34 @@ test_case("Extract actions from workflow") do
     workflow = parse_workflow_file(file)
     actions = extract_actions_from_workflow(workflow)
 
-    assert_equal 4, actions.length, "Should extract 4 actions"
+    assert_equal 4, actions.length, 'Should extract 4 actions'
 
     # Verify action extraction details
     checkout_actions = actions.select { |a| a[:action].start_with?('actions/checkout') }
-    assert_equal 2, checkout_actions.length, "Should find 2 checkout actions"
+    assert_equal 2, checkout_actions.length, 'Should find 2 checkout actions'
 
     # Verify job and step information is captured
     test_job_actions = actions.select { |a| a[:job] == 'test' }
-    assert_equal 2, test_job_actions.length, "Should find 2 actions in test job"
+    assert_equal 2, test_job_actions.length, 'Should find 2 actions in test job'
   end
 end
 
 # Test 5: Deprecation Detection
-test_case("Detect deprecated actions") do
+test_case('Detect deprecated actions') do
   database = load_deprecation_database
 
   # Test known deprecated action
   deprecated_info = check_action_deprecation('actions/checkout@v1', database)
-  assert deprecated_info, "Should detect actions/checkout@v1 as deprecated"
-  assert deprecated_info['severity'] == 'high', "Should have high severity"
+  assert deprecated_info, 'Should detect actions/checkout@v1 as deprecated'
+  assert deprecated_info['severity'] == 'high', 'Should have high severity'
 
   # Test current action (should not be deprecated)
   current_info = check_action_deprecation('actions/checkout@v4', database)
-  assert current_info.nil?, "Should not detect actions/checkout@v4 as deprecated"
+  assert current_info.nil?, 'Should not detect actions/checkout@v4 as deprecated'
 end
 
 # Test 6: Workflow Validation with Deprecated Actions
-test_case("Validate workflow with deprecated actions") do
+test_case('Validate workflow with deprecated actions') do
   deprecated_workflow = <<~YAML
     name: Deprecated Actions Workflow
     on: [push]
@@ -177,12 +177,12 @@ test_case("Validate workflow with deprecated actions") do
   create_test_workflow(deprecated_workflow) do |file|
     database = load_deprecation_database
     result = validate_workflow_file(file, database)
-    assert result == false, "Should fail validation with deprecated actions"
+    assert result == false, 'Should fail validation with deprecated actions'
   end
 end
 
 # Test 7: Workflow Validation with Current Actions
-test_case("Validate workflow with current actions") do
+test_case('Validate workflow with current actions') do
   current_workflow = <<~YAML
     name: Current Actions Workflow
     on: [push]
@@ -199,12 +199,12 @@ test_case("Validate workflow with current actions") do
   create_test_workflow(current_workflow) do |file|
     database = load_deprecation_database
     result = validate_workflow_file(file, database)
-    assert result == true, "Should pass validation with current actions"
+    assert result == true, 'Should pass validation with current actions'
   end
 end
 
 # Test 8: Edge Cases
-test_case("Handle edge cases") do
+test_case('Handle edge cases') do
   # Empty workflow
   empty_workflow = <<~YAML
     name: Empty Workflow
@@ -214,7 +214,7 @@ test_case("Handle edge cases") do
   create_test_workflow(empty_workflow) do |file|
     database = load_deprecation_database
     result = validate_workflow_file(file, database)
-    assert result == true, "Should pass validation for workflow with no actions"
+    assert result == true, 'Should pass validation for workflow with no actions'
   end
 
   # Workflow with only run steps (no uses)
@@ -234,61 +234,57 @@ test_case("Handle edge cases") do
   create_test_workflow(run_only_workflow) do |file|
     database = load_deprecation_database
     result = validate_workflow_file(file, database)
-    assert result == true, "Should pass validation for workflow with only run steps"
+    assert result == true, 'Should pass validation for workflow with only run steps'
   end
 end
 
 # Test 9: Action Reference Variations
-test_case("Handle action reference variations") do
+test_case('Handle action reference variations') do
   database = load_deprecation_database
 
   # Test with commit SHA
   sha_ref = check_action_deprecation('actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675', database)
-  assert sha_ref.nil?, "Should not match SHA references to deprecation patterns"
+  assert sha_ref.nil?, 'Should not match SHA references to deprecation patterns'
 
   # Test with different tag formats
   tag_ref = check_action_deprecation('actions/checkout@main', database)
-  assert tag_ref.nil?, "Should not match branch/tag references to version patterns"
+  assert tag_ref.nil?, 'Should not match branch/tag references to version patterns'
 end
 
 # Test 10: Database Fallback
-test_case("Use fallback database when YAML file missing") do
+test_case('Use fallback database when YAML file missing') do
   # Temporarily move the YAML file
   yaml_file = File.join(File.dirname(__FILE__), 'github-actions-deprecations.yml')
   backup_file = "#{yaml_file}.backup"
 
-  if File.exist?(yaml_file)
-    FileUtils.mv(yaml_file, backup_file)
-  end
+  FileUtils.mv(yaml_file, backup_file) if File.exist?(yaml_file)
 
   begin
     database = load_deprecation_database
-    assert database.is_a?(Hash), "Should return fallback database"
-    assert database.keys.length > 0, "Fallback database should contain entries"
+    assert database.is_a?(Hash), 'Should return fallback database'
+    assert database.keys.length > 0, 'Fallback database should contain entries'
   ensure
     # Restore the file
-    if File.exist?(backup_file)
-      FileUtils.mv(backup_file, yaml_file)
-    end
+    FileUtils.mv(backup_file, yaml_file) if File.exist?(backup_file)
   end
 end
 
 # Test Results Summary
-puts ""
-puts "=" * 50
-puts "📊 TEST RESULTS SUMMARY"
-puts "=" * 50
+puts ''
+puts '=' * 50
+puts '📊 TEST RESULTS SUMMARY'
+puts '=' * 50
 puts "Total tests: #{$test_successes + $test_failures}"
 puts "Passed: #{$test_successes}"
 puts "Failed: #{$test_failures}"
-puts ""
+puts ''
 
 if $test_failures == 0
-  puts "✅ ALL TESTS PASSED"
-  puts "🎉 GitHub Actions validation tool is working correctly!"
+  puts '✅ ALL TESTS PASSED'
+  puts '🎉 GitHub Actions validation tool is working correctly!'
   exit 0
 else
   puts "❌ #{$test_failures} TEST(S) FAILED"
-  puts "🔧 Fix the failing tests before deploying the validation tool"
+  puts '🔧 Fix the failing tests before deploying the validation tool'
   exit 1
 end

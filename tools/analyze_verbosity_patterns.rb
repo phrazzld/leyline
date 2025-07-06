@@ -75,9 +75,9 @@ class VerbosityAnalyzer
 
     # Find all markdown files in binding/tenet directories
     markdown_files = Dir.glob([
-      'docs/tenets/*.md',
-      'docs/bindings/**/*.md'
-    ]).reject { |f| f.include?('/00-index.md') }
+                                'docs/tenets/*.md',
+                                'docs/bindings/**/*.md'
+                              ]).reject { |f| f.include?('/00-index.md') }
 
     markdown_files.each do |file_path|
       line_count = count_lines(file_path)
@@ -86,16 +86,16 @@ class VerbosityAnalyzer
       is_tenet = file_path.include?('/tenets/')
       limit = is_tenet ? TENET_LIMIT : BINDING_LIMIT
 
-      if line_count > limit
-        excess = line_count - limit
-        docs[file_path] = {
-          line_count: line_count,
-          limit: limit,
-          excess: excess,
-          category: categorize_document(file_path),
-          is_tenet: is_tenet
-        }
-      end
+      next unless line_count > limit
+
+      excess = line_count - limit
+      docs[file_path] = {
+        line_count: line_count,
+        limit: limit,
+        excess: excess,
+        category: categorize_document(file_path),
+        is_tenet: is_tenet
+      }
     end
 
     docs
@@ -103,30 +103,30 @@ class VerbosityAnalyzer
 
   def count_lines(file_path)
     File.readlines(file_path).count
-  rescue => e
+  rescue StandardError => e
     puts "Warning: Could not read #{file_path}: #{e.message}"
     0
   end
 
   def categorize_document(file_path)
     case file_path
-    when /\/typescript\//
+    when %r{/typescript/}
       'TypeScript'
-    when /\/python\//
+    when %r{/python/}
       'Python'
-    when /\/go\//
+    when %r{/go/}
       'Go'
-    when /\/rust\//
+    when %r{/rust/}
       'Rust'
-    when /\/database\//
+    when %r{/database/}
       'Database'
-    when /\/security\//
+    when %r{/security/}
       'Security'
-    when /\/frontend\//, /\/react\//
+    when %r{/frontend/}, %r{/react/}
       'Frontend'
-    when /\/core\//
+    when %r{/core/}
       'Core'
-    when /\/tenets\//
+    when %r{/tenets/}
       'Tenets'
     else
       'Other'
@@ -143,10 +143,12 @@ class VerbosityAnalyzer
       pattern_info[:patterns].each do |regex|
         matches += content.scan(regex).length
       end
+      next unless matches > 0
+
       doc_patterns[pattern_name] = {
         count: matches,
         description: pattern_info[:description]
-      } if matches > 0
+      }
     end
 
     # Calculate code block languages
@@ -166,29 +168,29 @@ class VerbosityAnalyzer
 
     # Multiple languages contribute heavily to verbosity
     if patterns['multiple_languages'] && patterns['multiple_languages'][:count] > 4
-      reduction_score += [excess_lines * 0.4, 200].min  # Up to 40% reduction
+      reduction_score += [excess_lines * 0.4, 200].min # Up to 40% reduction
     end
 
     # Tool configurations and installation procedures
     if patterns['tool_configurations'] && patterns['tool_configurations'][:count] > 3
-      reduction_score += [excess_lines * 0.2, 100].min  # Up to 20% reduction
+      reduction_score += [excess_lines * 0.2, 100].min # Up to 20% reduction
     end
 
     if patterns['installation_procedures'] && patterns['installation_procedures'][:count] > 2
-      reduction_score += [excess_lines * 0.15, 80].min   # Up to 15% reduction
+      reduction_score += [excess_lines * 0.15, 80].min # Up to 15% reduction
     end
 
     # Step-by-step and troubleshooting content
     if patterns['step_by_step'] && patterns['step_by_step'][:count] > 5
-      reduction_score += [excess_lines * 0.1, 50].min    # Up to 10% reduction
+      reduction_score += [excess_lines * 0.1, 50].min # Up to 10% reduction
     end
 
     reduction_score.round
   end
 
   def generate_report
-    puts "📊 VERBOSITY ANALYSIS REPORT"
-    puts "=" * 50
+    puts '📊 VERBOSITY ANALYSIS REPORT'
+    puts '=' * 50
     puts
 
     # Summary by category
@@ -208,18 +210,18 @@ class VerbosityAnalyzer
   end
 
   def generate_category_summary
-    puts "📁 DOCUMENTS BY CATEGORY"
-    puts "-" * 25
+    puts '📁 DOCUMENTS BY CATEGORY'
+    puts '-' * 25
 
     by_category = @results.group_by { |_, data| data[:info][:category] }
 
-    by_category.sort_by { |category, docs|
+    by_category.sort_by do |category, _docs|
       case category
-      when 'TypeScript', 'Python', 'Go' then 0  # High priority
+      when 'TypeScript', 'Python', 'Go' then 0 # High priority
       when 'Core', 'Database', 'Security' then 1 # Medium priority
       else 2 # Low priority
       end
-    }.each do |category, docs|
+    end.each do |category, docs|
       total_excess = docs.sum { |_, data| data[:info][:excess] }
       avg_excess = total_excess / docs.length
 
@@ -231,8 +233,8 @@ class VerbosityAnalyzer
   end
 
   def generate_pattern_summary
-    puts "🔍 TOP VERBOSITY PATTERNS"
-    puts "-" * 25
+    puts '🔍 TOP VERBOSITY PATTERNS'
+    puts '-' * 25
 
     pattern_totals = {}
 
@@ -253,15 +255,15 @@ class VerbosityAnalyzer
   end
 
   def generate_priority_recommendations
-    puts "🎯 REFACTORING PRIORITY RECOMMENDATIONS"
-    puts "-" * 38
+    puts '🎯 REFACTORING PRIORITY RECOMMENDATIONS'
+    puts '-' * 38
 
     # High-impact documents (high excess + high reduction potential)
-    high_impact = @results.select { |_, data|
+    high_impact = @results.select do |_, data|
       data[:info][:excess] > 200 && data[:estimated_reduction] > 100
-    }.sort_by { |_, data| -data[:estimated_reduction] }
+    end.sort_by { |_, data| -data[:estimated_reduction] }
 
-    puts "HIGH IMPACT (tackle first):"
+    puts 'HIGH IMPACT (tackle first):'
     high_impact.first(8).each do |file_path, data|
       category = data[:info][:category]
       excess = data[:info][:excess]
@@ -273,11 +275,11 @@ class VerbosityAnalyzer
     puts
 
     # Quick wins (low excess but easy to fix)
-    quick_wins = @results.select { |_, data|
+    quick_wins = @results.select do |_, data|
       data[:info][:excess] < 100 && data[:estimated_reduction] > 30
-    }.sort_by { |_, data| data[:info][:excess] }
+    end.sort_by { |_, data| data[:info][:excess] }
 
-    puts "QUICK WINS (easy fixes):"
+    puts 'QUICK WINS (easy fixes):'
     quick_wins.first(6).each do |file_path, data|
       category = data[:info][:category]
       excess = data[:info][:excess]
@@ -289,8 +291,8 @@ class VerbosityAnalyzer
   end
 
   def generate_detailed_analysis
-    puts "📋 DETAILED DOCUMENT ANALYSIS"
-    puts "-" * 30
+    puts '📋 DETAILED DOCUMENT ANALYSIS'
+    puts '-' * 30
 
     @results.sort_by { |_, data| -data[:info][:excess] }.each do |file_path, data|
       filename = File.basename(file_path)
@@ -300,13 +302,11 @@ class VerbosityAnalyzer
       puts "  Lines: #{info[:line_count]} (#{info[:excess]} over #{info[:limit]} limit)"
       puts "  Estimated reduction potential: #{data[:estimated_reduction]} lines"
 
-      if data[:code_languages].any?
-        puts "  Code languages: #{data[:code_languages].join(', ')}"
-      end
+      puts "  Code languages: #{data[:code_languages].join(', ')}" if data[:code_languages].any?
 
       if data[:patterns].any?
-        puts "  Verbosity patterns found:"
-        data[:patterns].sort_by { |_, pattern_data| -pattern_data[:count] }.each do |pattern_name, pattern_data|
+        puts '  Verbosity patterns found:'
+        data[:patterns].sort_by { |_, pattern_data| -pattern_data[:count] }.each do |_pattern_name, pattern_data|
           puts "    - #{pattern_data[:description]}: #{pattern_data[:count]} occurrences"
         end
       end

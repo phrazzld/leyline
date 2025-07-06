@@ -70,7 +70,7 @@ def test_migration_script
       success = $?.success?
 
       unless success
-        puts "ERROR: Migration script failed"
+        puts 'ERROR: Migration script failed'
         puts output
         return false
       end
@@ -81,42 +81,33 @@ def test_migration_script
       # Check test1.md
       content1 = File.read(File.join(tenets_dir, 'test1.md'))
       yaml1 = YAML.safe_load(content1.split('---')[1])
-      unless yaml1['version'] == '0.1.0'
-        errors << "test1.md: version not added correctly (got: #{yaml1['version']})"
-      end
+      errors << "test1.md: version not added correctly (got: #{yaml1['version']})" unless yaml1['version'] == '0.1.0'
 
       # Check test2.md
       content2 = File.read(File.join(bindings_dir, 'test2.md'))
       yaml2 = YAML.safe_load(content2.split('---')[1])
-      unless yaml2['version'] == '0.1.0'
-        errors << "test2.md: version not added correctly (got: #{yaml2['version']})"
-      end
+      errors << "test2.md: version not added correctly (got: #{yaml2['version']})" unless yaml2['version'] == '0.1.0'
 
       # Check test3.md (should still have old version)
       content3 = File.read(File.join(tenets_dir, 'test3.md'))
       yaml3 = YAML.safe_load(content3.split('---')[1])
-      unless yaml3['version'] == '0.0.9'
-        errors << "test3.md: existing version was changed (got: #{yaml3['version']})"
-      end
+      errors << "test3.md: existing version was changed (got: #{yaml3['version']})" unless yaml3['version'] == '0.0.9'
 
       # Check that content after YAML is preserved
-      unless content1.include?("# Test Tenet 1")
-        errors << "test1.md: content after YAML was lost"
-      end
+      errors << 'test1.md: content after YAML was lost' unless content1.include?('# Test Tenet 1')
 
       if errors.empty?
-        puts "✅ All tests passed!"
-        puts "   - Version field added correctly"
-        puts "   - Existing versions preserved"
-        puts "   - YAML remains valid"
-        puts "   - Content preserved"
+        puts '✅ All tests passed!'
+        puts '   - Version field added correctly'
+        puts '   - Existing versions preserved'
+        puts '   - YAML remains valid'
+        puts '   - Content preserved'
         return true
       else
-        puts "❌ Tests failed:"
+        puts '❌ Tests failed:'
         errors.each { |e| puts "   - #{e}" }
         return false
       end
-
     ensure
       Dir.chdir(original_dir)
     end

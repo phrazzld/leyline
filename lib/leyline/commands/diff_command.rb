@@ -71,12 +71,14 @@ module Leyline
         # Get current local files
         begin
           local_files = discover_local_files
-        rescue Errno::ENOENT => e
+        rescue Errno::ENOENT
           # Handle missing leyline directory gracefully
           raise DiffError.new(
-            "No leyline directory found to compare",
-            path: File.join(@base_directory, 'docs', 'leyline'),
-            suggestion: 'Run leyline sync first'
+            'No leyline directory found to compare',
+            context: {
+              path: File.join(@base_directory, 'docs', 'leyline'),
+              suggestion: 'Run leyline sync first'
+            }
           )
         end
 
@@ -112,10 +114,10 @@ module Leyline
               base_directory: @base_directory
             }
           end
-        rescue Interrupt => e
+        rescue Interrupt
           # Handle user interruption gracefully
           raise Leyline::LeylineError.new(
-            "Diff operation cancelled by user",
+            'Diff operation cancelled by user',
             signal: 'SIGINT'
           )
         end
@@ -141,25 +143,24 @@ module Leyline
             git_client.fetch_version('https://github.com/phrazzld/leyline-standards.git', 'master')
           rescue Sync::GitClient::GitCommandError => e
             # Fallback: use current repository's content for testing
-            if Dir.exist?(File.join(@base_directory, '.git'))
-              current_repo_docs = File.join(@base_directory, 'docs')
-              if Dir.exist?(current_repo_docs)
-                FileUtils.cp_r(current_repo_docs, temp_dir)
-              else
-                raise DiffError, "No leyline content found locally and failed to fetch remote: #{e.message}"
-              end
-            else
-              raise DiffError, "Failed to fetch remote content and no local git repository found: #{e.message}"
+            unless Dir.exist?(File.join(@base_directory, '.git'))
+              raise DiffError.new("Failed to fetch remote content and no local git repository found: #{e.message}")
             end
+
+            current_repo_docs = File.join(@base_directory, 'docs')
+            unless Dir.exist?(current_repo_docs)
+              raise DiffError.new("No leyline content found locally and failed to fetch remote: #{e.message}")
+            end
+
+            FileUtils.cp_r(current_repo_docs, temp_dir)
           end
 
           remote_docs_path = File.join(temp_dir, 'docs')
           yield remote_docs_path if Dir.exist?(remote_docs_path)
-
-        rescue Sync::GitClient::GitNotAvailableError => e
-          raise DiffError, "Git is required for diff operations. Please install git and ensure it's in your PATH."
+        rescue Sync::GitClient::GitNotAvailableError
+          raise DiffError.new("Git is required for diff operations. Please install git and ensure it's in your PATH.")
         rescue Sync::GitClient::GitCommandError => e
-          raise DiffError, "Failed to fetch remote content: #{e.message}"
+          raise DiffError.new("Failed to fetch remote content: #{e.message}")
         ensure
           git_client.cleanup if git_client
           FileUtils.rm_rf(temp_dir) if Dir.exist?(temp_dir)
@@ -190,9 +191,7 @@ module Leyline
           local_hash = local_manifest[local_file]
           remote_hash = remote_manifest[remote_file]
 
-          if local_hash && remote_hash && local_hash != remote_hash
-            modified << relative_path
-          end
+          modified << relative_path if local_hash && remote_hash && local_hash != remote_hash
         end
 
         {
@@ -203,7 +202,7 @@ module Leyline
         }
       end
 
-      def generate_unified_diffs(modified_files, local_files, remote_files)
+      def generate_unified_diffs(modified_files, _local_files, _remote_files)
         diffs = {}
 
         modified_files.each do |relative_path, file_pair|
@@ -215,7 +214,7 @@ module Leyline
           begin
             unified_diff = create_unified_diff(local_file, remote_file, relative_path)
             diffs[relative_path] = unified_diff if unified_diff
-          rescue => e
+          rescue StandardError => e
             warn "Warning: Could not generate diff for #{relative_path}: #{e.message}" if @options[:verbose]
           end
         end
@@ -251,15 +250,15 @@ module Leyline
           if local_line != remote_line
             hunk_start ||= i
 
-            if local_line
-              hunk_lines << "-#{local_line.chomp}"
-            end
-            if remote_line
-              hunk_lines << "+#{remote_line.chomp}"
-            end
+            hunk_lines << "-#{local_line.chomp}" if local_line
+            hunk_lines << "+#{remote_line.chomp}" if remote_line
           elsif hunk_start && hunk_lines.any?
             # End of hunk - add header and lines
-            diff_lines << "@@ -#{hunk_start + 1},#{hunk_lines.count { |l| l.start_with?('-') }} +#{hunk_start + 1},#{hunk_lines.count { |l| l.start_with?('+') }} @@"
+            diff_lines << "@@ -#{hunk_start + 1},#{hunk_lines.count do |l|
+              l.start_with?('-')
+            end} +#{hunk_start + 1},#{hunk_lines.count do |l|
+                                      l.start_with?('+')
+                                    end} @@"
             diff_lines.concat(hunk_lines)
 
             hunk_start = nil
@@ -269,7 +268,11 @@ module Leyline
 
         # Add final hunk if needed
         if hunk_start && hunk_lines.any?
-          diff_lines << "@@ -#{hunk_start + 1},#{hunk_lines.count { |l| l.start_with?('-') }} +#{hunk_start + 1},#{hunk_lines.count { |l| l.start_with?('+') }} @@"
+          diff_lines << "@@ -#{hunk_start + 1},#{hunk_lines.count do |l|
+            l.start_with?('-')
+          end} +#{hunk_start + 1},#{hunk_lines.count do |l|
+                                    l.start_with?('+')
+                                  end} @@"
           diff_lines.concat(hunk_lines)
         end
 
@@ -290,6 +293,7 @@ module Leyline
           search_path = File.join(leyline_path, pattern)
           Dir.glob(search_path).each do |file_path|
             next unless File.file?(file_path)
+
             files << file_path
           end
         end
@@ -308,6 +312,7 @@ module Leyline
           search_path = File.join(remote_docs_path, pattern)
           Dir.glob(search_path).each do |file_path|
             next unless File.file?(file_path)
+
             files << file_path
           end
         end
@@ -320,6 +325,7 @@ module Leyline
 
         categories.each do |category|
           next if category == 'core'
+
           patterns << "bindings/categories/#{category}/**/*.md"
         end
 
@@ -332,6 +338,7 @@ module Leyline
 
         categories.each do |category|
           next if category == 'core'
+
           paths << "docs/bindings/categories/#{category}/"
         end
 
@@ -356,9 +363,7 @@ module Leyline
           next if entry.start_with?('.')
 
           category_path = File.join(bindings_path, entry)
-          if Dir.exist?(category_path)
-            categories << entry
-          end
+          categories << entry if Dir.exist?(category_path)
         end
 
         categories.sort
@@ -422,13 +427,13 @@ module Leyline
       end
 
       def output_unified_diff(diff_data)
-        puts "Leyline Diff Report"
-        puts "=================="
+        puts 'Leyline Diff Report'
+        puts '=================='
         puts
 
         summary = diff_data[:summary]
         if summary[:total_changes] == 0
-          puts "✓ No differences found between local and remote leyline standards"
+          puts '✓ No differences found between local and remote leyline standards'
           return
         end
 
@@ -437,13 +442,13 @@ module Leyline
 
         output_file_changes(diff_data[:changes])
 
-        if diff_data[:unified_diffs].any? && @options[:verbose]
-          puts
-          output_detailed_diffs(diff_data[:unified_diffs])
-        end
+        return unless diff_data[:unified_diffs].any? && @options[:verbose]
+
+        puts
+        output_detailed_diffs(diff_data[:unified_diffs])
       end
 
-      def output_summary(summary, changes)
+      def output_summary(summary, _changes)
         puts "Summary: #{summary[:total_changes]} change(s) detected"
         puts "  Added files: #{summary[:added_files]}"
         puts "  Modified files: #{summary[:modified_files]}"
@@ -452,24 +457,24 @@ module Leyline
 
       def output_file_changes(changes)
         unless changes[:added].empty?
-          puts "Added files:"
+          puts 'Added files:'
           changes[:added].each { |file| puts "  + #{file}" }
         end
 
         unless changes[:modified].empty?
-          puts "Modified files:"
+          puts 'Modified files:'
           changes[:modified].each { |file| puts "  ~ #{file}" }
         end
 
-        unless changes[:removed].empty?
-          puts "Removed files:"
-          changes[:removed].each { |file| puts "  - #{file}" }
-        end
+        return if changes[:removed].empty?
+
+        puts 'Removed files:'
+        changes[:removed].each { |file| puts "  - #{file}" }
       end
 
       def output_detailed_diffs(unified_diffs)
-        puts "Detailed Diffs:"
-        puts "==============="
+        puts 'Detailed Diffs:'
+        puts '==============='
 
         unified_diffs.each do |relative_path, diff_content|
           puts
@@ -481,45 +486,45 @@ module Leyline
       def handle_error(error)
         # Convert standard errors to Leyline errors with recovery guidance
         leyline_error = case error
-        when Leyline::LeylineError
-          error
-        when Errno::EACCES, Errno::EPERM
-          path = nil
-          begin
-            path = error.message.match(/- (.+)$/)[1] if error.message
-          rescue
-            # Ignore extraction errors
-          end
+                        when Leyline::LeylineError
+                          error
+                        when Errno::EACCES, Errno::EPERM
+                          path = nil
+                          begin
+                            path = error.message.match(/- (.+)$/)[1] if error.message
+                          rescue StandardError
+                            # Ignore extraction errors
+                          end
 
-          Leyline::FileSystemError.new(
-            "Permission denied accessing files",
-            reason: :permission_denied,
-            path: path
-          )
-        when Errno::ENOENT
-          DiffError.new("Leyline directory not found")
-        when Errno::ENOSPC
-          Leyline::CacheOperationError.new(
-            "No space left on device for temporary diff operations",
-            operation: :disk_full,
-            cache_dir: @cache_dir
-          )
-        when Leyline::Sync::GitClient::GitNotAvailableError
-          Leyline::RemoteAccessError.new(
-            "Git binary not found",
-            reason: :git_not_installed
-          )
-        when Leyline::Sync::GitClient::GitCommandError
-          handle_git_command_error(error)
-        when Net::OpenTimeout, Net::ReadTimeout
-          Leyline::RemoteAccessError.new(
-            "Network timeout while fetching remote content",
-            reason: :network_timeout,
-            url: 'https://github.com/phrazzld/leyline.git'
-          )
-        else
-          DiffError.new(error.message)
-        end
+                          Leyline::FileSystemError.new(
+                            'Permission denied accessing files',
+                            reason: :permission_denied,
+                            path: path
+                          )
+                        when Errno::ENOENT
+                          DiffError.new('Leyline directory not found')
+                        when Errno::ENOSPC
+                          Leyline::CacheOperationError.new(
+                            'No space left on device for temporary diff operations',
+                            operation: :disk_full,
+                            cache_dir: @cache_dir
+                          )
+                        when Leyline::Sync::GitClient::GitNotAvailableError
+                          Leyline::RemoteAccessError.new(
+                            'Git binary not found',
+                            reason: :git_not_installed
+                          )
+                        when Leyline::Sync::GitClient::GitCommandError
+                          handle_git_command_error(error)
+                        when Net::OpenTimeout, Net::ReadTimeout
+                          Leyline::RemoteAccessError.new(
+                            'Network timeout while fetching remote content',
+                            reason: :network_timeout,
+                            url: 'https://github.com/phrazzld/leyline.git'
+                          )
+                        else
+                          DiffError.new(error.message)
+                        end
 
         # Output error with recovery suggestions
         output_error_with_recovery(leyline_error)
@@ -528,18 +533,18 @@ module Leyline
       def handle_git_command_error(error)
         if error.message.include?('authentication')
           Leyline::RemoteAccessError.new(
-            "Git authentication failed",
+            'Git authentication failed',
             reason: :authentication_failed,
             repository: 'phrazzld/leyline'
           )
         elsif error.message.include?('could not resolve host')
           Leyline::RemoteAccessError.new(
-            "Cannot reach GitHub - check network connection",
+            'Cannot reach GitHub - check network connection',
             reason: :network_timeout
           )
         elsif error.message.include?('repository not found')
           Leyline::RemoteAccessError.new(
-            "Leyline repository not accessible",
+            'Leyline repository not accessible',
             reason: :repository_not_found
           )
         else
@@ -568,7 +573,7 @@ module Leyline
           warn "  Context: #{error.context.inspect}" if error.context.any?
           if error.respond_to?(:cause) && error.cause
             warn "  Original error: #{error.cause.class} - #{error.cause.message}"
-            warn "  Backtrace:"
+            warn '  Backtrace:'
             error.cause.backtrace.first(5).each { |line| warn "    #{line}" }
           end
         else

@@ -186,7 +186,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         ).and_return('cached_content')
 
         result = file_syncer.calculate_cache_hit_ratio(target_files, mock_cache)
-        expect(result).to eq(0.5)  # 1 hit out of 2 files
+        expect(result).to eq(0.5) # 1 hit out of 2 files
       end
     end
 
@@ -243,7 +243,9 @@ RSpec.describe Leyline::Sync::FileSyncer do
 
     context 'stats integration' do
       let(:mock_stats) { instance_double('Leyline::Cache::CacheStats') }
-      let(:file_syncer_with_stats) { described_class.new(temp_source_dir, temp_target_dir, cache: mock_cache, stats: mock_stats) }
+      let(:file_syncer_with_stats) do
+        described_class.new(temp_source_dir, temp_target_dir, cache: mock_cache, stats: mock_stats)
+      end
       let(:target_files) { ['docs/file1.md', 'docs/file2.md', 'docs/file3.md'] }
 
       before do
@@ -301,7 +303,8 @@ RSpec.describe Leyline::Sync::FileSyncer do
 
       it 'records cache miss when file read fails' do
         # Make first file unreadable
-        allow(File).to receive(:read).with(File.join(temp_source_dir, 'docs', 'file1.md')).and_raise(StandardError.new('Read failed'))
+        allow(File).to receive(:read).with(File.join(temp_source_dir, 'docs',
+                                                     'file1.md')).and_raise(StandardError.new('Read failed'))
         allow(File).to receive(:read).with(File.join(temp_source_dir, 'docs', 'file2.md')).and_return('content2')
         allow(File).to receive(:read).with(File.join(temp_source_dir, 'docs', 'file3.md')).and_return('content3')
 
@@ -329,7 +332,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         allow(mock_cache).to receive(:get).and_return('corrupt_data_that_is_not_nil')
 
         result = file_syncer.calculate_cache_hit_ratio(target_files, mock_cache)
-        expect(result).to eq(1.0)  # Still counts as hit since non-nil
+        expect(result).to eq(1.0) # Still counts as hit since non-nil
       end
 
       it 'treats empty string cache result as a hit' do
@@ -337,7 +340,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         allow(mock_cache).to receive(:get).and_return('')
 
         result = file_syncer.calculate_cache_hit_ratio(target_files, mock_cache)
-        expect(result).to eq(1.0)  # Empty string is still a hit
+        expect(result).to eq(1.0) # Empty string is still a hit
       end
 
       it 'treats false cache result as a miss' do
@@ -345,7 +348,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         allow(mock_cache).to receive(:get).and_return(false)
 
         result = file_syncer.calculate_cache_hit_ratio(target_files, mock_cache)
-        expect(result).to eq(1.0)  # false is non-nil, so counts as hit
+        expect(result).to eq(1.0) # false is non-nil, so counts as hit
       end
     end
 
@@ -361,13 +364,13 @@ RSpec.describe Leyline::Sync::FileSyncer do
         # Create protected file that exists but can't be read
         protected_path = File.join(temp_source_dir, 'docs', 'protected_file.md')
         File.write(protected_path, 'protected_content')
-        File.chmod(0000, protected_path) # Remove all permissions
+        File.chmod(0o000, protected_path) # Remove all permissions
       end
 
       after do
         # Restore permissions for cleanup
         protected_path = File.join(temp_source_dir, 'docs', 'protected_file.md')
-        File.chmod(0644, protected_path) if File.exist?(protected_path)
+        File.chmod(0o644, protected_path) if File.exist?(protected_path)
       end
 
       it 'treats permission-denied files as cache misses' do
@@ -377,7 +380,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         ).and_return('cached_content')
 
         result = file_syncer.calculate_cache_hit_ratio(target_files, mock_cache)
-        expect(result).to eq(0.5)  # 1 hit (normal file) out of 2 files
+        expect(result).to eq(0.5) # 1 hit (normal file) out of 2 files
       end
     end
 
@@ -403,7 +406,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         end_time = Time.now
 
         expect(result).to eq(1.0)
-        expect(end_time - start_time).to be < 1.0  # Should complete in under 1 second
+        expect(end_time - start_time).to be < 1.0 # Should complete in under 1 second
       end
 
       it 'handles mixed hit/miss scenarios with large file sets' do
@@ -418,7 +421,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         end
 
         result = file_syncer.calculate_cache_hit_ratio(target_files, mock_cache)
-        expect(result).to be_within(0.01).of(0.5)  # 50% hit ratio
+        expect(result).to be_within(0.01).of(0.5) # 50% hit ratio
       end
     end
   end
@@ -435,6 +438,37 @@ RSpec.describe Leyline::Sync::FileSyncer do
           described_class::SyncError,
           'Source directory does not exist: /nonexistent'
         )
+      end
+    end
+
+    context 'when target directory starts with a dash' do
+      let(:file_syncer) { described_class.new(temp_source_dir, '--help') }
+
+      it 'raises SyncError with helpful message' do
+        expect { file_syncer.sync }.to raise_error(
+          described_class::SyncError,
+          "Invalid target directory name '--help'. Directory names cannot start with a dash."
+        )
+      end
+
+      it 'rejects various flag-like directory names' do
+        %w[--version -h -v --stats --dry-run].each do |flag_dir|
+          syncer = described_class.new(temp_source_dir, flag_dir)
+          expect { syncer.sync }.to raise_error(described_class::SyncError)
+        end
+      end
+
+      it 'prevents accidental directory creation' do
+        # Ensure directory is not created when validation fails
+        syncer = described_class.new(temp_source_dir, '--help')
+
+        begin
+          syncer.sync
+        rescue described_class::SyncError
+          # Expected error
+        end
+
+        expect(Dir.exist?('--help')).to be false
       end
     end
 
@@ -498,7 +532,7 @@ RSpec.describe Leyline::Sync::FileSyncer do
         it 'proceeds with normal sync despite high cache hit ratio' do
           # Mock cache to return content for all files (high hit ratio)
           allow(mock_cache).to receive(:get).and_return('cached_content')
-          allow(mock_cache).to receive(:put).and_return('hash_value')  # Allow put calls during sync
+          allow(mock_cache).to receive(:put).and_return('hash_value') # Allow put calls during sync
 
           output = capture_output do
             results = file_syncer_with_cache.sync(verbose: true)
@@ -513,11 +547,11 @@ RSpec.describe Leyline::Sync::FileSyncer do
         it 'proceeds with normal sync' do
           # Mock cache to return nil for all files (low hit ratio)
           allow(mock_cache).to receive(:get).and_return(nil)
-          allow(mock_cache).to receive(:put).and_return('hash_value')  # Allow put calls during sync
+          allow(mock_cache).to receive(:put).and_return('hash_value') # Allow put calls during sync
 
           output = capture_output do
             results = file_syncer_with_cache.sync(verbose: true)
-            expect(results[:skipped]).to include('docs/file1.md', 'docs/file2.md')  # Files identical, so skipped
+            expect(results[:skipped]).to include('docs/file1.md', 'docs/file2.md') # Files identical, so skipped
           end
 
           expect(output).to include('below threshold, proceeding with sync')
@@ -528,11 +562,11 @@ RSpec.describe Leyline::Sync::FileSyncer do
         it 'bypasses cache optimization' do
           # Mock cache to return content for all files (high hit ratio)
           allow(mock_cache).to receive(:get).and_return('cached_content')
-          allow(mock_cache).to receive(:put).and_return('hash_value')  # Allow put calls during sync
+          allow(mock_cache).to receive(:put).and_return('hash_value') # Allow put calls during sync
 
           results = file_syncer_with_cache.sync(force_git: true, verbose: false)
           # Should proceed with normal sync logic, not cache optimization
-          expect(results[:skipped]).to include('docs/file1.md', 'docs/file2.md')  # Files identical, so skipped
+          expect(results[:skipped]).to include('docs/file1.md', 'docs/file2.md') # Files identical, so skipped
         end
       end
     end

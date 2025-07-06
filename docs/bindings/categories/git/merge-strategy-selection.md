@@ -11,42 +11,27 @@ Choose Git merge strategies based on objective criteria rather than personal pre
 
 ## Rationale
 
-Git provides multiple strategies for integrating changes—merge, rebase, squash—each with distinct effects on repository history and performance. Choosing arbitrarily or based on personal preference creates inconsistent history that's harder to navigate, debug, and understand. This binding establishes an algorithmic approach based on measurable criteria.
+Arbitrary merge strategy selection creates inconsistent history that's harder to navigate and debug. Each strategy optimizes for different constraints:
+- **Rebase**: Linear history, O(log n) debugging
+- **Merge**: Preserves temporal relationships and collaboration context
+- **Squash**: Logical atomicity, clean mainline
 
-From a computer science perspective, each strategy optimizes for different constraints:
-- **Rebase** optimizes for linear history and bisectability (O(log n) debugging)
-- **Merge** preserves temporal relationships and parallel development context
-- **Squash** optimizes for logical atomicity and clean mainline history
-
-The key insight is that the optimal strategy depends on the characteristics of the changes being integrated, not developer preference. A two-day feature branch benefits from rebase's linearity. A month-long collaborative effort benefits from merge's context preservation. A series of "fix typo" commits benefits from squash's consolidation.
-
-By applying strategies algorithmically, we achieve consistent history that serves its purpose as both an audit trail and a debugging tool. The resulting repository performs better, is easier to understand, and provides more value to future developers.
+Optimal strategy depends on change characteristics, not developer preference.
 
 ## Rule Definition
 
-**Strategy Selection Algorithm:**
-
+**Algorithm:**
 ```
-IF branch_lifetime <= 3 days AND single_author
-  THEN use REBASE
-ELSE IF external_contribution OR cross_team_collaboration
-  THEN use MERGE
-ELSE IF multiple_fixup_commits OR experimental_changes
-  THEN use SQUASH
-ELSE IF preserving_context_critical
-  THEN use MERGE
-ELSE
-  DEFAULT to REBASE
+IF branch_lifetime <= 3 days AND single_author THEN REBASE
+ELSE IF external_contribution OR cross_team_collaboration THEN MERGE
+ELSE IF multiple_fixup_commits OR experimental_changes THEN SQUASH
+ELSE IF preserving_context_critical THEN MERGE
+ELSE DEFAULT to REBASE
 ```
 
-**Detailed Criteria:**
-
-- **Use REBASE when:**
-  - Branch lifetime < 3 days
-  - Single author changes
-  - Linear progression of commits
-  - Target branch hasn't diverged significantly
-  - Commits are already atomic and well-structured
+**Use REBASE**: <3 days, single author, linear commits, atomic structure
+**Use MERGE**: External contributions, cross-team, context preservation
+**Use SQUASH**: Fixup commits, experimental changes, cleanup needed
 
 - **Use MERGE when:**
   - Multiple authors collaborated
@@ -70,94 +55,47 @@ ELSE
 
 ## Practical Implementation
 
-**Automated Strategy Recommendation:**
+**Strategy Recommendation Script:**
 
 ```bash
 #!/bin/bash
-# git-merge-strategy.sh - Recommend merge strategy based on branch analysis
-
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 BASE_BRANCH=${1:-main}
 
-# Calculate branch age
 BRANCH_AGE_DAYS=$(( ($(date +%s) - $(git log -1 --format=%ct $(git merge-base HEAD $BASE_BRANCH))) / 86400 ))
-
-# Count authors
 AUTHOR_COUNT=$(git log $BASE_BRANCH..HEAD --format=%ae | sort -u | wc -l)
-
-# Count commits
 COMMIT_COUNT=$(git rev-list --count $BASE_BRANCH..HEAD)
+FIXUP_COMMITS=$(git log $BASE_BRANCH..HEAD --oneline | grep -iE "(fix|typo|wip)" | wc -l)
+FIXUP_RATIO=$(echo "scale=2; $FIXUP_COMMITS / $COMMIT_COUNT" | bc)
 
-# Analyze commit messages
-FIXUP_COMMITS=$(git log $BASE_BRANCH..HEAD --oneline | grep -iE "(fix|typo|update|wip|tmp)" | wc -l)
-if [ "$COMMIT_COUNT" -eq 0 ]; then
-    FIXUP_RATIO=0
-else
-    FIXUP_RATIO=$(echo "scale=2; $FIXUP_COMMITS / $COMMIT_COUNT" | bc)
-fi
-
-# Recommendation logic
-echo "📊 Branch Analysis for: $BRANCH"
-echo "Age: $BRANCH_AGE_DAYS days"
-echo "Authors: $AUTHOR_COUNT"
-echo "Commits: $COMMIT_COUNT"
-echo "Fixup ratio: $FIXUP_RATIO"
-echo ""
+echo "Branch: $BRANCH | Age: $BRANCH_AGE_DAYS days | Authors: $AUTHOR_COUNT | Commits: $COMMIT_COUNT | Fixup: $FIXUP_RATIO"
 
 if [ $BRANCH_AGE_DAYS -le 3 ] && [ $AUTHOR_COUNT -eq 1 ]; then
-    echo "✅ Recommendation: REBASE"
-    echo "Reason: Short-lived, single-author branch"
-    echo "Command: git rebase $BASE_BRANCH"
+    echo "REBASE: git rebase $BASE_BRANCH"
 elif [ $AUTHOR_COUNT -gt 1 ]; then
-    echo "✅ Recommendation: MERGE"
-    echo "Reason: Multi-author collaboration"
-    echo "Command: git merge --no-ff $BRANCH"
+    echo "MERGE: git merge --no-ff $BRANCH"
 elif (( $(echo "$FIXUP_RATIO > 0.5" | bc -l) )); then
-    echo "✅ Recommendation: SQUASH"
-    echo "Reason: High ratio of fixup commits"
-    echo "Command: git merge --squash $BRANCH"
+    echo "SQUASH: git merge --squash $BRANCH"
 else
-    echo "✅ Recommendation: REBASE (default)"
-    echo "Reason: Standard feature branch"
-    echo "Command: git rebase $BASE_BRANCH"
+    echo "REBASE: git rebase $BASE_BRANCH"
 fi
 ```
 
-**PR Template with Strategy Selection:**
+**PR Template:**
 
 ```markdown
-<!-- .github/pull_request_template.md -->
-## Merge Strategy Selection
-
-Based on this PR's characteristics, select the appropriate merge strategy:
-
-### Branch Analysis
-- [ ] Branch age: ___ days
-- [ ] Number of authors: ___
-- [ ] Number of commits: ___
-- [ ] Contains fixup/WIP commits: Yes/No
-
-### Recommended Strategy
-- [ ] **REBASE** - Linear history for short-lived feature
-- [ ] **MERGE** - Preserve collaboration context
-- [ ] **SQUASH** - Consolidate experimental changes
-
-### Justification
-<!-- Explain if deviating from algorithmic recommendation -->
+## Merge Strategy
+- [ ] **REBASE** - <3 days, single author
+- [ ] **MERGE** - Multi-author/collaboration
+- [ ] **SQUASH** - Fixup commits/cleanup
 ```
 
-**Git Aliases for Each Strategy:**
+**Git Aliases:**
 
 ```bash
-# Configure strategy-specific aliases
 git config --global alias.integrate-rebase '!f() { git fetch && git rebase origin/main && git push --force-with-lease; }; f'
-
 git config --global alias.integrate-merge '!f() { git fetch && git merge origin/main && git push; }; f'
-
-git config --global alias.integrate-squash '!f() { git fetch && git checkout main && git merge --squash $1 && git commit; }; f'
-
-# Smart integration based on analysis
-git config --global alias.integrate '!f() { bash git-merge-strategy.sh | tail -1 | cut -d: -f2 | sh; }; f'
+git config --global alias.integrate-squash '!f() { git checkout main && git merge --squash $1 && git commit; }; f'
 ```
 
 **Repository Configuration by Project Type:**

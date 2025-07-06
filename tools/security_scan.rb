@@ -42,25 +42,25 @@ $scan_results = {
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: security_scan.rb [options]"
+  opts.banner = 'Usage: security_scan.rb [options]'
 
-  opts.on("-f", "--format FORMAT", "Output format (text, json)") do |format|
+  opts.on('-f', '--format FORMAT', 'Output format (text, json)') do |format|
     $options[:format] = format
   end
 
-  opts.on("--strict", "Fail on any security issues found") do
+  opts.on('--strict', 'Fail on any security issues found') do
     $options[:strict] = true
   end
 
-  opts.on("-v", "--verbose", "Show detailed scanning information") do
+  opts.on('-v', '--verbose', 'Show detailed scanning information') do
     $options[:verbose] = true
   end
 
-  opts.on("-o", "--output FILE", "Write results to file") do |file|
+  opts.on('-o', '--output FILE', 'Write results to file') do |file|
     $options[:output_file] = file
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -159,7 +159,7 @@ SECURITY_PATTERNS = {
         recommendation: 'Validate file paths with SecurityUtils.validate_file_path()'
       },
       {
-        regex: /['"][^'"]*\.\.\/[^'"]*['"]/,
+        regex: %r{['"][^'"]*\.\./[^'"]*['"]},
         message: 'Directory traversal pattern detected',
         recommendation: 'Use absolute paths or validate with SecurityUtils.validate_file_path()'
       }
@@ -227,7 +227,7 @@ SECURITY_PATTERNS = {
         recommendation: 'Validate URLs and use allowlists for external requests'
       },
       {
-        regex: /open\s*\(\s*['"]https?:\/\/[^'"]*#\{[^}]*\}[^'"]*['"]/,
+        regex: %r{open\s*\(\s*['"]https?://[^'"]*#\{[^}]*\}[^'"]*['"]},
         message: 'URL opening with interpolated content',
         recommendation: 'Validate URLs and use allowlists for external requests'
       }
@@ -248,31 +248,30 @@ def scan_file(file_path)
     SECURITY_PATTERNS.each do |category, config|
       config[:patterns].each do |pattern|
         lines.each_with_index do |line, index|
-          if line.match?(pattern[:regex])
-            issue = SecurityIssue.new(
-              severity: config[:severity],
-              type: category.to_s,
-              message: pattern[:message],
-              file: file_path,
-              line: index + 1,
-              code: line.chomp,
-              recommendation: pattern[:recommendation]
-            )
-            issues << issue
+          next unless line.match?(pattern[:regex])
+          issue = SecurityIssue.new(
+            severity: config[:severity],
+            type: category.to_s,
+            message: pattern[:message],
+            file: file_path,
+            line: index + 1,
+            code: line.chomp,
+            recommendation: pattern[:recommendation]
+          )
+          issues << issue
 
-            SecurityUtils.log_security_event('security_issue_detected', {
-              file: file_path,
-              line: index + 1,
-              type: category,
-              severity: config[:severity]
-            })
-          end
+          SecurityUtils.log_security_event('security_issue_detected', {
+                                             file: file_path,
+            line: index + 1,
+            type: category,
+            severity: config[:severity]
+                                           })
         end
       end
     end
 
     issues
-  rescue => e
+  rescue StandardError => e
     puts "Warning: Could not scan #{file_path}: #{e.message}" if $options[:verbose]
     []
   end
@@ -290,7 +289,7 @@ def discover_ruby_files
   # Filter out test files and this scanner itself
   files.reject! do |file|
     File.basename(file).start_with?('test_') ||
-    File.basename(file) == 'security_scan.rb'
+      File.basename(file) == 'security_scan.rb'
   end
 
   files.sort
@@ -317,32 +316,32 @@ end
 def format_text_output
   output = []
 
-  output << "# Security Scan Report"
-  output << ""
+  output << '# Security Scan Report'
+  output << ''
   output << "Generated: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
-  output << ""
+  output << ''
 
   summary = $scan_results[:summary]
 
-  output << "## Summary"
-  output << ""
+  output << '## Summary'
+  output << ''
   output << "**Files Scanned:** #{summary[:files_scanned]}"
   output << "**Total Issues:** #{summary[:total_issues]}"
   output << "**Scan Time:** #{summary[:scan_time]&.round(2)}s"
-  output << ""
+  output << ''
 
   if summary[:total_issues] == 0
-    output << "✅ **No security issues detected!**"
-    output << ""
-    output << "All scanned files passed security validation."
+    output << '✅ **No security issues detected!**'
+    output << ''
+    output << 'All scanned files passed security validation.'
   else
-    output << "### Issue Breakdown"
-    output << ""
+    output << '### Issue Breakdown'
+    output << ''
     output << "- **Critical:** #{summary[:critical_issues]} 🔴"
     output << "- **High:** #{summary[:high_issues]} 🟠"
     output << "- **Medium:** #{summary[:medium_issues]} 🟡"
     output << "- **Low:** #{summary[:low_issues]} 🔵"
-    output << ""
+    output << ''
 
     # Group issues by severity
     %w[critical high medium low].each do |severity|
@@ -350,32 +349,32 @@ def format_text_output
       next if severity_issues.empty?
 
       output << "## #{severity.capitalize} Issues"
-      output << ""
+      output << ''
 
       severity_issues.each do |issue|
         output << "### #{issue[:message]}"
-        output << ""
+        output << ''
         output << "**File:** #{issue[:file]}"
         output << "**Line:** #{issue[:line]}" if issue[:line]
         output << "**Type:** #{issue[:type]}"
-        output << ""
+        output << ''
 
         if issue[:code]
-          output << "**Code:**"
-          output << "```ruby"
+          output << '**Code:**'
+          output << '```ruby'
           output << issue[:code]
-          output << "```"
-          output << ""
+          output << '```'
+          output << ''
         end
 
         if issue[:recommendation]
-          output << "**Recommendation:**"
+          output << '**Recommendation:**'
           output << issue[:recommendation]
-          output << ""
+          output << ''
         end
 
-        output << "---"
-        output << ""
+        output << '---'
+        output << ''
       end
     end
   end
@@ -406,7 +405,7 @@ def run_security_scan
   files = discover_ruby_files
 
   if files.empty?
-    puts "No Ruby files found to scan"
+    puts 'No Ruby files found to scan'
     exit 0
   end
 
@@ -423,18 +422,20 @@ def run_security_scan
 
   # Format output
   content = case $options[:format]
-  when 'json'
+            when 'json'
     format_json_output
   else
     format_text_output
-  end
+            end
 
   # Write results
   write_output(content)
 
   # Exit with appropriate code
   if $options[:strict] && $scan_results[:summary][:total_issues] > 0
-    puts "\n❌ Security scan failed in strict mode (#{$scan_results[:summary][:total_issues]} issues found)" unless $options[:format] == 'json'
+    unless $options[:format] == 'json'
+      puts "\n❌ Security scan failed in strict mode (#{$scan_results[:summary][:total_issues]} issues found)"
+    end
     exit 1
   elsif $scan_results[:summary][:critical_issues] > 0 || $scan_results[:summary][:high_issues] > 0
     puts "\n⚠️  Critical or high severity security issues found" unless $options[:format] == 'json'
@@ -452,7 +453,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\n\n⚠️  Security scan interrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     puts "\n❌ Security scan error: #{e.message}"
     puts e.backtrace.join("\n") if $options[:verbose]
     exit 1

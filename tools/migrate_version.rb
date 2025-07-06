@@ -28,41 +28,41 @@ $migration_log = []
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: migrate_version.rb [options]"
+  opts.banner = 'Usage: migrate_version.rb [options]'
 
-  opts.on("--from VERSION", "Source Leyline version (e.g., v0.1.0)") do |version|
+  opts.on('--from VERSION', 'Source Leyline version (e.g., v0.1.0)') do |version|
     $options[:from_version] = version
   end
 
-  opts.on("--to VERSION", "Target Leyline version (e.g., v0.2.0)") do |version|
+  opts.on('--to VERSION', 'Target Leyline version (e.g., v0.2.0)') do |version|
     $options[:to_version] = version
   end
 
-  opts.on("--dry-run", "Show what would be changed without making changes") do
+  opts.on('--dry-run', 'Show what would be changed without making changes') do
     $options[:dry_run] = true
   end
 
-  opts.on("--interactive", "Interactive migration with prompts for decisions") do
+  opts.on('--interactive', 'Interactive migration with prompts for decisions') do
     $options[:interactive] = true
   end
 
-  opts.on("--auto", "Automatic migration (applies all safe changes)") do
+  opts.on('--auto', 'Automatic migration (applies all safe changes)') do
     $options[:auto] = true
   end
 
-  opts.on("--no-backup", "Skip creating backup before migration") do
+  opts.on('--no-backup', 'Skip creating backup before migration') do
     $options[:backup] = false
   end
 
-  opts.on("--force", "Force migration even with warnings") do
+  opts.on('--force', 'Force migration even with warnings') do
     $options[:force] = true
   end
 
-  opts.on("--verbose", "Verbose output") do
+  opts.on('--verbose', 'Verbose output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -75,10 +75,10 @@ def log_info(message)
 end
 
 def log_verbose(message)
-  if $options[:verbose]
-    puts "[VERBOSE] #{message}"
-    $migration_log << { level: 'verbose', message: message, timestamp: Time.now }
-  end
+  return unless $options[:verbose]
+
+  puts "[VERBOSE] #{message}"
+  $migration_log << { level: 'verbose', message: message, timestamp: Time.now }
 end
 
 def log_warning(message)
@@ -113,7 +113,7 @@ def confirm_action(question)
   return false if $options[:dry_run]
 
   response = prompt_user("#{question} (y/N)", 'n')
-  ['y', 'yes'].include?(response.downcase)
+  %w[y yes].include?(response.downcase)
 end
 
 # Version handling
@@ -160,21 +160,21 @@ def create_backup
   ]
 
   backup_files.each do |file|
-    if File.exist?(file)
-      backup_path = File.join(backup_dir, file)
-      FileUtils.mkdir_p(File.dirname(backup_path))
-      FileUtils.cp(file, backup_path)
-      log_verbose("Backed up #{file}")
-    end
+    next unless File.exist?(file)
+
+    backup_path = File.join(backup_dir, file)
+    FileUtils.mkdir_p(File.dirname(backup_path))
+    FileUtils.cp(file, backup_path)
+    log_verbose("Backed up #{file}")
   end
 
   # Backup standards directories
   ['docs/leyline', 'docs/standards', 'leyline'].each do |dir|
-    if Dir.exist?(dir)
-      backup_path = File.join(backup_dir, dir)
-      FileUtils.cp_r(dir, backup_path)
-      log_verbose("Backed up #{dir}")
-    end
+    next unless Dir.exist?(dir)
+
+    backup_path = File.join(backup_dir, dir)
+    FileUtils.cp_r(dir, backup_path)
+    log_verbose("Backed up #{dir}")
   end
 
   # Create backup metadata
@@ -202,7 +202,7 @@ def detect_integration_method
   elsif File.exist?('.github/workflows/sync-leyline.yml')
     'pull_based'
   else
-    log_warning("Could not detect integration method")
+    log_warning('Could not detect integration method')
     'unknown'
   end
 end
@@ -219,11 +219,11 @@ def migrate_configuration(from_version, to_version, integration_method)
   when 'pull_based'
     migrate_pull_based_config(from_version, to_version)
   else
-    log_warning("Unknown integration method, skipping configuration migration")
+    log_warning('Unknown integration method, skipping configuration migration')
   end
 end
 
-def migrate_submodule_config(from_version, to_version)
+def migrate_submodule_config(_from_version, to_version)
   config_file = 'leyline-config.yml'
 
   unless File.exist?(config_file)
@@ -231,7 +231,7 @@ def migrate_submodule_config(from_version, to_version)
     return
   end
 
-  log_verbose("Migrating submodule configuration")
+  log_verbose('Migrating submodule configuration')
 
   if $options[:dry_run]
     log_dry_run("Would update leyline_version in #{config_file}")
@@ -255,13 +255,13 @@ def migrate_submodule_config(from_version, to_version)
   log_info("Updated leyline_version: #{old_version} → #{config['leyline_version']}")
 end
 
-def migrate_direct_copy_config(from_version, to_version)
+def migrate_direct_copy_config(_from_version, to_version)
   selection_file = '.leyline-selection.yml'
   tracking_file = '.leyline-tracking.yml'
 
   # Update selection configuration
   if File.exist?(selection_file)
-    log_verbose("Migrating direct copy selection configuration")
+    log_verbose('Migrating direct copy selection configuration')
 
     if $options[:dry_run]
       log_dry_run("Would update leyline_version in #{selection_file}")
@@ -274,28 +274,28 @@ def migrate_direct_copy_config(from_version, to_version)
   end
 
   # Update tracking information
-  if File.exist?(tracking_file)
-    log_verbose("Updating direct copy tracking information")
+  return unless File.exist?(tracking_file)
 
-    if $options[:dry_run]
-      log_dry_run("Would update tracking info for version migration")
-    else
-      tracking = YAML.load_file(tracking_file)
-      tracking['leyline_version'] = to_version
-      tracking['last_updated'] = Time.now.utc.iso8601
-      tracking['migration_history'] ||= []
-      tracking['migration_history'] << {
-        'from_version' => $options[:from_version],
-        'to_version' => to_version,
-        'migrated_at' => Time.now.utc.iso8601
-      }
-      File.write(tracking_file, YAML.dump(tracking))
-      log_info("Updated tracking info for #{to_version}")
-    end
+  log_verbose('Updating direct copy tracking information')
+
+  if $options[:dry_run]
+    log_dry_run('Would update tracking info for version migration')
+  else
+    tracking = YAML.load_file(tracking_file)
+    tracking['leyline_version'] = to_version
+    tracking['last_updated'] = Time.now.utc.iso8601
+    tracking['migration_history'] ||= []
+    tracking['migration_history'] << {
+      'from_version' => $options[:from_version],
+      'to_version' => to_version,
+      'migrated_at' => Time.now.utc.iso8601
+    }
+    File.write(tracking_file, YAML.dump(tracking))
+    log_info("Updated tracking info for #{to_version}")
   end
 end
 
-def migrate_pull_based_config(from_version, to_version)
+def migrate_pull_based_config(_from_version, to_version)
   workflow_file = '.github/workflows/sync-leyline.yml'
 
   unless File.exist?(workflow_file)
@@ -303,7 +303,7 @@ def migrate_pull_based_config(from_version, to_version)
     return
   end
 
-  log_verbose("Migrating pull-based workflow configuration")
+  log_verbose('Migrating pull-based workflow configuration')
 
   if $options[:dry_run]
     log_dry_run("Would update leyline_ref in #{workflow_file}")
@@ -313,13 +313,14 @@ def migrate_pull_based_config(from_version, to_version)
   content = File.read(workflow_file)
 
   # Update leyline_ref in workflow
-  updated_content = content.gsub(/leyline_ref:\s*#{Regexp.escape($options[:from_version])}/, "leyline_ref: #{to_version}")
+  updated_content = content.gsub(/leyline_ref:\s*#{Regexp.escape($options[:from_version])}/,
+                                 "leyline_ref: #{to_version}")
 
   if content != updated_content
     File.write(workflow_file, updated_content)
     log_info("Updated workflow leyline_ref: #{$options[:from_version]} → #{to_version}")
   else
-    log_warning("Could not find leyline_ref to update in workflow file")
+    log_warning('Could not find leyline_ref to update in workflow file')
   end
 end
 
@@ -333,105 +334,99 @@ def handle_breaking_changes(from_version, to_version)
   when 'minor'
     handle_minor_version_changes(from_version, to_version)
   else
-    log_info("Patch version migration, no breaking changes expected")
+    log_info('Patch version migration, no breaking changes expected')
   end
 end
 
 def handle_major_version_changes(from_version, to_version)
-  log_info("Handling major version breaking changes")
+  log_info('Handling major version breaking changes')
 
   # Handle v1.0.0 breaking changes
-  if to_version.start_with?('v1.0')
-    handle_v1_breaking_changes(from_version)
-  end
+  return unless to_version.start_with?('v1.0')
+
+  handle_v1_breaking_changes(from_version)
 
   # Handle other major version changes as needed
 end
 
 def handle_minor_version_changes(from_version, to_version)
-  log_info("Handling minor version changes")
+  log_info('Handling minor version changes')
 
   # Handle v0.2.0 changes (pragmatic programming integration)
-  if to_version.start_with?('v0.2')
-    handle_v02_changes(from_version)
-  end
+  return unless to_version.start_with?('v0.2')
+
+  handle_v02_changes(from_version)
 end
 
-def handle_v1_breaking_changes(from_version)
-  log_info("Applying v1.0.0 breaking changes")
+def handle_v1_breaking_changes(_from_version)
+  log_info('Applying v1.0.0 breaking changes')
 
   # YAML front-matter migration
-  if confirm_action("Migrate YAML front-matter to v2.0 format?")
-    migrate_yaml_frontmatter
-  end
+  migrate_yaml_frontmatter if confirm_action('Migrate YAML front-matter to v2.0 format?')
 
   # Directory structure migration
-  if confirm_action("Migrate to new directory structure?")
-    migrate_directory_structure
-  end
+  migrate_directory_structure if confirm_action('Migrate to new directory structure?')
 
   # Validation config migration
-  if confirm_action("Update validation configurations?")
-    migrate_validation_config
-  end
+  return unless confirm_action('Update validation configurations?')
+
+  migrate_validation_config
 end
 
-def handle_v02_changes(from_version)
-  log_info("Applying v0.2.0 enhancements")
+def handle_v02_changes(_from_version)
+  log_info('Applying v0.2.0 enhancements')
 
-  if confirm_action("Update configuration for new binding categories?")
-    update_binding_categories
-  end
+  update_binding_categories if confirm_action('Update configuration for new binding categories?')
 
-  if confirm_action("Update workflows for enhanced validation?")
-    update_validation_workflows
-  end
+  return unless confirm_action('Update workflows for enhanced validation?')
+
+  update_validation_workflows
 end
 
 # Specific migration handlers
 def migrate_yaml_frontmatter
-  log_info("Migrating YAML front-matter format")
+  log_info('Migrating YAML front-matter format')
 
   if $options[:dry_run]
-    log_dry_run("Would run: ruby tools/migrate_yaml_frontmatter.rb")
+    log_dry_run('Would run: ruby tools/migrate_yaml_frontmatter.rb')
     return
   end
 
   # This would call the actual YAML migration tool
-  log_info("Running YAML front-matter migration...")
-  system("ruby tools/migrate_yaml_frontmatter.rb")
-  log_info("YAML front-matter migration completed")
+  log_info('Running YAML front-matter migration...')
+  system('ruby tools/migrate_yaml_frontmatter.rb')
+  log_info('YAML front-matter migration completed')
 end
 
 def migrate_directory_structure
-  log_info("Migrating directory structure")
+  log_info('Migrating directory structure')
 
   if $options[:dry_run]
-    log_dry_run("Would run: ruby tools/migrate_directory_structure.rb")
+    log_dry_run('Would run: ruby tools/migrate_directory_structure.rb')
     return
   end
 
   # This would call the actual directory migration tool
-  log_info("Running directory structure migration...")
-  system("ruby tools/migrate_directory_structure.rb")
-  log_info("Directory structure migration completed")
+  log_info('Running directory structure migration...')
+  system('ruby tools/migrate_directory_structure.rb')
+  log_info('Directory structure migration completed')
 end
 
 def migrate_validation_config
-  log_info("Migrating validation configuration")
+  log_info('Migrating validation configuration')
 
   if $options[:dry_run]
-    log_dry_run("Would update validation configurations")
+    log_dry_run('Would update validation configurations')
     return
   end
 
   # Update validation tool configurations
-  log_info("Updating validation configurations...")
-  log_info("Validation configuration migration completed")
+  log_info('Updating validation configurations...')
+  log_info('Validation configuration migration completed')
 end
 
 def update_binding_categories
-  log_info("Updating binding categories for v0.2.0")
+  log_info('Updating binding categories for v0.2.0')
 
   integration_method = detect_integration_method
 
@@ -457,13 +452,12 @@ def update_submodule_categories
   config = YAML.load_file(config_file)
 
   # Add backend category if not present
-  unless config['binding_categories'].include?('backend')
-    if confirm_action("Add 'backend' binding category?")
-      config['binding_categories'] << 'backend'
-      File.write(config_file, YAML.dump(config))
-      log_info("Added backend binding category")
-    end
-  end
+  return if config['binding_categories'].include?('backend')
+  return unless confirm_action("Add 'backend' binding category?")
+
+  config['binding_categories'] << 'backend'
+  File.write(config_file, YAML.dump(config))
+  log_info('Added backend binding category')
 end
 
 def update_direct_copy_categories
@@ -478,13 +472,12 @@ def update_direct_copy_categories
   config = YAML.load_file(selection_file)
 
   # Add backend category option
-  if config['binding_categories'] && !config['binding_categories'].include?('backend')
-    if confirm_action("Add 'backend' binding category to selection?")
-      config['binding_categories'] << 'backend'
-      File.write(selection_file, YAML.dump(config))
-      log_info("Added backend to binding categories")
-    end
-  end
+  return unless config['binding_categories'] && !config['binding_categories'].include?('backend')
+  return unless confirm_action("Add 'backend' binding category to selection?")
+
+  config['binding_categories'] << 'backend'
+  File.write(selection_file, YAML.dump(config))
+  log_info('Added backend to binding categories')
 end
 
 def update_pull_based_categories
@@ -498,14 +491,14 @@ def update_pull_based_categories
 
   content = File.read(workflow_file)
 
-  if content.include?('categories:') && !content.include?('backend')
-    log_info("Consider adding 'backend' to your workflow categories")
-    log_info("Edit #{workflow_file} and add 'backend' to the categories list")
-  end
+  return unless content.include?('categories:') && !content.include?('backend')
+
+  log_info("Consider adding 'backend' to your workflow categories")
+  log_info("Edit #{workflow_file} and add 'backend' to the categories list")
 end
 
 def update_validation_workflows
-  log_info("Updating validation workflows")
+  log_info('Updating validation workflows')
 
   integration_method = detect_integration_method
 
@@ -526,13 +519,11 @@ def update_submodule_validation
   end
 
   if File.exist?(workflow_file)
-    log_info("Validation workflow already exists")
-  else
-    if confirm_action("Copy enhanced validation workflow?")
-      FileUtils.mkdir_p('.github/workflows')
-      # Copy from examples
-      log_info("Enhanced validation workflow copied")
-    end
+    log_info('Validation workflow already exists')
+  elsif confirm_action('Copy enhanced validation workflow?')
+    FileUtils.mkdir_p('.github/workflows')
+    # Copy from examples
+    log_info('Enhanced validation workflow copied')
   end
 end
 
@@ -545,13 +536,11 @@ def update_direct_copy_validation
   end
 
   if File.exist?(workflow_file)
-    log_info("Standards validation workflow already exists")
-  else
-    if confirm_action("Copy enhanced standards validation workflow?")
-      FileUtils.mkdir_p('.github/workflows')
-      # Copy from examples
-      log_info("Enhanced standards validation workflow copied")
-    end
+    log_info('Standards validation workflow already exists')
+  elsif confirm_action('Copy enhanced standards validation workflow?')
+    FileUtils.mkdir_p('.github/workflows')
+    # Copy from examples
+    log_info('Enhanced standards validation workflow copied')
   end
 end
 
@@ -576,10 +565,10 @@ def validate_migration(to_version)
   if validation_errors.any?
     log_warning("Migration validation found #{validation_errors.size} issue(s):")
     validation_errors.each { |error| log_warning("  - #{error}") }
-    return false
+    false
   else
-    log_info("Migration validation passed")
-    return true
+    log_info('Migration validation passed')
+    true
   end
 end
 
@@ -591,16 +580,12 @@ def validate_submodule_migration(to_version)
     config = YAML.load_file(config_file)
     expected_version = to_version.gsub(/^v/, '')
 
-    unless config['leyline_version'] == expected_version
-      errors << "leyline_version not updated in #{config_file}"
-    end
+    errors << "leyline_version not updated in #{config_file}" unless config['leyline_version'] == expected_version
   else
     errors << "Submodule config file missing: #{config_file}"
   end
 
-  unless Dir.exist?('leyline')
-    errors << "Leyline submodule directory missing"
-  end
+  errors << 'Leyline submodule directory missing' unless Dir.exist?('leyline')
 
   errors
 end
@@ -611,17 +596,13 @@ def validate_direct_copy_migration(to_version)
   selection_file = '.leyline-selection.yml'
   if File.exist?(selection_file)
     config = YAML.load_file(selection_file)
-    unless config['leyline_version'] == to_version
-      errors << "leyline_version not updated in #{selection_file}"
-    end
+    errors << "leyline_version not updated in #{selection_file}" unless config['leyline_version'] == to_version
   end
 
   tracking_file = '.leyline-tracking.yml'
   if File.exist?(tracking_file)
     tracking = YAML.load_file(tracking_file)
-    unless tracking['leyline_version'] == to_version
-      errors << "leyline_version not updated in #{tracking_file}"
-    end
+    errors << "leyline_version not updated in #{tracking_file}" unless tracking['leyline_version'] == to_version
   end
 
   errors
@@ -633,9 +614,7 @@ def validate_pull_based_migration(to_version)
   workflow_file = '.github/workflows/sync-leyline.yml'
   if File.exist?(workflow_file)
     content = File.read(workflow_file)
-    unless content.include?("leyline_ref: #{to_version}")
-      errors << "leyline_ref not updated in #{workflow_file}"
-    end
+    errors << "leyline_ref not updated in #{workflow_file}" unless content.include?("leyline_ref: #{to_version}")
   else
     errors << "Pull-based workflow file missing: #{workflow_file}"
   end
@@ -701,7 +680,7 @@ end
 def main
   # Validate required options
   unless $options[:from_version] && $options[:to_version]
-    log_error("Both --from and --to versions are required")
+    log_error('Both --from and --to versions are required')
     exit_with_summary
   end
 
@@ -712,14 +691,12 @@ def main
   $options[:from_version] = from_version
   $options[:to_version] = to_version
 
-  log_info("=== Leyline Version Migration ===")
+  log_info('=== Leyline Version Migration ===')
   log_info("From: #{from_version}")
   log_info("To: #{to_version}")
   log_info("Mode: #{$options[:dry_run] ? 'DRY RUN' : 'LIVE'}")
 
-  if $options[:dry_run]
-    log_info("=== DRY RUN MODE - No changes will be made ===")
-  end
+  log_info('=== DRY RUN MODE - No changes will be made ===') if $options[:dry_run]
 
   # Detect integration method
   integration_method = detect_integration_method
@@ -737,12 +714,10 @@ def main
   # Validate migration
   unless $options[:dry_run]
     if validate_migration(to_version)
-      log_info("✅ Migration validation passed")
+      log_info('✅ Migration validation passed')
     else
-      log_error("❌ Migration validation failed")
-      if backup_dir
-        log_info("Consider restoring from backup: #{backup_dir}")
-      end
+      log_error('❌ Migration validation failed')
+      log_info("Consider restoring from backup: #{backup_dir}") if backup_dir
     end
   end
 
@@ -759,7 +734,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nInterrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     log_error("Unexpected error: #{e.message}")
     log_error("Backtrace: #{e.backtrace.join("\n")}")
     exit 1

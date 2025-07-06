@@ -16,7 +16,7 @@ RSpec.describe Leyline::Discovery::MetadataCache do
 
         cache.cache_document(document)
 
-        expect(cache.memory_usage_bytes).to be < document[:size] * 0.8  # 20%+ compression expected
+        expect(cache.memory_usage_bytes).to be < document[:size] * 0.8 # 20%+ compression expected
       end
     end
 
@@ -25,14 +25,14 @@ RSpec.describe Leyline::Discovery::MetadataCache do
         cache = described_class.new(compression_enabled: true)
 
         # Use deterministic test data that compresses well
-        content = "# Heading\n\n" + "This is repeated content. " * 100
+        content = "# Heading\n\n" + 'This is repeated content. ' * 100
         document = create_document_with_content(content)
 
         cache.cache_document(document)
 
         stats = cache.performance_stats
         compression_ratio = stats[:compression_stats][:compression_ratio]
-        expect(compression_ratio).to be <= 0.5  # 50% or better compression
+        expect(compression_ratio).to be <= 0.5 # 50% or better compression
       end
     end
 
@@ -72,9 +72,7 @@ RSpec.describe Leyline::Discovery::MetadataCache do
         it 'preserves search interface' do
           results = subject.search('test')
           expect(results).to be_an(Array)
-          unless results.empty?
-            expect(results.first).to include(:document, :score)
-          end
+          expect(results.first).to include(:document, :score) unless results.empty?
         end
       end
 
@@ -93,7 +91,7 @@ RSpec.describe Leyline::Discovery::MetadataCache do
   private
 
   def create_large_test_document
-    large_content = "This is repeated content that should compress well. " * 50
+    large_content = 'This is repeated content that should compress well. ' * 50
     {
       id: 'large-test-doc',
       title: 'Large Test Document',

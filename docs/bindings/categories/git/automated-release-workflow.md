@@ -11,43 +11,19 @@ Transform releases from manual, error-prone ceremonies into automated, predictab
 
 ## Rationale
 
-This binding implements our Git workflow conventions tenet by automating the entire release process through conventions. Just as Rails eliminated manual SQL schema management with migrations, we eliminate manual version bumping, changelog writing, and release tagging. The information needed for releases already exists in your conventional commits—automation simply harvests it.
+Manual release processes compound human errors: forgotten version updates, missed changelog entries, mismatched tags, vague release notes. Each manual step wastes developer time and frustrates users.
 
-Manual release processes are where human errors compound. Someone forgets to update the version number. The changelog misses important changes. Tags don't match package versions. Release notes are vague or missing. Each manual step is an opportunity for mistakes that frustrate users and waste developer time. Automated releases driven by commit conventions eliminate these errors while actually producing better documentation than most manual processes.
-
-Think of automated releases like a self-checkout system at a grocery store. In a manual process, you'd tell the cashier about each item, they'd enter it, calculate the total, and process payment—multiple opportunities for miscommunication. With self-checkout (automated releases), you scan items (write conventional commits) and the system handles the rest. The result is faster, more accurate, and frees humans for more valuable work.
+Automated releases driven by commit conventions harvest information that already exists in commits, eliminating errors while producing better documentation than manual processes.
 
 ## Rule Definition
 
-This binding establishes automated release workflows:
+**Requirements:**
 
-- **Version Determination**: Semantic versioning based on commit types
-  - `feat:` commits trigger MINOR version bumps (1.2.0 → 1.3.0)
-  - `fix:` commits trigger PATCH version bumps (1.2.0 → 1.2.1)
-  - `BREAKING CHANGE:` triggers MAJOR version bumps (1.2.0 → 2.0.0)
-  - Multiple commits: highest change wins (feat + fix = MINOR)
-
-- **Changelog Generation**: Automated from commit messages
-  - Group commits by type with clear headings
-  - Include breaking changes prominently
-  - Link to commits and issues automatically
-  - Generate upgrade guides from breaking change descriptions
-
-- **Release Triggers**: Define when releases happen
-  - On merge to main (continuous deployment)
-  - On manual trigger (controlled releases)
-  - On schedule (regular release cadence)
-  - Never require manual version updates
-
-- **Release Artifacts**: Automate all release outputs
-  - Git tags with version numbers
-  - GitHub/GitLab releases with notes
-  - Package registry publications
-  - Documentation site updates
-  - Notification to stakeholders
-
-- **Version Locations**: Keep versions synchronized
-  - package.json (Node.js)
+- **Version Determination**: `feat:`→MINOR, `fix:`→PATCH, `BREAKING CHANGE:`→MAJOR
+- **Changelog Generation**: Group by type, highlight breaking changes, auto-link commits/issues
+- **Release Triggers**: On main merge, manual trigger, or schedule
+- **Artifacts**: Git tags, releases with notes, package publications, docs updates, notifications
+- **Version Sync**: package.json, Cargo.toml, setup.py, etc.
   - Cargo.toml (Rust)
   - pyproject.toml (Python)
   - VERSION file
@@ -122,99 +98,6 @@ Here's how to implement automated releases effectively:
          - run: npm test
 
          - name: Release
-           env:
-             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-             NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-           run: npx semantic-release
-   ```
-
-3. **Create Release Configuration**: Define release behavior
-
-   ```javascript
-   // release.config.js
-   module.exports = {
-     branches: [
-       'main',
-       {name: 'beta', prerelease: true},
-       {name: 'alpha', prerelease: true}
-     ],
-     plugins: [
-       ['@semantic-release/commit-analyzer', {
-         preset: 'conventionalcommits',
-         releaseRules: [
-           {type: 'refactor', release: 'patch'},
-           {type: 'perf', release: 'patch'},
-           {scope: 'no-release', release: false}
-         ]
-       }],
-       ['@semantic-release/release-notes-generator', {
-         preset: 'conventionalcommits',
-         presetConfig: {
-           types: [
-             {type: 'feat', section: '✨ Features'},
-             {type: 'fix', section: '🐛 Bug Fixes'},
-             {type: 'perf', section: '⚡ Performance'},
-             {type: 'docs', section: '📚 Documentation', hidden: false}
-           ]
-         }
-       }],
-       '@semantic-release/changelog',
-       '@semantic-release/npm',
-       '@semantic-release/github'
-     ]
-   };
-   ```
-
-4. **Implement Version Synchronization**: Keep versions consistent
-
-   ```json
-   // package.json
-   {
-     "scripts": {
-       "version": "echo 'Version managed by semantic-release'",
-       "prepare-release": "npm run build && npm test",
-       "release:dry": "semantic-release --dry-run",
-       "release:preview": "semantic-release --dry-run --debug"
-     }
-   }
-   ```
-
-5. **Add Release Documentation**: Make process transparent
-
-   ```markdown
-   # RELEASING.md
-
-   ## Automated Release Process
-
-   Releases are fully automated based on commit messages:
-
-   ### Version Bumps
-   - `fix:` → Patch release (1.0.0 → 1.0.1)
-   - `feat:` → Minor release (1.0.0 → 1.1.0)
-   - `BREAKING CHANGE:` → Major release (1.0.0 → 2.0.0)
-
-   ### Release Triggers
-   - Every merge to main triggers a release
-   - Pre-releases from beta/alpha branches
-   - Manual releases: Run "Release" workflow
-
-   ### What Gets Updated
-   - ✅ Version in package.json
-   - ✅ CHANGELOG.md with all changes
-   - ✅ Git tag with version
-   - ✅ GitHub release with notes
-   - ✅ NPM package publication
-   - ✅ Documentation site
-   ```
-
-## Examples
-
-```bash
-# ❌ BAD: Manual release process
-# 1. Remember to update version in package.json
-# 2. Write changelog entries manually
-# 3. Create git tag
-# 4. Push tag
 # 5. Create GitHub release
 # 6. Publish to npm
 # 7. Hope you didn't miss anything

@@ -12,11 +12,7 @@ Use TypeScript for developer productivity—autocomplete, basic safety, and refa
 
 ## Rationale
 
-Grug teaches that type systems should make development easier, not harder. TypeScript's main benefits are IDE support (autocomplete, navigation), catching obvious mistakes (typos, wrong arguments), and enabling confident refactoring. These benefits come from basic typing, not from complex generic manipulations or type-level programming.
-
-The complexity demon loves TypeScript because it whispers seductive lies: "This mapped type will make your API perfectly type-safe." "This conditional type will prevent all possible misuse." "This template literal type will encode your business rules." But these sophisticated types often create more problems than they solve—they're difficult to debug, impossible for junior developers to understand, and brittle when requirements change.
-
-TypeScript should feel like a helpful assistant, not a puzzle to solve. When you find yourself fighting the type system, step back and ask: "Am I serving the types, or are the types serving me?" Choose boring, obvious types that make your code easier to work with, not harder.
+TypeScript's main benefits are IDE support, catching obvious mistakes, and enabling confident refactoring. These benefits come from basic typing, not complex generic manipulations. Sophisticated types often create more problems—they're difficult to debug, hard for junior developers to understand, and brittle when requirements change. Choose boring, obvious types that make code easier to work with.
 
 ## Rule Definition
 
@@ -30,11 +26,9 @@ TypeScript should feel like a helpful assistant, not a puzzle to solve. When you
 
 **SHOULD** avoid template literal types, conditional types, and mapped types unless they solve specific problems.
 
-## Pragmatic TypeScript Philosophy
+## Implementation
 
-### Types Serve Developers, Not Computers
-
-**✅ Good: Types for developer productivity**
+**✅ Good: Simple, productive types**
 ```typescript
 interface User {
   id: string;
@@ -44,158 +38,81 @@ interface User {
 }
 
 function getUserDisplayName(user: User): string {
-  return user.name || user.email; // IDE knows these properties exist
+  return user.name || user.email;
 }
 ```
 
-**❌ Bad: Types as academic exercise**
+**❌ Bad: Overly complex types**
 ```typescript
-// Overly complex mapped type that doesn't add real value
+// Complex mapped type that doesn't add real value
 type DeepReadonly<T> = {
-  readonly [P in keyof T]: T[P] extends (infer U)[]
-    ? DeepReadonlyArray<U>
-    : T[P] extends ReadonlyArray<infer U>
-    ? DeepReadonlyArray<U>
-    : T[P] extends object
-    ? DeepReadonly<T[P]>
-    : T[P];
+  readonly [P in keyof T]: T[P] extends (infer U)[] ? DeepReadonlyArray<U>
+    : T[P] extends object ? DeepReadonly<T[P]> : T[P];
 };
-
-interface DeepReadonlyArray<T> extends ReadonlyArray<DeepReadonly<T>> {}
-
-// When you could just use readonly where it matters
+// When you could just use readonly where needed
 ```
 
-### When to Use `any` (Yes, Really)
+**When to Use `any`:**
 
-**✅ Third-party library without types:**
+✅ Third-party libraries without types
+✅ Complex data transformation where typing is harder than logic
+✅ Rapid prototyping (add types when logic stabilizes)
+❌ Laziness when simple types would work
+
 ```typescript
-// Don't spend hours writing complex type definitions for libraries you don't control
+// Good: Unknown third-party library
 const weirdLibrary: any = require('some-weird-library');
-const result = weirdLibrary.doSomething(); // any is honest about unknown shape
+
+// Bad: Should be properly typed
+function addUser(user: any): any { return database.save(user); }
 ```
 
-**✅ Complex data transformation:**
+**Prefer Union Types Over Complex Inheritance:**
+
 ```typescript
-// When the type transformation is more complex than the actual logic
-function processApiResponse(response: any): ProcessedData {
-  // Focus on the logic, not type gymnastics
-  return {
-    id: response.data?.id || 'unknown',
-    name: response.data?.attributes?.name || 'Unknown',
-    // ...clear transformation logic
-  };
-}
-```
-
-**✅ Prototyping and iteration:**
-```typescript
-// During rapid prototyping, don't let types slow you down
-function experimentalFeature(data: any): any {
-  // Once the logic is stable, then add proper types
-  const result = complexExperimentalLogic(data);
-  return result;
-}
-```
-
-**❌ Bad use of `any`:**
-```typescript
-// Laziness when simple types would work
-function addUser(user: any): any { // Should be typed
-  return database.save(user);
-}
-```
-
-## Simple Type Patterns
-
-### Prefer Union Types Over Complex Inheritance
-
-**✅ Simple and clear:**
-```typescript
-type DatabaseConfig = {
-  type: 'postgres';
-  host: string;
-  port: number;
-  database: string;
-} | {
-  type: 'sqlite';
-  filename: string;
-} | {
-  type: 'memory';
-};
+// ✅ Simple union type
+type DatabaseConfig =
+  | { type: 'postgres'; host: string; port: number; database: string; }
+  | { type: 'sqlite'; filename: string; }
+  | { type: 'memory'; };
 
 function connectToDatabase(config: DatabaseConfig) {
   switch (config.type) {
-    case 'postgres':
-      return connectPostgres(config); // TypeScript knows postgres properties
-    case 'sqlite':
-      return connectSqlite(config);   // TypeScript knows sqlite properties
-    case 'memory':
-      return connectMemory();
+    case 'postgres': return connectPostgres(config);
+    case 'sqlite': return connectSqlite(config);
+    case 'memory': return connectMemory();
   }
 }
+
+// ❌ Complex inheritance hierarchy
+abstract class DatabaseConfig { abstract type: string; }
+class PostgresConfig extends DatabaseConfig { /* ceremony */ }
 ```
 
-**❌ Complex inheritance hierarchy:**
+**Use Basic Generics, Avoid Complex Constraints:**
+
 ```typescript
-abstract class DatabaseConfig {
-  abstract type: string;
-  abstract connect(): Connection;
-}
-
-class PostgresConfig extends DatabaseConfig {
-  // ... complex inheritance structure
-}
-// More ceremony than value for simple configuration
-```
-
-### Use Basic Generics, Avoid Complex Constraints
-
-**✅ Simple generics for basic reuse:**
-```typescript
-interface ApiResponse<T> {
-  data: T;
-  status: number;
-  message: string;
-}
-
+// ✅ Simple generic
+interface ApiResponse<T> { data: T; status: number; message: string; }
 function apiCall<T>(url: string): Promise<ApiResponse<T>> {
-  // Generic provides type safety without complexity
   return fetch(url).then(r => r.json());
 }
+
+// ❌ Over-constrained generic
+interface Repository<T extends { id: string | number }, K extends keyof T> {
+  findBy(key: K, value: T[K]): Promise<T[]>;
+}
+
+// ✅ Simple alternative
+interface SimpleRepository<T> { findBy(key: string, value: any): Promise<T[]>; }
 ```
 
-**❌ Over-constrained generics:**
+**Prefer Explicit Types Over Complex Inference:**
+
 ```typescript
-// Unnecessarily complex constraints
-interface Repository<
-  T extends { id: string | number },
-  K extends keyof T,
-  U extends T[K] extends string ? string : never
-> {
-  findBy(key: K, value: U): Promise<T[]>;
-}
-
-// When you could just use:
-interface SimpleRepository<T> {
-  findBy(key: string, value: any): Promise<T[]>;
-}
-```
-
-### Explicit Types Over Complex Inference
-
-**✅ Clear and explicit:**
-```typescript
-interface CreateUserRequest {
-  name: string;
-  email: string;
-  role: string;
-}
-
-interface CreateUserResponse {
-  id: string;
-  success: boolean;
-}
+// ✅ Clear interfaces
+interface CreateUserRequest { name: string; email: string; role: string; }
+interface CreateUserResponse { id: string; success: boolean; }
 
 function createUser(request: CreateUserRequest): Promise<CreateUserResponse> {
   // Types are immediately clear to any reader

@@ -38,10 +38,10 @@ RSpec.describe 'Sync Workflow Integration', type: :integration do
     sync_state = Leyline::SyncState.new(cache_dir)
     manifest = create_manifest(target_dir, base_state)
     sync_state.save_sync_state({
-      categories: ['core'],
-      manifest: manifest,
-      leyline_version: '2.1.0'
-    })
+                                 categories: ['core'],
+                                 manifest: manifest,
+                                 leyline_version: '2.1.0'
+                               })
   end
 
   after do
@@ -77,7 +77,7 @@ RSpec.describe 'Sync Workflow Integration', type: :integration do
       remote_manifest = create_manifest(source_dir, updated_state)
 
       # Use FileComparator to identify changes
-      comparator = Leyline::FileComparator.new(base_directory: target_dir)
+      Leyline::FileComparator.new(base_directory: target_dir)
 
       # Simple comparison logic
       changes = {
@@ -132,17 +132,17 @@ RSpec.describe 'Sync Workflow Integration', type: :integration do
 
       # Apply updates
       syncer = Leyline::Sync::FileSyncer.new(source_dir, target_dir)
-      results = syncer.sync(force: true)
+      syncer.sync(force: true)
 
       # Update sync state
       sync_state = Leyline::SyncState.new(cache_dir)
       new_manifest = create_manifest(target_dir, updated_state)
 
       sync_state.save_sync_state({
-        categories: ['core'],
-        manifest: new_manifest,
-        leyline_version: '2.2.0'
-      })
+                                   categories: ['core'],
+                                   manifest: new_manifest,
+                                   leyline_version: '2.2.0'
+                                 })
 
       # Verify state was updated
       loaded_state = sync_state.load_sync_state
@@ -158,25 +158,25 @@ RSpec.describe 'Sync Workflow Integration', type: :integration do
 
         # Load baseline state
         sync_state = Leyline::SyncState.new(cache_dir)
-        baseline_state = sync_state.load_sync_state
+        sync_state.load_sync_state
 
         # Check current vs baseline
         current_manifest = create_manifest(target_dir, {
-          'tenets/clarity.md' => File.read(clarity_path),
-          'bindings/core/naming.md' => base_state['bindings/core/naming.md']
-        })
+                                             'tenets/clarity.md' => File.read(clarity_path),
+                                             'bindings/core/naming.md' => base_state['bindings/core/naming.md']
+                                           })
 
         comparison = sync_state.compare_with_current_files(current_manifest)
         expect(comparison[:modified]).to include('tenets/clarity.md')
 
         # Now simulate remote also having changes
-        remote_manifest = manifest_from_content(updated_state)
+        manifest_from_content(updated_state)
 
         # Both modified the same file = conflict
         locally_modified = Set.new(comparison[:modified])
-        remotely_modified = updated_state.keys.select { |k|
+        remotely_modified = updated_state.keys.select do |k|
           base_state[k] && updated_state[k] != base_state[k]
-        }
+        end
 
         conflicts = locally_modified & remotely_modified
         expect(conflicts).to include('tenets/clarity.md')
@@ -204,16 +204,16 @@ RSpec.describe 'Sync Workflow Integration', type: :integration do
         sync_state = Leyline::SyncState.new(cache_dir)
         manifest = create_manifest(target_dir, realistic_content)
         sync_state.save_sync_state({
-          categories: ['core'],
-          manifest: manifest,
-          leyline_version: '2.1.0'
-        })
+                                     categories: ['core'],
+                                     manifest: manifest,
+                                     leyline_version: '2.1.0'
+                                   })
 
         duration = Time.now - start_time
 
         expect(results[:errors]).to be_empty
         expect(results[:copied].size).to eq(40)
-        expect(duration).to be < 1.0  # Should complete in under 1 second
+        expect(duration).to be < 1.0 # Should complete in under 1 second
       end
     end
 

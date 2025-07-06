@@ -8,15 +8,15 @@ require 'tmpdir'
 require 'json'
 
 class PerformanceBenchmark
-  BENCHMARK_DIR = "benchmark_temp"
-  RESULTS_FILE = "benchmark_results.json"
+  BENCHMARK_DIR = 'benchmark_temp'
+  RESULTS_FILE = 'benchmark_results.json'
 
   # Test scenarios with different file counts and types
   TEST_SCENARIOS = {
-    small: { count: 50, description: "Small dataset (50 files)" },
-    medium: { count: 200, description: "Medium dataset (200 files)" },
-    large: { count: 500, description: "Large dataset (500 files)" },
-    xl: { count: 1000, description: "Extra-large dataset (1000 files)" }
+    small: { count: 50, description: 'Small dataset (50 files)' },
+    medium: { count: 200, description: 'Medium dataset (200 files)' },
+    large: { count: 500, description: 'Large dataset (500 files)' },
+    xl: { count: 1000, description: 'Extra-large dataset (1000 files)' }
   }.freeze
 
   # Different file types for testing various performance characteristics
@@ -35,7 +35,7 @@ class PerformanceBenchmark
           This is a benchmark tenet file for performance testing.
         MARKDOWN
       },
-      directory: "tenets"
+      directory: 'tenets'
     },
 
     valid_binding: {
@@ -54,7 +54,7 @@ class PerformanceBenchmark
           This is a benchmark binding file for performance testing.
         MARKDOWN
       },
-      directory: "bindings/core"
+      directory: 'bindings/core'
     },
 
     invalid_yaml: {
@@ -73,7 +73,7 @@ class PerformanceBenchmark
           This file has invalid YAML syntax for testing error handling performance.
         MARKDOWN
       },
-      directory: "bindings/core"
+      directory: 'bindings/core'
     },
 
     missing_fields: {
@@ -89,7 +89,7 @@ class PerformanceBenchmark
           This file is missing required fields for testing validation performance.
         MARKDOWN
       },
-      directory: "bindings/core"
+      directory: 'bindings/core'
     },
 
     invalid_references: {
@@ -108,7 +108,7 @@ class PerformanceBenchmark
           This file references a non-existent tenet for testing reference validation performance.
         MARKDOWN
       },
-      directory: "bindings/core"
+      directory: 'bindings/core'
     }
   }.freeze
 
@@ -118,10 +118,10 @@ class PerformanceBenchmark
   end
 
   def run_benchmarks
-    puts "=" * 80
-    puts "Performance Benchmark Suite"
-    puts "Testing validation script performance against various datasets"
-    puts "=" * 80
+    puts '=' * 80
+    puts 'Performance Benchmark Suite'
+    puts 'Testing validation script performance against various datasets'
+    puts '=' * 80
     puts
 
     begin
@@ -130,9 +130,9 @@ class PerformanceBenchmark
 
       # Run scenario-based benchmarks
       TEST_SCENARIOS.each do |scenario_name, config|
-        puts "\n" + "-" * 60
+        puts "\n" + '-' * 60
         puts "Running scenario: #{config[:description]}"
-        puts "-" * 60
+        puts '-' * 60
 
         run_scenario_benchmark(scenario_name, config)
       end
@@ -143,7 +143,6 @@ class PerformanceBenchmark
       # Save and display results
       save_results
       display_summary
-
     ensure
       cleanup_temp_directories
     end
@@ -152,10 +151,10 @@ class PerformanceBenchmark
   private
 
   def run_baseline_benchmark
-    puts "Establishing baseline with existing repository files..."
+    puts 'Establishing baseline with existing repository files...'
 
     # Test with actual repository files
-    existing_files = Dir.glob("docs/**/*.md").select { |f| File.file?(f) }
+    existing_files = Dir.glob('docs/**/*.md').select { |f| File.file?(f) }
     puts "Found #{existing_files.count} existing files"
 
     if existing_files.count > 0
@@ -169,7 +168,7 @@ class PerformanceBenchmark
 
       puts "✓ Baseline: #{format_time(time)} for 10 files (#{format_throughput(10.0 / time)})"
     else
-      puts "⚠ No existing files found for baseline"
+      puts '⚠ No existing files found for baseline'
     end
   end
 
@@ -207,9 +206,9 @@ class PerformanceBenchmark
   end
 
   def run_file_type_benchmarks
-    puts "\n" + "-" * 60
-    puts "File Type Specific Performance Analysis"
-    puts "-" * 60
+    puts "\n" + '-' * 60
+    puts 'File Type Specific Performance Analysis'
+    puts '-' * 60
 
     FILE_TYPES.each do |type_name, type_config|
       temp_dir = create_temp_directory("filetype_#{type_name}")
@@ -227,7 +226,8 @@ class PerformanceBenchmark
         file_type: type_name
       }
 
-      puts "✓ #{type_name.to_s.gsub('_', ' ').capitalize}: #{format_time(time)} for 100 files (#{format_throughput(100.0 / time)})"
+      puts "✓ #{type_name.to_s.gsub('_',
+                                    ' ').capitalize}: #{format_time(time)} for 100 files (#{format_throughput(100.0 / time)})"
     end
   end
 
@@ -237,15 +237,15 @@ class PerformanceBenchmark
     @temp_dirs << temp_dir
 
     # Create directory structure
-    FileUtils.mkdir_p(File.join(temp_dir, "docs/tenets"))
-    FileUtils.mkdir_p(File.join(temp_dir, "docs/bindings/core"))
-    FileUtils.mkdir_p(File.join(temp_dir, "docs/bindings/categories/typescript"))
+    FileUtils.mkdir_p(File.join(temp_dir, 'docs/tenets'))
+    FileUtils.mkdir_p(File.join(temp_dir, 'docs/bindings/core'))
+    FileUtils.mkdir_p(File.join(temp_dir, 'docs/bindings/categories/typescript'))
 
     # Copy VERSION file if it exists
-    if File.exist?("VERSION")
-      FileUtils.cp("VERSION", temp_dir)
+    if File.exist?('VERSION')
+      FileUtils.cp('VERSION', temp_dir)
     else
-      File.write(File.join(temp_dir, "VERSION"), "0.1.0")
+      File.write(File.join(temp_dir, 'VERSION'), '0.1.0')
     end
 
     temp_dir
@@ -253,7 +253,7 @@ class PerformanceBenchmark
 
   def generate_files(base_dir, type_name, type_config, count)
     files = []
-    dir_path = File.join(base_dir, "docs", type_config[:directory])
+    dir_path = File.join(base_dir, 'docs', type_config[:directory])
     FileUtils.mkdir_p(dir_path)
 
     count.times do |i|
@@ -296,9 +296,9 @@ class PerformanceBenchmark
 
       # Copy files to expected structure
       files.each do |file|
-        if file.include?("/tenets/")
+        if file.include?('/tenets/')
           FileUtils.cp(file, "#{temp_docs_dir}/tenets/")
-        elsif file.include?("/bindings/")
+        elsif file.include?('/bindings/')
           FileUtils.cp(file, "#{temp_docs_dir}/bindings/core/")
         end
       end
@@ -319,7 +319,7 @@ class PerformanceBenchmark
     File.delete(temp_file_list) if File.exist?(temp_file_list)
 
     time
-  rescue => e
+  rescue StandardError => e
     puts "Error measuring validation time: #{e.message}"
     0.0
   end
@@ -327,7 +327,7 @@ class PerformanceBenchmark
   def save_results
     # Add metadata
     @results[:metadata] = {
-      timestamp: Time.now.strftime("%Y-%m-%dT%H:%M:%S%z"),
+      timestamp: Time.now.strftime('%Y-%m-%dT%H:%M:%S%z'),
       ruby_version: RUBY_VERSION,
       platform: RUBY_PLATFORM,
       total_scenarios: @results.count - 1 # Exclude metadata
@@ -338,9 +338,9 @@ class PerformanceBenchmark
   end
 
   def display_summary
-    puts "\n" + "=" * 80
-    puts "Performance Benchmark Summary"
-    puts "=" * 80
+    puts "\n" + '=' * 80
+    puts 'Performance Benchmark Summary'
+    puts '=' * 80
 
     if @results[:baseline]
       baseline = @results[:baseline]
@@ -383,7 +383,7 @@ class PerformanceBenchmark
 
   def analyze_performance
     # Find fastest and slowest scenarios
-    scenario_results = @results.select { |k, v| TEST_SCENARIOS.key?(k) }
+    scenario_results = @results.select { |k, _v| TEST_SCENARIOS.key?(k) }
 
     if scenario_results.any?
       fastest = scenario_results.max_by { |_, v| v[:throughput] }
@@ -399,14 +399,16 @@ class PerformanceBenchmark
     end
 
     # File type analysis
-    file_type_results = @results.select { |k, v| k.to_s.start_with?('filetype_') }
+    file_type_results = @results.select { |k, _v| k.to_s.start_with?('filetype_') }
 
     if file_type_results.any?
       fastest_type = file_type_results.max_by { |_, v| v[:throughput] }
       slowest_type = file_type_results.min_by { |_, v| v[:throughput] }
 
-      puts "  Fastest file type: #{fastest_type[1][:file_type].to_s.gsub('_', ' ')} (#{format_throughput(fastest_type[1][:throughput])})"
-      puts "  Slowest file type: #{slowest_type[1][:file_type].to_s.gsub('_', ' ')} (#{format_throughput(slowest_type[1][:throughput])})"
+      puts "  Fastest file type: #{fastest_type[1][:file_type].to_s.gsub('_',
+                                                                         ' ')} (#{format_throughput(fastest_type[1][:throughput])})"
+      puts "  Slowest file type: #{slowest_type[1][:file_type].to_s.gsub('_',
+                                                                         ' ')} (#{format_throughput(slowest_type[1][:throughput])})"
     end
 
     # Performance recommendations
@@ -418,21 +420,21 @@ class PerformanceBenchmark
       slow_scenarios = scenario_results.select { |_, v| v[:throughput] < baseline_throughput * 0.5 }
 
       if slow_scenarios.any?
-        puts "  ⚠ Some scenarios are significantly slower than baseline"
-        slow_scenarios.each do |name, result|
+        puts '  ⚠ Some scenarios are significantly slower than baseline'
+        slow_scenarios.each do |_name, result|
           puts "    - #{result[:description]}: #{format_throughput(result[:throughput])} (#{((result[:throughput] / baseline_throughput) * 100).round(1)}% of baseline)"
         end
       else
-        puts "  ✓ Performance is acceptable across all scenarios"
+        puts '  ✓ Performance is acceptable across all scenarios'
       end
     end
 
     # Check for very slow absolute performance
     all_throughputs = @results.values.select { |v| v.is_a?(Hash) && v[:throughput] }.map { |v| v[:throughput] }
-    if all_throughputs.any? && all_throughputs.min < 1.0
-      puts "  ⚠ Some scenarios have very low throughput (< 1 file/second)"
-      puts "    Consider optimizing for large file sets"
-    end
+    return unless all_throughputs.any? && all_throughputs.min < 1.0
+
+    puts '  ⚠ Some scenarios have very low throughput (< 1 file/second)'
+    puts '    Consider optimizing for large file sets'
   end
 
   def cleanup_temp_directories

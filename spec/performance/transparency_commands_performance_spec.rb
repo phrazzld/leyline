@@ -105,7 +105,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
           validate_cache_optimization(baseline_metrics, optimized_metrics)
           store_performance_baseline('diff', baseline_metrics)
         else
-          puts "Diff command baseline skipped (git environment limitations)"
+          puts 'Diff command baseline skipped (git environment limitations)'
         end
       end
     end
@@ -128,7 +128,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
           validate_cache_optimization(baseline_metrics, optimized_metrics)
           store_performance_baseline('update', baseline_metrics)
         else
-          puts "Update command baseline skipped (git environment limitations)"
+          puts 'Update command baseline skipped (git environment limitations)'
         end
       end
     end
@@ -351,12 +351,10 @@ RSpec.describe 'Transparency Commands Performance', :performance do
       start_memory = current_memory_usage_mb
 
       benchmark = Benchmark.measure do
-        begin
-          result = block.call
-          success_count += 1 if result[:success]
-        rescue => e
-          puts "Iteration #{i + 1} failed: #{e.message}" if i == 0
-        end
+        result = block.call
+        success_count += 1 if result[:success]
+      rescue StandardError => e
+        puts "Iteration #{i + 1} failed: #{e.message}" if i == 0
       end
 
       end_memory = current_memory_usage_mb
@@ -406,7 +404,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
 
   def calculate_standard_deviation(values)
     mean = values.sum.to_f / values.length
-    variance = values.sum { |v| (v - mean) ** 2 } / values.length
+    variance = values.sum { |v| (v - mean)**2 } / values.length
     Math.sqrt(variance)
   end
 
@@ -415,7 +413,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
 
     result = capture_cli_output do
       cli.invoke(:status, [test_directories[:target]],
-                verbose: false, stats: false)
+                 verbose: false, stats: false)
     end
 
     {
@@ -429,14 +427,14 @@ RSpec.describe 'Transparency Commands Performance', :performance do
 
     result = capture_cli_output do
       cli.invoke(:diff, [test_directories[:target]],
-                verbose: false, stats: false)
+                 verbose: false, stats: false)
     end
 
     # Diff command may fail due to git remote issues in test environment
     {
       success: result[:stderr].empty? ||
-               result[:stderr].include?('No changes') ||
-               !result[:stderr].include?('Fatal error'),
+        result[:stderr].include?('No changes') ||
+        !result[:stderr].include?('Fatal error'),
       output: result
     }
   end
@@ -446,13 +444,13 @@ RSpec.describe 'Transparency Commands Performance', :performance do
 
     result = capture_cli_output do
       cli.invoke(:update, [test_directories[:target]],
-                dry_run: dry_run, verbose: false, stats: false)
+                 dry_run: dry_run, verbose: false, stats: false)
     end
 
     {
       success: result[:stderr].empty? ||
-               result[:stderr].include?('No updates') ||
-               !result[:stderr].include?('Fatal error'),
+        result[:stderr].include?('No updates') ||
+        !result[:stderr].include?('Fatal error'),
       output: result
     }
   end
@@ -467,19 +465,19 @@ RSpec.describe 'Transparency Commands Performance', :performance do
     else
       `ps -o rss= -p #{Process.pid}`.to_i / 1024.0
     end
-  rescue
+  rescue StandardError
     0.0
   end
 
   def validate_performance_baseline(metrics, baseline_name)
     expect(metrics[:success_rate]).to be > 0.8,
-           "#{baseline_name}: Success rate #{(metrics[:success_rate] * 100).round(1)}% too low"
+                                      "#{baseline_name}: Success rate #{(metrics[:success_rate] * 100).round(1)}% too low"
 
     expect(metrics[:p95_seconds]).to be < 5.0,
-           "#{baseline_name}: P95 time #{metrics[:p95_seconds].round(3)}s exceeds maximum threshold"
+                                     "#{baseline_name}: P95 time #{metrics[:p95_seconds].round(3)}s exceeds maximum threshold"
 
     expect(metrics[:median_memory_mb]).to be < 100,
-           "#{baseline_name}: Memory usage #{metrics[:median_memory_mb].round(1)}MB too high"
+                                          "#{baseline_name}: Memory usage #{metrics[:median_memory_mb].round(1)}MB too high"
 
     puts "✅ #{baseline_name}: P95=#{(metrics[:p95_seconds] * 1000).round(1)}ms, " \
          "Memory=#{metrics[:median_memory_mb].round(1)}MB, " \
@@ -501,13 +499,13 @@ RSpec.describe 'Transparency Commands Performance', :performance do
     else
       puts "📊 Cache optimization: #{(improvement_ratio * 100).round(1)}% improvement " \
            "(#{(baseline_time * 1000).round(1)}ms → #{(optimized_time * 1000).round(1)}ms)"
-      puts "   Note: Small improvements expected in test environment"
+      puts '   Note: Small improvements expected in test environment'
     end
   end
 
   def validate_resource_efficiency(metrics)
     expect(metrics[:p95_memory_mb]).to be < 150,
-           "Resource efficiency: Memory usage #{metrics[:p95_memory_mb].round(1)}MB exceeds efficiency target"
+                                       "Resource efficiency: Memory usage #{metrics[:p95_memory_mb].round(1)}MB exceeds efficiency target"
   end
 
   def validate_scalability_characteristics(results)
@@ -521,7 +519,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
     scalability_factor = time_ratio / file_ratio
 
     expect(scalability_factor).to be < 1.5,
-           "Scalability: Performance scales at #{scalability_factor.round(2)}x rate (target: <1.5x)"
+                                  "Scalability: Performance scales at #{scalability_factor.round(2)}x rate (target: <1.5x)"
 
     puts "✅ Scalability: #{scalability_factor.round(2)}x scaling factor " \
          "(#{file_ratio.round(1)}x files → #{time_ratio.round(1)}x time)"
@@ -529,25 +527,25 @@ RSpec.describe 'Transparency Commands Performance', :performance do
 
   def validate_command_reliability(metrics, command_name)
     expect(metrics[:success_rate]).to be > 0.3,
-           "#{command_name}: Success rate #{(metrics[:success_rate] * 100).round(1)}% too low " \
-           "(accounting for test environment limitations)"
+                                      "#{command_name}: Success rate #{(metrics[:success_rate] * 100).round(1)}% too low " \
+                                      '(accounting for test environment limitations)'
 
-    if metrics[:success_rate] < 0.8
-      puts "⚠️  #{command_name}: Limited success rate " \
-           "#{(metrics[:success_rate] * 100).round(1)}% (git environment constraints)"
-    end
+    return unless metrics[:success_rate] < 0.8
+
+    puts "⚠️  #{command_name}: Limited success rate " \
+         "#{(metrics[:success_rate] * 100).round(1)}% (git environment constraints)"
   end
 
   def validate_workflow_efficiency(workflow_metrics)
     expect(workflow_metrics[:total_time_seconds]).to be < 10.0,
-           "Workflow efficiency: Total time #{workflow_metrics[:total_time_seconds].round(2)}s exceeds target"
+                                                     "Workflow efficiency: Total time #{workflow_metrics[:total_time_seconds].round(2)}s exceeds target"
 
     puts "✅ Workflow efficiency: #{(workflow_metrics[:total_time_seconds] * 1000).round(1)}ms total"
   end
 
   def validate_workflow_resource_usage(workflow_metrics)
     expect(workflow_metrics[:memory_delta_mb].abs).to be < 200,
-           "Workflow resource usage: Memory delta #{workflow_metrics[:memory_delta_mb].round(1)}MB too high"
+                                                      "Workflow resource usage: Memory delta #{workflow_metrics[:memory_delta_mb].round(1)}MB too high"
   end
 
   def store_performance_baseline(command, metrics)
@@ -564,7 +562,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
       p95_seconds: 0.8,
       median_seconds: 0.5,
       success_rate: 0.9,
-      timestamp: (Time.now - 86400).iso8601
+      timestamp: (Time.now - 86_400).iso8601
     }
   end
 
@@ -575,7 +573,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
     median_regression = current[:median_seconds] / historical[:median_seconds]
 
     regression_detected = p95_regression > performance_config[:regression_threshold] ||
-                         median_regression > performance_config[:regression_threshold]
+                          median_regression > performance_config[:regression_threshold]
 
     {
       regression_detected: regression_detected,
@@ -587,33 +585,33 @@ RSpec.describe 'Transparency Commands Performance', :performance do
 
   def validate_regression_detection(analysis)
     if analysis[:regression_detected]
-      puts "⚠️  Performance regression detected: " \
+      puts '⚠️  Performance regression detected: ' \
            "P95 #{(analysis[:p95_ratio] * 100).round(1)}% of baseline"
     else
-      puts "✅ No performance regression detected"
+      puts '✅ No performance regression detected'
     end
   end
 
   def log_scalability_analysis(results)
     puts "\n📈 SCALABILITY ANALYSIS"
-    puts "=" * 50
+    puts '=' * 50
     results.each do |result|
-      puts format("Files: %3d | P95: %6.1fms | Memory: %5.1fMB",
+      puts format('Files: %3d | P95: %6.1fms | Memory: %5.1fMB',
                   result[:file_count],
                   result[:p95_time] * 1000,
                   result[:median_memory])
     end
-    puts "=" * 50
+    puts '=' * 50
   end
 
   def log_regression_analysis(analysis)
     puts "\n🔍 REGRESSION ANALYSIS"
-    puts "=" * 50
-    puts format("P95 performance ratio: %.2f (threshold: %.2f)",
+    puts '=' * 50
+    puts format('P95 performance ratio: %.2f (threshold: %.2f)',
                 analysis[:p95_ratio], analysis[:threshold])
-    puts format("Median performance ratio: %.2f", analysis[:median_ratio])
-    puts format("Regression detected: %s", analysis[:regression_detected])
-    puts "=" * 50
+    puts format('Median performance ratio: %.2f', analysis[:median_ratio])
+    puts format('Regression detected: %s', analysis[:regression_detected])
+    puts '=' * 50
   end
 
   def capture_cli_output(&block)
@@ -628,7 +626,7 @@ RSpec.describe 'Transparency Commands Performance', :performance do
 
     begin
       block.call
-    rescue SystemExit => e
+    rescue SystemExit
       # CLI commands may call exit, capture gracefully
     ensure
       $stdout = original_stdout

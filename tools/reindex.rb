@@ -19,17 +19,17 @@ $options = {
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: reindex.rb [options]"
+  opts.banner = 'Usage: reindex.rb [options]'
 
-  opts.on("--strict", "Exit with error code on any error") do
+  opts.on('--strict', 'Exit with error code on any error') do
     $options[:strict] = true
   end
 
-  opts.on("--verbose", "Show more detailed output") do
+  opts.on('--verbose', 'Show more detailed output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit
   end
@@ -64,76 +64,74 @@ def process_tenets_dir
   puts "Processing #{tenet_files.size} tenet files..." if $options[:verbose]
 
   tenet_files.each do |file|
-    begin
-      content = File.read(file)
+    content = File.read(file)
 
-      # Check for YAML front-matter
-      if content !~ /^---\n/
-        report_error(file, "No YAML front-matter found")
+    # Check for YAML front-matter
+    if content !~ /^---\n/
+      report_error(file, 'No YAML front-matter found')
+      next
+    end
+
+    # Extract front-matter and first paragraph after title using YAML format
+    if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
+      # Parse YAML with explicit error handling
+      yaml_content = Regexp.last_match(1)
+      begin
+        front_matter = YAML.safe_load(yaml_content)
+      rescue StandardError => e
+        report_error(file, "Invalid YAML in front-matter: #{e.message}")
         next
       end
 
-      # Extract front-matter and first paragraph after title using YAML format
-      if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
-        # Parse YAML with explicit error handling
-        yaml_content = $1
-        begin
-          front_matter = YAML.safe_load(yaml_content)
-        rescue => e
-          report_error(file, "Invalid YAML in front-matter: #{e.message}")
-          next
-        end
+      # Validate required fields for tenets
+      required_fields = %w[id last_modified version]
+      missing_fields = required_fields - front_matter.keys
 
-        # Validate required fields for tenets
-        required_fields = ['id', 'last_modified', 'version']
-        missing_fields = required_fields - front_matter.keys
-
-        if !missing_fields.empty?
-          report_error(file, "Missing required metadata fields: #{missing_fields.join(', ')}")
-          next
-        end
-
-        title = $2.strip
-        first_para = $3.strip.gsub(/\s+/, ' ')
-
-        # Skip placeholder text that's enclosed in brackets
-        if first_para =~ /^\[.*\]$/
-          # Try to find the first real paragraph in the Core Belief/Rationale section
-          if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
-            section_text = $2.strip.gsub(/\s+/, ' ')
-
-            # Skip if this is also a placeholder
-            if section_text =~ /^\[.*\]$/
-              first_para = "See document for details."
-              report_warning(file, "Using placeholder text for summary")
-            else
-              first_para = section_text
-            end
-          else
-            first_para = "See document for details."
-            report_warning(file, "Using placeholder text for summary - no Core Belief section found")
-          end
-        # This handles the non-bracketed placeholder case that might appear in templates
-        elsif first_para.include?("Write a") && (first_para.include?("paragraph") || first_para.include?("explanation"))
-          first_para = "See document for details."
-          report_warning(file, "Using placeholder text for summary - template text found")
-        end
-
-        # Truncate if too long
-        summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
-
-        # Add to entries
-        entries << {
-          id: front_matter['id'] || File.basename(file, '.md'),
-          summary: summary,
-          version: front_matter['version']
-        }
-      else
-        report_error(file, "Could not parse file structure - expected YAML front-matter followed by title and content")
+      unless missing_fields.empty?
+        report_error(file, "Missing required metadata fields: #{missing_fields.join(', ')}")
+        next
       end
-    rescue => e
-      report_error(file, "Failed to process file: #{e.message}")
+
+      Regexp.last_match(2).strip
+      first_para = Regexp.last_match(3).strip.gsub(/\s+/, ' ')
+
+      # Skip placeholder text that's enclosed in brackets
+      if first_para =~ /^\[.*\]$/
+        # Try to find the first real paragraph in the Core Belief/Rationale section
+        if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
+          section_text = Regexp.last_match(2).strip.gsub(/\s+/, ' ')
+
+          # Skip if this is also a placeholder
+          if section_text =~ /^\[.*\]$/
+            first_para = 'See document for details.'
+            report_warning(file, 'Using placeholder text for summary')
+          else
+            first_para = section_text
+          end
+        else
+          first_para = 'See document for details.'
+          report_warning(file, 'Using placeholder text for summary - no Core Belief section found')
+        end
+      # This handles the non-bracketed placeholder case that might appear in templates
+      elsif first_para.include?('Write a') && (first_para.include?('paragraph') || first_para.include?('explanation'))
+        first_para = 'See document for details.'
+        report_warning(file, 'Using placeholder text for summary - template text found')
+      end
+
+      # Truncate if too long
+      summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
+
+      # Add to entries
+      entries << {
+        id: front_matter['id'] || File.basename(file, '.md'),
+        summary: summary,
+        version: front_matter['version']
+      }
+    else
+      report_error(file, 'Could not parse file structure - expected YAML front-matter followed by title and content')
     end
+  rescue StandardError => e
+    report_error(file, "Failed to process file: #{e.message}")
   end
 
   # Generate index content
@@ -149,7 +147,7 @@ def process_tenets_dir
     end
   else
     index_content += "_No #{dir_base} defined yet._\n"
-    report_warning(dir, "No valid tenet entries found for index generation")
+    report_warning(dir, 'No valid tenet entries found for index generation')
   end
 
   # Ensure directory exists and write index file
@@ -165,13 +163,13 @@ def process_bindings_dir
   # Check for misplaced files in the root directory
   misplaced_files = Dir.glob("#{dir}/*.md").reject { |f| f =~ /00-index\.md$/ || f =~ /glance\.md$/ }
   misplaced_files.each do |file|
-    report_error(file, "Misplaced binding file found in root directory")
-    puts "       This file should be moved to either:" if $options[:verbose]
+    report_error(file, 'Misplaced binding file found in root directory')
+    puts '       This file should be moved to either:' if $options[:verbose]
     puts "       - '#{dir}/core/' (if it's a core binding)" if $options[:verbose]
     puts "       - '#{dir}/categories/<category>/' (if it's a category-specific binding)" if $options[:verbose]
   end
 
-  if !misplaced_files.empty?
+  unless misplaced_files.empty?
     puts "Found #{misplaced_files.size} misplaced binding file(s) in root directory. These will be skipped."
   end
 
@@ -193,7 +191,7 @@ def process_bindings_dir
 
   # 2. Process category bindings
   # Define standard categories that should always be included
-  standard_categories = ['backend', 'cli', 'csharp', 'frontend', 'go', 'rust', 'typescript']
+  standard_categories = %w[backend cli csharp frontend go rust typescript]
 
   # Initialize all standard categories
   standard_categories.each do |category|
@@ -233,7 +231,7 @@ def process_bindings_dir
 
   # Check if no valid bindings were found
   if core_entries.empty? && category_entries.values.flatten.empty?
-    report_warning(dir, "No valid binding entries found for index generation")
+    report_warning(dir, 'No valid binding entries found for index generation')
   end
 
   # Generate index content
@@ -250,12 +248,11 @@ def process_bindings_dir
     end
   else
     index_content += "_No core bindings defined yet._\n\n"
-    report_warning("#{dir}/core", "No valid core binding entries found")
+    report_warning("#{dir}/core", 'No valid core binding entries found')
   end
 
   # Category sections - process all standard categories in fixed order, then any additional ones
   (standard_categories + (category_entries.keys - standard_categories).sort).each do |category|
-
     entries = category_entries[category]
 
     # Use proper title case for category names
@@ -263,7 +260,7 @@ def process_bindings_dir
     if category =~ /^(ts|go)$/i
       category_title = category.upcase
     elsif category =~ /typescript/i
-      category_title = "TypeScript"
+      category_title = 'TypeScript'
     end
 
     index_content += "\n## #{category_title} Bindings\n\n"
@@ -278,7 +275,7 @@ def process_bindings_dir
       # Handle empty category gracefully with an informative message
       # This ensures the section appears in the index but clearly indicates it's empty
       index_content += "_No #{category} bindings defined yet._\n"
-      report_warning("#{dir}/categories/#{category}", "No valid binding entries found for category")
+      report_warning("#{dir}/categories/#{category}", 'No valid binding entries found for category')
     end
   end
 
@@ -290,78 +287,76 @@ end
 
 # Helper to process a single binding file and extract metadata
 def process_binding_file(file)
-  begin
-    content = File.read(file)
+  content = File.read(file)
 
-    # Check for YAML front-matter
-    if content !~ /^---\n/
-      report_error(file, "No YAML front-matter found")
-      return nil
-    end
-
-    # Extract front-matter using YAML format
-    if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
-      # Parse YAML with explicit error handling
-      yaml_content = $1
-      begin
-        front_matter = YAML.safe_load(yaml_content)
-      rescue => e
-        report_error(file, "Invalid YAML in front-matter: #{e.message}")
-        return nil
-      end
-
-      # Validate required fields for bindings
-      required_fields = ['id', 'last_modified', 'derived_from', 'enforced_by', 'version']
-      missing_fields = required_fields - front_matter.keys
-
-      if !missing_fields.empty?
-        report_error(file, "Missing required metadata fields: #{missing_fields.join(', ')}")
-        return nil
-      end
-
-      title = $2.strip
-      first_para = $3.strip.gsub(/\s+/, ' ')
-
-      # Handle placeholders
-      if first_para =~ /^\[.*\]$/
-        if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
-          section_text = $2.strip.gsub(/\s+/, ' ')
-          if section_text =~ /^\[.*\]$/
-            first_para = "See document for details."
-            report_warning(file, "Using placeholder text for summary")
-          else
-            first_para = section_text
-          end
-        else
-          first_para = "See document for details."
-          report_warning(file, "Using placeholder text for summary - no Rationale section found")
-        end
-      elsif first_para.include?("Write a") && (first_para.include?("paragraph") || first_para.include?("explanation"))
-        first_para = "See document for details."
-        report_warning(file, "Using placeholder text for summary - template text found")
-      end
-
-      # Truncate if too long
-      summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
-
-      # Return entry data
-      return {
-        id: front_matter['id'] || File.basename(file, '.md'),
-        summary: summary,
-        version: front_matter['version']
-      }
-    else
-      report_error(file, "Could not parse file structure - expected YAML front-matter followed by title and content")
-      return nil
-    end
-  rescue => e
-    report_error(file, "Failed to process file: #{e.message}")
+  # Check for YAML front-matter
+  if content !~ /^---\n/
+    report_error(file, 'No YAML front-matter found')
     return nil
   end
+
+  # Extract front-matter using YAML format
+  if content =~ /^---\n(.*?)\n---\s*#[^#]+(.*?)\n\n(.*?)(\n\n|\n#|$)/m
+    # Parse YAML with explicit error handling
+    yaml_content = Regexp.last_match(1)
+    begin
+      front_matter = YAML.safe_load(yaml_content)
+    rescue StandardError => e
+      report_error(file, "Invalid YAML in front-matter: #{e.message}")
+      return nil
+    end
+
+    # Validate required fields for bindings
+    required_fields = %w[id last_modified derived_from enforced_by version]
+    missing_fields = required_fields - front_matter.keys
+
+    unless missing_fields.empty?
+      report_error(file, "Missing required metadata fields: #{missing_fields.join(', ')}")
+      return nil
+    end
+
+    Regexp.last_match(2).strip
+    first_para = Regexp.last_match(3).strip.gsub(/\s+/, ' ')
+
+    # Handle placeholders
+    if first_para =~ /^\[.*\]$/
+      if content =~ /## (Core Belief|Rationale)\s*\n\n(.*?)(\n\n|\n#|$)/m
+        section_text = Regexp.last_match(2).strip.gsub(/\s+/, ' ')
+        if section_text =~ /^\[.*\]$/
+          first_para = 'See document for details.'
+          report_warning(file, 'Using placeholder text for summary')
+        else
+          first_para = section_text
+        end
+      else
+        first_para = 'See document for details.'
+        report_warning(file, 'Using placeholder text for summary - no Rationale section found')
+      end
+    elsif first_para.include?('Write a') && (first_para.include?('paragraph') || first_para.include?('explanation'))
+      first_para = 'See document for details.'
+      report_warning(file, 'Using placeholder text for summary - template text found')
+    end
+
+    # Truncate if too long
+    summary = first_para.length > 150 ? "#{first_para[0, 147]}..." : first_para
+
+    # Return entry data
+    {
+      id: front_matter['id'] || File.basename(file, '.md'),
+      summary: summary,
+      version: front_matter['version']
+    }
+  else
+    report_error(file, 'Could not parse file structure - expected YAML front-matter followed by title and content')
+    nil
+  end
+rescue StandardError => e
+  report_error(file, "Failed to process file: #{e.message}")
+  nil
 end
 
 # Process each directory type
-puts "Starting index generation..." if $options[:verbose]
+puts 'Starting index generation...' if $options[:verbose]
 process_tenets_dir
 process_bindings_dir
 

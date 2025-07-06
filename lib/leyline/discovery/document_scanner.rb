@@ -20,13 +20,13 @@ module Leyline
       def initialize
         @scan_stats = Concurrent::Hash.new
         @scan_stats.merge!({
-          files_scanned: 0,
-          yaml_parse_errors: 0,
-          total_bytes_processed: 0,
-          avg_scan_time: 0.0,
-          parallel_batches: 0,
-          sequential_batches: 0
-        })
+                             files_scanned: 0,
+                             yaml_parse_errors: 0,
+                             total_bytes_processed: 0,
+                             avg_scan_time: 0.0,
+                             parallel_batches: 0,
+                             sequential_batches: 0
+                           })
       end
 
       # Scan a single document file for metadata
@@ -34,9 +34,7 @@ module Leyline
       def scan_document(file_path)
         start_time = Time.now
 
-        unless File.exist?(file_path)
-          return nil
-        end
+        return nil unless File.exist?(file_path)
 
         begin
           # Read file content efficiently
@@ -46,9 +44,7 @@ module Leyline
           # Extract front-matter with performance optimization
           front_matter = extract_front_matter_fast(content)
 
-          unless front_matter
-            return nil
-          end
+          return nil unless front_matter
 
           # Build document metadata
           document = build_document_metadata(file_path, content, front_matter)
@@ -59,8 +55,7 @@ module Leyline
           update_avg_scan_time(scan_time)
 
           document
-
-        rescue => e
+        rescue StandardError => e
           warn "Document scan error for #{file_path}: #{e.message}"
           nil
         end
@@ -88,13 +83,13 @@ module Leyline
       def reset_statistics!
         @scan_stats = Concurrent::Hash.new
         @scan_stats.merge!({
-          files_scanned: 0,
-          yaml_parse_errors: 0,
-          total_bytes_processed: 0,
-          avg_scan_time: 0.0,
-          parallel_batches: 0,
-          sequential_batches: 0
-        })
+                             files_scanned: 0,
+                             yaml_parse_errors: 0,
+                             total_bytes_processed: 0,
+                             avg_scan_time: 0.0,
+                             parallel_batches: 0,
+                             sequential_batches: 0
+                           })
       end
 
       private
@@ -161,7 +156,7 @@ module Leyline
         return nil unless content.start_with?('---')
 
         # Find the closing marker efficiently
-        start_pos = 4  # Skip initial "---\n"
+        start_pos = 4 # Skip initial "---\n"
         end_pos = content.index("\n---\n", start_pos)
 
         return nil unless end_pos
@@ -178,7 +173,7 @@ module Leyline
         # Parse YAML with error handling
         begin
           YAML.safe_load(yaml_content)
-        rescue => e
+        rescue StandardError => e
           @scan_stats[:yaml_parse_errors] += 1
           warn "YAML parse error: #{e.message}"
           nil
@@ -240,11 +235,11 @@ module Leyline
           next unless front_matter_ended
 
           # Look for markdown header
-          if stripped.start_with?('#')
-            # Extract title, removing markdown syntax
-            title = stripped.gsub(/^#+\s*/, '').strip
-            return title unless title.empty?
-          end
+          next unless stripped.start_with?('#')
+
+          # Extract title, removing markdown syntax
+          title = stripped.gsub(/^#+\s*/, '').strip
+          return title unless title.empty?
         end
 
         # Fallback: use filename if no title found

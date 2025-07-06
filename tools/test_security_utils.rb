@@ -10,7 +10,6 @@ require 'stringio'
 require_relative 'security_utils'
 
 class TestSecurityUtils < Test::Unit::TestCase
-
   def setup
     @original_dir = Dir.pwd
     @test_dir = Dir.mktmpdir('security_test_')
@@ -115,7 +114,7 @@ class TestSecurityUtils < Test::Unit::TestCase
 
   def test_validate_file_path_invalid_traversal
     invalid_paths = [
-      '/etc/passwd',      # Absolute path
+      '/etc/passwd', # Absolute path
       '../../../etc/passwd', # Directory traversal
       'dir/../../../etc/passwd', # Mixed traversal
       '..',               # Just parent dir
@@ -123,7 +122,7 @@ class TestSecurityUtils < Test::Unit::TestCase
       'dir/../../../file', # Contains traversal
       "file\0.txt",       # Null byte
       "file\n.txt",       # Newline
-      'a' * 1001         # Too long
+      'a' * 1001 # Too long
     ]
 
     invalid_paths.each do |path|
@@ -149,9 +148,9 @@ class TestSecurityUtils < Test::Unit::TestCase
     invalid_messages = [
       nil,
       '',
-      "message\0with\0nulls",    # Null bytes
+      "message\0with\0nulls", # Null bytes
       "message\x01with\x02control", # Control characters
-      'a' * 10001                   # Too long
+      'a' * 10_001 # Too long
     ]
 
     invalid_messages.each do |message|
@@ -184,7 +183,7 @@ class TestSecurityUtils < Test::Unit::TestCase
 
   def test_safe_system_empty_command
     assert_raises(SecurityUtils::SecurityError) do
-      SecurityUtils.safe_system()
+      SecurityUtils.safe_system
     end
   end
 
@@ -211,7 +210,7 @@ class TestSecurityUtils < Test::Unit::TestCase
     system('chmod +x test_script.sh')
 
     result = SecurityUtils.safe_capture('./test_script.sh')
-    assert_equal 'hello world', result[:stdout]  # Control chars replaced with spaces
+    assert_equal 'hello world', result[:stdout] # Control chars replaced with spaces
   end
 
   # Git command safety tests
@@ -249,7 +248,7 @@ class TestSecurityUtils < Test::Unit::TestCase
     ]
 
     valid_tokens.each do |token|
-      assert SecurityUtils.validate_github_token(token), "Should accept valid token format"
+      assert SecurityUtils.validate_github_token(token), 'Should accept valid token format'
     end
   end
 
@@ -265,7 +264,7 @@ class TestSecurityUtils < Test::Unit::TestCase
     ]
 
     invalid_tokens.each do |token|
-      refute SecurityUtils.validate_github_token(token), "Should reject invalid token"
+      refute SecurityUtils.validate_github_token(token), 'Should reject invalid token'
     end
   end
 
@@ -311,7 +310,7 @@ class TestSecurityUtils < Test::Unit::TestCase
   end
 
   def test_safe_file_operations_size_limits
-    large_content = 'a' * 10_000_001  # Over 10MB limit
+    large_content = 'a' * 10_000_001 # Over 10MB limit
 
     assert_raises(SecurityUtils::SecurityError) do
       SecurityUtils.safe_file_write('large.txt', large_content)
@@ -360,7 +359,7 @@ class TestSecurityUtils < Test::Unit::TestCase
       '..\\..\\..\\windows\\system32\\config\\sam',
       'valid/path/../../../etc/passwd',
       '....//....//....//etc/passwd',
-      '%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd'  # URL encoded
+      '%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd' # URL encoded
     ]
 
     traversal_attempts.each do |attempt|
@@ -378,5 +377,4 @@ class TestSecurityUtils < Test::Unit::TestCase
   ensure
     $stdout = old_stdout
   end
-
 end

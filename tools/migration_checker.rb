@@ -29,41 +29,41 @@ $warnings = []
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: migration_checker.rb [options]"
+  opts.banner = 'Usage: migration_checker.rb [options]'
 
-  opts.on("--from VERSION", "Source Leyline version (e.g., v0.1.0)") do |version|
+  opts.on('--from VERSION', 'Source Leyline version (e.g., v0.1.0)') do |version|
     $options[:from_version] = version
   end
 
-  opts.on("--to VERSION", "Target Leyline version (e.g., v0.2.0)") do |version|
+  opts.on('--to VERSION', 'Target Leyline version (e.g., v0.2.0)') do |version|
     $options[:to_version] = version
   end
 
-  opts.on("--detailed", "Provide detailed analysis with recommendations") do
+  opts.on('--detailed', 'Provide detailed analysis with recommendations') do
     $options[:detailed] = true
   end
 
-  opts.on("--breaking-changes-only", "Show only breaking changes") do
+  opts.on('--breaking-changes-only', 'Show only breaking changes') do
     $options[:breaking_changes_only] = true
   end
 
-  opts.on("--generate-plan", "Generate a migration plan file") do
+  opts.on('--generate-plan', 'Generate a migration plan file') do
     $options[:generate_plan] = true
   end
 
-  opts.on("--format FORMAT", "Output format (text, json, yaml)") do |format|
+  opts.on('--format FORMAT', 'Output format (text, json, yaml)') do |format|
     $options[:output_format] = format
   end
 
-  opts.on("-o", "--output FILE", "Output file path") do |file|
+  opts.on('-o', '--output FILE', 'Output file path') do |file|
     $options[:output_file] = file
   end
 
-  opts.on("--verbose", "Verbose output") do
+  opts.on('--verbose', 'Verbose output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -162,9 +162,7 @@ def fetch_version_info(version)
   log_verbose("Analyzing repository data for #{version}")
 
   # Check if this is the current working directory
-  if version == 'HEAD' || version == 'current'
-    return analyze_current_repository
-  end
+  return analyze_current_repository if %w[HEAD current].include?(version)
 
   # Check if the version tag exists
   unless tag_exists?(version)
@@ -184,7 +182,7 @@ end
 
 # Analyze current repository state
 def analyze_current_repository
-  log_verbose("Analyzing current repository state")
+  log_verbose('Analyzing current repository state')
 
   info = {
     'tenets_count' => 0,
@@ -223,38 +221,38 @@ def analyze_current_repository
   end
 
   # Determine directory structure
-  if Dir.exist?('docs/bindings/categories')
-    info['directory_structure'] = 'hierarchical'
-  elsif Dir.exist?('docs/bindings') && Dir.glob('docs/bindings/*.md').any?
-    info['directory_structure'] = 'flat'
-  else
-    info['directory_structure'] = 'unknown'
-  end
+  info['directory_structure'] = if Dir.exist?('docs/bindings/categories')
+                                  'hierarchical'
+                                elsif Dir.exist?('docs/bindings') && Dir.glob('docs/bindings/*.md').any?
+                                  'flat'
+                                else
+                                  'unknown'
+                                end
 
   # Detect YAML front-matter version by examining a sample file
   sample_files = Dir.glob('docs/**/*.md').reject { |f| f.include?('00-index.md') }.first(3)
   sample_files.each do |file|
-    if File.exist?(file)
-      content = File.read(file)
-      if content.start_with?('---')
-        yaml_end = content.index('---', 3)
-        if yaml_end
-          begin
-            yaml_content = content[4...yaml_end]
-            yaml_data = YAML.safe_load(yaml_content)
-            if yaml_data.is_a?(Hash) && yaml_data.key?('version')
-              info['yaml_frontmatter_version'] = '1.0'  # Has version field
-              break
-            end
-          rescue
-            # Skip invalid YAML
-          end
-        end
+    next unless File.exist?(file)
+
+    content = File.read(file)
+    next unless content.start_with?('---')
+
+    yaml_end = content.index('---', 3)
+    next unless yaml_end
+
+    begin
+      yaml_content = content[4...yaml_end]
+      yaml_data = YAML.safe_load(yaml_content)
+      if yaml_data.is_a?(Hash) && yaml_data.key?('version')
+        info['yaml_frontmatter_version'] = '1.0' # Has version field
+        break
       end
+    rescue StandardError
+      # Skip invalid YAML
     end
   end
 
-  log_verbose("Repository analysis complete")
+  log_verbose('Repository analysis complete')
   info
 end
 
@@ -284,7 +282,9 @@ def analyze_repository_at_version(version)
     # Count core bindings at this version
     core_bindings_output = `git ls-tree -r --name-only #{version} -- docs/bindings/core/ 2>/dev/null`
     if $?.success?
-      core_bindings = core_bindings_output.lines.map(&:strip).select { |f| f.end_with?('.md') && !f.include?('00-index.md') }
+      core_bindings = core_bindings_output.lines.map(&:strip).select do |f|
+        f.end_with?('.md') && !f.include?('00-index.md')
+      end
       info['core_bindings_count'] = core_bindings.length
       log_verbose("Found #{core_bindings.length} core bindings at #{version}")
     end
@@ -292,17 +292,19 @@ def analyze_repository_at_version(version)
     # Count category bindings at this version
     categories_output = `git ls-tree -r --name-only #{version} -- docs/bindings/categories/ 2>/dev/null`
     if $?.success?
-      category_files = categories_output.lines.map(&:strip).select { |f| f.end_with?('.md') && !f.include?('00-index.md') }
+      category_files = categories_output.lines.map(&:strip).select do |f|
+        f.end_with?('.md') && !f.include?('00-index.md')
+      end
 
       # Group by category
       category_files.each do |file|
         # Extract category from path like "docs/bindings/categories/go/interface-design.md"
         parts = file.split('/')
-        if parts.length >= 5 && parts[2] == 'categories'
-          category = parts[3]
-          info['category_bindings'][category] ||= 0
-          info['category_bindings'][category] += 1
-        end
+        next unless parts.length >= 5 && parts[2] == 'categories'
+
+        category = parts[3]
+        info['category_bindings'][category] ||= 0
+        info['category_bindings'][category] += 1
       end
 
       info['category_bindings'].each do |category, count|
@@ -316,15 +318,14 @@ def analyze_repository_at_version(version)
       files = structure_check.lines.map(&:strip)
       if files.any? { |f| f.include?('docs/bindings/categories/') }
         info['directory_structure'] = 'hierarchical'
-      elsif files.any? { |f| f.match(/^docs\/bindings\/[^\/]+\.md$/) }
+      elsif files.any? { |f| f.match(%r{^docs/bindings/[^/]+\.md$}) }
         info['directory_structure'] = 'flat'
       end
     end
 
     # Get breaking changes from commit messages since previous version
     info['breaking_changes'] = get_breaking_changes_since_previous_version(version)
-
-  rescue => e
+  rescue StandardError => e
     log_warning("Error analyzing version #{version}: #{e.message}")
     return nil
   end
@@ -352,17 +353,17 @@ def get_breaking_changes_since_previous_version(version)
         commits.lines.each do |commit|
           # Extract breaking change info from commit message
           commit_detail = `git show --format=%B -s #{commit.split(' ').first} 2>/dev/null`
-          if commit_detail.match(/BREAKING CHANGE[:\s]+(.+?)$/i)
-            breaking_changes << $1.strip
-          elsif commit_detail.match(/breaking change[:\s]+(.+?)$/i)
-            breaking_changes << $1.strip
-          else
-            breaking_changes << "Breaking change in #{commit.strip}"
-          end
+          breaking_changes << if commit_detail.match(/BREAKING CHANGE[:\s]+(.+?)$/i)
+                                Regexp.last_match(1).strip
+                              elsif commit_detail.match(/breaking change[:\s]+(.+?)$/i)
+                                Regexp.last_match(1).strip
+                              else
+                                "Breaking change in #{commit.strip}"
+                              end
         end
       end
     end
-  rescue => e
+  rescue StandardError => e
     log_verbose("Could not determine breaking changes: #{e.message}")
   end
 
@@ -437,64 +438,64 @@ def analyze_changes(from_info, to_info, from_version, to_version)
 end
 
 # Generate migration recommendations
-def generate_recommendations(changes, from_version, to_version)
+def generate_recommendations(changes, _from_version, _to_version)
   recommendations = []
 
   case changes['migration_type']
   when 'major'
-    recommendations << "⚠️  MAJOR VERSION MIGRATION: Breaking changes present, migration required"
-    recommendations << "📋 Create backup before proceeding"
-    recommendations << "🧪 Test migration in staging environment first"
-    recommendations << "📚 Review all breaking changes and update configurations"
+    recommendations << '⚠️  MAJOR VERSION MIGRATION: Breaking changes present, migration required'
+    recommendations << '📋 Create backup before proceeding'
+    recommendations << '🧪 Test migration in staging environment first'
+    recommendations << '📚 Review all breaking changes and update configurations'
   when 'minor'
-    recommendations << "✅ MINOR VERSION MIGRATION: Backward compatible, optional adoption"
-    recommendations << "🆕 Review new features and consider adoption"
-    recommendations << "📈 Enhanced features available for existing components"
+    recommendations << '✅ MINOR VERSION MIGRATION: Backward compatible, optional adoption'
+    recommendations << '🆕 Review new features and consider adoption'
+    recommendations << '📈 Enhanced features available for existing components'
   when 'patch'
-    recommendations << "🔧 PATCH VERSION MIGRATION: Safe to update immediately"
-    recommendations << "🐛 Bug fixes and minor improvements"
+    recommendations << '🔧 PATCH VERSION MIGRATION: Safe to update immediately'
+    recommendations << '🐛 Bug fixes and minor improvements'
   end
 
   # Breaking change specific recommendations
   if changes['breaking_changes'].any?
-    recommendations << ""
-    recommendations << "🚨 BREAKING CHANGES DETECTED:"
+    recommendations << ''
+    recommendations << '🚨 BREAKING CHANGES DETECTED:'
     changes['breaking_changes'].each do |change|
       recommendations << "   - #{change}"
     end
 
-    recommendations << ""
-    recommendations << "📋 Required Actions:"
+    recommendations << ''
+    recommendations << '📋 Required Actions:'
 
     if changes['breaking_changes'].any? { |c| c.include?('YAML front-matter') }
-      recommendations << "   - Run YAML front-matter migration tool"
-      recommendations << "   - Validate all metadata after migration"
+      recommendations << '   - Run YAML front-matter migration tool'
+      recommendations << '   - Validate all metadata after migration'
     end
 
     if changes['breaking_changes'].any? { |c| c.include?('Directory structure') }
-      recommendations << "   - Update file references and imports"
-      recommendations << "   - Regenerate indexes and navigation"
+      recommendations << '   - Update file references and imports'
+      recommendations << '   - Regenerate indexes and navigation'
     end
 
     if changes['breaking_changes'].any? { |c| c.include?('validation') }
-      recommendations << "   - Update validation configurations"
-      recommendations << "   - Install new validation dependencies"
+      recommendations << '   - Update validation configurations'
+      recommendations << '   - Install new validation dependencies'
     end
   end
 
   # New feature recommendations
   if changes['new_features'].any?
-    recommendations << ""
-    recommendations << "🆕 NEW FEATURES AVAILABLE:"
+    recommendations << ''
+    recommendations << '🆕 NEW FEATURES AVAILABLE:'
     changes['new_features'].each do |feature|
       recommendations << "   - #{feature}"
     end
 
-    recommendations << ""
-    recommendations << "💡 Consider adopting:"
-    recommendations << "   - Review new tenets for team alignment"
-    recommendations << "   - Evaluate new bindings for current projects"
-    recommendations << "   - Update integration patterns if beneficial"
+    recommendations << ''
+    recommendations << '💡 Consider adopting:'
+    recommendations << '   - Review new tenets for team alignment'
+    recommendations << '   - Evaluate new bindings for current projects'
+    recommendations << '   - Update integration patterns if beneficial'
   end
 
   recommendations
@@ -609,9 +610,7 @@ def extract_required_actions(recommendations)
       in_required_section = false
     end
 
-    if in_required_section
-      actions << line.strip.sub(/^- /, '')
-    end
+    actions << line.strip.sub(/^- /, '') if in_required_section
   end
 
   actions
@@ -632,57 +631,57 @@ end
 def format_text_output(analysis_result)
   output = []
 
-  output << "# Leyline Migration Analysis"
-  output << ""
+  output << '# Leyline Migration Analysis'
+  output << ''
   output << "**From:** #{analysis_result['from_version']}"
   output << "**To:** #{analysis_result['to_version']}"
   output << "**Migration Type:** #{analysis_result['changes']['migration_type'].upcase}"
-  output << ""
+  output << ''
 
   if analysis_result['changes']['breaking_changes'].any?
-    output << "## Breaking Changes"
+    output << '## Breaking Changes'
     analysis_result['changes']['breaking_changes'].each do |change|
       output << "- #{change}"
     end
-    output << ""
+    output << ''
   end
 
   if analysis_result['changes']['new_features'].any?
-    output << "## New Features"
+    output << '## New Features'
     analysis_result['changes']['new_features'].each do |feature|
       output << "- #{feature}"
     end
-    output << ""
+    output << ''
   end
 
   if analysis_result['changes']['enhancements'].any?
-    output << "## Enhancements"
+    output << '## Enhancements'
     analysis_result['changes']['enhancements'].each do |enhancement|
       output << "- #{enhancement}"
     end
-    output << ""
+    output << ''
   end
 
   if analysis_result['recommendations'].any?
-    output << "## Recommendations"
+    output << '## Recommendations'
     analysis_result['recommendations'].each do |rec|
       output << rec
     end
-    output << ""
+    output << ''
   end
 
   if $options[:detailed] && analysis_result['migration_plan']
-    output << "## Migration Plan"
-    output << ""
+    output << '## Migration Plan'
+    output << ''
     output << "**Estimated Time:** #{analysis_result['migration_plan']['migration_info']['estimated_time']}"
     output << "**Risk Level:** #{analysis_result['migration_plan']['migration_info']['risk_level'].upcase}"
-    output << ""
+    output << ''
 
-    output << "### Migration Steps"
+    output << '### Migration Steps'
     analysis_result['migration_plan']['migration_steps'].each_with_index do |step, i|
       output << "#{i + 1}. #{step}"
     end
-    output << ""
+    output << ''
   end
 
   output.join("\n")
@@ -702,7 +701,7 @@ end
 def main
   # Validate required options
   unless $options[:from_version] && $options[:to_version]
-    log_error("Both --from and --to versions are required")
+    log_error('Both --from and --to versions are required')
     exit_with_summary
   end
 
@@ -719,11 +718,11 @@ def main
   # Check if migration is needed
   version_comparison = compare_versions(from_version, to_version)
   if version_comparison == 0
-    log_info("Versions are identical, no migration needed")
+    log_info('Versions are identical, no migration needed')
     exit 0
   elsif version_comparison > 0
     log_warning("Target version (#{to_version}) is older than source version (#{from_version})")
-    log_warning("This appears to be a rollback rather than a migration")
+    log_warning('This appears to be a rollback rather than a migration')
   end
 
   # Fetch version information
@@ -779,7 +778,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nInterrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     log_error("Unexpected error: #{e.message}")
     log_error("Backtrace: #{e.backtrace.join("\n")}")
     exit 1

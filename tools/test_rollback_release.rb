@@ -21,10 +21,10 @@ def log_test(test_name, status, details = nil)
   $test_results << result
 
   icon = case status
-  when 'pass' then '✅'
-  when 'fail' then '❌'
-  when 'skip' then '⏭️'
-  end
+         when 'pass' then '✅'
+         when 'fail' then '❌'
+         when 'skip' then '⏭️'
+         end
 
   message = "#{icon} #{test_name}"
   message += " - #{details}" if details
@@ -72,7 +72,7 @@ def setup_test_environment
   system('git commit -m "chore: release 0.2.0" -q')
   system('git tag v0.2.0')
 
-  log_test("Test environment setup", "pass", $test_dir)
+  log_test('Test environment setup', 'pass', $test_dir)
 end
 
 def test_dry_run
@@ -82,34 +82,35 @@ def test_dry_run
   original_changelog = File.read('CHANGELOG.md')
 
   # Run rollback in dry run mode
-  cmd = "ruby #{File.join(File.dirname(__dir__), 'tools', 'rollback_release.rb')} --version v0.2.0 --dry-run --repo test/repo"
+  cmd = "ruby #{File.join(File.dirname(__dir__), 'tools',
+                          'rollback_release.rb')} --version v0.2.0 --dry-run --repo test/repo"
   output = `#{cmd} 2>&1`
-  success = $?.success?
+  $?.success?
 
-  if output.include?("DRY RUN SUMMARY - No changes were made")
-    log_test("Dry run execution", "pass")
+  if output.include?('DRY RUN SUMMARY - No changes were made')
+    log_test('Dry run execution', 'pass')
   else
-    log_test("Dry run execution", "fail", "Command failed or no summary")
+    log_test('Dry run execution', 'fail', 'Command failed or no summary')
   end
 
   # Verify no changes were made
   if File.read('VERSION').strip == original_version
-    log_test("Dry run - VERSION unchanged", "pass")
+    log_test('Dry run - VERSION unchanged', 'pass')
   else
-    log_test("Dry run - VERSION unchanged", "fail", "VERSION was modified")
+    log_test('Dry run - VERSION unchanged', 'fail', 'VERSION was modified')
   end
 
   if File.read('CHANGELOG.md') == original_changelog
-    log_test("Dry run - CHANGELOG unchanged", "pass")
+    log_test('Dry run - CHANGELOG unchanged', 'pass')
   else
-    log_test("Dry run - CHANGELOG unchanged", "fail", "CHANGELOG was modified")
+    log_test('Dry run - CHANGELOG unchanged', 'fail', 'CHANGELOG was modified')
   end
 
   # Check tag still exists
   if system('git rev-parse v0.2.0 >/dev/null 2>&1')
-    log_test("Dry run - Tag preserved", "pass")
+    log_test('Dry run - Tag preserved', 'pass')
   else
-    log_test("Dry run - Tag preserved", "fail", "Tag was deleted")
+    log_test('Dry run - Tag preserved', 'fail', 'Tag was deleted')
   end
 end
 
@@ -117,14 +118,15 @@ def test_version_revert
   puts "\n📋 Testing VERSION file revert..."
 
   # Run rollback
-  cmd = "ruby #{File.join(File.dirname(__dir__), 'tools', 'rollback_release.rb')} --version v0.2.0 --no-issue --repo test/repo"
+  cmd = "ruby #{File.join(File.dirname(__dir__), 'tools',
+                          'rollback_release.rb')} --version v0.2.0 --no-issue --repo test/repo"
   output = `#{cmd} 2>&1`
   success = $?.success?
 
   if success
-    log_test("Rollback execution", "pass")
+    log_test('Rollback execution', 'pass')
   else
-    log_test("Rollback execution", "fail", "Command failed")
+    log_test('Rollback execution', 'fail', 'Command failed')
     puts output
     return
   end
@@ -132,9 +134,9 @@ def test_version_revert
   # Check VERSION was reverted
   current_version = File.read('VERSION').strip
   if current_version == '0.1.0'
-    log_test("VERSION revert", "pass", "Reverted to 0.1.0")
+    log_test('VERSION revert', 'pass', 'Reverted to 0.1.0')
   else
-    log_test("VERSION revert", "fail", "VERSION is #{current_version}, expected 0.1.0")
+    log_test('VERSION revert', 'fail', "VERSION is #{current_version}, expected 0.1.0")
   end
 end
 
@@ -144,17 +146,17 @@ def test_changelog_revert
   changelog_content = File.read('CHANGELOG.md')
 
   # Check that v0.2.0 section was removed
-  if !changelog_content.include?("## [0.2.0]")
-    log_test("CHANGELOG revert", "pass", "v0.2.0 section removed")
+  if !changelog_content.include?('## [0.2.0]')
+    log_test('CHANGELOG revert', 'pass', 'v0.2.0 section removed')
   else
-    log_test("CHANGELOG revert", "fail", "v0.2.0 section still present")
+    log_test('CHANGELOG revert', 'fail', 'v0.2.0 section still present')
   end
 
   # Check that v0.1.0 section is still there
-  if changelog_content.include?("## [0.1.0]")
-    log_test("CHANGELOG preservation", "pass", "v0.1.0 section preserved")
+  if changelog_content.include?('## [0.1.0]')
+    log_test('CHANGELOG preservation', 'pass', 'v0.1.0 section preserved')
   else
-    log_test("CHANGELOG preservation", "fail", "v0.1.0 section missing")
+    log_test('CHANGELOG preservation', 'fail', 'v0.1.0 section missing')
   end
 end
 
@@ -163,16 +165,16 @@ def test_tag_deletion
 
   # Check that v0.2.0 tag was deleted
   if !system('git rev-parse v0.2.0 >/dev/null 2>&1')
-    log_test("Tag deletion", "pass", "v0.2.0 tag deleted")
+    log_test('Tag deletion', 'pass', 'v0.2.0 tag deleted')
   else
-    log_test("Tag deletion", "fail", "v0.2.0 tag still exists")
+    log_test('Tag deletion', 'fail', 'v0.2.0 tag still exists')
   end
 
   # Check that v0.1.0 tag still exists
   if system('git rev-parse v0.1.0 >/dev/null 2>&1')
-    log_test("Tag preservation", "pass", "v0.1.0 tag preserved")
+    log_test('Tag preservation', 'pass', 'v0.1.0 tag preserved')
   else
-    log_test("Tag preservation", "fail", "v0.1.0 tag missing")
+    log_test('Tag preservation', 'fail', 'v0.1.0 tag missing')
   end
 end
 
@@ -180,24 +182,25 @@ def test_invalid_version
   puts "\n📋 Testing invalid version handling..."
 
   # Test with invalid version format
-  cmd = "ruby #{File.join(File.dirname(__dir__), 'tools', 'rollback_release.rb')} --version invalid-version --repo test/repo"
+  cmd = "ruby #{File.join(File.dirname(__dir__), 'tools',
+                          'rollback_release.rb')} --version invalid-version --repo test/repo"
   output = `#{cmd} 2>&1`
   success = $?.success?
 
-  if !success && output.include?("Invalid version format")
-    log_test("Invalid version rejection", "pass")
+  if !success && output.include?('Invalid version format')
+    log_test('Invalid version rejection', 'pass')
   else
-    log_test("Invalid version rejection", "fail", "Should reject invalid version")
+    log_test('Invalid version rejection', 'fail', 'Should reject invalid version')
   end
 
   # Test with non-existent version
   cmd = "ruby #{File.join(File.dirname(__dir__), 'tools', 'rollback_release.rb')} --version v9.9.9 --repo test/repo"
   output = `#{cmd} 2>&1`
 
-  if output.include?("Could not determine previous version")
-    log_test("Non-existent version handling", "pass")
+  if output.include?('Could not determine previous version')
+    log_test('Non-existent version handling', 'pass')
   else
-    log_test("Non-existent version handling", "fail", "Should warn about missing version")
+    log_test('Non-existent version handling', 'fail', 'Should warn about missing version')
   end
 end
 
@@ -207,8 +210,8 @@ def cleanup_test_environment
 end
 
 def generate_report
-  puts "\n" + "="*60
-  puts "# Rollback Release Test Report"
+  puts "\n" + '=' * 60
+  puts '# Rollback Release Test Report'
 
   total = $test_results.size
   passed = $test_results.count { |r| r[:status] == 'pass' }
@@ -248,7 +251,7 @@ begin
   test_invalid_version
 
   generate_report
-rescue => e
+rescue StandardError => e
   puts "\n❌ Test error: #{e.message}"
   puts e.backtrace.join("\n")
   exit 1

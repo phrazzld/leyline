@@ -36,6 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'thor', '~> 1.3'
 
   # Development dependencies
-  spec.add_development_dependency 'rspec', '~> 3.13'
   spec.add_development_dependency 'bundler', '~> 2.0'
+  spec.add_development_dependency 'rspec', '~> 3.13'
 end

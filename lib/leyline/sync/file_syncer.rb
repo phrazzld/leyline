@@ -23,8 +23,13 @@ module Leyline
       def sync(force: false, force_git: false, verbose: false)
         @stats&.start_sync_timing
 
-        unless Dir.exist?(@source_directory)
-          raise SyncError, "Source directory does not exist: #{@source_directory}"
+        raise SyncError, "Source directory does not exist: #{@source_directory}" unless Dir.exist?(@source_directory)
+
+        # Validate target directory name
+        target_basename = File.basename(@target_directory)
+        if target_basename.start_with?('-')
+          raise SyncError,
+                "Invalid target directory name '#{target_basename}'. Directory names cannot start with a dash."
         end
 
         # Create target directory if it doesn't exist
@@ -55,11 +60,13 @@ module Leyline
 
               @stats&.end_sync_timing
               return @sync_results
-            else
-              puts "Cache hit ratio #{(cache_hit_ratio * 100).round(1)}% sufficient, but some target files missing. Proceeding with sync..." if verbose
+            elsif verbose
+              puts "Cache hit ratio #{(cache_hit_ratio * 100).round(1)}% sufficient, but some target files missing. Proceeding with sync..."
             end
-          else
-            puts "Cache hit ratio #{(cache_hit_ratio * 100).round(1)}% below threshold, proceeding with sync..." if verbose
+          elsif verbose
+            if verbose
+              puts "Cache hit ratio #{(cache_hit_ratio * 100).round(1)}% below threshold, proceeding with sync..."
+            end
           end
         end
 
@@ -75,35 +82,35 @@ module Leyline
       # Calculate the percentage of target files available in cache
       # Returns float 0.0-1.0 representing cache hit ratio
       def calculate_cache_hit_ratio(target_files, cache)
-        return 0.0 unless cache  # No cache = 0% hit ratio
+        return 0.0 unless cache # No cache = 0% hit ratio
 
         total_files = target_files.size
-        return 0.0 if total_files == 0  # No files = 0% hit ratio
+        return 0.0 if total_files == 0 # No files = 0% hit ratio
 
         cache_hits = target_files.count do |relative_path|
           source_path = File.join(@source_directory, relative_path)
-          next false unless File.exist?(source_path)  # Missing source = cache miss
+          next false unless File.exist?(source_path) # Missing source = cache miss
 
           begin
             source_content = File.read(source_path)
             source_hash = Digest::SHA256.hexdigest(source_content)
             cache_result = cache.get(source_hash)
 
-            if cache_result != nil
+            if !cache_result.nil?
               @stats&.record_cache_hit
               true
             else
               @stats&.record_cache_miss
               false
             end
-          rescue => e
+          rescue StandardError
             @stats&.record_cache_miss
-            false  # File read error = cache miss
+            false # File read error = cache miss
           end
         end
 
         cache_hits.to_f / total_files
-      rescue => e
+      rescue StandardError
         # Log error but return 0.0 to fail safely
         0.0
       end
@@ -120,15 +127,15 @@ module Leyline
 
         # Validate threshold is in reasonable range
         if threshold < 0.0 || threshold > 1.0
-          threshold = 0.8  # Fall back to default
+          threshold = 0.8 # Fall back to default
         end
 
         # Sync needed if cache hit ratio is below threshold
         cache_hit_ratio < threshold
-      rescue ArgumentError, TypeError => e
+      rescue ArgumentError, TypeError
         # Invalid threshold format, default to syncing (fail safe)
         true
-      rescue => e
+      rescue StandardError
         # On any other error, default to syncing (fail safe)
         true
       end
@@ -158,7 +165,7 @@ module Leyline
               else
                 details << { file: relative_path, status: :exists_and_matches }
               end
-            rescue => e
+            rescue StandardError => e
               all_exist = false
               details << { file: relative_path, status: :read_error, error: e.message }
             end
@@ -168,7 +175,7 @@ module Leyline
         end
 
         { all_exist: all_exist, details: details }
-      rescue => e
+      rescue StandardError => e
         # On any error, assume we need to sync
         { all_exist: false, details: [{ error: e.message }] }
       end
@@ -177,7 +184,7 @@ module Leyline
 
       def find_files(directory)
         files = []
-        Dir.glob("**/*", base: directory).each do |relative_path|
+        Dir.glob('**/*', base: directory).each do |relative_path|
           full_path = File.join(directory, relative_path)
           files << relative_path if File.file?(full_path)
         end
@@ -219,12 +226,12 @@ module Leyline
               source_content = File.read(source_path)
               cache_result = @cache.put(source_content)
               @stats&.record_cache_put if cache_result
-            rescue => e
+            rescue StandardError
               # Cache errors should not interrupt file sync
               # Error is already logged by FileCache
             end
           end
-        rescue => e
+        rescue StandardError => e
           @sync_results[:errors] << { file: relative_path, error: e.message }
         end
       end
@@ -243,14 +250,14 @@ module Leyline
           begin
             cache_result = @cache.put(source_content)
             @stats&.record_cache_put if cache_result
-          rescue => e
+          rescue StandardError
             # Cache errors should not interrupt file comparison
             # Error is already logged by FileCache
           end
         end
 
         source_hash != target_hash
-      rescue => e
+      rescue StandardError
         # If we can't read files for comparison, assume they're different
         true
       end

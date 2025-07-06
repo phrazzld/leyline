@@ -29,17 +29,17 @@ $warnings = []
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: prepare_release.rb [options]"
+  opts.banner = 'Usage: prepare_release.rb [options]'
 
-  opts.on("--dry-run", "Show what would be done without making changes") do
+  opts.on('--dry-run', 'Show what would be done without making changes') do
     $options[:dry_run] = true
   end
 
-  opts.on("--verbose", "Show detailed output") do
+  opts.on('--verbose', 'Show detailed output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -91,18 +91,18 @@ def run_command(command, description)
   if exit_status != 0
     log_error("#{description} failed with exit code #{exit_status}")
     log_error("Command output: #{output}")
-    return false, output
+    [false, output]
   else
     log_verbose("#{description} succeeded")
-    return true, output
+    [true, output]
   end
 end
 
 # Step 1: Calculate next version
 def calculate_next_version
-  log_info("Step 1: Calculating next version...")
+  log_info('Step 1: Calculating next version...')
 
-  success, output = run_command("ruby tools/calculate_version.rb", "Version calculation")
+  success, output = run_command('ruby tools/calculate_version.rb', 'Version calculation')
   return nil unless success
 
   begin
@@ -119,11 +119,11 @@ def calculate_next_version
     log_info("Commits since last release: #{commits.size}")
 
     if next_version == current_version
-      log_warning("No version bump needed - no relevant changes found")
+      log_warning('No version bump needed - no relevant changes found')
       return nil
     end
 
-    return {
+    {
       current_version: current_version,
       next_version: next_version,
       bump_type: bump_type,
@@ -133,13 +133,13 @@ def calculate_next_version
   rescue JSON::ParserError => e
     log_error("Failed to parse version calculation output: #{e.message}")
     log_error("Raw output: #{output}")
-    return nil
+    nil
   end
 end
 
 # Step 2: Update VERSION file
 def update_version_file(next_version)
-  log_info("Step 2: Updating VERSION file...")
+  log_info('Step 2: Updating VERSION file...')
 
   version_file = 'VERSION'
 
@@ -151,34 +151,34 @@ def update_version_file(next_version)
   begin
     File.write(version_file, "#{next_version}\n")
     log_info("Updated #{version_file} to: #{next_version}")
-    return true
-  rescue => e
+    true
+  rescue StandardError => e
     log_error("Failed to update #{version_file}: #{e.message}")
-    return false
+    false
   end
 end
 
 # Step 3: Run validation suite
 def run_validation_suite
-  log_info("Step 3: Running validation suite...")
+  log_info('Step 3: Running validation suite...')
 
   # Run front-matter validation
-  log_info("Running YAML front-matter validation...")
-  success, output = run_command("ruby tools/validate_front_matter.rb", "Front-matter validation")
+  log_info('Running YAML front-matter validation...')
+  success, = run_command('ruby tools/validate_front_matter.rb', 'Front-matter validation')
   return false unless success
 
   # Run reindexing
-  log_info("Running documentation reindexing...")
-  success, output = run_command("ruby tools/reindex.rb", "Documentation reindexing")
+  log_info('Running documentation reindexing...')
+  success, = run_command('ruby tools/reindex.rb', 'Documentation reindexing')
   return false unless success
 
-  log_info("All validation checks passed")
-  return true
+  log_info('All validation checks passed')
+  true
 end
 
 # Step 4: Update CHANGELOG.md
 def update_changelog(version_data)
-  log_info("Step 4: Updating CHANGELOG.md...")
+  log_info('Step 4: Updating CHANGELOG.md...')
 
   changelog_file = 'CHANGELOG.md'
   next_version = version_data[:next_version]
@@ -186,14 +186,14 @@ def update_changelog(version_data)
 
   if $options[:dry_run]
     log_info("[DRY RUN] Would add the following entry to #{changelog_file}:")
-    puts "=" * 50
+    puts '=' * 50
     puts changelog_markdown
-    puts "=" * 50
+    puts '=' * 50
     return true
   end
 
   # Read existing changelog or create new one
-  existing_content = ""
+  existing_content = ''
   if File.exist?(changelog_file)
     existing_content = File.read(changelog_file)
   else
@@ -208,16 +208,16 @@ def update_changelog(version_data)
   )
 
   # Insert new entry after the header
-  if existing_content.include?("# Changelog")
+  if existing_content.include?('# Changelog')
     # Find the position after the main header and description
     header_end = existing_content.index("\n\n") + 2
-    if header_end < existing_content.length && existing_content[header_end..-1].strip != ""
-      # There's existing content, add new entry before it
-      new_content = existing_content[0..header_end-1] + "#{dated_changelog}\n\n" + existing_content[header_end..-1]
-    else
-      # No existing releases, just append
-      new_content = existing_content.rstrip + "\n\n#{dated_changelog}\n"
-    end
+    new_content = if header_end < existing_content.length && existing_content[header_end..-1].strip != ''
+                    # There's existing content, add new entry before it
+                    existing_content[0..header_end - 1] + "#{dated_changelog}\n\n" + existing_content[header_end..-1]
+                  else
+                    # No existing releases, just append
+                    existing_content.rstrip + "\n\n#{dated_changelog}\n"
+                  end
   else
     # No proper changelog structure, create it
     new_content = "# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n#{dated_changelog}\n"
@@ -226,40 +226,38 @@ def update_changelog(version_data)
   begin
     File.write(changelog_file, new_content)
     log_info("Added #{next_version} entry to #{changelog_file}")
-    return true
-  rescue => e
+    true
+  rescue StandardError => e
     log_error("Failed to update #{changelog_file}: #{e.message}")
-    return false
+    false
   end
 end
 
 # Step 5: Final validation
 def final_validation
-  log_info("Step 5: Running final validation...")
+  log_info('Step 5: Running final validation...')
 
   # Re-run validation to ensure everything is still correct
-  log_info("Re-running validation after all changes...")
-  success, output = run_command("ruby tools/validate_front_matter.rb", "Final validation")
+  log_info('Re-running validation after all changes...')
+  success, = run_command('ruby tools/validate_front_matter.rb', 'Final validation')
   return false unless success
 
-  log_info("Final validation passed")
-  return true
+  log_info('Final validation passed')
+  true
 end
 
 # Main execution
 def main
-  if $options[:dry_run]
-    log_info("=== DRY RUN MODE - No changes will be made ===")
-  end
+  log_info('=== DRY RUN MODE - No changes will be made ===') if $options[:dry_run]
 
-  log_info("Starting release preparation...")
+  log_info('Starting release preparation...')
 
   # Step 1: Calculate next version
   version_data = calculate_next_version
   exit_with_summary if $errors.any?
 
   if version_data.nil?
-    log_info("No release preparation needed")
+    log_info('No release preparation needed')
     exit_with_summary
   end
 
@@ -281,13 +279,13 @@ def main
 
   # Success!
   if $options[:dry_run]
-    log_info("=== DRY RUN COMPLETED ===")
-    log_info("All steps would execute successfully")
+    log_info('=== DRY RUN COMPLETED ===')
+    log_info('All steps would execute successfully')
   else
-    log_info("Release preparation completed successfully!")
+    log_info('Release preparation completed successfully!')
     log_info("Next version: #{version_data[:next_version]}")
-    log_info("Updated files: VERSION, CHANGELOG.md")
-    log_info("Ready for commit and release")
+    log_info('Updated files: VERSION, CHANGELOG.md')
+    log_info('Ready for commit and release')
   end
 
   exit_with_summary
@@ -300,7 +298,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nInterrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     log_error("Unexpected error: #{e.message}")
     log_error("Backtrace: #{e.backtrace.join("\n")}")
     exit 1

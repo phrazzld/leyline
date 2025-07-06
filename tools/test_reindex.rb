@@ -17,150 +17,150 @@ begin
 
   # Create a small tenet with actual content for comparison
   real_tenet_content = <<~MARKDOWN
----
-id: real-tenet
-last_modified: "2025-05-04"
----
+    ---
+    id: real-tenet
+    last_modified: "2025-05-04"
+    ---
 
-# Tenet: Real Tenet
+    # Tenet: Real Tenet
 
-This is a real tenet that should be indexed correctly.
+    This is a real tenet that should be indexed correctly.
 
-## Core Belief
+    ## Core Belief
 
-The core belief is that indexing should work correctly.
+    The core belief is that indexing should work correctly.
 
-## Practical Guidelines
+    ## Practical Guidelines
 
-1. **Test Guideline**: This is just a test guideline.
-MARKDOWN
+    1. **Test Guideline**: This is just a test guideline.
+  MARKDOWN
 
   # Create a small binding with actual content for comparison
   real_binding_content = <<~MARKDOWN
----
-id: real-binding
-last_modified: "2025-05-04"
-derived_from: simplicity
-enforced_by: testing
----
+    ---
+    id: real-binding
+    last_modified: "2025-05-04"
+    derived_from: simplicity
+    enforced_by: testing
+    ---
 
-# Binding: Real Binding
+    # Binding: Real Binding
 
-This is a real binding that should be indexed correctly.
+    This is a real binding that should be indexed correctly.
 
-## Rationale
+    ## Rationale
 
-The rationale is that indexing should work correctly for bindings too.
+    The rationale is that indexing should work correctly for bindings too.
 
-## Rule Definition
+    ## Rule Definition
 
-This is a rule definition for testing purposes.
-MARKDOWN
+    This is a rule definition for testing purposes.
+  MARKDOWN
 
   # Create files with errors for testing error handling
 
   # 1. Missing YAML front-matter
   missing_frontmatter = <<~MARKDOWN
-# Tenet: Missing Front-matter
+    # Tenet: Missing Front-matter
 
-This tenet is missing the required YAML front-matter.
+    This tenet is missing the required YAML front-matter.
 
-## Core Belief
+    ## Core Belief
 
-This should cause an error.
-MARKDOWN
+    This should cause an error.
+  MARKDOWN
 
   # 4. Complex YAML with nested structures
   complex_yaml = <<~MARKDOWN
----
-id: complex-yaml
-last_modified: "2025-05-04"
-derived_from: simplicity
-enforced_by: "automated tests"
-config:
-  severity: error
-  options:
-    allow-any-in-tests: true
-    strict-mode: false
----
+    ---
+    id: complex-yaml
+    last_modified: "2025-05-04"
+    derived_from: simplicity
+    enforced_by: "automated tests"
+    config:
+      severity: error
+      options:
+        allow-any-in-tests: true
+        strict-mode: false
+    ---
 
-# Binding: Complex YAML
+    # Binding: Complex YAML
 
-This binding has complex nested YAML structures to test proper parsing.
+    This binding has complex nested YAML structures to test proper parsing.
 
-## Rationale
+    ## Rationale
 
-This tests that complex YAML structures are handled correctly.
-MARKDOWN
+    This tests that complex YAML structures are handled correctly.
+  MARKDOWN
 
   # 5. Placeholder text
   placeholder_text = <<~MARKDOWN
----
-id: placeholder-text
-last_modified: "2025-05-04"
-derived_from: maintainability
-enforced_by: "code review"
----
+    ---
+    id: placeholder-text
+    last_modified: "2025-05-04"
+    derived_from: maintainability
+    enforced_by: "code review"
+    ---
 
-# Binding: Placeholder Text
+    # Binding: Placeholder Text
 
-[This is a placeholder description that should be replaced with the rationale section]
+    [This is a placeholder description that should be replaced with the rationale section]
 
-## Rationale
+    ## Rationale
 
-The rationale explains why this binding is important.
-MARKDOWN
+    The rationale explains why this binding is important.
+  MARKDOWN
 
   # 6. Too long first paragraph
   long_paragraph = <<~MARKDOWN
----
-id: long-paragraph
-last_modified: "2025-05-04"
-derived_from: explicitness
-enforced_by: "manual review"
----
+    ---
+    id: long-paragraph
+    last_modified: "2025-05-04"
+    derived_from: explicitness
+    enforced_by: "manual review"
+    ---
 
-# Binding: Long Paragraph
+    # Binding: Long Paragraph
 
-This binding has an extremely long first paragraph that exceeds the 150 character limit for summaries and should be truncated when displayed in the index. It goes on and on with more text to ensure it's well over the limit. This should definitely be truncated in the final index display.
+    This binding has an extremely long first paragraph that exceeds the 150 character limit for summaries and should be truncated when displayed in the index. It goes on and on with more text to ensure it's well over the limit. This should definitely be truncated in the final index display.
 
-## Rationale
+    ## Rationale
 
-The summary should be truncated with ellipsis.
-MARKDOWN
+    The summary should be truncated with ellipsis.
+  MARKDOWN
 
   # 2. Invalid YAML syntax
   invalid_yaml = <<~MARKDOWN
----
-id: invalid-yaml
-last_modified: "2025-05-04
-derived_from: simplicity
----
+    ---
+    id: invalid-yaml
+    last_modified: "2025-05-04
+    derived_from: simplicity
+    ---
 
-# Binding: Invalid YAML
+    # Binding: Invalid YAML
 
-This binding has invalid YAML in the front-matter (missing closing quote).
+    This binding has invalid YAML in the front-matter (missing closing quote).
 
-## Rationale
+    ## Rationale
 
-This should cause a YAML parsing error.
-MARKDOWN
+    This should cause a YAML parsing error.
+  MARKDOWN
 
   # 3. Missing required fields
   missing_fields = <<~MARKDOWN
----
-id: missing-fields
-# Missing the last_modified, derived_from, and enforced_by fields
----
+    ---
+    id: missing-fields
+    # Missing the last_modified, derived_from, and enforced_by fields
+    ---
 
-# Binding: Missing Fields
+    # Binding: Missing Fields
 
-This binding is missing required fields in the front-matter.
+    This binding is missing required fields in the front-matter.
 
-## Rationale
+    ## Rationale
 
-This should cause a validation error.
-MARKDOWN
+    This should cause a validation error.
+  MARKDOWN
 
   # Write the test files
   File.write('test_reindex/tenets/real-tenet.md', real_tenet_content)
@@ -177,10 +177,11 @@ MARKDOWN
   File.write('test_reindex/bindings/categories/go/long-paragraph.md', long_paragraph)
 
   # Add a misplaced binding file
-  File.write('test_reindex/bindings/misplaced-binding.md', real_binding_content.gsub('real-binding', 'misplaced-binding'))
+  File.write('test_reindex/bindings/misplaced-binding.md',
+             real_binding_content.gsub('real-binding', 'misplaced-binding'))
 
   # Run the indexing script with test options
-  puts "Testing reindex.rb with valid and invalid files..."
+  puts 'Testing reindex.rb with valid and invalid files...'
 
   # Temporarily modify the script to use our test directories
   original_reindex = File.read('tools/reindex.rb')
@@ -247,20 +248,18 @@ MARKDOWN
     # The truncation depends on exactly where the paragraph cutting occurs
     # and may vary depending on the implementation
     long_paragraph_truncated = long_paragraph_included &&
-                              (binding_index_content.include?('...') ||
-                               !binding_index_content.include?('definitely be truncated in the final index display'))
+                               (binding_index_content.include?('...') ||
+                                !binding_index_content.include?('definitely be truncated in the final index display'))
     puts "✓ Long paragraph properly truncated: #{long_paragraph_truncated}"
 
     # Check for nested YAML structure handling
-    if complex_yaml_included
-      puts "✓ Complex YAML correctly processed despite nested structures"
-    end
+    puts '✓ Complex YAML correctly processed despite nested structures' if complex_yaml_included
   end
 
   # Analyze error reporting
   standard_output = File.read('test_reindex/output_standard.txt')
   verbose_output = File.read('test_reindex/output_verbose.txt')
-  strict_output = File.read('test_reindex/output_strict.txt')
+  File.read('test_reindex/output_strict.txt')
 
   # Check error reporting consistency
   reports_missing_frontmatter = standard_output.include?('No YAML front-matter found')
@@ -293,15 +292,15 @@ MARKDOWN
 
   puts "\n== Test Results Summary =="
   if reports_missing_frontmatter && reports_invalid_yaml && reports_missing_fields && reports_misplaced_file
-    puts "✅ Error handling tests PASSED - All error types were correctly reported"
+    puts '✅ Error handling tests PASSED - All error types were correctly reported'
   else
-    puts "❌ Error handling tests FAILED - Not all error types were correctly reported"
+    puts '❌ Error handling tests FAILED - Not all error types were correctly reported'
   end
 
   if feature_tests_passed
-    puts "✅ Feature tests PASSED - All YAML parsing features working correctly"
+    puts '✅ Feature tests PASSED - All YAML parsing features working correctly'
   else
-    puts "❌ Feature tests FAILED - Not all YAML parsing features working correctly"
+    puts '❌ Feature tests FAILED - Not all YAML parsing features working correctly'
   end
 
   puts "\n✅ Index generation test complete!"

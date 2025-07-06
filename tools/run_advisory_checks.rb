@@ -48,46 +48,46 @@ $skip_dependencies = false
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: run_advisory_checks.rb [options]"
-  opts.separator ""
-  opts.separator "Advisory validation script for authors who want comprehensive feedback"
-  opts.separator ""
-  opts.separator "⚠️  IMPORTANT: All checks are ADVISORY ONLY - failures provide feedback but never block development"
-  opts.separator ""
-  opts.separator "Options:"
+  opts.banner = 'Usage: run_advisory_checks.rb [options]'
+  opts.separator ''
+  opts.separator 'Advisory validation script for authors who want comprehensive feedback'
+  opts.separator ''
+  opts.separator '⚠️  IMPORTANT: All checks are ADVISORY ONLY - failures provide feedback but never block development'
+  opts.separator ''
+  opts.separator 'Options:'
 
-  opts.on("-v", "--verbose", "Show detailed output from validation tools") do
+  opts.on('-v', '--verbose', 'Show detailed output from validation tools') do
     $verbose = true
   end
 
-  opts.on("--skip-security", "Skip security scanning checks") do
+  opts.on('--skip-security', 'Skip security scanning checks') do
     $skip_security = true
   end
 
-  opts.on("--skip-links", "Skip external link validation") do
+  opts.on('--skip-links', 'Skip external link validation') do
     $skip_links = true
   end
 
-  opts.on("--skip-typescript", "Skip TypeScript binding validation") do
+  opts.on('--skip-typescript', 'Skip TypeScript binding validation') do
     $skip_typescript = true
   end
 
-  opts.on("--skip-dependencies", "Skip dependency security auditing") do
+  opts.on('--skip-dependencies', 'Skip dependency security auditing') do
     $skip_dependencies = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
 
-  opts.separator ""
-  opts.separator "Exit Codes:"
-  opts.separator "  0 - Script completed (advisory checks may have findings)"
-  opts.separator "  1 - Script execution error (not advisory check failure)"
-  opts.separator ""
-  opts.separator "Remember: This script provides ADVISORY feedback only."
-  opts.separator "Findings are informational and never block development workflow."
+  opts.separator ''
+  opts.separator 'Exit Codes:'
+  opts.separator '  0 - Script completed (advisory checks may have findings)'
+  opts.separator '  1 - Script execution error (not advisory check failure)'
+  opts.separator ''
+  opts.separator 'Remember: This script provides ADVISORY feedback only.'
+  opts.separator 'Findings are informational and never block development workflow.'
 end.parse!
 
 def run_advisory_command(command, description)
@@ -106,172 +106,170 @@ def run_advisory_command(command, description)
 
   if success
     puts "✅ #{description} - no issues found (#{duration}s)"
-    return { status: :clean, duration: duration }
+    { status: :clean, duration: duration }
   else
     exit_code = $?.exitstatus
     puts "📋 #{description} - findings available (#{duration}s)"
     puts "   💡 Run manually for details: #{command}"
-    return { status: :findings, duration: duration, exit_code: exit_code }
+    { status: :findings, duration: duration, exit_code: exit_code }
   end
 end
 
 def check_tool_available(tool, install_hint = nil)
-  if system("command -v #{tool} >/dev/null 2>&1")
-    return true
-  else
-    puts "⚠️  #{tool} not available"
-    puts "   #{install_hint}" if install_hint
-    return false
-  end
+  return true if system("command -v #{tool} >/dev/null 2>&1")
+
+  puts "⚠️  #{tool} not available"
+  puts "   #{install_hint}" if install_hint
+  false
 end
 
 def main
-  puts "🔍 Advisory Validation for Authors"
-  puts "================================="
-  puts "All checks are ADVISORY ONLY - findings provide feedback but never block development"
-  puts ""
+  puts '🔍 Advisory Validation for Authors'
+  puts '================================='
+  puts 'All checks are ADVISORY ONLY - findings provide feedback but never block development'
+  puts ''
 
   start_time = Time.now
   findings_summary = []
 
   # Advisory Check 1: Cross-reference validation
-  puts "📋 Cross-reference link validation (advisory)..."
+  puts '📋 Cross-reference link validation (advisory)...'
   result = run_advisory_command(
     "ruby tools/validate_cross_references.rb#{$verbose ? ' -v' : ''}",
-    "Cross-reference validation"
+    'Cross-reference validation'
   )
-  findings_summary << { check: "Cross-references", **result }
+  findings_summary << { check: 'Cross-references', **result }
 
   # Advisory Check 2: Document length validation
-  puts ""
-  puts "📏 Document length validation (advisory)..."
+  puts ''
+  puts '📏 Document length validation (advisory)...'
   result = run_advisory_command(
     "ruby tools/check_document_length.rb#{$verbose ? ' -v' : ''}",
-    "Document length validation"
+    'Document length validation'
   )
-  findings_summary << { check: "Document length", **result }
+  findings_summary << { check: 'Document length', **result }
 
   # Advisory Check 3: TypeScript binding validation
-  unless $skip_typescript
-    puts ""
-    if Dir.exist?("docs/bindings/categories/typescript")
-      puts "📋 TypeScript binding validation (advisory)..."
+  if $skip_typescript
+    puts '⏭️  Skipping TypeScript validation (--skip-typescript)'
+  else
+    puts ''
+    if Dir.exist?('docs/bindings/categories/typescript')
+      puts '📋 TypeScript binding validation (advisory)...'
       result = run_advisory_command(
         "ruby tools/validate_typescript_bindings.rb#{$verbose ? ' --verbose' : ''}",
-        "TypeScript binding compilation"
+        'TypeScript binding compilation'
       )
-      findings_summary << { check: "TypeScript bindings", **result }
+      findings_summary << { check: 'TypeScript bindings', **result }
     else
-      puts "⏭️  No TypeScript bindings found - skipping TypeScript validation"
+      puts '⏭️  No TypeScript bindings found - skipping TypeScript validation'
     end
-  else
-    puts "⏭️  Skipping TypeScript validation (--skip-typescript)"
   end
 
   # Advisory Check 4: Security scanning
-  unless $skip_security
-    puts ""
-    puts "🔒 Security scanning (advisory)..."
-
-    if check_tool_available("gitleaks", "Install from https://github.com/gitleaks/gitleaks")
-      result = run_advisory_command(
-        "gitleaks detect --source=. --no-git",
-        "Security scan (gitleaks)"
-      )
-      findings_summary << { check: "Security scan", **result }
-    else
-      puts "   ⏭️ Skipping security scan (gitleaks not available)"
-    end
+  if $skip_security
+    puts '⏭️  Skipping security scanning (--skip-security)'
   else
-    puts "⏭️  Skipping security scanning (--skip-security)"
+    puts ''
+    puts '🔒 Security scanning (advisory)...'
+
+    if check_tool_available('gitleaks', 'Install from https://github.com/gitleaks/gitleaks')
+      result = run_advisory_command(
+        'gitleaks detect --source=. --no-git',
+        'Security scan (gitleaks)'
+      )
+      findings_summary << { check: 'Security scan', **result }
+    else
+      puts '   ⏭️ Skipping security scan (gitleaks not available)'
+    end
   end
 
   # Advisory Check 5: Dependency security auditing
-  unless $skip_dependencies
-    puts ""
-    if File.exist?("examples/typescript-full-toolchain/package.json")
-      puts "🔐 Dependency security audit (advisory)..."
-      Dir.chdir("examples/typescript-full-toolchain") do
+  if $skip_dependencies
+    puts '⏭️  Skipping dependency audit (--skip-dependencies)'
+  else
+    puts ''
+    if File.exist?('examples/typescript-full-toolchain/package.json')
+      puts '🔐 Dependency security audit (advisory)...'
+      Dir.chdir('examples/typescript-full-toolchain') do
         result = run_advisory_command(
-          "pnpm audit --audit-level=moderate",
-          "Dependency security audit"
+          'pnpm audit --audit-level=moderate',
+          'Dependency security audit'
         )
-        findings_summary << { check: "Dependency audit", **result }
+        findings_summary << { check: 'Dependency audit', **result }
       end
     else
-      puts "⏭️  No TypeScript example project found - skipping dependency audit"
+      puts '⏭️  No TypeScript example project found - skipping dependency audit'
     end
-  else
-    puts "⏭️  Skipping dependency audit (--skip-dependencies)"
   end
 
   # Advisory Check 6: External link validation
-  unless $skip_links
-    puts ""
-    puts "📡 External link validation (advisory)..."
+  if $skip_links
+    puts '⏭️  Skipping external link validation (--skip-links)'
+  else
+    puts ''
+    puts '📡 External link validation (advisory)...'
 
-    if check_tool_available("node") && check_tool_available("npm")
-      if system("npm list -g markdown-link-check >/dev/null 2>&1")
+    if check_tool_available('node') && check_tool_available('npm')
+      if system('npm list -g markdown-link-check >/dev/null 2>&1')
         result = run_advisory_command(
           "find . -name '*.md' | grep -v 'node_modules\\|venv\\|site' | xargs markdown-link-check -q",
-          "External link validation"
+          'External link validation'
         )
-        findings_summary << { check: "External links", **result }
+        findings_summary << { check: 'External links', **result }
       else
-        puts "   ⚠️  markdown-link-check not installed"
-        puts "   Install with: npm install -g markdown-link-check"
+        puts '   ⚠️  markdown-link-check not installed'
+        puts '   Install with: npm install -g markdown-link-check'
       end
     else
-      puts "   ⏭️ Skipping external links (Node.js/npm not available)"
+      puts '   ⏭️ Skipping external links (Node.js/npm not available)'
     end
-  else
-    puts "⏭️  Skipping external link validation (--skip-links)"
   end
 
   # Advisory Check 7: Python code validation (if available)
-  if File.exist?("tools/validate_python_examples.rb")
-    puts ""
-    puts "🐍 Python code example validation (advisory)..."
+  if File.exist?('tools/validate_python_examples.rb')
+    puts ''
+    puts '🐍 Python code example validation (advisory)...'
     result = run_advisory_command(
       "ruby tools/validate_python_examples.rb#{$verbose ? ' -v' : ''}",
-      "Python code examples"
+      'Python code examples'
     )
-    findings_summary << { check: "Python examples", **result }
+    findings_summary << { check: 'Python examples', **result }
   end
 
   # Summary
   total_duration = (Time.now - start_time).round(3)
-  puts ""
-  puts "📊 Advisory Validation Summary"
-  puts "============================="
+  puts ''
+  puts '📊 Advisory Validation Summary'
+  puts '============================='
 
   clean_checks = findings_summary.select { |check| check[:status] == :clean }
   findings_checks = findings_summary.select { |check| check[:status] == :findings }
 
   if findings_checks.empty?
-    puts "✨ All advisory checks clean!"
-    puts "🎉 No findings in comprehensive validation"
+    puts '✨ All advisory checks clean!'
+    puts '🎉 No findings in comprehensive validation'
   else
-    puts "📋 Advisory findings summary:"
+    puts '📋 Advisory findings summary:'
     findings_checks.each do |check|
       puts "   • #{check[:check]}: findings available"
     end
-    puts ""
-    puts "💡 Findings are informational feedback, not blockers"
-    puts "💡 Run with --verbose or individual tools for details"
+    puts ''
+    puts '💡 Findings are informational feedback, not blockers'
+    puts '💡 Run with --verbose or individual tools for details'
   end
 
-  puts ""
-  puts "📈 Performance summary:"
+  puts ''
+  puts '📈 Performance summary:'
   puts "   • Total checks run: #{findings_summary.length}"
   puts "   • Clean checks: #{clean_checks.length}"
   puts "   • Checks with findings: #{findings_checks.length}"
   puts "   • Total time: #{total_duration}s"
 
-  puts ""
-  puts "⚠️  Remember: All findings are ADVISORY ONLY"
-  puts "🚀 Development workflow is never blocked by advisory validation"
-  puts "📝 Use findings to improve content quality when desired"
+  puts ''
+  puts '⚠️  Remember: All findings are ADVISORY ONLY'
+  puts '🚀 Development workflow is never blocked by advisory validation'
+  puts '📝 Use findings to improve content quality when desired'
 
   # Always exit 0 - advisory validation never fails the script
   exit 0

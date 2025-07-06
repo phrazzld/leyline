@@ -35,17 +35,17 @@ $errors = []
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: calculate_version.rb [options]"
+  opts.banner = 'Usage: calculate_version.rb [options]'
 
-  opts.on("--pretty", "Pretty print JSON output") do
+  opts.on('--pretty', 'Pretty print JSON output') do
     $options[:pretty] = true
   end
 
-  opts.on("--verbose", "Show detailed processing information") do
+  opts.on('--verbose', 'Show detailed processing information') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -53,7 +53,7 @@ end.parse!
 
 # Load breaking change rules from YAML configuration
 def load_breaking_change_rules
-  rules_file = 'breaking_change_rules.yml'  # Simplified path for security
+  rules_file = 'breaking_change_rules.yml' # Simplified path for security
   rules_full_path = File.join(File.dirname(__FILE__), rules_file)
 
   unless File.exist?(rules_full_path)
@@ -70,7 +70,7 @@ def load_breaking_change_rules
 
     # Validate the structure contains expected keys
     unless rules.is_a?(Hash)
-      report_error("Invalid breaking change rules format: must be a hash")
+      report_error('Invalid breaking change rules format: must be a hash')
       SecurityUtils.log_security_event('invalid_rules_format', { type: rules.class })
       return {}
     end
@@ -80,7 +80,7 @@ def load_breaking_change_rules
     report_error("Security error loading breaking change rules: #{e.message}")
     SecurityUtils.log_security_event('rules_file_security_error', { error: e.message })
     {}
-  rescue => e
+  rescue StandardError => e
     report_error("Failed to load breaking change rules: #{e.message}")
     SecurityUtils.log_security_event('rules_file_load_error', { error: e.message })
     {}
@@ -105,18 +105,18 @@ def get_current_version
         unless SecurityUtils.validate_version(version)
           report_error("Invalid version format in VERSION file: #{version}")
           SecurityUtils.log_security_event('invalid_version_file', { version: version })
-          return "0.1.0"
+          return '0.1.0'
         end
         puts "Found current version from VERSION file: #{version}" if $options[:verbose]
         version
       rescue SecurityUtils::SecurityError => e
         report_error("Failed to read VERSION file: #{e.message}")
         SecurityUtils.log_security_event('version_file_read_error', { error: e.message })
-        "0.1.0"
+        '0.1.0'
       end
     else
-      puts "No version found, defaulting to 0.1.0" if $options[:verbose]
-      "0.1.0"
+      puts 'No version found, defaulting to 0.1.0' if $options[:verbose]
+      '0.1.0'
     end
   end
 end
@@ -154,6 +154,7 @@ def get_commits_since_last_tag(current_version)
   if status.success?
     commits = output.strip.split("\n").map do |line|
       next if line.empty?
+
       hash, message = line.split('|', 2)
 
       # Validate commit hash format (40 character hex string)
@@ -175,7 +176,7 @@ def get_commits_since_last_tag(current_version)
       # Validate full commit message too
       unless SecurityUtils.validate_commit_message(full_text)
         SecurityUtils.log_security_event('invalid_full_commit_message', { hash: hash })
-        full_text = message || ''  # Fallback to short message
+        full_text = message || '' # Fallback to short message
       end
 
       parsed = parse_conventional_commit(message || '')
@@ -202,10 +203,10 @@ end
 def parse_conventional_commit(message)
   if message =~ /^(\w+)(\(([^)]+)\))?(!)?:\s*(.+)/
     {
-      type: $1.downcase,
-      scope: $3,
-      subject: $5,
-      breaking: $4 == '!'
+      type: Regexp.last_match(1).downcase,
+      scope: Regexp.last_match(3),
+      subject: Regexp.last_match(5),
+      breaking: Regexp.last_match(4) == '!'
     }
   else
     {
@@ -242,15 +243,13 @@ def detect_file_based_breaking_changes(commits, rules)
   # Get all changed files for these commits
   commits.each do |commit|
     output, status = run_git_command("show --name-only --format= #{commit[:hash]}")
-    if status.success?
-      files = output.strip.split("\n").reject(&:empty?)
+    next unless status.success?
 
-      files.each do |file|
-        rules['breaking_patterns'].each do |pattern|
-          if file.match?(Regexp.new(pattern))
-            breaking_changes << "Breaking change detected in file: #{file}"
-          end
-        end
+    files = output.strip.split("\n").reject(&:empty?)
+
+    files.each do |file|
+      rules['breaking_patterns'].each do |pattern|
+        breaking_changes << "Breaking change detected in file: #{file}" if file.match?(Regexp.new(pattern))
       end
     end
   end
@@ -277,17 +276,15 @@ def determine_bump_type(commits, current_version, breaking_changes)
     else
       'patch' # Other changes default to patch
     end
-  else
+  elsif has_breaking
     # Post-1.0 strategy: standard semver
-    if has_breaking
-      'major'
-    elsif has_features
-      'minor'
-    elsif has_fixes
-      'patch'
-    else
-      'patch'
-    end
+    'major'
+  elsif has_features
+    'minor'
+  elsif has_fixes
+    'patch'
+  else
+    'patch'
   end
 end
 
@@ -296,7 +293,9 @@ def calculate_next_version(current_version, bump_type)
   return current_version if bump_type == 'none'
 
   parts = current_version.split('.').map(&:to_i)
-  major, minor, patch = parts[0] || 0, parts[1] || 0, parts[2] || 0
+  major = parts[0] || 0
+  minor = parts[1] || 0
+  patch = parts[2] || 0
 
   case bump_type
   when 'major'
@@ -324,11 +323,11 @@ def run_git_command(command)
     report_error("Git command security error: #{e.message}")
     SecurityUtils.log_security_event('git_command_blocked', { command: command, error: e.message })
     mock_status = OpenStruct.new(success?: false, exitstatus: 1)
-    ["", mock_status]
-  rescue => e
+    ['', mock_status]
+  rescue StandardError => e
     report_error("Git command failed: #{e.message}")
     mock_status = OpenStruct.new(success?: false, exitstatus: 1)
-    ["", mock_status]
+    ['', mock_status]
   end
 end
 
@@ -341,14 +340,15 @@ end
 # Get GitHub repository URL for commit links
 def get_github_repo_url
   # Try to get the GitHub URL from git remote
-  output, status = run_git_command("config --get remote.origin.url")
+  output, status = run_git_command('config --get remote.origin.url')
 
   if status.success? && !output.empty?
     url = output.strip
 
     # Convert various formats to standard GitHub URL
-    if url =~ /github\.com[\/:](.+?)\/(.+?)(?:\.git)?$/
-      owner, repo = $1, $2
+    if url =~ %r{github\.com[/:](.+?)/(.+?)(?:\.git)?$}
+      owner = Regexp.last_match(1)
+      repo = Regexp.last_match(2)
       "https://github.com/#{owner}/#{repo}"
     else
       # Fallback if we can't parse the URL
@@ -356,7 +356,7 @@ def get_github_repo_url
       nil
     end
   else
-    puts "Could not get remote origin URL" if $options[:verbose]
+    puts 'Could not get remote origin URL' if $options[:verbose]
     nil
   end
 end
@@ -374,7 +374,7 @@ end
 
 # Generate changelog markdown from commits
 def generate_changelog_markdown(commits, next_version)
-  return "No changes since last release." if commits.empty?
+  return 'No changes since last release.' if commits.empty?
 
   repo_url = get_github_repo_url
 
@@ -382,70 +382,70 @@ def generate_changelog_markdown(commits, next_version)
   breaking_commits = commits.select { |c| c[:breaking] }
   feature_commits = commits.select { |c| c[:type] == 'feat' && !c[:breaking] }
   fix_commits = commits.select { |c| c[:type] == 'fix' && !c[:breaking] }
-  other_commits = commits.select { |c| !['feat', 'fix'].include?(c[:type]) && !c[:breaking] }
+  other_commits = commits.select { |c| !%w[feat fix].include?(c[:type]) && !c[:breaking] }
 
   markdown = []
   markdown << "# Release #{next_version}"
-  markdown << ""
+  markdown << ''
 
   # Breaking Changes section
   if breaking_commits.any?
-    markdown << "## ⚠️ BREAKING CHANGES"
-    markdown << ""
+    markdown << '## ⚠️ BREAKING CHANGES'
+    markdown << ''
     breaking_commits.each do |commit|
       message = clean_commit_message(commit[:message])
-      if repo_url
-        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
-      else
-        markdown << "- #{message} (#{commit[:hash][0..7]})"
-      end
+      markdown << if repo_url
+                    "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+                  else
+                    "- #{message} (#{commit[:hash][0..7]})"
+                  end
     end
-    markdown << ""
+    markdown << ''
   end
 
   # Features section
   if feature_commits.any?
-    markdown << "## ✨ Features"
-    markdown << ""
+    markdown << '## ✨ Features'
+    markdown << ''
     feature_commits.each do |commit|
       message = clean_commit_message(commit[:message])
-      if repo_url
-        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
-      else
-        markdown << "- #{message} (#{commit[:hash][0..7]})"
-      end
+      markdown << if repo_url
+                    "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+                  else
+                    "- #{message} (#{commit[:hash][0..7]})"
+                  end
     end
-    markdown << ""
+    markdown << ''
   end
 
   # Bug Fixes section
   if fix_commits.any?
-    markdown << "## 🐛 Bug Fixes"
-    markdown << ""
+    markdown << '## 🐛 Bug Fixes'
+    markdown << ''
     fix_commits.each do |commit|
       message = clean_commit_message(commit[:message])
-      if repo_url
-        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
-      else
-        markdown << "- #{message} (#{commit[:hash][0..7]})"
-      end
+      markdown << if repo_url
+                    "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+                  else
+                    "- #{message} (#{commit[:hash][0..7]})"
+                  end
     end
-    markdown << ""
+    markdown << ''
   end
 
   # Other changes section (if any)
   if other_commits.any?
-    markdown << "## 🔧 Other Changes"
-    markdown << ""
+    markdown << '## 🔧 Other Changes'
+    markdown << ''
     other_commits.each do |commit|
       message = clean_commit_message(commit[:message])
-      if repo_url
-        markdown << "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
-      else
-        markdown << "- #{message} (#{commit[:hash][0..7]})"
-      end
+      markdown << if repo_url
+                    "- #{message} ([#{commit[:hash][0..7]}](#{repo_url}/commit/#{commit[:hash]}))"
+                  else
+                    "- #{message} (#{commit[:hash][0..7]})"
+                  end
     end
-    markdown << ""
+    markdown << ''
   end
 
   markdown.join("\n").strip
@@ -506,7 +506,7 @@ if __FILE__ == $0
     result = calculate_version
 
     if $errors.any?
-      puts "Errors occurred during version calculation:" unless $options[:pretty]
+      puts 'Errors occurred during version calculation:' unless $options[:pretty]
       $errors.each { |error| puts "  #{error}" } unless $options[:pretty]
       exit 1
     end
@@ -516,8 +516,7 @@ if __FILE__ == $0
     else
       puts JSON.generate(result)
     end
-
-  rescue => e
+  rescue StandardError => e
     puts "FATAL ERROR: #{e.message}" unless $options[:pretty]
     puts e.backtrace.join("\n") if $options[:verbose]
     exit 1

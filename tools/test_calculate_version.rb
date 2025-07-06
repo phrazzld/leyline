@@ -87,7 +87,7 @@ class TestCalculateVersion < Test::Unit::TestCase
       # Create a small change to trigger a commit
       timestamp = Time.now.to_f.to_s
       File.write('test_change.tmp', timestamp)
-      system("git add test_change.tmp")
+      system('git add test_change.tmp')
     end
 
     # Use a temporary file for multi-line commit messages
@@ -165,8 +165,8 @@ BREAKING CHANGE: Complete API overhaul')
 
   def test_breaking_change_detection_by_file_pattern
     create_commit('feat: update tenet structure', [
-      { path: 'docs/tenets/new-tenet.md', content: '# New Tenet' }
-    ])
+                    { path: 'docs/tenets/new-tenet.md', content: '# New Tenet' }
+                  ])
 
     result = run_calculate_version
 
@@ -268,7 +268,7 @@ from YAML to JSON. Users must migrate their config files.')
 
     # When no tags and no VERSION file, it defaults to 0.1.0
     # If there are commits, it will bump the version
-    assert_equal '0.1.0', result['current_version']  # Defaults to 0.1.0 per script logic
+    assert_equal '0.1.0', result['current_version'] # Defaults to 0.1.0 per script logic
     # The next version depends on whether there are commits since setup
     assert result['next_version'] # Just ensure we get a version back
   end
@@ -276,7 +276,7 @@ from YAML to JSON. Users must migrate their config files.')
   def test_malformed_commit_messages
     create_commit('random commit message without conventional format')
     create_commit('another: weird format that might break parsing')
-    create_commit('fix')  # Missing description
+    create_commit('fix') # Missing description
 
     result = run_calculate_version
 
@@ -298,7 +298,7 @@ from YAML to JSON. Users must migrate their config files.')
     # Should complete within reasonable time (< 5 seconds)
     assert (end_time - start_time) < 5, "Version calculation took too long: #{end_time - start_time} seconds"
     assert_equal 100, result['commits'].size
-    assert_equal '0.2.0', result['next_version']  # Pre-1.0 feature bump
+    assert_equal '0.2.0', result['next_version'] # Pre-1.0 feature bump
   end
 
   def test_empty_repository
@@ -354,7 +354,6 @@ from YAML to JSON. Users must migrate their config files.')
 
   def test_very_long_commit_messages
     long_message = 'feat: implement comprehensive feature
-
 ' + 'Very long description that goes on and on. ' * 100
 
     create_commit(long_message)
@@ -420,7 +419,7 @@ from YAML to JSON. Users must migrate their config files.')
       refute result.key?('error'), "Calculation failed for #{commit_count} commits"
     end
 
-    puts "=== End Benchmark ==="
+    puts '=== End Benchmark ==='
   end
 
   private

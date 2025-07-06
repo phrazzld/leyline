@@ -76,7 +76,7 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
         end
 
         expect(result[:average_ms]).to be < MICRO_TARGETS[:file_discovery][:manifest_creation]
-        expect(result[:memory_delta_mb]).to be < 20  # Reasonable memory usage
+        expect(result[:memory_delta_mb]).to be < 20 # Reasonable memory usage
 
         log_benchmark_result('manifest_creation', result)
       end
@@ -96,8 +96,8 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
         expect(result[:average_ms]).to be < MICRO_TARGETS[:file_discovery][:hash_computation]
 
         # Verify hash rate
-        hash_rate = (1000.0 / result[:average_ms]) * 1000  # files per second
-        expect(hash_rate).to be > 3000  # Should hash >3000 files/second
+        hash_rate = (1000.0 / result[:average_ms]) * 1000 # files per second
+        expect(hash_rate).to be > 3000 # Should hash >3000 files/second
 
         log_benchmark_result('hash_computation', result.merge(hash_rate: hash_rate))
       end
@@ -112,6 +112,7 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
           if Dir.exist?(bindings_path)
             Dir.entries(bindings_path).each do |entry|
               next if entry.start_with?('.')
+
               category_path = File.join(bindings_path, entry)
               categories << entry if Dir.exist?(category_path)
             end
@@ -121,7 +122,7 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
         end
 
         expect(result[:average_ms]).to be < MICRO_TARGETS[:file_discovery][:category_detection]
-        expect(result[:std_deviation_ms]).to be < 10  # Should be very consistent
+        expect(result[:std_deviation_ms]).to be < 10 # Should be very consistent
 
         log_benchmark_result('category_detection', result)
       end
@@ -129,7 +130,7 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
   end
 
   describe 'Cache Operations' do
-    let(:test_content) { 'x' * 5000 }  # 5KB test content
+    let(:test_content) { 'x' * 5000 } # 5KB test content
 
     context 'cache lookup' do
       it 'performs lookups within target' do
@@ -143,8 +144,8 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
 
         expect(result[:average_ms]).to be < MICRO_TARGETS[:cache_operations][:cache_lookup]
 
-        lookup_rate = (1000.0 / result[:average_ms]) * 1000  # lookups per second
-        expect(lookup_rate).to be > 100_000  # Should handle >100k lookups/second
+        lookup_rate = (1000.0 / result[:average_ms]) * 1000 # lookups per second
+        expect(lookup_rate).to be > 100_000 # Should handle >100k lookups/second
 
         log_benchmark_result('cache_lookup', result.merge(lookup_rate: lookup_rate))
       end
@@ -159,8 +160,8 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
 
         expect(result[:average_ms]).to be < MICRO_TARGETS[:cache_operations][:cache_write]
 
-        write_rate = (100.0 / result[:average_ms]) * 1000  # writes per second
-        expect(write_rate).to be > 10_000  # Should handle >10k writes/second
+        write_rate = (100.0 / result[:average_ms]) * 1000 # writes per second
+        expect(write_rate).to be > 10_000 # Should handle >10k writes/second
 
         log_benchmark_result('cache_write', result.merge(write_rate: write_rate))
       end
@@ -222,8 +223,8 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
 
         expect(result[:average_ms]).to be < MICRO_TARGETS[:comparison_operations][:manifest_diff]
 
-        diff_rate = (1000.0 / result[:average_ms]) * 1000  # files compared per second
-        expect(diff_rate).to be > 10_000  # Should compare >10k files/second
+        diff_rate = (1000.0 / result[:average_ms]) * 1000 # files compared per second
+        expect(diff_rate).to be > 10_000 # Should compare >10k files/second
 
         log_benchmark_result('manifest_diff', result.merge(diff_rate: diff_rate))
       end
@@ -324,7 +325,7 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
 
       # Verify memory scales linearly and stays within bounds
       memory_results.each do |result|
-        expect(result[:mb_per_1k_files]).to be < 10  # <10MB per 1000 files
+        expect(result[:mb_per_1k_files]).to be < 10 # <10MB per 1000 files
       end
 
       # Log results
@@ -381,13 +382,13 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
     # Generate realistic file sizes (power law distribution)
     size_category = random.rand(100)
     base_size = case size_category
-                when 0..60   then random.rand(1000..5000)      # 1-5KB - 60%
-                when 61..85  then random.rand(5000..20000)     # 5-20KB - 25%
-                when 86..95  then random.rand(20000..100000)   # 20-100KB - 10%
-                else              random.rand(100000..500000)   # 100-500KB - 5%
+                when 0..60   then random.rand(1000..5000) # 1-5KB - 60%
+                when 61..85  then random.rand(5000..20_000) # 5-20KB - 25%
+                when 86..95  then random.rand(20_000..100_000) # 20-100KB - 10%
+                else              random.rand(100_000..500_000) # 100-500KB - 5%
                 end
 
-    content = <<~CONTENT
+    <<~CONTENT
       ---
       id: #{type}-#{index}
       last_modified: '2025-06-22'
@@ -402,20 +403,18 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
 
       #{random.bytes(base_size / 2).unpack1('H*')}
     CONTENT
-
-    content
   end
 
   def discover_all_files(base_dir)
     Dir.glob(File.join(base_dir, 'docs', 'leyline', '**', '*.md'))
   end
 
-  def benchmark_operation(name, iterations:)
+  def benchmark_operation(name, iterations:, &block)
     times = []
     memory_deltas = []
 
     # Warmup
-    2.times { yield }
+    2.times(&block)
 
     iterations.times do
       GC.start
@@ -457,9 +456,7 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
     modified = original.dup
 
     modified.each do |path, hash|
-      if rand < modification_rate
-        modified[path] = Digest::SHA256.hexdigest("#{hash}-modified")
-      end
+      modified[path] = Digest::SHA256.hexdigest("#{hash}-modified") if rand < modification_rate
     end
 
     # Add some new files
@@ -494,14 +491,14 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
 
   def calculate_std_deviation(values)
     mean = values.sum / values.length.to_f
-    variance = values.map { |v| (v - mean) ** 2 }.sum / values.length
+    variance = values.map { |v| (v - mean)**2 }.sum / values.length
     Math.sqrt(variance)
   end
 
   def get_memory_usage_mb
     @memory_strategy ||= detect_memory_strategy
     @memory_strategy.call
-  rescue => e
+  rescue StandardError => e
     warn "Memory measurement failed: #{e.message}" if ENV['LEYLINE_DEBUG']
     0.0
   end
@@ -543,7 +540,7 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
     else
       unix_memory
     end
-  rescue
+  rescue StandardError
     unix_memory
   end
 
@@ -560,7 +557,9 @@ RSpec.describe 'Transparency Commands Micro-Benchmarks', type: :benchmark do
 
     # Log additional metrics if present
     result.each do |key, value|
-      next if [:operation, :iterations, :times_ms, :average_ms, :min_ms, :max_ms, :p95_ms, :std_deviation_ms, :memory_delta_mb].include?(key)
+      next if %i[operation iterations times_ms average_ms min_ms max_ms p95_ms std_deviation_ms
+                 memory_delta_mb].include?(key)
+
       puts "  #{key.to_s.gsub('_', ' ').capitalize}: #{value.is_a?(Float) ? value.round(2) : value}"
     end
   end

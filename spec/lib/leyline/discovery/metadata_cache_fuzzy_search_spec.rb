@@ -26,7 +26,7 @@ RSpec.describe Leyline::Discovery::MetadataCache do
       it 'continues to work as before for exact substring matches' do
         results = cache.search('Testing')
         expect(results.first[:document][:title]).to eq('Testing Best Practices')
-        expect(results.first[:score]).to be >= 100  # May have additional matches
+        expect(results.first[:score]).to be >= 100 # May have additional matches
       end
 
       it 'finds case-insensitive matches' do
@@ -42,26 +42,26 @@ RSpec.describe Leyline::Discovery::MetadataCache do
 
     context 'fuzzy matches for typos' do
       it 'finds documents with single character transpositions' do
-        results = cache.search('Tesitng')  # transposed 't' and 'i'
+        results = cache.search('Tesitng') # transposed 't' and 'i'
         expect(results).not_to be_empty
         expect(results.first[:document][:title]).to eq('Testing Best Practices')
-        expect(results.first[:score]).to be < 100  # Lower than exact match
+        expect(results.first[:score]).to be < 100 # Lower than exact match
       end
 
       it 'finds documents with missing characters' do
-        results = cache.search('Performnce')  # missing 'a'
+        results = cache.search('Performnce') # missing 'a'
         expect(results).not_to be_empty
         expect(results.first[:document][:title]).to eq('Performance Optimization')
       end
 
       it 'finds documents with extra characters' do
-        results = cache.search('Testting')  # extra 't'
+        results = cache.search('Testting') # extra 't'
         expect(results).not_to be_empty
         expect(results.first[:document][:title]).to eq('Testing Best Practices')
       end
 
       it 'finds documents with character substitutions' do
-        results = cache.search('Cacheng')  # 'i' -> 'e'
+        results = cache.search('Cacheng') # 'i' -> 'e'
         expect(results).not_to be_empty
         expect(results.first[:document][:title]).to eq('Caching Strategies')
       end
@@ -80,11 +80,11 @@ RSpec.describe Leyline::Discovery::MetadataCache do
       end
 
       it 'ranks closer fuzzy matches higher' do
-        results = cache.search('Testng')  # Missing one character from 'Testing'
+        results = cache.search('Testng') # Missing one character from 'Testing'
         expect(results).not_to be_empty
         close_match_score = results.first[:score]
 
-        results = cache.search('Tesng')  # Missing two characters from 'Testing'
+        results = cache.search('Tesng') # Missing two characters from 'Testing'
         expect(results).not_to be_empty
         distant_match_score = results.first[:score]
 
@@ -92,20 +92,20 @@ RSpec.describe Leyline::Discovery::MetadataCache do
       end
 
       it 'does not match when too many differences exist' do
-        results = cache.search('xyz')  # Completely different
+        results = cache.search('xyz') # Completely different
         expect(results).to be_empty
       end
     end
 
     context 'word-level fuzzy matching' do
       it 'matches individual words in multi-word titles' do
-        results = cache.search('Guidlines')  # 'Guidelines' with typo
+        results = cache.search('Guidlines') # 'Guidelines' with typo
         expect(results).not_to be_empty
         expect(results.first[:document][:title]).to eq('Binding Guidelines')
       end
 
       it 'finds partial word matches' do
-        results = cache.search('Type')  # Partial match for 'TypeScript'
+        results = cache.search('Type') # Partial match for 'TypeScript'
         expect(results).not_to be_empty
         expect(results.first[:document][:title]).to eq('TypeScript Configuration')
       end
@@ -116,12 +116,12 @@ RSpec.describe Leyline::Discovery::MetadataCache do
         # Create larger dataset for realistic testing
         50.times do |i|
           cache.cache_document(create_document(
-            id: "doc-#{i}",
-            title: "Document about #{['testing', 'performance', 'caching', 'binding'].sample} #{i}"
-          ))
+                                 id: "doc-#{i}",
+                                 title: "Document about #{%w[testing performance caching binding].sample} #{i}"
+                               ))
         end
 
-        queries_with_typos = ['tesitng', 'perfromance', 'cachign', 'bindng']
+        queries_with_typos = %w[tesitng perfromance cachign bindng]
 
         queries_with_typos.each do |query|
           elapsed = Benchmark.realtime { cache.search(query) }
@@ -146,14 +146,14 @@ RSpec.describe Leyline::Discovery::MetadataCache do
 
       it 'handles very short queries' do
         results = cache.search('T')
-        expect(results).to be_an(Array)  # Should not crash
+        expect(results).to be_an(Array) # Should not crash
       end
 
       it 'preserves existing search behavior for long exact matches' do
         cache.cache_document(create_document(
-          id: 'long-001',
-          title: 'A Very Long Document Title With Many Words'
-        ))
+                               id: 'long-001',
+                               title: 'A Very Long Document Title With Many Words'
+                             ))
 
         results = cache.search('Very Long Document')
         expect(results.first[:document][:title]).to eq('A Very Long Document Title With Many Words')
@@ -162,12 +162,12 @@ RSpec.describe Leyline::Discovery::MetadataCache do
 
     context '"Did you mean?" suggestions' do
       it 'provides suggestions for queries with no results' do
-        suggestions = cache.suggest_corrections('Testng')  # Close to 'Testing'
+        suggestions = cache.suggest_corrections('Testng') # Close to 'Testing'
         expect(suggestions).to include('Testing')
       end
 
       it 'provides multiple relevant suggestions' do
-        suggestions = cache.suggest_corrections('Performnce')  # Close to 'Performance'
+        suggestions = cache.suggest_corrections('Performnce') # Close to 'Performance'
         expect(suggestions).to include('Performance')
       end
 
@@ -182,12 +182,12 @@ RSpec.describe Leyline::Discovery::MetadataCache do
       end
 
       it 'limits number of suggestions' do
-        suggestions = cache.suggest_corrections('Te', 2)  # May match multiple words
+        suggestions = cache.suggest_corrections('Te', 2) # May match multiple words
         expect(suggestions.length).to be <= 2
       end
 
       it 'suggests words from document titles' do
-        suggestions = cache.suggest_corrections('Cachng')  # Close to 'Caching'
+        suggestions = cache.suggest_corrections('Cachng') # Close to 'Caching'
         expect(suggestions).to include('Caching')
       end
     end

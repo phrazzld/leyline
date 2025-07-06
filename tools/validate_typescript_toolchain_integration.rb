@@ -26,28 +26,28 @@ $verbose = false
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: validate_typescript_toolchain_integration.rb [options]"
-  opts.separator ""
-  opts.separator "Full TypeScript toolchain integration validation"
-  opts.separator ""
-  opts.separator "Options:"
+  opts.banner = 'Usage: validate_typescript_toolchain_integration.rb [options]'
+  opts.separator ''
+  opts.separator 'Full TypeScript toolchain integration validation'
+  opts.separator ''
+  opts.separator 'Options:'
 
-  opts.on("-v", "--verbose", "Show detailed output from validation commands") do
+  opts.on('-v', '--verbose', 'Show detailed output from validation commands') do
     $verbose = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
 
-  opts.separator ""
-  opts.separator "Environment Variables:"
-  opts.separator "  LEYLINE_STRUCTURED_LOGGING=true  Enable JSON structured logging to STDERR"
-  opts.separator ""
-  opts.separator "Exit Codes:"
-  opts.separator "  0 - Full toolchain integration successful"
-  opts.separator "  1 - Integration validation failed"
+  opts.separator ''
+  opts.separator 'Environment Variables:'
+  opts.separator '  LEYLINE_STRUCTURED_LOGGING=true  Enable JSON structured logging to STDERR'
+  opts.separator ''
+  opts.separator 'Exit Codes:'
+  opts.separator '  0 - Full toolchain integration successful'
+  opts.separator '  1 - Integration validation failed'
 end.parse!
 
 PROJECT_DIR = 'examples/typescript-full-toolchain'
@@ -63,20 +63,20 @@ def log_structured(event, data = {})
       **data
     }
 
-    STDERR.puts JSON.generate(log_entry)
-  rescue => e
+    warn JSON.generate(log_entry)
+  rescue StandardError => e
     # Graceful degradation if structured logging fails
-    STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    warn "Warning: Structured logging failed: #{e.message}"
   end
 end
 
 # Execute a shell command with proper error handling and output capture
 def run_command(cmd, description, required: true)
   log_structured('integration_command_start', {
-    step: description,
-    command: cmd,
-    required: required
-  })
+                   step: description,
+                   command: cmd,
+                   required: required
+                 })
 
   puts "  🔧 #{description}..."
   start_time = Time.now
@@ -93,31 +93,31 @@ def run_command(cmd, description, required: true)
   if success
     puts "    ✅ #{description} completed (#{duration}s)"
     log_structured('integration_command_success', {
-      step: description,
-      duration_seconds: duration
-    })
-    return true
+                     step: description,
+                     duration_seconds: duration
+                   })
+    true
   else
     exit_code = $?.exitstatus
     puts "    ❌ #{description} failed (exit code #{exit_code})"
     log_structured('integration_command_failure', {
-      step: description,
-      duration_seconds: duration,
-      exit_code: exit_code
-    })
+                     step: description,
+                     duration_seconds: duration,
+                     exit_code: exit_code
+                   })
 
     if required
-      puts "    💡 Run the command manually for detailed error output:"
+      puts '    💡 Run the command manually for detailed error output:'
       puts "    cd #{PROJECT_DIR} && #{cmd}"
     end
 
-    return false
+    false
   end
 end
 
 # Check that the integration project exists and has required files
 def validate_project_structure
-  puts "📁 Validating project structure..."
+  puts '📁 Validating project structure...'
 
   required_files = [
     'package.json',
@@ -142,41 +142,41 @@ def validate_project_structure
     end
   end
 
-  puts "  ✅ All required files present"
-  return true
+  puts '  ✅ All required files present'
+  true
 end
 
 # Check that all required tools are available
 def check_prerequisites
-  puts "🔍 Checking prerequisites..."
+  puts '🔍 Checking prerequisites...'
 
   # Check Ruby
   unless system('ruby --version >/dev/null 2>&1')
-    puts "  ❌ Ruby not found"
+    puts '  ❌ Ruby not found'
     return false
   end
 
   # Check Node.js
   unless system('node --version >/dev/null 2>&1')
-    puts "  ❌ Node.js not found - required for TypeScript toolchain"
-    puts "     Install Node.js 18+ from https://nodejs.org/"
+    puts '  ❌ Node.js not found - required for TypeScript toolchain'
+    puts '     Install Node.js 18+ from https://nodejs.org/'
     return false
   end
 
   # Check pnpm
   unless system('pnpm --version >/dev/null 2>&1')
-    puts "  ❌ pnpm not found - required for package management"
-    puts "     Install with: npm install -g pnpm"
+    puts '  ❌ pnpm not found - required for package management'
+    puts '     Install with: npm install -g pnpm'
     return false
   end
 
-  puts "  ✅ All prerequisites available"
-  return true
+  puts '  ✅ All prerequisites available'
+  true
 end
 
 # Validate that build artifacts are created correctly
 def validate_build_artifacts
-  puts "📦 Validating build artifacts..."
+  puts '📦 Validating build artifacts...'
 
   required_artifacts = [
     'dist/index.js',     # CJS build
@@ -193,23 +193,23 @@ def validate_build_artifacts
     end
   end
 
-  puts "  ✅ All build artifacts present"
-  return true
+  puts '  ✅ All build artifacts present'
+  true
 end
 
 # Main integration validation workflow
 def validate_toolchain_integration
   log_structured('toolchain_integration_start', {
-    tool: 'validate_typescript_toolchain_integration',
-    project_dir: PROJECT_DIR,
-    verbose: $verbose
-  })
+                   tool: 'validate_typescript_toolchain_integration',
+                   project_dir: PROJECT_DIR,
+                   verbose: $verbose
+                 })
 
-  puts "🚀 TypeScript Toolchain Integration Validation"
-  puts "=============================================="
+  puts '🚀 TypeScript Toolchain Integration Validation'
+  puts '=============================================='
   puts "Project: #{PROJECT_DIR}"
   puts "Correlation ID: #{$correlation_id}"
-  puts ""
+  puts ''
 
   # Step 1: Check prerequisites
   unless check_prerequisites
@@ -230,42 +230,31 @@ def validate_toolchain_integration
 
     # Step 4: Install dependencies (package-json-standards + pnpm enforcement)
     puts "\n📦 Testing dependency management..."
-    unless run_command('pnpm install', 'Install dependencies with pnpm')
-      return false
-    end
+    return false unless run_command('pnpm install', 'Install dependencies with pnpm')
 
     # Step 5: Code quality validation (eslint-prettier-setup)
     puts "\n🔍 Testing code quality automation..."
-    unless run_command('pnpm quality:check', 'Run lint and format checks')
-      return false
-    end
+    return false unless run_command('pnpm quality:check', 'Run lint and format checks')
 
     # Step 6: Testing framework validation (vitest-testing-framework + tanstack-query-state)
     puts "\n🧪 Testing framework integration..."
-    unless run_command('pnpm test:coverage', 'Run tests with coverage thresholds')
-      return false
-    end
+    return false unless run_command('pnpm test:coverage', 'Run tests with coverage thresholds')
 
     # Step 7: Build system validation (tsup-build-system)
     puts "\n🏗️  Testing build system..."
-    unless run_command('pnpm build', 'Build project with dual ESM/CJS output')
-      return false
-    end
+    return false unless run_command('pnpm build', 'Build project with dual ESM/CJS output')
 
     # Step 8: Validate build artifacts
-    unless validate_build_artifacts
-      return false
-    end
+    return false unless validate_build_artifacts
 
     # Step 9: Development workflow test (modern-typescript-toolchain)
     puts "\n⚡ Testing development workflow..."
     unless run_command('timeout 10s pnpm dev || true', 'Test development mode startup', required: false)
-      puts "    ⚠️  Development mode test skipped (requires manual verification)"
+      puts '    ⚠️  Development mode test skipped (requires manual verification)'
     end
 
     puts "\n🎉 Full toolchain integration validation successful!"
-    return true
-
+    true
   ensure
     Dir.chdir(original_dir)
   end
@@ -274,14 +263,14 @@ end
 # Performance benchmark of the toolchain
 def run_performance_benchmark
   puts "\n⏱️  Performance Benchmarks"
-  puts "========================="
+  puts '========================='
 
   original_dir = Dir.pwd
   begin
     Dir.chdir(PROJECT_DIR)
 
     # Clean install benchmark
-    puts "Testing cold install performance..."
+    puts 'Testing cold install performance...'
     system('rm -rf node_modules pnpm-lock.yaml')
     install_start = Time.now
     if system('pnpm install >/dev/null 2>&1')
@@ -290,7 +279,7 @@ def run_performance_benchmark
     end
 
     # Test execution benchmark
-    puts "Testing test execution performance..."
+    puts 'Testing test execution performance...'
     test_start = Time.now
     if system('pnpm test >/dev/null 2>&1')
       test_time = (Time.now - test_start).round(2)
@@ -298,13 +287,12 @@ def run_performance_benchmark
     end
 
     # Build performance benchmark
-    puts "Testing build performance..."
+    puts 'Testing build performance...'
     build_start = Time.now
     if system('pnpm build >/dev/null 2>&1')
       build_time = (Time.now - build_start).round(2)
       puts "  ✅ Build time: #{build_time}s"
     end
-
   ensure
     Dir.chdir(original_dir)
   end
@@ -318,34 +306,32 @@ def main
   success = validate_toolchain_integration
 
   # Run performance benchmarks if integration succeeded
-  if success && $verbose
-    run_performance_benchmark
-  end
+  run_performance_benchmark if success && $verbose
 
   # Summary
   total_duration = (Time.now - start_time).round(3)
   puts "\n📊 Integration Summary"
-  puts "====================="
+  puts '====================='
 
   if success
-    puts "✅ All 6 TypeScript bindings integrate successfully!"
-    puts "🎯 Complete development workflow operates end-to-end"
+    puts '✅ All 6 TypeScript bindings integrate successfully!'
+    puts '🎯 Complete development workflow operates end-to-end'
     puts "⏱️  Total validation time: #{total_duration}s"
 
     log_structured('toolchain_integration_success', {
-      duration_seconds: total_duration,
-      bindings_integrated: 6
-    })
+                     duration_seconds: total_duration,
+                     bindings_integrated: 6
+                   })
 
     exit 0
   else
-    puts "❌ Toolchain integration validation failed"
-    puts "💡 Review the error messages above and fix integration issues"
+    puts '❌ Toolchain integration validation failed'
+    puts '💡 Review the error messages above and fix integration issues'
     puts "⏱️  Total validation time: #{total_duration}s"
 
     log_structured('toolchain_integration_failure', {
-      duration_seconds: total_duration
-    })
+                     duration_seconds: total_duration
+                   })
 
     exit 1
   end

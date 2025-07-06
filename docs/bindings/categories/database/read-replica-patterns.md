@@ -8,384 +8,194 @@ enforced_by: architecture review & monitoring
 
 # Binding: Design Maintainable Read Replica Patterns
 
-Read replica implementations must prioritize long-term maintainability by using clear separation patterns, explicit consistency guarantees, and predictable failover behaviors. Design for operational simplicity and graceful degradation rather than complex optimization schemes that are difficult to maintain.
+Read replica implementations must prioritize long-term maintainability through clear separation patterns, explicit consistency guarantees, and predictable failover behaviors.
 
 ## Rationale
 
-This binding implements maintainability by ensuring that read replica patterns remain comprehensible and manageable as systems scale. Read replicas often solve immediate performance problems but can create complex distributed systems that become operational nightmares without careful design.
-
-Think of read replicas like having multiple copies of a reference book distributed across different libraries. Each copy helps serve more readers simultaneously, but you need clear policies about which copy to consult for which purposes, how to handle outdated or unavailable copies, and what to do when the main book is updated.
-
-The challenge with read replicas is that they introduce distributed system complexity—replication lag, eventual consistency, and failure scenarios—into previously simple systems. Maintainable replica patterns establish clear, consistent approaches to these challenges.
+This binding implements maintainability by ensuring read replica patterns remain comprehensible and manageable as systems scale. Read replicas introduce distributed system complexity—replication lag, eventual consistency, and failure scenarios—requiring clear, consistent patterns.
 
 ## Rule Definition
 
-Maintainable read replica patterns require designing database scaling solutions that remain operationally simple and predictable over time:
+**Requirements:**
+- **Explicit Consistency Levels**: Define clear requirements (strong, eventual, bounded-stale) for each operation
+- **Clear Routing**: Explicitly classify and route reads vs writes to appropriate data stores
+- **Fallback Strategies**: Implement predictable degradation when replicas fail or lag
+- **Session Consistency**: Manage read-after-write consistency for user sessions
+- **Lag Monitoring**: Monitor replication lag with automated alerts
+- **Simple Failover**: Design testable failover with clear recovery procedures
 
-**Consistency Management:**
-- **Explicit Consistency Levels**: Define clear read consistency requirements for each operation (strong, eventual, or stale-acceptable)
-- **Lag Tolerance Specification**: Document acceptable replication lag for each data type and operation
-- **Fallback Strategies**: Implement predictable degradation when replicas are unavailable or too stale
-
-**Read/Write Separation:**
-- **Clear Operation Classification**: Explicitly route reads and writes to appropriate data stores
-- **Transaction Boundary Management**: Handle cross-replica operations with clear consistency guarantees
-- **Session Affinity Patterns**: Manage user session consistency across replica reads
-
-**Operational Simplicity:**
-- **Monitoring and Alerting**: Implement comprehensive lag monitoring and automated health checks
-- **Failover Automation**: Design simple, testable failover mechanisms with clear recovery procedures
-- **Capacity Planning**: Provide clear guidelines for replica scaling and performance tuning
+**Prohibited Practices:**
+- Implicit routing decisions without clear consistency guarantees
+- Complex optimization schemes that sacrifice operational clarity
+- Session consistency patterns that create unpredictable user experiences
 
 ## Practical Implementation
 
-1. **Implement Explicit Read Routing**: Create clear patterns for directing reads to appropriate replicas:
+**1. Explicit Read Routing** - Define clear consistency levels and routing logic:
 
-   ```typescript
-   enum ConsistencyLevel {
-     STRONG = 'strong',           // Must read from primary
-     EVENTUAL = 'eventual',       // Can read from replica with any lag
-     BOUNDED_STALE = 'bounded',   // Can read from replica within time bound
-   }
+```typescript
+enum ConsistencyLevel {
+  STRONG = 'strong',
+  EVENTUAL = 'eventual',
+  BOUNDED_STALE = 'bounded'
+}
 
-   interface ReadOptions {
-     consistency: ConsistencyLevel;
-     maxStaleness?: number; // milliseconds
-     timeout?: number;
-   }
+class DatabaseRouter {
+  async read<T>(query: string, params: any[], options: {
+    consistency: ConsistencyLevel;
+    maxStaleness?: number;
+  }): Promise<T> {
+    switch (options.consistency) {
+      case ConsistencyLevel.STRONG:
+        return await this.primary.execute(query, params);
 
-   class DatabaseRouter {
-     constructor(
-       private primary: DatabaseConnection,
-       private replicas: DatabaseConnection[],
-       private replicationMonitor: ReplicationMonitor
-     ) {}
+      case ConsistencyLevel.BOUNDED_STALE:
+        const replica = await this.selectReplicaWithinBound(options.maxStaleness || 1000);
+        return replica
+          ? await replica.execute(query, params)
+          : await this.primary.execute(query, params);
 
-     async read<T>(
-       query: string,
-       params: any[],
-       options: ReadOptions = { consistency: ConsistencyLevel.EVENTUAL }
-     ): Promise<T> {
-       try {
-         switch (options.consistency) {
-           case ConsistencyLevel.STRONG:
-             return await this.readFromPrimary(query, params, options.timeout);
+      case ConsistencyLevel.EVENTUAL:
+        const healthyReplica = await this.selectHealthyReplica();
+        return healthyReplica
+          ? await healthyReplica.execute(query, params)
+          : await this.primary.execute(query, params);
+    }
+  }
 
-           case ConsistencyLevel.BOUNDED_STALE:
-             const replica = await this.selectReplicaWithinBound(options.maxStaleness || 1000);
-             if (replica) {
-               return await this.readFromReplica(replica, query, params, options.timeout);
-             }
-             // Fallback to primary if no suitable replica
-             return await this.readFromPrimary(query, params, options.timeout);
+  async write<T>(query: string, params: any[]): Promise<T> {
+    return await this.primary.execute(query, params);
+  }
+}
+```
 
-           case ConsistencyLevel.EVENTUAL:
-             const healthyReplica = await this.selectHealthyReplica();
-             if (healthyReplica) {
-               return await this.readFromReplica(healthyReplica, query, params, options.timeout);
-             }
-             // Fallback to primary if no healthy replica
-             return await this.readFromPrimary(query, params, options.timeout);
+**2. Session Consistency Management** - Handle read-after-write consistency:
 
-           default:
-             throw new Error(`Unknown consistency level: ${options.consistency}`);
-         }
-       } catch (error) {
-         // Always fallback to primary on error
-         if (options.consistency !== ConsistencyLevel.STRONG) {
-           try {
-             return await this.readFromPrimary(query, params, options.timeout);
-           } catch (primaryError) {
-             throw new DatabaseError('Primary and replica reads failed', {
-               replicaError: error,
-               primaryError
-             });
-           }
-         }
-         throw error;
-       }
-     }
+```typescript
+class SessionConsistencyManager {
+  private userLastWrites = new Map<string, number>();
 
-     async write<T>(query: string, params: any[], timeout?: number): Promise<T> {
-       // All writes go to primary
-       return await this.primary.execute(query, params, timeout);
-     }
+  async handleRead<T>(userId: string, readFn: () => Promise<T>, requireConsistency = false): Promise<T> {
+    if (requireConsistency) {
+      const lastWrite = this.userLastWrites.get(userId);
+      if (lastWrite && Date.now() - lastWrite < 5000) {
+        return await this.dbRouter.read(readFn, { consistency: ConsistencyLevel.STRONG });
+      }
+    }
+    return await readFn();
+  }
 
-     private async selectReplicaWithinBound(maxStalenessMs: number): Promise<DatabaseConnection | null> {
-       for (const replica of this.replicas) {
-         const lag = await this.replicationMonitor.getLag(replica);
-         if (lag !== null && lag <= maxStalenessMs) {
-           return replica;
-         }
-       }
-       return null;
-     }
+  async handleWrite<T>(userId: string, writeFn: () => Promise<T>): Promise<T> {
+    const result = await writeFn();
+    this.userLastWrites.set(userId, Date.now());
+    return result;
+  }
+}
+```
 
-     private async selectHealthyReplica(): Promise<DatabaseConnection | null> {
-       for (const replica of this.replicas) {
-         if (await this.replicationMonitor.isHealthy(replica)) {
-           return replica;
-         }
-       }
-       return null;
-     }
-   }
-   ```
+**3. Replication Monitoring** - Monitor replica health and lag:
 
-2. **Design Session Consistency Management**: Handle user sessions that require read-after-write consistency:
+```typescript
+class ReplicationMonitor {
+  async getLag(replica: DatabaseConnection): Promise<number | null> {
+    try {
+      const result = await replica.query('SELECT EXTRACT(EPOCH FROM (now() - pg_last_xact_replay_timestamp())) * 1000 as lag_ms');
+      const lag = result.rows[0]?.lag_ms || null;
 
-   ```typescript
-   class SessionConsistencyManager {
-     private userLastWrites = new Map<string, number>();
+      if (lag > 10000) {
+        await this.alertManager.warn(`Replica lag: ${lag}ms`);
+      }
 
-     async handleRead<T>(
-       userId: string,
-       readOperation: () => Promise<T>,
-       options: ReadOptions & { requireReadAfterWrite?: boolean } = {}
-     ): Promise<T> {
-       if (options.requireReadAfterWrite) {
-         const lastWriteTime = this.userLastWrites.get(userId);
-         if (lastWriteTime) {
-           const timeSinceWrite = Date.now() - lastWriteTime;
-           if (timeSinceWrite < 5000) { // Within 5 seconds, read from primary
-             return await this.dbRouter.read(
-               readOperation,
-               { consistency: ConsistencyLevel.STRONG }
-             );
-           }
-         }
-       }
+      return lag;
+    } catch {
+      return null;
+    }
+  }
 
-       return await this.dbRouter.read(readOperation, options);
-     }
+  async isHealthy(replica: DatabaseConnection): Promise<boolean> {
+    try {
+      await replica.query('SELECT 1');
+      const lag = await this.getLag(replica);
+      return lag !== null && lag < 30000;
+    } catch {
+      return false;
+    }
+  }
+}
+```
 
-     async handleWrite<T>(
-       userId: string,
-       writeOperation: () => Promise<T>
-     ): Promise<T> {
-       const result = await this.dbRouter.write(writeOperation);
-       this.userLastWrites.set(userId, Date.now());
+**4. Service-Level Patterns** - Apply consistency requirements:
 
-       // Clean up old entries periodically
-       this.cleanupOldEntries();
+```typescript
+class UserService {
+  async getUserProfile(userId: string): Promise<UserProfile> {
+    return await this.dbRouter.read(
+      'SELECT * FROM profiles WHERE user_id = $1', [userId],
+      { consistency: ConsistencyLevel.EVENTUAL }
+    );
+  }
 
-       return result;
-     }
+  async getUserPermissions(userId: string): Promise<Permission[]> {
+    return await this.dbRouter.read(
+      'SELECT * FROM permissions WHERE user_id = $1', [userId],
+      { consistency: ConsistencyLevel.STRONG }
+    );
+  }
 
-     private cleanupOldEntries(): void {
-       const cutoff = Date.now() - 60000; // 1 minute ago
-       for (const [userId, timestamp] of this.userLastWrites.entries()) {
-         if (timestamp < cutoff) {
-           this.userLastWrites.delete(userId);
-         }
-       }
-     }
-   }
-   ```
-
-3. **Implement Replication Monitoring**: Create comprehensive monitoring for replica health and lag:
-
-   ```typescript
-   class ReplicationMonitor {
-     private lagCache = new Map<string, { lag: number | null; timestamp: number }>();
-     private readonly CACHE_TTL = 1000; // 1 second
-
-     async getLag(replica: DatabaseConnection): Promise<number | null> {
-       const replicaId = replica.getId();
-       const cached = this.lagCache.get(replicaId);
-
-       if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-         return cached.lag;
-       }
-
-       try {
-         // Query replica for its lag behind primary
-         const result = await replica.query(
-           'SELECT EXTRACT(EPOCH FROM (now() - pg_last_xact_replay_timestamp())) * 1000 as lag_ms'
-         );
-
-         const lag = result.rows[0]?.lag_ms || null;
-         this.lagCache.set(replicaId, { lag, timestamp: Date.now() });
-
-         // Alert if lag exceeds threshold
-         if (lag !== null && lag > 10000) { // 10 seconds
-           await this.alertManager.sendAlert({
-             level: 'warning',
-             message: `Replica ${replicaId} lag: ${lag}ms`,
-             replica: replicaId,
-             lag
-           });
-         }
-
-         return lag;
-       } catch (error) {
-         this.lagCache.set(replicaId, { lag: null, timestamp: Date.now() });
-         return null;
-       }
-     }
-
-     async isHealthy(replica: DatabaseConnection): Promise<boolean> {
-       try {
-         // Simple health check query
-         await replica.query('SELECT 1');
-
-         // Check lag is within acceptable bounds
-         const lag = await this.getLag(replica);
-         return lag !== null && lag < 30000; // 30 seconds max
-       } catch (error) {
-         return false;
-       }
-     }
-
-     async getHealthStatus(): Promise<ReplicationStatus> {
-       const replicaStatuses = await Promise.all(
-         this.replicas.map(async (replica) => ({
-           id: replica.getId(),
-           healthy: await this.isHealthy(replica),
-           lag: await this.getLag(replica)
-         }))
-       );
-
-       return {
-         primaryHealthy: await this.isHealthy(this.primary),
-         replicas: replicaStatuses,
-         overallHealth: replicaStatuses.every(r => r.healthy) ? 'healthy' : 'degraded'
-       };
-     }
-   }
-   ```
-
-4. **Implement Service-Level Patterns**: Create domain-specific read routing strategies:
-
-   ```typescript
-   class UserService {
-     constructor(
-       private dbRouter: DatabaseRouter,
-       private sessionManager: SessionConsistencyManager
-     ) {}
-
-     // Profile reads can be eventually consistent
-     async getUserProfile(userId: string): Promise<UserProfile> {
-       return await this.dbRouter.read(
-         'SELECT * FROM user_profiles WHERE user_id = $1',
-         [userId],
-         { consistency: ConsistencyLevel.EVENTUAL }
-       );
-     }
-
-     // Security-sensitive reads require strong consistency
-     async getUserPermissions(userId: string): Promise<Permission[]> {
-       return await this.dbRouter.read(
-         'SELECT * FROM user_permissions WHERE user_id = $1',
-         [userId],
-         { consistency: ConsistencyLevel.STRONG }
-       );
-     }
-
-     // Recent activity should show user's own writes
-     async getUserActivity(userId: string, requesterId: string): Promise<Activity[]> {
-       const requireReadAfterWrite = userId === requesterId;
-
-       return await this.sessionManager.handleRead(
-         requesterId,
-         () => this.dbRouter.read(
-           'SELECT * FROM user_activities WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50',
-           [userId],
-           { consistency: ConsistencyLevel.EVENTUAL }
-         ),
-         { requireReadAfterWrite }
-       );
-     }
-
-     // All writes go through session manager
-     async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<void> {
-       await this.sessionManager.handleWrite(
-         userId,
-         () => this.dbRouter.write(
-           'UPDATE user_profiles SET name = $1, email = $2 WHERE user_id = $3',
-           [updates.name, updates.email, userId]
-         )
-       );
-     }
-   }
-   ```
+  async getUserActivity(userId: string, requesterId: string): Promise<Activity[]> {
+    return await this.sessionManager.handleRead(
+      requesterId,
+      () => this.dbRouter.read(/* query */),
+      userId === requesterId
+    );
+  }
+}
+```
 
 ## Examples
 
 ```typescript
-// ❌ BAD: Implicit routing with unclear consistency guarantees
+// ❌ BAD: Implicit routing with unclear consistency
 class UserService {
   async getUser(id: string) {
-    // Which database? What consistency? Unknown!
     return await this.db.query('SELECT * FROM users WHERE id = ?', [id]);
   }
 
   async updateUser(id: string, data: any) {
     await this.db.query('UPDATE users SET ... WHERE id = ?', [data, id]);
-    // No consideration of read-after-write consistency
-  }
-
-  async getUserPosts(userId: string) {
-    // Might hit replica, might not see user's recent posts
-    return await this.db.query('SELECT * FROM posts WHERE user_id = ?', [userId]);
   }
 }
-```
 
-```typescript
-// ✅ GOOD: Explicit consistency levels and clear routing
+// ✅ GOOD: Explicit consistency and clear routing
 class UserService {
   async getUser(id: string): Promise<User> {
-    // Profile data can be eventually consistent
     return await this.dbRouter.read(
-      'SELECT * FROM users WHERE id = $1',
-      [id],
+      'SELECT * FROM users WHERE id = $1', [id],
       { consistency: ConsistencyLevel.EVENTUAL }
     );
   }
 
-  async getUserSensitiveData(id: string): Promise<UserSensitiveData> {
-    // Security data requires strong consistency
+  async getUserPermissions(id: string): Promise<Permission[]> {
     return await this.dbRouter.read(
-      'SELECT * FROM user_sensitive WHERE id = $1',
-      [id],
+      'SELECT * FROM permissions WHERE user_id = $1', [id],
       { consistency: ConsistencyLevel.STRONG }
     );
   }
 
   async updateUser(id: string, data: UserUpdate): Promise<void> {
-    await this.sessionManager.handleWrite(
-      id,
-      () => this.dbRouter.write(
-        'UPDATE users SET name = $1, email = $2 WHERE id = $3',
-        [data.name, data.email, id]
-      )
-    );
+    await this.sessionManager.handleWrite(id, () => this.dbRouter.write('UPDATE users SET ... WHERE id = $1', [data, id]));
   }
 
   async getUserPosts(userId: string, requesterId: string): Promise<Post[]> {
-    // Show user their own recent posts immediately
-    const requireReadAfterWrite = userId === requesterId;
-
     return await this.sessionManager.handleRead(
       requesterId,
-      () => this.dbRouter.read(
-        'SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC',
-        [userId],
-        { consistency: ConsistencyLevel.BOUNDED_STALE, maxStaleness: 2000 }
-      ),
-      { requireReadAfterWrite }
-    );
+      () => this.dbRouter.read(/* query */, [userId], { consistency: ConsistencyLevel.BOUNDED_STALE, maxStaleness: 2000 }),
+      userId === requesterId);
   }
 }
 ```
-
 ## Related Bindings
-
-- [maintainability](../../tenets/maintainability.md): Read replica patterns directly implement maintainability by creating comprehensible, modifiable database scaling solutions that remain operational as systems grow.
-
-- [explicit-over-implicit](../../tenets/explicit-over-implicit.md): Replica patterns require explicit consistency level declarations and clear routing decisions rather than hidden or automatic behavior.
-
-- [system-boundaries](../core/system-boundaries.md): Read replicas create new system boundaries that must be explicitly managed with clear contracts about consistency guarantees and failure modes.
-
-- [use-structured-logging](../core/use-structured-logging.md): Replica operations require comprehensive logging to track routing decisions, lag monitoring, and failover events for operational visibility.
+- [maintainability](../../tenets/maintainability.md): Creates comprehensible, modifiable database scaling solutions
+- [explicit-over-implicit](../../tenets/explicit-over-implicit.md): Requires explicit consistency declarations and routing decisions
+- [system-boundaries](../core/system-boundaries.md): Read replicas create new boundaries requiring clear contracts
+- [use-structured-logging](../core/use-structured-logging.md): Requires comprehensive logging for routing decisions and monitoring

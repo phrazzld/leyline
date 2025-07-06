@@ -47,24 +47,24 @@ RSpec.describe 'Simple Transparency Performance Tests', :performance do
       end
 
       puts "\n📊 PERFORMANCE TESTING APPROACH COMPARISON"
-      puts "=" * 60
-      puts "Statistical Approach (our method):"
+      puts '=' * 60
+      puts 'Statistical Approach (our method):'
       puts "  - P95 time: #{(statistical_metrics[:p95_seconds] * 1000).round(1)}ms"
       puts "  - Success rate: #{(statistical_metrics[:success_rate] * 100).round(1)}%"
       puts "  - Sample size: #{statistical_metrics[:sample_size]}"
       puts "  - Coefficient variation: #{statistical_metrics[:coefficient_of_variation].round(3)}"
       puts
-      puts "Fixed Threshold Approach (comparison):"
+      puts 'Fixed Threshold Approach (comparison):'
       puts "  - Single measurement: #{(fixed_threshold_result[:single_time] * 1000).round(1)}ms"
       puts "  - Pass/fail: #{fixed_threshold_result[:passes_2s_threshold] ? 'PASS' : 'FAIL'} (<2000ms)"
-      puts "  - Reliability: Lower (single sample, hardware dependent)"
-      puts "=" * 60
+      puts '  - Reliability: Lower (single sample, hardware dependent)'
+      puts '=' * 60
 
       # Our statistical approach should provide more reliable insights
       expect(statistical_metrics[:sample_size]).to be >= 8
       expect(statistical_metrics[:coefficient_of_variation]).to be < 1.0
 
-      puts "✅ Statistical approach provides more reliable performance insights"
+      puts '✅ Statistical approach provides more reliable performance insights'
     end
   end
 

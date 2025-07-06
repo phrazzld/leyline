@@ -12,72 +12,72 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
   # Failure scenarios to test graceful degradation
   DEGRADATION_SCENARIOS = {
     cache_permission_denied: {
-      description: "Cache directory has no read/write permissions",
-      setup: lambda { |cache_dir| File.chmod(0000, cache_dir) if Dir.exist?(cache_dir) },
-      cleanup: lambda { |cache_dir| File.chmod(0755, cache_dir) if Dir.exist?(cache_dir) },
+      description: 'Cache directory has no read/write permissions',
+      setup: ->(cache_dir) { File.chmod(0o000, cache_dir) if Dir.exist?(cache_dir) },
+      cleanup: ->(cache_dir) { File.chmod(0o755, cache_dir) if Dir.exist?(cache_dir) },
       expected_behavior: :fallback_to_no_cache,
-      max_performance_penalty: 1.5,  # 50% slower maximum
+      max_performance_penalty: 1.5, # 50% slower maximum
       should_succeed: true
     },
 
     cache_disk_full: {
-      description: "Disk is full, cache writes fail",
-      setup: lambda { |cache_dir| simulate_disk_full(cache_dir) },
-      cleanup: lambda { |cache_dir| cleanup_disk_full_simulation(cache_dir) },
+      description: 'Disk is full, cache writes fail',
+      setup: ->(cache_dir) { simulate_disk_full(cache_dir) },
+      cleanup: ->(cache_dir) { cleanup_disk_full_simulation(cache_dir) },
       expected_behavior: :continue_readonly,
       max_performance_penalty: 1.2,
       should_succeed: true
     },
 
     corrupted_cache_files: {
-      description: "10% of cache files are corrupted",
-      setup: lambda { |cache_dir| corrupt_cache_files(cache_dir, 0.1) },
-      cleanup: lambda { |cache_dir| FileUtils.rm_rf(Dir.glob(File.join(cache_dir, '**', '*.corrupted'))) },
+      description: '10% of cache files are corrupted',
+      setup: ->(cache_dir) { corrupt_cache_files(cache_dir, 0.1) },
+      cleanup: ->(cache_dir) { FileUtils.rm_rf(Dir.glob(File.join(cache_dir, '**', '*.corrupted'))) },
       expected_behavior: :auto_repair,
       max_performance_penalty: 2.0,
       should_succeed: true
     },
 
     zero_byte_cache_files: {
-      description: "Cache files exist but are zero bytes",
-      setup: lambda { |cache_dir| create_zero_byte_cache_files(cache_dir) },
-      cleanup: lambda { |cache_dir| }, # handled by cache
+      description: 'Cache files exist but are zero bytes',
+      setup: ->(cache_dir) { create_zero_byte_cache_files(cache_dir) },
+      cleanup: ->(cache_dir) {}, # handled by cache
       expected_behavior: :auto_cleanup,
       max_performance_penalty: 1.3,
       should_succeed: true
     },
 
     cache_directory_missing: {
-      description: "Cache directory is deleted mid-operation",
-      setup: lambda { |cache_dir| FileUtils.rm_rf(cache_dir) },
-      cleanup: lambda { |cache_dir| FileUtils.mkdir_p(cache_dir) },
+      description: 'Cache directory is deleted mid-operation',
+      setup: ->(cache_dir) { FileUtils.rm_rf(cache_dir) },
+      cleanup: ->(cache_dir) { FileUtils.mkdir_p(cache_dir) },
       expected_behavior: :recreate_cache,
       max_performance_penalty: 1.5,
       should_succeed: true
     },
 
     partial_cache_state: {
-      description: "Cache metadata is incomplete",
-      setup: lambda { |cache_dir| create_partial_cache_state(cache_dir) },
-      cleanup: lambda { |cache_dir| }, # handled by cache
+      description: 'Cache metadata is incomplete',
+      setup: ->(cache_dir) { create_partial_cache_state(cache_dir) },
+      cleanup: ->(cache_dir) {}, # handled by cache
       expected_behavior: :rebuild_metadata,
       max_performance_penalty: 1.8,
       should_succeed: true
     },
 
     concurrent_cache_access: {
-      description: "Multiple processes accessing cache simultaneously",
-      setup: lambda { |cache_dir| simulate_concurrent_access(cache_dir) },
-      cleanup: lambda { |cache_dir| cleanup_concurrent_access(cache_dir) },
+      description: 'Multiple processes accessing cache simultaneously',
+      setup: ->(cache_dir) { simulate_concurrent_access(cache_dir) },
+      cleanup: ->(cache_dir) { cleanup_concurrent_access(cache_dir) },
       expected_behavior: :handle_contention,
       max_performance_penalty: 1.4,
       should_succeed: true
     },
 
     invalid_cache_content: {
-      description: "Cache contains invalid/malformed data",
-      setup: lambda { |cache_dir| inject_invalid_cache_content(cache_dir) },
-      cleanup: lambda { |cache_dir| }, # handled by cache
+      description: 'Cache contains invalid/malformed data',
+      setup: ->(cache_dir) { inject_invalid_cache_content(cache_dir) },
+      cleanup: ->(cache_dir) {}, # handled by cache
       expected_behavior: :skip_invalid,
       max_performance_penalty: 1.3,
       should_succeed: true
@@ -88,10 +88,10 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
   let(:baseline_times) { {} }
 
   before(:all) do
-    puts "\n" + "=" * 80
-    puts "DEGRADATION TEST SUITE"
-    puts "Testing graceful handling of failure conditions"
-    puts "=" * 80
+    puts "\n" + '=' * 80
+    puts 'DEGRADATION TEST SUITE'
+    puts 'Testing graceful handling of failure conditions'
+    puts '=' * 80
   end
 
   describe 'Baseline Performance' do
@@ -101,7 +101,7 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
         baseline_times[scenario_name] = result[:average_ms]
 
         expect(result[:average_ms]).to be < 2000,
-          "Baseline performance #{result[:average_ms]}ms exceeds reasonable limits"
+                                       "Baseline performance #{result[:average_ms]}ms exceeds reasonable limits"
 
         puts "\nBaseline for #{scenario_name}: #{result[:average_ms].round(2)}ms"
       end
@@ -111,9 +111,9 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
   describe 'Degradation Scenarios' do
     DEGRADATION_SCENARIOS.each do |scenario_name, config|
       context config[:description] do
-        it "handles degradation gracefully with acceptable performance impact" do
+        it 'handles degradation gracefully with acceptable performance impact' do
           # Skip if baseline not established
-          skip "Baseline not established" unless baseline_times[scenario_name]
+          skip 'Baseline not established' unless baseline_times[scenario_name]
 
           baseline = baseline_times[scenario_name]
 
@@ -127,7 +127,7 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
             # Validate the command still succeeds (if expected)
             if config[:should_succeed]
               expect(degraded_result[:success]).to be(true),
-                "Command failed when it should have succeeded gracefully"
+                                                   'Command failed when it should have succeeded gracefully'
             end
 
             # Validate performance degradation is within acceptable bounds
@@ -135,8 +135,8 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
               degradation_ratio = degraded_result[:average_ms] / baseline
 
               expect(degradation_ratio).to be <= config[:max_performance_penalty],
-                "Performance degraded by #{degradation_ratio.round(2)}x, " \
-                "expected <= #{config[:max_performance_penalty]}x"
+                                           "Performance degraded by #{degradation_ratio.round(2)}x, " \
+                                           "expected <= #{config[:max_performance_penalty]}x"
 
               # Log detailed results
               log_degradation_results(scenario_name, baseline, degraded_result, degradation_ratio)
@@ -144,15 +144,14 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
 
             # Validate expected behavior
             validate_expected_behavior(config[:expected_behavior], degraded_result, setup_result)
-
           ensure
             # Always cleanup
             cleanup_degradation_environment(setup_result, config)
           end
         end
 
-        it "recovers successfully after failure condition is resolved" do
-          skip "Baseline not established" unless baseline_times[scenario_name]
+        it 'recovers successfully after failure condition is resolved' do
+          skip 'Baseline not established' unless baseline_times[scenario_name]
 
           # Setup and trigger failure
           setup_result = setup_degradation_environment(scenario_name, config)
@@ -169,12 +168,12 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
             recovery_ratio = recovery_result[:average_ms] / baseline_times[scenario_name]
 
             expect(recovery_ratio).to be < 1.2,
-              "Recovery performance #{recovery_ratio.round(2)}x baseline, expected near 1.0x"
+                                      "Recovery performance #{recovery_ratio.round(2)}x baseline, expected near 1.0x"
           end
 
           # Validate cache metrics show recovery
           expect(recovery_result[:cache_errors]).to eq(0),
-            "Cache errors persist after recovery"
+                                                    'Cache errors persist after recovery'
         end
       end
     end
@@ -183,9 +182,9 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
   describe 'Compound Failure Scenarios' do
     it 'handles multiple simultaneous failures' do
       compound_scenarios = [
-        [:cache_permission_denied, :corrupted_cache_files],
-        [:cache_disk_full, :invalid_cache_content],
-        [:zero_byte_cache_files, :concurrent_cache_access]
+        %i[cache_permission_denied corrupted_cache_files],
+        %i[cache_disk_full invalid_cache_content],
+        %i[zero_byte_cache_files concurrent_cache_access]
       ]
 
       compound_scenarios.each do |scenario_names|
@@ -205,13 +204,12 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
 
           # Should still complete, even if slowly
           expect(result[:completed]).to be(true),
-            "Command failed to complete under compound failures"
+                                        'Command failed to complete under compound failures'
 
           # Log results
           puts "  Completed: #{result[:completed]}"
           puts "  Time: #{result[:average_ms]&.round(2)}ms"
           puts "  Errors: #{result[:errors].length}"
-
         ensure
           # Cleanup all
           setup_results.zip(scenario_names).each do |setup_result, name|
@@ -241,14 +239,13 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
           error_quality_results[scenario_name] = error_quality
 
           expect(error_quality[:has_clear_problem]).to be(true),
-            "Error message doesn't clearly identify the problem"
+                                                       "Error message doesn't clearly identify the problem"
 
           expect(error_quality[:has_suggestion]).to be(true),
-            "Error message doesn't provide actionable suggestions"
+                                                    "Error message doesn't provide actionable suggestions"
 
           expect(error_quality[:mentions_cache]).to be(true),
-            "Error message doesn't mention cache when cache-related"
-
+                                                    "Error message doesn't mention cache when cache-related"
         ensure
           cleanup_degradation_environment(setup_result, config)
         end
@@ -385,12 +382,12 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
 
       begin
         command = Leyline::Commands::StatusCommand.new(options)
-        output = command.execute
+        command.execute
 
         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
         times << (end_time - start_time)
         successes << true
-      rescue => e
+      rescue StandardError => e
         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
         times << (end_time - start_time)
         successes << false
@@ -430,12 +427,12 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
 
       command = Leyline::Commands::StatusCommand.new(options)
-      output = command.execute
+      command.execute
 
       end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :millisecond)
       times << (end_time - start_time)
       completed = true
-    rescue => e
+    rescue StandardError => e
       errors << e
     end
 
@@ -499,11 +496,11 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
     # Create a file that fills most of available space
     # In practice, would use fallocate or similar
     marker_file = File.join(cache_dir, '.disk_full_simulation')
-    File.write(marker_file, "DISK_FULL_MARKER")
+    File.write(marker_file, 'DISK_FULL_MARKER')
 
     # Make cache files read-only to simulate write failures
     Dir.glob(File.join(cache_dir, '**', '*')).each do |file|
-      File.chmod(0444, file) if File.file?(file)
+      File.chmod(0o444, file) if File.file?(file)
     end
   end
 
@@ -513,7 +510,7 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
 
     # Restore write permissions
     Dir.glob(File.join(cache_dir, '**', '*')).each do |file|
-      File.chmod(0644, file) if File.file?(file)
+      File.chmod(0o644, file) if File.file?(file)
     end
   end
 
@@ -570,18 +567,18 @@ RSpec.describe 'Transparency Commands Degradation Tests', type: :benchmark do
     3.times do |i|
       dir = File.join(cache_dir, 'content', format('%02x', 100 + i))
       FileUtils.mkdir_p(dir)
-      File.write(File.join(dir, "invalid_#{i}"), "{invalid json content[}")
+      File.write(File.join(dir, "invalid_#{i}"), '{invalid json content[}')
     end
   end
 
-  def capture_error_output(&block)
+  def capture_error_output
     original_stderr = $stderr
     $stderr = StringIO.new
 
     begin
       yield
-    rescue => e
-      $stderr.puts e.message
+    rescue StandardError => e
+      warn e.message
     end
 
     $stderr.string

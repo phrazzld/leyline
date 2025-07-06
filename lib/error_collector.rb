@@ -26,7 +26,7 @@ class ErrorCollector
   # @param type [String] Error type/category for classification
   # @param message [String] Human-readable error description
   # @param suggestion [String, nil] Actionable fix suggestion (nil if no suggestion available)
-  def add_error(file:, line: nil, field: nil, type:, message:, suggestion: nil)
+  def add_error(file:, type:, message:, line: nil, field: nil, suggestion: nil)
     error_record = {
       file: file,
       line: line,
@@ -73,14 +73,12 @@ class ErrorCollector
   # Get the correlation ID for this validation session
   #
   # @return [String] Unique correlation ID
-  def correlation_id
-    @correlation_id
-  end
+  attr_reader :correlation_id
 
   # Export all errors as structured JSON
   #
   # @return [String] JSON representation of all errors with metadata
-  def to_json
+  def to_json(*_args)
     {
       correlation_id: @correlation_id,
       start_time: @start_time.iso8601,
@@ -106,10 +104,10 @@ class ErrorCollector
     }
 
     begin
-      STDERR.puts JSON.generate(summary)
-    rescue => e
+      warn JSON.generate(summary)
+    rescue StandardError => e
       # Graceful degradation if structured logging fails
-      STDERR.puts "Warning: Structured logging failed: #{e.message}"
+      warn "Warning: Structured logging failed: #{e.message}"
     end
   end
 
@@ -122,16 +120,14 @@ class ErrorCollector
 
   # Log a single error as structured JSON to STDERR
   def log_structured_error(error_record)
-    begin
-      log_entry = {
-        event: 'validation_error',
-        **error_record
-      }
+    log_entry = {
+      event: 'validation_error',
+      **error_record
+    }
 
-      STDERR.puts JSON.generate(log_entry)
-    rescue => e
-      # Graceful degradation if structured logging fails
-      STDERR.puts "Warning: Structured logging failed: #{e.message}"
-    end
+    warn JSON.generate(log_entry)
+  rescue StandardError => e
+    # Graceful degradation if structured logging fails
+    warn "Warning: Structured logging failed: #{e.message}"
   end
 end

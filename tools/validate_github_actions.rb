@@ -7,8 +7,8 @@ require 'optparse'
 # GitHub Actions Deprecation Validator
 # Prevents CI failures by detecting deprecated action versions in workflow files
 class GitHubActionsValidator
-  WORKFLOW_GLOB = '.github/workflows/*.yml'.freeze
-  DEPRECATIONS_FILE = 'tools/github-actions-deprecations.yml'.freeze
+  WORKFLOW_GLOB = '.github/workflows/*.yml'
+  DEPRECATIONS_FILE = 'tools/github-actions-deprecations.yml'
 
   def initialize(verbose: false)
     @verbose = verbose
@@ -36,7 +36,7 @@ class GitHubActionsValidator
     return {} unless File.exist?(DEPRECATIONS_FILE)
 
     YAML.safe_load(File.read(DEPRECATIONS_FILE)) || {}
-  rescue => e
+  rescue StandardError => e
     puts "Warning: Could not load deprecations file: #{e.message}" if @verbose
     {}
   end
@@ -54,7 +54,7 @@ class GitHubActionsValidator
       action_ref = action_match[1].strip
       check_action_deprecation(action_ref, file_path, index + 1)
     end
-  rescue => e
+  rescue StandardError => e
     @findings << {
       file: file_path,
       line: 0,
@@ -80,11 +80,11 @@ class GitHubActionsValidator
 
   def report_findings
     if @findings.empty?
-      puts "✅ GitHub Actions deprecation check passed" if @verbose
+      puts '✅ GitHub Actions deprecation check passed' if @verbose
       return
     end
 
-    puts "❌ GitHub Actions deprecation issues found:"
+    puts '❌ GitHub Actions deprecation issues found:'
     puts
 
     @findings.each do |finding|
@@ -95,15 +95,13 @@ class GitHubActionsValidator
       puts "  Severity: #{finding[:severity].upcase}"
       puts "  Reason: #{finding[:reason]}" if finding[:reason]
 
-      if finding[:upgrade_to]
-        puts "  🔧 Upgrade to: #{finding[:upgrade_to]}"
-      end
+      puts "  🔧 Upgrade to: #{finding[:upgrade_to]}" if finding[:upgrade_to]
 
       puts "  Deprecated since: #{finding[:deprecated_since]}" if finding[:deprecated_since]
       puts
     end
 
-    puts "💡 Update your workflow files to use supported action versions"
+    puts '💡 Update your workflow files to use supported action versions'
   end
 
   def severity_icon(severity)
@@ -127,7 +125,10 @@ if __FILE__ == $PROGRAM_NAME
   OptionParser.new do |opts|
     opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
     opts.on('-v', '--verbose', 'Enable verbose output') { options[:verbose] = true }
-    opts.on('-h', '--help', 'Show this help') { puts opts; exit }
+    opts.on('-h', '--help', 'Show this help') do
+      puts opts
+      exit
+    end
   end.parse!
 
   validator = GitHubActionsValidator.new(verbose: options[:verbose])

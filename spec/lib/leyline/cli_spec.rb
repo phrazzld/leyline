@@ -53,7 +53,7 @@ RSpec.describe Leyline::CLI do
 
     context 'with categories option' do
       before do
-        cli.options = { categories: ['typescript', 'go'] }
+        cli.options = { categories: %w[typescript go] }
       end
 
       it 'displays specified categories' do
@@ -107,6 +107,38 @@ RSpec.describe Leyline::CLI do
       end
     end
 
+    context 'with flag-like paths' do
+      it 'rejects paths starting with dash' do
+        expect { cli.sync('--help') }.to exit_with_code(1)
+      end
+
+      it 'displays helpful error message for --help path' do
+        output = capture_stdout_and_exit { cli.sync('--help') }
+        expect(output).to include("Error: Invalid path '--help'")
+        expect(output).to include('Path cannot start with a dash')
+        expect(output).to include("Did you mean to use 'leyline help sync'")
+      end
+
+      it 'rejects various flag-like paths' do
+        %w[--version -h -v --stats --dry-run].each do |flag_path|
+          expect { cli.sync(flag_path) }.to exit_with_code(1)
+        end
+      end
+
+      it 'prevents accidental directory creation from mistyped commands' do
+        # Ensure no directory is created when flag-like path is provided
+        temp_dir = Dir.mktmpdir
+        begin
+          Dir.chdir(temp_dir) do
+            capture_stdout_and_exit { cli.sync('--help') }
+            expect(Dir.exist?('--help')).to be false
+          end
+        ensure
+          FileUtils.rm_rf(temp_dir)
+        end
+      end
+    end
+
     context 'with valid categories' do
       let(:valid_categories) { %w[typescript go core python rust web] }
 
@@ -141,7 +173,7 @@ RSpec.describe Leyline::CLI do
       end
 
       it 'accepts multiple valid categories' do
-        cli.options = { categories: ['typescript', 'go', 'python'] }
+        cli.options = { categories: %w[typescript go python] }
         expect { capture_stdout { cli.sync } }.not_to raise_error
       end
 
@@ -149,6 +181,226 @@ RSpec.describe Leyline::CLI do
         cli.options = { categories: ['typescript,go,python'] }
         output = capture_stdout { cli.sync }
         expect(output).to include('Categories: go, python, typescript')
+      end
+    end
+  end
+
+  describe '#status' do
+    context 'with default options' do
+      it 'displays status report with current directory' do
+        output = capture_stdout { cli.status }
+        expect(output).to include('Leyline Status Report')
+      end
+
+      it 'uses current directory as default path' do
+        output = capture_stdout { cli.status }
+        expect(output).to include('Base Directory:')
+      end
+    end
+
+    context 'with custom path' do
+      it 'displays status for specified path' do
+        output = capture_stdout { cli.status('/tmp') }
+        expect(output).to include('Base Directory: /tmp')
+      end
+    end
+
+    context 'with invalid path' do
+      it 'exits with error for nonexistent parent directory' do
+        expect { cli.status('/nonexistent/deeply/nested/path') }.to exit_with_code(1)
+      end
+
+      it 'displays path validation error' do
+        output = capture_stdout_and_exit { cli.status('/nonexistent/deeply/nested/path') }
+        expect(output).to include('Error: Parent directory does not exist')
+      end
+    end
+
+    context 'with flag-like paths' do
+      it 'rejects paths starting with dash' do
+        expect { cli.status('--help') }.to exit_with_code(1)
+      end
+
+      it 'displays helpful error message for --help path' do
+        output = capture_stdout_and_exit { cli.status('--help') }
+        expect(output).to include("Error: Invalid path '--help'")
+        expect(output).to include('Path cannot start with a dash')
+        expect(output).to include("Did you mean to use 'leyline help status'")
+      end
+
+      it 'rejects various flag-like paths' do
+        %w[--json -j --categories --verbose].each do |flag_path|
+          expect { cli.status(flag_path) }.to exit_with_code(1)
+        end
+      end
+    end
+
+    context 'with categories option' do
+      before do
+        cli.options = { categories: %w[typescript go] }
+      end
+
+      it 'filters status by specified categories' do
+        output = capture_stdout { cli.status }
+        expect(output).to include('Active Categories: typescript, go')
+      end
+    end
+
+    context 'with JSON output' do
+      before do
+        cli.options = { json: true }
+      end
+
+      it 'outputs status in JSON format' do
+        output = capture_stdout { cli.status }
+        expect { JSON.parse(output) }.not_to raise_error
+      end
+    end
+  end
+
+  describe '#diff' do
+    context 'with default options' do
+      it 'displays diff report with current directory' do
+        output = capture_stdout { cli.diff }
+        expect(output).to include('Leyline Diff Report')
+      end
+    end
+
+    context 'with custom path' do
+      it 'displays diff for specified path' do
+        output = capture_stdout { cli.diff('/tmp') }
+        expect(output).to include('Leyline Diff Report')
+      end
+    end
+
+    context 'with invalid path' do
+      it 'exits with error for nonexistent parent directory' do
+        expect { cli.diff('/nonexistent/deeply/nested/path') }.to exit_with_code(1)
+      end
+
+      it 'displays path validation error' do
+        output = capture_stdout_and_exit { cli.diff('/nonexistent/deeply/nested/path') }
+        expect(output).to include('Error: Parent directory does not exist')
+      end
+    end
+
+    context 'with flag-like paths' do
+      it 'rejects paths starting with dash' do
+        expect { cli.diff('--help') }.to exit_with_code(1)
+      end
+
+      it 'displays helpful error message for --help path' do
+        output = capture_stdout_and_exit { cli.diff('--help') }
+        expect(output).to include("Error: Invalid path '--help'")
+        expect(output).to include('Path cannot start with a dash')
+        expect(output).to include("Did you mean to use 'leyline help diff'")
+      end
+
+      it 'rejects various flag-like paths' do
+        %w[--format -f --categories --verbose].each do |flag_path|
+          expect { cli.diff(flag_path) }.to exit_with_code(1)
+        end
+      end
+    end
+
+    context 'with format option' do
+      before do
+        cli.options = { format: 'json' }
+      end
+
+      it 'outputs diff in specified format' do
+        output = capture_stdout { cli.diff }
+        expect { JSON.parse(output) }.not_to raise_error
+      end
+    end
+
+    context 'with categories option' do
+      before do
+        cli.options = { categories: %w[typescript go] }
+      end
+
+      it 'filters diff by specified categories' do
+        output = capture_stdout { cli.diff }
+        expect(output).to include('Leyline Diff Report')
+      end
+    end
+  end
+
+  describe '#update' do
+    context 'with default options' do
+      it 'displays update report with current directory' do
+        output = capture_stdout { cli.update }
+        expect(output).to include('Leyline Update Preview')
+      end
+    end
+
+    context 'with custom path' do
+      it 'displays update for specified path' do
+        output = capture_stdout { cli.update('/tmp') }
+        expect(output).to include('Leyline Update Preview')
+      end
+    end
+
+    context 'with invalid path' do
+      it 'exits with error for nonexistent parent directory' do
+        expect { cli.update('/nonexistent/deeply/nested/path') }.to exit_with_code(1)
+      end
+
+      it 'displays path validation error' do
+        output = capture_stdout_and_exit { cli.update('/nonexistent/deeply/nested/path') }
+        expect(output).to include('Error: Parent directory does not exist')
+      end
+    end
+
+    context 'with flag-like paths' do
+      it 'rejects paths starting with dash' do
+        expect { cli.update('--help') }.to exit_with_code(1)
+      end
+
+      it 'displays helpful error message for --help path' do
+        output = capture_stdout_and_exit { cli.update('--help') }
+        expect(output).to include("Error: Invalid path '--help'")
+        expect(output).to include('Path cannot start with a dash')
+        expect(output).to include("Did you mean to use 'leyline help update'")
+      end
+
+      it 'rejects various flag-like paths' do
+        %w[--dry-run -d --force --categories].each do |flag_path|
+          expect { cli.update(flag_path) }.to exit_with_code(1)
+        end
+      end
+    end
+
+    context 'with dry-run option' do
+      before do
+        cli.options = { dry_run: true }
+      end
+
+      it 'displays what would be updated without making changes' do
+        output = capture_stdout { cli.update }
+        expect(output).to include('Leyline Update Preview')
+      end
+    end
+
+    context 'with force option' do
+      before do
+        cli.options = { force: true }
+      end
+
+      it 'forces update even with conflicts' do
+        output = capture_stdout { cli.update }
+        expect(output).to include('Leyline Update Preview')
+      end
+    end
+
+    context 'with categories option' do
+      before do
+        cli.options = { categories: %w[typescript go] }
+      end
+
+      it 'updates only specified categories' do
+        output = capture_stdout { cli.update }
+        expect(output).to include('Leyline Update Preview')
       end
     end
   end
@@ -167,12 +419,27 @@ RSpec.describe Leyline::CLI do
       expect(described_class.commands.keys).to include('sync')
     end
 
+    it 'includes transparency commands in available commands' do
+      expect(described_class.commands.keys).to include('status')
+      expect(described_class.commands.keys).to include('diff')
+      expect(described_class.commands.keys).to include('update')
+    end
+
     it 'has proper command descriptions' do
       version_command = described_class.commands['version']
       expect(version_command.description).to eq('Show version information')
 
       sync_command = described_class.commands['sync']
       expect(sync_command.description).to eq('Synchronize leyline standards to target directory')
+
+      status_command = described_class.commands['status']
+      expect(status_command.description).to eq('Show sync status and local modifications')
+
+      diff_command = described_class.commands['diff']
+      expect(diff_command.description).to eq('Show differences between local and remote leyline standards')
+
+      update_command = described_class.commands['update']
+      expect(update_command.description).to eq('Update local leyline standards with conflict detection')
     end
   end
 
@@ -186,7 +453,6 @@ RSpec.describe Leyline::CLI do
       expect(output).to include('Synchronizing leyline standards')
     end
   end
-
 
   private
 

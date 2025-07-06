@@ -11,37 +11,37 @@ TENET_MAX_LINES = 150
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: check_document_length.rb [options] [files...]"
+  opts.banner = 'Usage: check_document_length.rb [options] [files...]'
 
-  opts.on("-v", "--verbose", "Verbose output") do |v|
+  opts.on('-v', '--verbose', 'Verbose output') do |v|
     options[:verbose] = v
   end
 
-  opts.on("-h", "--help", "Show this help") do
+  opts.on('-h', '--help', 'Show this help') do
     puts opts
     exit
   end
 end.parse!
 
 # Get files to check
-files = ARGV.empty? ? Dir.glob("docs/{tenets,bindings}/**/*.md") : ARGV
+files = ARGV.empty? ? Dir.glob('docs/{tenets,bindings}/**/*.md') : ARGV
 
 violations = []
 checked_count = 0
 
 files.each do |file|
   next unless File.exist?(file)
-  next if file.include?("00-index.md") # Skip index files
+  next if file.include?('00-index.md') # Skip index files
 
   checked_count += 1
   line_count = File.readlines(file).size
 
   # Determine limit based on file type
-  limit = if file.include?("/tenets/")
-    TENET_MAX_LINES
-  else
-    MAX_LINES
-  end
+  limit = if file.include?('/tenets/')
+            TENET_MAX_LINES
+          else
+            MAX_LINES
+          end
 
   if line_count > limit
     violations << {
@@ -68,8 +68,8 @@ else
   puts "\nPlease refactor these documents to be more concise:"
   puts "  - Tenets should be ≤#{TENET_MAX_LINES} lines"
   puts "  - Bindings should be ≤#{MAX_LINES} lines"
-  puts "  - Use ONE clear example instead of multiple languages"
-  puts "  - Focus on principles over implementation details"
+  puts '  - Use ONE clear example instead of multiple languages'
+  puts '  - Focus on principles over implementation details'
 
   exit 1
 end

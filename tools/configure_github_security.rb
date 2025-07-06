@@ -28,25 +28,25 @@ $errors = []
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: configure_github_security.rb [options]"
+  opts.banner = 'Usage: configure_github_security.rb [options]'
 
-  opts.on("-r", "--repo REPO", "GitHub repository (owner/repo format)") do |repo|
+  opts.on('-r', '--repo REPO', 'GitHub repository (owner/repo format)') do |repo|
     $options[:repo] = repo
   end
 
-  opts.on("--dry-run", "Show what would be configured without making changes") do
+  opts.on('--dry-run', 'Show what would be configured without making changes') do
     $options[:dry_run] = true
   end
 
-  opts.on("-v", "--verbose", "Show detailed processing information") do
+  opts.on('-v', '--verbose', 'Show detailed processing information') do
     $options[:verbose] = true
   end
 
-  opts.on("-t", "--token TOKEN", "GitHub personal access token") do |token|
+  opts.on('-t', '--token TOKEN', 'GitHub personal access token') do |token|
     $options[:token] = token
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -55,15 +55,15 @@ end.parse!
 # Security configuration for Leyline repository
 SECURITY_CONFIG = {
   branch_protection: {
-    branch: 'master',  # Main branch name
+    branch: 'master', # Main branch name
     protection: {
       required_status_checks: {
         strict: true,
-        contexts: [
-          'test-suite',
-          'security-scan',
-          'yaml-validation',
-          'index-generation'
+        contexts: %w[
+          test-suite
+          security-scan
+          yaml-validation
+          index-generation
         ]
       },
       enforce_admins: true,
@@ -108,8 +108,8 @@ def validate_repo_format(repo)
   owner, repo_name = parts
 
   # Validate owner and repo names (GitHub username/org rules)
-  return false unless owner.match?(/^[a-zA-Z0-9\-_\.]+$/)
-  return false unless repo_name.match?(/^[a-zA-Z0-9\-_\.]+$/)
+  return false unless owner.match?(/^[a-zA-Z0-9\-_.]+$/)
+  return false unless repo_name.match?(/^[a-zA-Z0-9\-_.]+$/)
   return false if owner.length > 39 || repo_name.length > 100
 
   true
@@ -120,12 +120,12 @@ def get_github_token
   token = $options[:token] || ENV['GITHUB_TOKEN']
 
   unless token
-    puts "ERROR: GitHub token required. Set GITHUB_TOKEN environment variable or use --token"
+    puts 'ERROR: GitHub token required. Set GITHUB_TOKEN environment variable or use --token'
     exit 1
   end
 
   unless SecurityUtils.validate_github_token(token)
-    puts "ERROR: Invalid GitHub token format"
+    puts 'ERROR: Invalid GitHub token format'
     SecurityUtils.log_security_event('invalid_github_token', { token_prefix: token[0..10] })
     exit 1
   end
@@ -139,7 +139,7 @@ def github_api_call(method, endpoint, payload = nil, token)
   SecurityUtils.rate_limit_check('github_api', max_calls: 5000, window: 3600)
 
   # Validate endpoint format
-  unless endpoint.match?(/^\/[a-zA-Z0-9\/_\-\.]+$/)
+  unless endpoint.match?(%r{^/[a-zA-Z0-9/_\-.]+$})
     raise SecurityUtils::SecurityError, "Invalid API endpoint format: #{endpoint}"
   end
 
@@ -170,7 +170,7 @@ def github_api_call(method, endpoint, payload = nil, token)
     result = SecurityUtils.safe_capture(*command)
     File.delete(payload_file) if payload && File.exist?(payload_file)
     result
-  rescue => e
+  rescue StandardError => e
     File.delete(payload_file) if payload && File.exist?(payload_file)
     raise SecurityUtils::SecurityError, "GitHub API call failed: #{e.message}"
   end
@@ -186,7 +186,7 @@ def configure_branch_protection(repo, token)
   result = github_api_call('PUT', endpoint, config[:protection], token)
 
   if result[:success]
-    puts "✅ Branch protection configured successfully"
+    puts '✅ Branch protection configured successfully'
     SecurityUtils.log_security_event('branch_protection_configured', { repo: repo })
   else
     puts "❌ Branch protection configuration failed: #{result[:stderr]}"
@@ -207,7 +207,7 @@ def configure_security_settings(repo, token)
     result = github_api_call('PUT', endpoint, nil, token)
 
     if result[:success]
-      puts "✅ Vulnerability alerts enabled"
+      puts '✅ Vulnerability alerts enabled'
     else
       puts "⚠️  Could not enable vulnerability alerts: #{result[:stderr]}"
     end
@@ -219,7 +219,7 @@ def configure_security_settings(repo, token)
     result = github_api_call('PUT', endpoint, nil, token)
 
     if result[:success]
-      puts "✅ Automated security updates enabled"
+      puts '✅ Automated security updates enabled'
     else
       puts "⚠️  Could not enable automated security updates: #{result[:stderr]}"
     end
@@ -239,7 +239,7 @@ def configure_repository_settings(repo, token)
   result = github_api_call('PATCH', endpoint, repo_config, token)
 
   if result[:success]
-    puts "✅ Repository settings configured successfully"
+    puts '✅ Repository settings configured successfully'
     SecurityUtils.log_security_event('repository_settings_configured', { repo: repo })
   else
     puts "❌ Repository settings configuration failed: #{result[:stderr]}"
@@ -291,7 +291,7 @@ def create_security_policy(repo, token)
   endpoint = "/repos/#{repo}/contents/SECURITY.md"
 
   payload = {
-    message: "security: add security policy and reporting guidelines",
+    message: 'security: add security policy and reporting guidelines',
     content: Base64.strict_encode64(security_policy),
     branch: SECURITY_CONFIG[:branch_protection][:branch]
   }
@@ -299,7 +299,7 @@ def create_security_policy(repo, token)
   result = github_api_call('PUT', endpoint, payload, token)
 
   if result[:success]
-    puts "✅ Security policy created"
+    puts '✅ Security policy created'
     SecurityUtils.log_security_event('security_policy_created', { repo: repo })
   else
     puts "⚠️  Could not create security policy: #{result[:stderr]}"
@@ -310,12 +310,12 @@ end
 def configure_github_security
   # Validate inputs
   unless $options[:repo]
-    puts "ERROR: Repository required. Use --repo owner/repo"
+    puts 'ERROR: Repository required. Use --repo owner/repo'
     exit 1
   end
 
   unless validate_repo_format($options[:repo])
-    puts "ERROR: Invalid repository format. Use owner/repo"
+    puts 'ERROR: Invalid repository format. Use owner/repo'
     SecurityUtils.log_security_event('invalid_repo_format', { repo: $options[:repo] })
     exit 1
   end
@@ -325,7 +325,7 @@ def configure_github_security
 
   puts "🔐 Configuring GitHub Security for #{$options[:repo]}"
   puts "Mode: #{$options[:dry_run] ? 'DRY RUN' : 'LIVE'}"
-  puts ""
+  puts ''
 
   success_count = 0
   total_steps = 4
@@ -342,31 +342,31 @@ def configure_github_security
   # Create security policy
   success_count += 1 if create_security_policy($options[:repo], token)
 
-  puts "\n" + "=" * 60
-  puts "🎯 Security Configuration Summary"
-  puts "=" * 60
+  puts "\n" + '=' * 60
+  puts '🎯 Security Configuration Summary'
+  puts '=' * 60
   puts "Repository: #{$options[:repo]}"
   puts "Steps completed: #{success_count}/#{total_steps}"
   puts "Mode: #{$options[:dry_run] ? 'DRY RUN (no changes made)' : 'LIVE'}"
 
   if success_count == total_steps
-    puts "✅ All security configurations applied successfully!"
+    puts '✅ All security configurations applied successfully!'
     SecurityUtils.log_security_event('github_security_configured', {
-      repo: $options[:repo],
-      steps_completed: success_count
-    })
+                                       repo: $options[:repo],
+                                       steps_completed: success_count
+                                     })
   else
-    puts "⚠️  Some configurations may need manual attention"
-    puts "Check the output above for specific issues"
+    puts '⚠️  Some configurations may need manual attention'
+    puts 'Check the output above for specific issues'
   end
 
   puts "\n🔒 Repository is now secured with:"
   puts "  • Branch protection on #{SECURITY_CONFIG[:branch_protection][:branch]}"
-  puts "  • Required code reviews and status checks"
-  puts "  • Vulnerability scanning and alerts"
-  puts "  • Secret scanning with push protection"
-  puts "  • Automated security updates"
-  puts "  • Security policy documentation"
+  puts '  • Required code reviews and status checks'
+  puts '  • Vulnerability scanning and alerts'
+  puts '  • Secret scanning with push protection'
+  puts '  • Automated security updates'
+  puts '  • Security policy documentation'
 
   exit(success_count == total_steps ? 0 : 1)
 end
@@ -382,7 +382,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\n\n⚠️  Configuration interrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     puts "\n❌ Unexpected error: #{e.message}"
     puts e.backtrace.join("\n") if $options[:verbose]
     exit 1

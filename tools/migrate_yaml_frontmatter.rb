@@ -18,17 +18,17 @@ $options = {
 }
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: migrate_yaml_frontmatter.rb [options]"
+  opts.banner = 'Usage: migrate_yaml_frontmatter.rb [options]'
 
-  opts.on("--dry-run", "Show what would be changed without making changes") do
+  opts.on('--dry-run', 'Show what would be changed without making changes') do
     $options[:dry_run] = true
   end
 
-  opts.on("-v", "--verbose", "Show detailed output") do
+  opts.on('-v', '--verbose', 'Show detailed output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -47,10 +47,10 @@ def log_dry_run(message)
 end
 
 def migrate_yaml_frontmatter
-  log_info("Starting YAML front-matter migration")
+  log_info('Starting YAML front-matter migration')
 
   # Find all markdown files with YAML front-matter
-  markdown_files = Dir.glob("docs/**/*.md").reject { |f| f.include?('00-index.md') }
+  markdown_files = Dir.glob('docs/**/*.md').reject { |f| f.include?('00-index.md') }
 
   log_info("Found #{markdown_files.length} markdown files to examine")
 
@@ -91,13 +91,12 @@ def migrate_yaml_frontmatter
       else
         log_verbose("No YAML front-matter in #{file}")
       end
-
-    rescue => e
+    rescue StandardError => e
       log_info("Error processing #{file}: #{e.message}")
     end
   end
 
-  log_info("YAML front-matter migration completed")
+  log_info('YAML front-matter migration completed')
   log_info("Processed #{migrated_count} files with valid YAML front-matter")
 
   exit 0
@@ -110,7 +109,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nYAML migration interrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     puts "YAML migration error: #{e.message}"
     puts e.backtrace.join("\n") if $options[:verbose]
     exit 1

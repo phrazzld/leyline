@@ -14,7 +14,7 @@ module Leyline
 
       # Performance targets
       TARGET_CACHE_HIT_RATIO = 0.8
-      MAX_MEMORY_USAGE = 10 * 1024 * 1024  # 10MB
+      MAX_MEMORY_USAGE = 10 * 1024 * 1024 # 10MB
 
       def initialize(file_cache: nil, compression_enabled: false)
         @file_cache = file_cache
@@ -86,14 +86,14 @@ module Leyline
           # Search through all cached documents
           @memory_cache.each_value do |document|
             score = calculate_relevance_score(document, query_normalized)
-            if score > 0
-              decompressed_document = decompress_if_needed(document)
-              results << {
-                document: decompressed_document,
-                score: score,
-                category: decompressed_document[:category] # Use category from DocumentScanner
-              }
-            end
+            next unless score > 0
+
+            decompressed_document = decompress_if_needed(document)
+            results << {
+              document: decompressed_document,
+              score: score,
+              category: decompressed_document[:category] # Use category from DocumentScanner
+            }
           end
 
           # Sort by relevance score (descending)
@@ -109,18 +109,18 @@ module Leyline
         # Calculate operation-specific statistics
         operation_metrics = {}
         @operation_stats.each do |operation, stats|
-          if stats[:count] > 0
-            avg_time = stats[:total_time] / stats[:count]
-            operation_metrics[operation] = {
-              count: stats[:count],
-              total_time_us: stats[:total_time],
-              avg_time_us: avg_time,
-              min_time_us: stats[:min_time],
-              max_time_us: stats[:max_time],
-              avg_time_ms: avg_time / 1000.0,
-              recent_timings: @operation_timings[operation].last(10) # Last 10 for trend analysis
-            }
-          end
+          next unless stats[:count] > 0
+
+          avg_time = stats[:total_time] / stats[:count]
+          operation_metrics[operation] = {
+            count: stats[:count],
+            total_time_us: stats[:total_time],
+            avg_time_us: avg_time,
+            min_time_us: stats[:min_time],
+            max_time_us: stats[:max_time],
+            avg_time_ms: avg_time / 1000.0,
+            recent_timings: @operation_timings[operation].last(10) # Last 10 for trend analysis
+          }
         end
 
         {
@@ -148,13 +148,11 @@ module Leyline
         return false if @warming_thread&.alive? || @warming_complete
 
         @warming_thread = Thread.new do
-          begin
-            ensure_cache_current
-            @warming_complete = true
-          rescue => e
-            # Warming failures shouldn't break existing functionality
-            warn "Cache warming failed: #{e.message}" if ENV['LEYLINE_DEBUG']
-          end
+          ensure_cache_current
+          @warming_complete = true
+        rescue StandardError => e
+          # Warming failures shouldn't break existing functionality
+          warn "Cache warming failed: #{e.message}" if ENV['LEYLINE_DEBUG']
         end
 
         true
@@ -192,9 +190,7 @@ module Leyline
           title_normalized = title.downcase
           if title_normalized != query_normalized
             distance = edit_distance(query_normalized, title_normalized)
-            if distance > 0 && distance <= 3 && distance < query_normalized.length
-              candidates << [title, distance]
-            end
+            candidates << [title, distance] if distance > 0 && distance <= 3 && distance < query_normalized.length
           end
 
           # Check individual words in title
@@ -202,12 +198,10 @@ module Leyline
             word_normalized = word.downcase
             next if word_normalized.length < 3
 
-            if word_normalized != query_normalized
-              distance = edit_distance(query_normalized, word_normalized)
-              if distance > 0 && distance <= 2 && distance < query_normalized.length
-                candidates << [word, distance]
-              end
-            end
+            next unless word_normalized != query_normalized
+
+            distance = edit_distance(query_normalized, word_normalized)
+            candidates << [word, distance] if distance > 0 && distance <= 2 && distance < query_normalized.length
           end
         end
 
@@ -239,9 +233,9 @@ module Leyline
         }
 
         # Implement simple LRU if memory usage exceeds limit
-        if @memory_usage > MAX_MEMORY_USAGE
-          evict_least_recently_used
-        end
+        return unless @memory_usage > MAX_MEMORY_USAGE
+
+        evict_least_recently_used
       end
 
       # Force cache refresh - use sparingly for testing
@@ -298,10 +292,10 @@ module Leyline
         return { enabled: false } unless @compression_enabled
 
         compression_ratio = if @compression_stats[:total_original_size] > 0
-          @compression_stats[:total_compressed_size].to_f / @compression_stats[:total_original_size]
-        else
-          1.0
-        end
+                              @compression_stats[:total_compressed_size].to_f / @compression_stats[:total_original_size]
+                            else
+                              1.0
+                            end
 
         {
           enabled: true,
@@ -315,11 +309,11 @@ module Leyline
 
       def ensure_cache_current
         # Check if we need to rescan (first run or cache invalidation)
-        if @last_scan_time.nil? || cache_needs_refresh?
-          scan_documents
-          @last_scan_time = Time.now
-          @scan_count += 1
-        end
+        return unless @last_scan_time.nil? || cache_needs_refresh?
+
+        scan_documents
+        @last_scan_time = Time.now
+        @scan_count += 1
       end
 
       def cache_needs_refresh?
@@ -339,17 +333,15 @@ module Leyline
 
         # First pass: check which files need scanning
         paths_to_scan.each do |path|
-          begin
-            if file_changed?(path)
-              @miss_count += 1
-              changed_paths << path
-            else
-              @hit_count += 1
-            end
-          rescue => e
-            # Log error but continue scanning other documents
-            warn "Error checking #{path}: #{e.message}"
+          if file_changed?(path)
+            @miss_count += 1
+            changed_paths << path
+          else
+            @hit_count += 1
           end
+        rescue StandardError => e
+          # Log error but continue scanning other documents
+          warn "Error checking #{path}: #{e.message}"
         end
 
         # Second pass: scan changed files using parallel processing
@@ -384,6 +376,7 @@ module Leyline
           Dir.glob(pattern).each do |path|
             # Skip index files and other non-content files
             next if File.basename(path) =~ /^(index|glance|00-index)\.md$/
+
             paths << path
           end
         end
@@ -437,14 +430,14 @@ module Leyline
         original_size = document[:size]
 
         # Compress content_preview and metadata if they're large enough
-        compressible_fields = [:content_preview, :metadata]
+        compressible_fields = %i[content_preview metadata]
         compression_applied = false
 
         compressible_fields.each do |field|
           next unless document[field]
 
           original_data = field == :metadata ? document[field].to_yaml : document[field].to_s
-          next if original_data.bytesize < 100  # Only compress if worthwhile
+          next if original_data.bytesize < 100 # Only compress if worthwhile
 
           begin
             compressed_data = LZ4.compress(original_data)
@@ -456,7 +449,7 @@ module Leyline
               compressed_document.delete(field)
               compression_applied = true
             end
-          rescue => e
+          rescue StandardError => e
             # Graceful fallback on compression failure
             warn "Compression failed for #{field}: #{e.message}" if ENV['LEYLINE_DEBUG']
           end
@@ -482,18 +475,18 @@ module Leyline
         decompressed_document = document.dup
 
         # Decompress each compressed field
-        [:content_preview, :metadata].each do |field|
+        %i[content_preview metadata].each do |field|
           compressed_key = :"#{field}_compressed"
-          if document[compressed_key]
-            begin
-              decompressed_data = LZ4.decompress(document[compressed_key])
-              decompressed_document[field] = field == :metadata ? YAML.safe_load(decompressed_data) : decompressed_data
-              decompressed_document.delete(compressed_key)
-              decompressed_document.delete(:"#{field}_original_size")
-            rescue => e
-              warn "Decompression failed for #{field}: #{e.message}" if ENV['LEYLINE_DEBUG']
-              # Continue with missing field rather than breaking entirely
-            end
+          next unless document[compressed_key]
+
+          begin
+            decompressed_data = LZ4.decompress(document[compressed_key])
+            decompressed_document[field] = field == :metadata ? YAML.safe_load(decompressed_data) : decompressed_data
+            decompressed_document.delete(compressed_key)
+            decompressed_document.delete(:"#{field}_original_size")
+          rescue StandardError => e
+            warn "Decompression failed for #{field}: #{e.message}" if ENV['LEYLINE_DEBUG']
+            # Continue with missing field rather than breaking entirely
           end
         end
 
@@ -507,19 +500,19 @@ module Leyline
 
       def calculate_compressed_document_size(document)
         size = 0
-        document.each do |key, value|
-          case value
-          when String
-            size += value.bytesize
-          when Integer, Numeric
-            size += 8
-          when Time
-            size += 16
-          when Hash
-            size += value.to_yaml.bytesize
-          else
-            size += value.to_s.bytesize
-          end
+        document.each do |_key, value|
+          size += case value
+                  when String
+                    value.bytesize
+                  when Integer, Numeric
+                    8
+                  when Time
+                    16
+                  when Hash
+                    value.to_yaml.bytesize
+                  else
+                    value.to_s.bytesize
+                  end
         end
         size
       end
@@ -532,28 +525,24 @@ module Leyline
         # Title matches (exact and fuzzy)
         title = searchable_document[:title]&.downcase
         if title&.include?(query)
-          score += 100  # Exact substring match
+          score += 100 # Exact substring match
         elsif title && fuzzy_match?(title, query)
-          score += fuzzy_score(title, query)  # Fuzzy match with distance-based scoring
+          score += fuzzy_score(title, query) # Fuzzy match with distance-based scoring
         end
 
         # ID match (high weight)
-        if searchable_document[:id]&.include?(query)
-          score += 50
-        end
+        score += 50 if searchable_document[:id]&.include?(query)
 
         # Content preview match (medium weight)
         content = searchable_document[:content_preview]&.downcase
         if content&.include?(query)
           score += 25
         elsif content && fuzzy_match?(content, query)
-          score += fuzzy_score(content, query) / 2  # Lower weight for content fuzzy match
+          score += fuzzy_score(content, query) / 2 # Lower weight for content fuzzy match
         end
 
         # Category match (low weight)
-        if searchable_document[:category]&.include?(query)
-          score += 10
-        end
+        score += 10 if searchable_document[:category]&.include?(query)
 
         score
       end
@@ -581,16 +570,16 @@ module Leyline
         max_word_score = 0
         query_words.each do |q_word|
           text_words.each do |t_word|
-            if word_fuzzy_match?(t_word, q_word)
-              distance = edit_distance(t_word, q_word)
-              word_score = case distance
-                when 0 then 90  # Exact word match
-                when 1 then 75  # Single character difference
-                when 2 then 60  # Two character difference
-                else 40         # More differences but still acceptable
-              end
-              max_word_score = [max_word_score, word_score].max
-            end
+            next unless word_fuzzy_match?(t_word, q_word)
+
+            distance = edit_distance(t_word, q_word)
+            word_score = case distance
+                         when 0 then 90  # Exact word match
+                         when 1 then 75  # Single character difference
+                         when 2 then 60  # Two character difference
+                         else 40 # More differences but still acceptable
+                         end
+            max_word_score = [max_word_score, word_score].max
           end
         end
 

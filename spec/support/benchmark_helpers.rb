@@ -30,18 +30,18 @@ module BenchmarkHelpers
   # Helper method to validate performance targets
   def expect_performance_target_met(duration_ms, target_ms = TARGET_PERFORMANCE_MS)
     expect(duration_ms).to be < target_ms,
-      "Performance target not met: #{duration_ms}ms >= #{target_ms}ms"
+                           "Performance target not met: #{duration_ms}ms >= #{target_ms}ms"
   end
 
   # Helper method to validate cache hit ratio
   def expect_cache_ratio_target_met(hit_ratio, target_ratio = TARGET_CACHE_HIT_RATIO)
     expect(hit_ratio).to be >= target_ratio,
-      "Cache hit ratio target not met: #{hit_ratio} < #{target_ratio}"
+                         "Cache hit ratio target not met: #{hit_ratio} < #{target_ratio}"
   end
 
   # Helper method to validate memory usage
   def expect_memory_target_met(memory_mb, target_mb = TARGET_MEMORY_MB)
     expect(memory_mb).to be < target_mb,
-      "Memory usage target not met: #{memory_mb}MB >= #{target_mb}MB"
+                         "Memory usage target not met: #{memory_mb}MB >= #{target_mb}MB"
   end
 end

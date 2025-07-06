@@ -8,19 +8,13 @@ enforced_by: authentication audit tools + access control testing + security code
 
 # Binding: Implement Explicit Authentication and Authorization Patterns
 
-Establish clear, explicit identity verification and access control mechanisms that make authentication and authorization decisions visible, auditable, and enforceable. Never suppress or bypass security controls without proper documentation and approval, ensuring all security decisions are transparent and can be systematically validated.
+Establish clear, explicit identity verification and access control mechanisms that make authentication and authorization decisions visible, auditable, and enforceable.
 
 ## Rationale
 
-This binding implements explicit-over-implicit by requiring that all authentication and authorization decisions be visible, documented, and intentional rather than hidden behind implicit assumptions. It also embodies no-secret-suppression by preventing bypass of security controls without proper justification.
-
-Authentication and authorization work like a secure building's access control system with explicit badges, clear entry points, and visible security checkpoints rather than relying on informal recognition or assumptions about who belongs where.
-
-Implicit patterns—such as assuming user context from global state, making authorization decisions based on hidden application logic, or bypassing security checks through backdoors—create significant vulnerabilities and compliance risks.
+This binding implements explicit-over-implicit by requiring that all authentication and authorization decisions be visible, documented, and intentional rather than hidden behind implicit assumptions. It prevents bypass of security controls without proper justification.
 
 ## Rule Definition
-
-Authentication and authorization patterns must implement comprehensive identity and access control with full transparency and auditability:
 
 **Authentication Requirements:**
 - Multi-factor authentication with explicit trust levels
@@ -32,241 +26,129 @@ Authentication and authorization patterns must implement comprehensive identity 
 - Role-based access control with clear hierarchies
 - Attribute-based decisions using user and resource context
 - Least privilege principle with explicit elevation
-- Clear permission boundaries between security domains
-
-**Security Control Transparency:**
-- Comprehensive authentication and authorization logging
-- Real-time security event monitoring and anomaly detection
-- Audit trails supporting compliance and incident investigation
+- Comprehensive logging and audit trails
 
 ## Practical Implementation
 
-1. **Implement Explicit Authentication Flow**: Create clear authentication workflows with proper state management:
+**1. Authentication Context:**
 
-   ```typescript
-   interface AuthenticationContext {
-     userId: string;
-     sessionId: string;
-     authenticationMethods: AuthMethod[];
-     trustLevel: TrustLevel;
-     expiresAt: Date;
-     lastActivity: Date;
-   }
+```typescript
+interface AuthenticationContext {
+  userId: string;
+  sessionId: string;
+  trustLevel: TrustLevel;
+  expiresAt: Date;
+}
 
-   enum AuthMethod {
-     PASSWORD = 'password',
-     TOTP = 'totp',
-     SMS = 'sms',
-     BIOMETRIC = 'biometric',
-     CERTIFICATE = 'certificate'
-   }
+enum TrustLevel {
+  ANONYMOUS = 0,
+  AUTHENTICATED = 1,
+  VERIFIED = 2
+}
 
-   enum TrustLevel {
-     ANONYMOUS = 0,
-     AUTHENTICATED = 1,
-     VERIFIED = 2,
-     HIGH_TRUST = 3
-   }
+class AuthenticationService {
+  async authenticate(credentials: LoginCredentials): Promise<AuthenticationResult> {
+    try {
+      const user = await this.validateCredentials(credentials);
+      const authContext = await this.createAuthenticationContext(user);
 
-   class AuthenticationService {
-     async authenticate(credentials: LoginCredentials): Promise<AuthenticationResult> {
-       const auditContext = {
-         correlationId: generateCorrelationId(),
-         ipAddress: credentials.ipAddress,
-         timestamp: new Date()
-       };
+      await this.auditLogger.logAuthenticationSuccess({ userId: user.id });
 
-       try {
-         const user = await this.validateCredentials(credentials);
-         const requiredMethods = await this.getRequiredAuthMethods(user);
+      return {
+        status: 'SUCCESS',
+        authenticationContext: authContext,
+        sessionToken: await this.createSessionToken(authContext)
+      };
+    } catch (error) {
+      await this.auditLogger.logAuthenticationFailure({ username: credentials.username });
+      throw new AuthenticationError('Authentication failed');
+    }
+  }
+}
+```
 
-         if (requiredMethods.length > 1) {
-           return {
-             status: 'ADDITIONAL_FACTORS_REQUIRED',
-             requiredMethods,
-             partialToken: await this.createPartialToken(user, auditContext)
-           };
-         }
+**2. Role-Based Access Control:**
 
-         const authContext = await this.createAuthenticationContext(user, [AuthMethod.PASSWORD]);
+```typescript
+interface Permission {
+  id: string;
+  resource: string;
+  action: string;
+}
 
-         await this.auditLogger.logAuthenticationSuccess({
-           userId: user.id,
-           methods: [AuthMethod.PASSWORD],
-           trustLevel: authContext.trustLevel,
-           ...auditContext
-         });
+interface Role {
+  id: string;
+  name: string;
+  permissions: Permission[];
+}
 
-         return {
-           status: 'SUCCESS',
-           authenticationContext: authContext,
-           sessionToken: await this.createSessionToken(authContext)
-         };
-       } catch (error) {
-         await this.auditLogger.logAuthenticationFailure({
-           username: credentials.username,
-           reason: error.message,
-           ...auditContext
-         });
-         throw new AuthenticationError('Authentication failed');
-       }
-     }
-   }
-   ```
+class AuthorizationService {
+  async authorize(
+    authContext: AuthenticationContext,
+    resource: string,
+    action: string
+  ): Promise<AuthorizationResult> {
+    const userRoles = await this.getUserRoles(authContext.userId);
+    const effectivePermissions = await this.resolvePermissions(userRoles);
 
-2. **Design Role-Based Access Control**: Create explicit permission structures with clear hierarchies:
+    const matchingPermission = this.findMatchingPermission(
+      effectivePermissions,
+      resource,
+      action
+    );
 
-   ```typescript
-   interface Permission {
-     id: string;
-     resource: string;
-     action: string;
-     conditions?: AccessCondition[];
-   }
+    if (!matchingPermission) {
+      await this.auditLogger.logAuthorizationDenied({ userId: authContext.userId, resource, action });
+      return { granted: false, reason: 'Insufficient permissions' };
+    }
 
-   interface Role {
-     id: string;
-     name: string;
-     permissions: Permission[];
-     inheritsFrom?: string[];
-   }
+    await this.auditLogger.logAuthorizationGranted({ userId: authContext.userId, resource, action });
 
-   interface AccessCondition {
-     type: 'time' | 'location' | 'resource_owner' | 'approval';
-     parameters: Record<string, any>;
-   }
+    return { granted: true, permission: matchingPermission };
+  }
+}
+```
 
-   class AuthorizationService {
-     async authorize(
-       authContext: AuthenticationContext,
-       resource: string,
-       action: string,
-       context?: AccessContext
-     ): Promise<AuthorizationResult> {
-       const auditContext = {
-         userId: authContext.userId,
-         sessionId: authContext.sessionId,
-         resource,
-         action,
-         timestamp: new Date()
-       };
+**3. Security Middleware:**
 
-       try {
-         const userRoles = await this.getUserRoles(authContext.userId);
-         const effectivePermissions = await this.resolvePermissions(userRoles);
+```typescript
+class SecurityMiddleware {
+  authenticate() {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const token = this.extractToken(req);
+      if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
 
-         const matchingPermission = this.findMatchingPermission(
-           effectivePermissions,
-           resource,
-           action
-         );
+      const authContext = await this.authService.validateSession(token);
+      if (!authContext) {
+        return res.status(401).json({ error: 'Invalid session' });
+      }
 
-         if (!matchingPermission) {
-           await this.auditLogger.logAuthorizationDenied({
-             reason: 'NO_PERMISSION',
-             ...auditContext
-           });
-           return { granted: false, reason: 'Insufficient permissions' };
-         }
+      req.authContext = authContext;
+      next();
+    };
+  }
 
-         const conditionResult = await this.evaluateConditions(
-           matchingPermission.conditions || [],
-           context
-         );
+  authorize(resource: string, action: string) {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const authResult = await this.authzService.authorize(
+        req.authContext,
+        resource,
+        action
+      );
 
-         if (!conditionResult.satisfied) {
-           await this.auditLogger.logAuthorizationDenied({
-             reason: 'CONDITION_FAILED',
-             ...auditContext
-           });
-           return { granted: false, reason: conditionResult.reason };
-         }
+      if (!authResult.granted) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
 
-         await this.auditLogger.logAuthorizationGranted({
-           permission: matchingPermission.id,
-           ...auditContext
-         });
+      next();
+    };
+  }
+}
 
-         return { granted: true, permission: matchingPermission };
-       } catch (error) {
-         await this.auditLogger.logAuthorizationError({
-           error: error.message,
-           ...auditContext
-         });
-         throw new AuthorizationError('Authorization check failed');
-       }
-     }
-   }
-   ```
-
-3. **Security Middleware**: Create explicit security controls for web applications:
-
-   ```typescript
-   class SecurityMiddleware {
-     authenticate() {
-       return async (req: Request, res: Response, next: NextFunction) => {
-         try {
-           const token = this.extractToken(req);
-           if (!token) {
-             return res.status(401).json({ error: 'Authentication required' });
-           }
-
-           const authContext = await this.authService.validateSession(token);
-           if (!authContext) {
-             return res.status(401).json({ error: 'Invalid or expired session' });
-           }
-
-           req.authContext = authContext;
-           await this.auditLogger.logSecurityEvent({
-             type: 'AUTHENTICATION_SUCCESS',
-             userId: authContext.userId,
-             path: req.path,
-             method: req.method
-           });
-           next();
-         } catch (error) {
-           await this.auditLogger.logSecurityEvent({
-             type: 'AUTHENTICATION_FAILURE',
-             path: req.path,
-             error: error.message
-           });
-           res.status(401).json({ error: 'Authentication failed' });
-         }
-       };
-     }
-
-     authorize(resource: string, action: string) {
-       return async (req: Request, res: Response, next: NextFunction) => {
-         const authResult = await this.authzService.authorize(
-           req.authContext,
-           resource,
-           action,
-           { path: req.path, method: req.method, ipAddress: req.ip }
-         );
-
-         if (!authResult.granted) {
-           return res.status(403).json({
-             error: 'Access denied',
-             reason: authResult.reason
-           });
-         }
-
-         req.authzContext = authResult;
-         next();
-       };
-     }
-   }
-
-   // Usage example
-   app.get('/admin/users',
-     security.authenticate(),
-     security.authorize('users', 'read'),
-     async (req, res) => {
-       const users = await userService.getAllUsers();
-       res.json(users);
-     }
-   );
-   ```
+// Usage: app.get('/admin/users', security.authenticate(), security.authorize('users', 'read'), handler);
+```
 
 ## Examples
 
@@ -283,42 +165,22 @@ function createPost(data: PostData) {
 }
 
 // ✅ GOOD: Explicit authentication and authorization
-interface AuthenticatedRequest extends Request {
-  authContext: AuthenticationContext;
-}
-
 async function createPost(req: AuthenticatedRequest, res: Response) {
-  const { authContext } = req;
-
   const authResult = await authzService.authorize(
-    authContext,
+    req.authContext,
     'posts',
     'create'
   );
 
   if (!authResult.granted) {
-    await auditLogger.logAuthorizationDenied({
-      userId: authContext.userId,
-      resource: 'posts',
-      action: 'create',
-      reason: authResult.reason
-    });
-
     return res.status(403).json({
       error: 'Access denied',
       reason: authResult.reason
     });
   }
 
-  await auditLogger.logResourceAccess({
-    userId: authContext.userId,
-    resource: 'posts',
-    action: 'create',
-    granted: true
-  });
-
   const post = await postService.create(req.body, {
-    createdBy: authContext.userId
+    createdBy: req.authContext.userId
   });
 
   res.json(post);
@@ -327,10 +189,7 @@ async function createPost(req: AuthenticatedRequest, res: Response) {
 
 ## Related Bindings
 
-- [explicit-over-implicit](../../tenets/explicit-over-implicit.md): Authentication and authorization patterns directly implement this tenet by making all security decisions visible, documented, and intentional rather than hidden behind implicit assumptions.
-
-- [no-secret-suppression](../../tenets/no-secret-suppression.md): This binding prevents bypass of security controls without proper justification, ensuring all exceptions to security policies are explicit and auditable.
-
-- [use-structured-logging](../core/use-structured-logging.md): Security event logging requires structured, searchable audit trails that support compliance reporting and security incident investigation.
-
-- [secure-by-design-principles](../../docs/bindings/categories/security/secure-by-design-principles.md): Authentication and authorization patterns provide the foundational security controls that enable secure-by-design architecture through explicit identity verification and access control.
+- [explicit-over-implicit](../../tenets/explicit-over-implicit.md): Makes all security decisions visible, documented, and intentional
+- [no-secret-suppression](../../tenets/no-secret-suppression.md): Prevents bypass of security controls without proper justification
+- [use-structured-logging](../../core/use-structured-logging.md): Requires structured audit trails for compliance and investigation
+- [secure-by-design-principles](secure-by-design-principles.md): Provides foundational security controls for secure-by-design architecture

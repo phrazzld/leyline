@@ -15,13 +15,13 @@ $options = {
 
 # Parse command line options
 OptionParser.new do |opts|
-  opts.banner = "Usage: test_release_gates.rb [options]"
+  opts.banner = 'Usage: test_release_gates.rb [options]'
 
-  opts.on("--verbose", "Show detailed output") do
+  opts.on('--verbose', 'Show detailed output') do
     $options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit 0
   end
@@ -47,21 +47,19 @@ def run_command(command, description)
 
   log_verbose("#{description} output: #{output}") if $options[:verbose]
 
-  return exit_status == 0, output
+  [exit_status == 0, output]
 end
 
 def test_yaml_validation_gate
-  log_info("Testing YAML validation gate...")
+  log_info('Testing YAML validation gate...')
 
   # Create a temporary file with invalid YAML
-  test_file = "docs/tenets/test-invalid-yaml.md"
+  test_file = 'docs/tenets/test-invalid-yaml.md'
   original_content = nil
 
   begin
     # Backup original if it exists
-    if File.exist?(test_file)
-      original_content = File.read(test_file)
-    end
+    original_content = File.read(test_file) if File.exist?(test_file)
 
     # Create file with invalid YAML front-matter
     File.write(test_file, <<~EOF)
@@ -78,51 +76,51 @@ def test_yaml_validation_gate
     EOF
 
     # Run validation - should fail
-    success, output = run_command("ruby tools/validate_front_matter.rb", "YAML validation")
+    success, = run_command('ruby tools/validate_front_matter.rb', 'YAML validation')
 
     if success
-      log_error("❌ YAML validation should have failed but passed")
-      return false
+      log_error('❌ YAML validation should have failed but passed')
+      false
     else
-      log_info("✅ YAML validation gate correctly rejected invalid YAML")
-      return true
+      log_info('✅ YAML validation gate correctly rejected invalid YAML')
+      true
     end
-
   ensure
     # Clean up test file
     if original_content
       File.write(test_file, original_content)
-    else
-      File.delete(test_file) if File.exist?(test_file)
+    elsif File.exist?(test_file)
+      File.delete(test_file)
     end
   end
 end
 
 def test_reindex_validation_gate
-  log_info("Testing documentation reindex validation gate...")
+  log_info('Testing documentation reindex validation gate...')
 
   # Run reindex in strict mode - should pass with current files
-  success, output = run_command("ruby tools/reindex.rb --strict", "Documentation reindex")
+  success, output = run_command('ruby tools/reindex.rb --strict', 'Documentation reindex')
 
   if success
-    log_info("✅ Documentation reindex validation gate passed")
-    return true
+    log_info('✅ Documentation reindex validation gate passed')
+    true
   else
     log_error("❌ Documentation reindex validation failed: #{output}")
-    return false
+    false
   end
 end
 
 def test_version_calculation_gate
-  log_info("Testing version calculation gate...")
+  log_info('Testing version calculation gate...')
 
   # Run version calculation - should work
-  success, output = run_command("ruby tools/calculate_version.rb", "Version calculation")
+  success, output = run_command('ruby tools/calculate_version.rb', 'Version calculation')
 
   if success
     begin
       result = JSON.parse(output)
-      required_fields = ['current_version', 'next_version', 'bump_type', 'commits', 'breaking_changes', 'changelog_markdown']
+      required_fields = %w[current_version next_version bump_type commits breaking_changes
+                           changelog_markdown]
 
       missing_fields = required_fields - result.keys
       if missing_fields.any?
@@ -130,27 +128,27 @@ def test_version_calculation_gate
         return false
       end
 
-      log_info("✅ Version calculation gate passed with all required fields")
-      return true
+      log_info('✅ Version calculation gate passed with all required fields')
+      true
     rescue JSON::ParserError => e
       log_error("❌ Version calculation produced invalid JSON: #{e.message}")
-      return false
+      false
     end
   else
     log_error("❌ Version calculation failed: #{output}")
-    return false
+    false
   end
 end
 
 def test_security_scan_patterns
-  log_info("Testing security scan patterns...")
+  log_info('Testing security scan patterns...')
 
   # Test that our security patterns work
   test_patterns = [
-    { pattern: "eval", description: "eval usage" },
-    { pattern: "exec", description: "exec usage" },
-    { pattern: "system", description: "system usage" },
-    { pattern: "`", description: "backtick execution" }
+    { pattern: 'eval', description: 'eval usage' },
+    { pattern: 'exec', description: 'exec usage' },
+    { pattern: 'system', description: 'system usage' },
+    { pattern: '`', description: 'backtick execution' }
   ]
 
   passed = 0
@@ -171,64 +169,64 @@ def test_security_scan_patterns
   end
 
   log_info("✅ Security scan pattern tests completed (#{passed}/#{test_patterns.length})")
-  return true
+  true
 end
 
 def test_script_permissions_gate
-  log_info("Testing script permissions gate...")
+  log_info('Testing script permissions gate...')
 
   # Check that executable scripts have proper permissions
   scripts_checked = 0
   scripts_fixed = 0
 
-  Dir.glob("tools/*.rb").each do |script|
-    if File.exist?(script)
-      scripts_checked += 1
+  Dir.glob('tools/*.rb').each do |script|
+    next unless File.exist?(script)
 
-      # Check if script has shebang
-      first_line = File.readlines(script).first
-      if first_line && first_line.start_with?("#!/")
-        # Should be executable
-        unless File.executable?(script)
-          log_verbose("Script #{script} has shebang but is not executable")
-          scripts_fixed += 1
-        else
-          log_verbose("Script #{script} has correct permissions")
-        end
+    scripts_checked += 1
+
+    # Check if script has shebang
+    first_line = File.readlines(script).first
+    if first_line && first_line.start_with?('#!/')
+      # Should be executable
+      if File.executable?(script)
+        log_verbose("Script #{script} has correct permissions")
+      else
+        log_verbose("Script #{script} has shebang but is not executable")
+        scripts_fixed += 1
       end
     end
   end
 
   log_info("✅ Script permissions gate checked #{scripts_checked} scripts")
-  return true
+  true
 end
 
 def test_branch_protection_config
-  log_info("Testing branch protection configuration script...")
+  log_info('Testing branch protection configuration script...')
 
   # Test the branch protection script in dry-run mode
-  success, output = run_command("ruby tools/configure_branch_protection.rb --dry-run", "Branch protection config")
+  success, output = run_command('ruby tools/configure_branch_protection.rb --dry-run', 'Branch protection config')
 
   if success
-    log_info("✅ Branch protection configuration script works")
-    return true
+    log_info('✅ Branch protection configuration script works')
+    true
   else
     log_error("❌ Branch protection configuration failed: #{output}")
-    return false
+    false
   end
 end
 
 def main
-  log_info("Starting release gates test suite...")
-  log_info("")
+  log_info('Starting release gates test suite...')
+  log_info('')
 
   tests = [
-    { name: "YAML Validation Gate", method: :test_yaml_validation_gate },
-    { name: "Documentation Reindex Gate", method: :test_reindex_validation_gate },
-    { name: "Version Calculation Gate", method: :test_version_calculation_gate },
-    { name: "Security Scan Patterns", method: :test_security_scan_patterns },
-    { name: "Script Permissions Gate", method: :test_script_permissions_gate },
-    { name: "Branch Protection Config", method: :test_branch_protection_config }
+    { name: 'YAML Validation Gate', method: :test_yaml_validation_gate },
+    { name: 'Documentation Reindex Gate', method: :test_reindex_validation_gate },
+    { name: 'Version Calculation Gate', method: :test_version_calculation_gate },
+    { name: 'Security Scan Patterns', method: :test_security_scan_patterns },
+    { name: 'Script Permissions Gate', method: :test_script_permissions_gate },
+    { name: 'Branch Protection Config', method: :test_branch_protection_config }
   ]
 
   passed = 0
@@ -245,25 +243,25 @@ def main
         failed += 1
         log_error("❌ #{test[:name]} - FAILED")
       end
-    rescue => e
+    rescue StandardError => e
       failed += 1
       log_error("❌ #{test[:name]} - ERROR: #{e.message}")
     end
 
-    log_info("")
+    log_info('')
   end
 
   # Summary
-  log_info("🎯 Test Results:")
+  log_info('🎯 Test Results:')
   log_info("  ✅ Passed: #{passed}")
   log_info("  ❌ Failed: #{failed}")
   log_info("  📊 Total: #{tests.length}")
 
   if failed == 0
-    log_info("🟢 All release gate tests passed!")
+    log_info('🟢 All release gate tests passed!')
     exit 0
   else
-    log_error("🔴 Some release gate tests failed!")
+    log_error('🔴 Some release gate tests failed!')
     exit 1
   end
 end
@@ -275,7 +273,7 @@ if __FILE__ == $0
   rescue Interrupt
     puts "\nInterrupted by user"
     exit 1
-  rescue => e
+  rescue StandardError => e
     log_error("Unexpected error: #{e.message}")
     log_error("Backtrace: #{e.backtrace.join("\n")}")
     exit 1

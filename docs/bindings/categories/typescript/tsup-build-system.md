@@ -8,143 +8,78 @@ enforced_by: 'tsup configuration, build scripts, CI validation, output verificat
 
 # Binding: Optimize TypeScript Builds with tsup for Simplicity and Performance
 
-Use tsup as the standard build tool for all TypeScript libraries and applications. Configure builds for multiple output formats (ESM, CJS, type definitions) with minimal configuration, automated bundle optimization, and integrated development workflows. Enforce build validation in CI pipelines with clear success criteria and actionable error messages.
-
-## Rationale
-
-This binding implements our simplicity tenet by choosing tsup as a zero-configuration build tool that eliminates the complexity demons of webpack configs, rollup plugins, and babel transforms. Just as a sharp knife is more useful than a Swiss Army knife for cutting, tsup's focused approach to TypeScript building provides better results with less cognitive overhead than complex, general-purpose bundlers.
-
-Think of traditional build tools as over-engineered factory machines that require PhD-level expertise to operate—capable of incredible feats but requiring extensive setup, configuration, and maintenance. tsup is like a precision instrument: it does one thing exceptionally well with sensible defaults that work for 95% of use cases. When you need the remaining 5%, you have escape hatches, but you never pay the complexity tax for features you don't use.
-
-The automation benefits compound significantly across team members and projects. When every TypeScript project uses the same build approach, developers spend zero mental energy on build configuration decisions. They know that `pnpm build` will reliably produce optimized artifacts with source maps, type definitions, and appropriate output formats for their target environment. This consistency enables teams to focus their creative energy on solving business problems rather than wrestling with build tools.
+Use tsup as the standard build tool for all TypeScript libraries and applications. Configure builds for multiple output formats (ESM, CJS, type definitions) with minimal configuration, automated bundle optimization, and integrated development workflows.
 
 ## Rule Definition
 
-This rule applies to all TypeScript projects that produce distributable artifacts: libraries, CLI tools, web applications, and Node.js services. The rule specifically requires:
+Applies to all TypeScript projects producing distributable artifacts. Requirements:
 
-**Build Configuration Standards:**
-- **Single Configuration File**: Use `tsup.config.ts` with TypeScript for type safety and IDE support
-- **Multiple Output Formats**: Generate ESM and CommonJS builds for maximum compatibility
-- **Type Definitions**: Always generate `.d.ts` files for library consumption
-- **Source Maps**: Include source maps for debugging in all environments
+**Configuration Standards:**
+- **Single Configuration File**: Use `tsup.config.ts` for type safety
+- **Multiple Output Formats**: Generate ESM and CommonJS builds
+- **Type Definitions**: Always generate `.d.ts` files for libraries
+- **Source Maps**: Include source maps for debugging
 
-**Output Optimization:**
-- **Bundle Splitting**: Split vendor dependencies from application code for better caching
-- **Tree Shaking**: Enable dead code elimination for smaller bundle sizes
-- **Minification**: Minify production builds while preserving readable development builds
-- **External Dependencies**: Externalize peer dependencies to avoid duplication
+**Optimization:**
+- **Bundle Splitting**: Split vendor dependencies for better caching
+- **Tree Shaking**: Enable dead code elimination
+- **Minification**: Minify production builds
+- **External Dependencies**: Externalize peer dependencies
 
-**Development Integration:**
-- **Watch Mode**: Support development with file watching and rapid rebuilds
-- **Clean Builds**: Automatically clean output directories before building
-- **Build Verification**: Validate build outputs and fail fast on errors
-- **Performance Monitoring**: Track build times and bundle sizes
+**Development:**
+- **Watch Mode**: File watching with rapid rebuilds
+- **Clean Builds**: Auto-clean output directories
+- **Build Verification**: Validate outputs and fail fast on errors
 
-The rule prohibits complex webpack configurations, custom babel setups, or multi-tool build chains without documented architectural necessity. When exceptions exist, they must include migration plans back to the standard tsup approach.
+## Implementation
 
-## Practical Implementation
-
-1. **Library Build Configuration**: Optimize for distribution and consumption:
+1. **Library Configuration**:
    ```typescript
    // tsup.config.ts
    import { defineConfig } from 'tsup';
 
    export default defineConfig({
-     // Input and output
      entry: ['src/index.ts'],
      outDir: 'dist',
      clean: true,
-
-     // Output formats for maximum compatibility
      format: ['esm', 'cjs'],
      target: 'es2020',
-
-     // Type definitions and source maps
      dts: true,
      sourcemap: true,
-
-     // Bundle optimization
-     splitting: false, // Keep single entry point for libraries
+     splitting: false, // Libraries use single entry
      treeshake: true,
-     minify: false, // Let consumers decide on minification
-
-     // External dependencies - don't bundle peer deps
-     external: ['react', 'react-dom', 'typescript'],
-
-     // Build metadata
-     banner: {
-       js: '// Generated by tsup - https://tsup.egoist.dev',
-     },
-
-     onSuccess: async () => {
-       console.log('✅ Library build completed successfully');
-       // Optional: Run package size analysis
-       const { exec } = await import('child_process');
-       exec('npx bundlesize', (error, stdout) => {
-         if (stdout) console.log(stdout);
-       });
-     }
+     external: ['react', 'react-dom'] // Don't bundle peer deps
    });
    ```
 
-2. **Application Build Configuration**: Optimize for performance and deployment:
+2. **Application Configuration**:
    ```typescript
    // tsup.config.ts
    import { defineConfig } from 'tsup';
 
    export default defineConfig({
-     entry: {
-       app: 'src/main.ts',
-       worker: 'src/worker.ts' // Multiple entry points
-     },
+     entry: { app: 'src/main.ts', worker: 'src/worker.ts' },
      outDir: 'dist',
      clean: true,
-
-     // Application-specific outputs
      format: ['esm'],
      target: 'es2022',
-     platform: 'browser', // or 'node' for backend
-
-     // Production optimizations
-     dts: false, // Applications don't need type exports
+     platform: 'browser',
+     dts: false, // Apps don't need type exports
      sourcemap: true,
-     splitting: true, // Enable code splitting for apps
+     splitting: true, // Enable code splitting
      treeshake: true,
-     minify: process.env.NODE_ENV === 'production',
-
-     // Bundle analysis
-     metafile: true, // Generate metadata for bundle analysis
-
-     // Environment-specific configuration
-     env: {
-       NODE_ENV: process.env.NODE_ENV || 'development'
-     },
-
-     onSuccess: async () => {
-       if (process.env.NODE_ENV === 'production') {
-         console.log('🚀 Production build completed');
-         // Analyze bundle with esbuild-visualizer or similar
-         const { analyzeMetafile } = await import('esbuild');
-         const metafile = await import('../dist/metafile.json');
-         const analysis = await analyzeMetafile(metafile);
-         console.log('Bundle analysis:', analysis);
-       }
-     }
+     minify: process.env.NODE_ENV === 'production'
    });
    ```
 
-3. **Package.json Integration**: Provide consistent build scripts across projects:
+3. **Package.json Integration**:
    ```json
    {
      "scripts": {
        "build": "tsup",
        "build:watch": "tsup --watch",
-       "build:analyze": "tsup --metafile && npx esbuild-visualizer --metadata=dist/metafile.json",
-       "prepack": "pnpm build",
-       "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
-       "clean": "rm -rf dist"
+       "dev": "tsup --watch --onSuccess \"node dist/index.js\""
      },
-     "files": ["dist"],
      "main": "./dist/index.js",
      "module": "./dist/index.mjs",
      "types": "./dist/index.d.ts",
@@ -158,153 +93,43 @@ The rule prohibits complex webpack configurations, custom babel setups, or multi
    }
    ```
 
-4. **Development Workflow Integration**: Seamless development experience:
+4. **Development Workflow**:
    ```typescript
-   // tsup.config.dev.ts - Development-specific overrides
+   // tsup.config.dev.ts
    import { defineConfig } from 'tsup';
    import baseConfig from './tsup.config.js';
 
    export default defineConfig({
      ...baseConfig,
-     // Development optimizations
      minify: false,
      sourcemap: 'inline',
      watch: ['src'],
-
-     // Fast rebuilds
-     splitting: false,
-
-     // Development server integration
-     onSuccess: async () => {
-       console.log('🔄 Development build ready');
-       // Optional: Trigger dev server reload
-       if (process.env.DEV_SERVER_RELOAD_URL) {
-         await fetch(process.env.DEV_SERVER_RELOAD_URL);
-       }
-     }
+     splitting: false // Faster rebuilds
    });
    ```
 
-5. **CI/CD Integration**: Validate builds in automated pipelines:
+5. **CI/CD Integration**:
    ```yaml
-   # Build validation in CI
-   build-validation:
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v4
-       - uses: pnpm/action-setup@v4
-         with:
-           version: 10
-
-       - name: Install dependencies
-         run: pnpm install --frozen-lockfile
-
-       - name: Validate build configuration
-         run: |
-           # Ensure tsup config exists and is valid
-           if [[ ! -f "tsup.config.ts" ]]; then
-             echo "❌ Missing tsup.config.ts"
-             exit 1
-           fi
-
-           # Validate TypeScript config
-           npx tsc --noEmit
-
-       - name: Run production build
-         run: pnpm build
-
-       - name: Verify build outputs
-         run: |
-           # Check required output files exist
-           required_files=("dist/index.js" "dist/index.mjs" "dist/index.d.ts")
-           for file in "${required_files[@]}"; do
-             if [[ ! -f "$file" ]]; then
-               echo "❌ Missing required build output: $file"
-               exit 1
-             fi
-           done
-           echo "✅ All build outputs present"
-
-       - name: Validate bundle size
-         run: |
-           # Check bundle size doesn't exceed thresholds
-           main_size=$(stat -f%z dist/index.js 2>/dev/null || stat -c%s dist/index.js)
-           max_size=500000 # 500KB limit
-
-           if [[ $main_size -gt $max_size ]]; then
-             echo "❌ Bundle size ${main_size} exceeds limit ${max_size}"
-             echo "Consider code splitting or external dependencies"
-             exit 1
-           fi
-           echo "✅ Bundle size ${main_size} within limits"
-
-       - name: Test build artifacts
-         run: |
-           # Validate that built code actually works
-           node -e "
-             const pkg = require('./dist/index.js');
-             if (typeof pkg !== 'object') {
-               console.error('❌ Build output is not valid');
-               process.exit(1);
-             }
-             console.log('✅ Build artifacts are functional');
-           "
+   - run: pnpm install --frozen-lockfile
+   - run: pnpm build
+   - run: test -f dist/index.js && test -f dist/index.d.ts
    ```
 
 ## Examples
 
+**❌ BAD: Complex webpack configuration**
 ```typescript
-// ❌ BAD: Overly complex webpack configuration
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-
+// 200+ lines of webpack config with loaders, plugins, optimization...
 module.exports = {
-  mode: process.env.NODE_ENV || 'development',
+  mode: process.env.NODE_ENV,
   entry: './src/index.ts',
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              configFile: 'tsconfig.build.json'
-            }
-          }
-        ],
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
-      },
-    ],
-  },
-  optimization: {
-    minimizer: [new TerserPlugin({
-      terserOptions: {
-        format: { comments: false },
-        compress: { drop_console: true }
-      }
-    })],
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
-        },
-      },
-    },
-  },
-  // ... 200+ more lines of configuration
+  module: { rules: [/* complex rules */] },
+  optimization: { minimizer: [/* config */], splitChunks: {/* ... */} }
 };
+```
 
-// ✅ GOOD: Simple, focused tsup configuration
+**✅ GOOD: Simple tsup configuration**
+```typescript
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
@@ -318,51 +143,43 @@ export default defineConfig({
 });
 ```
 
+**❌ BAD: Inconsistent build scripts**
 ```json
-// ❌ BAD: Inconsistent build scripts across projects
 {
   "scripts": {
     "compile": "webpack --mode=production",
-    "dev": "webpack-dev-server --mode=development",
     "types": "tsc --emitDeclarationOnly",
     "bundle": "rollup -c",
     "minify": "terser dist/bundle.js -o dist/bundle.min.js"
   }
 }
+```
 
-// ✅ GOOD: Consistent tsup-based scripts
+**✅ GOOD: Consistent tsup scripts**
+```json
 {
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
-    "dev": "tsup --watch --onSuccess \"node dist/index.js\"",
-    "clean": "rm -rf dist"
+    "dev": "tsup --watch --onSuccess \"node dist/index.js\""
   }
 }
 ```
 
+**❌ BAD: Manual build orchestration**
 ```typescript
-// ❌ BAD: Manual build orchestration with error-prone steps
 async function buildProject() {
-  // Clean output directory
-  await fs.rm('dist', { recursive: true, force: true });
-
-  // Compile TypeScript
+  await fs.rm('dist', { recursive: true });
   await exec('tsc --project tsconfig.build.json');
-
-  // Bundle with rollup
   await exec('rollup -c rollup.config.js');
-
-  // Generate type definitions separately
   await exec('tsc --emitDeclarationOnly');
-
-  // Minify output
   await exec('terser dist/index.js -o dist/index.min.js');
-
-  // Copy package.json and adjust paths...
+  // Multiple error-prone steps...
 }
+```
 
-// ✅ GOOD: Single tsup command handles all build concerns
+**✅ GOOD: Single tsup command**
+```typescript
 // tsup.config.ts handles everything automatically
 export default defineConfig({
   entry: ['src/index.ts'],
@@ -372,18 +189,12 @@ export default defineConfig({
   clean: true,
   minify: process.env.NODE_ENV === 'production'
 });
-
 // Single command: pnpm build
 ```
 
 ## Related Bindings
 
-- [modern-typescript-toolchain.md](../../docs/bindings/categories/typescript/modern-typescript-toolchain.md): This build binding implements the build component of the unified toolchain, providing consistent tsup integration with TypeScript, Vitest, and other tools in the standardized development environment.
-
-- [automated-quality-gates.md](../core/automated-quality-gates.md): The build validation and CI integration aspects of this binding implement automated quality gates specifically for build verification, ensuring consistent artifact quality across all TypeScript projects.
-
-- [ci-cd-pipeline-standards.md](../core/ci-cd-pipeline-standards.md): The CI integration patterns in this binding follow the standardized pipeline architecture, providing build-specific implementation of the broader CI/CD automation principles.
-
-- [development-environment-consistency.md](../core/development-environment-consistency.md): The standardized build configuration and scripts support environment consistency by ensuring identical build behavior across different development machines and CI environments.
-
-- [semantic-versioning.md](../core/semantic-versioning.md): The build output verification and artifact management aspects integrate with semantic versioning practices to ensure proper library distribution and dependency management.
+- [modern-typescript-toolchain.md](modern-typescript-toolchain.md): Implements build component of unified toolchain
+- [automated-quality-gates.md](../../core/automated-quality-gates.md): Build validation implements automated quality gates
+- [development-environment-consistency.md](../../core/development-environment-consistency.md): Standardized build configuration supports environment consistency
+- [semantic-versioning.md](../../core/semantic-versioning.md): Build output verification integrates with semantic versioning

@@ -156,6 +156,38 @@ The project uses a detailed TODO.md with task dependencies:
 - Coverage target: 85%+
 - No internal mocking - refactor for testability instead
 
+### Test Commands
+
+The repository uses RSpec for testing with different test categories:
+
+```bash
+# Fast unit tests (recommended for daily development and quality gates)
+bundle exec rspec                        # Runs unit tests only (excludes performance/benchmark)
+
+# Specific test categories
+bundle exec rspec --tag performance      # Run performance tests only
+bundle exec rspec --tag benchmark        # Run benchmark tests only
+bundle exec rspec --tag integration      # Run integration tests only
+
+# Combined test runs
+bundle exec rspec --tag performance --tag benchmark  # Run all slow tests
+bundle exec rspec --exclude-tag integration         # Exclude integration tests only
+
+# All tests (including slow performance and benchmark tests)
+bundle exec rspec --tag performance --tag benchmark --tag integration
+```
+
+**Test Categories:**
+- **Unit tests**: Fast tests for core functionality (default)
+- **Performance tests**: Statistical performance benchmarks with multiple iterations
+- **Benchmark tests**: Micro/macro benchmarks for specific components
+- **Integration tests**: End-to-end workflow testing
+
+**Performance Notes:**
+- Default `bundle exec rspec` runs in <10 seconds (unit tests only)
+- Performance tests can take 2-5 minutes (statistical measurement with warmup)
+- Benchmark tests include memory usage and scalability analysis
+
 ### Development Workflow
 
 1. Pre-commit hooks automatically:

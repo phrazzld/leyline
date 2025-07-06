@@ -67,9 +67,9 @@ RSpec.describe 'GitClient sparse-checkout integration', type: :integration do
     it 'checks out multiple specified files' do
       git_client.setup_sparse_checkout(checkout_dir)
       git_client.add_sparse_paths([
-        'docs/tenets/simplicity.md',
-        'docs/bindings/core/automated-quality-gates.md'
-      ])
+                                    'docs/tenets/simplicity.md',
+                                    'docs/bindings/core/automated-quality-gates.md'
+                                  ])
       git_client.fetch_version("file://#{source_repo_dir}", 'HEAD')
 
       # Verify specified files are present
@@ -78,7 +78,8 @@ RSpec.describe 'GitClient sparse-checkout integration', type: :integration do
 
       # Verify content is correct
       expect(File.read(File.join(checkout_dir, 'docs/tenets/simplicity.md'))).to eq('# Simplicity Tenet')
-      expect(File.read(File.join(checkout_dir, 'docs/bindings/core/automated-quality-gates.md'))).to eq('# Automated Quality Gates')
+      expect(File.read(File.join(checkout_dir,
+                                 'docs/bindings/core/automated-quality-gates.md'))).to eq('# Automated Quality Gates')
 
       # Verify other files are not present
       expect(File.exist?(File.join(checkout_dir, 'README.md'))).to be false
@@ -105,8 +106,10 @@ RSpec.describe 'GitClient sparse-checkout integration', type: :integration do
       git_client.fetch_version("file://#{source_repo_dir}", 'HEAD')
 
       # Verify nested file is present
-      expect(File.exist?(File.join(checkout_dir, 'docs/bindings/categories/typescript/modern-typescript.md'))).to be true
-      expect(File.read(File.join(checkout_dir, 'docs/bindings/categories/typescript/modern-typescript.md'))).to eq('# Modern TypeScript')
+      expect(File.exist?(File.join(checkout_dir,
+                                   'docs/bindings/categories/typescript/modern-typescript.md'))).to be true
+      expect(File.read(File.join(checkout_dir,
+                                 'docs/bindings/categories/typescript/modern-typescript.md'))).to eq('# Modern TypeScript')
 
       # Verify other files are not present
       expect(File.exist?(File.join(checkout_dir, 'docs/tenets/simplicity.md'))).to be false

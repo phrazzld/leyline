@@ -33,10 +33,10 @@ def log_structured(event, data = {})
       **data
     }
 
-    STDERR.puts JSON.generate(log_entry)
-  rescue => e
+    warn JSON.generate(log_entry)
+  rescue StandardError => e
     # Graceful degradation if structured logging fails
-    STDERR.puts "Warning: Structured logging failed: #{e.message}"
+    warn "Warning: Structured logging failed: #{e.message}"
   end
 end
 
@@ -55,18 +55,18 @@ end
 
 # Find all markdown files to validate
 def find_markdown_files
-  markdown_files = Dir.glob("**/*.md").reject do |file|
-    file.start_with?("venv/") ||
-    file.start_with?("node_modules/") ||
-    file.start_with?("site/") ||
-    file.end_with?("glance.md") ||  # Skip overview files
-    file.end_with?("00-index.md")  # Skip index files
+  markdown_files = Dir.glob('**/*.md').reject do |file|
+    file.start_with?('venv/') ||
+      file.start_with?('node_modules/') ||
+      file.start_with?('site/') ||
+      file.end_with?('glance.md') || # Skip overview files
+      file.end_with?('00-index.md') # Skip index files
   end
 
   log_structured('validation_scope', {
-    total_files: markdown_files.size,
-    excluded_patterns: ['venv/', 'node_modules/', 'site/', 'glance.md', '00-index.md']
-  })
+                   total_files: markdown_files.size,
+                   excluded_patterns: ['venv/', 'node_modules/', 'site/', 'glance.md', '00-index.md']
+                 })
 
   markdown_files
 end
@@ -74,9 +74,9 @@ end
 # Extract all markdown links from file content
 def extract_links(content)
   # Match [text](link) patterns
-  content.scan(/\[([^\]]*)\]\(([^)]+)\)/).map { |text, link|
+  content.scan(/\[([^\]]*)\]\(([^)]+)\)/).map do |text, link|
     { text: text, link: link }
-  }
+  end
 end
 
 # Check if a file exists relative to a base file
@@ -86,12 +86,12 @@ def file_exists?(base_file, link)
   return false if clean_link.nil? || clean_link.empty?
 
   # Skip external URLs
-  return true if clean_link.match?(/^https?:\/\//)
+  return true if clean_link.match?(%r{^https?://})
 
   # Calculate absolute path
   if clean_link.start_with?('/')
     # Absolute path from repo root
-    abs_path = clean_link[1..-1]  # Remove leading slash
+    abs_path = clean_link[1..-1] # Remove leading slash
   else
     # Relative path from current file
     base_dir = File.dirname(base_file)
@@ -112,36 +112,38 @@ def validate_file_references(file)
 
   links.each do |link_info|
     link = link_info[:link]
-    text = link_info[:text]
+    link_info[:text]
 
     # Skip external URLs and mailto links
-    next if link.match?(/^(https?:\/\/|mailto:)/)
+    next if link.match?(%r{^(https?://|mailto:)})
 
-    unless file_exists?(file, link)
-      suggestion = case link
-      when /\.md$/
-        if link.include?('/tenets/')
-          "Check if the tenet file exists in docs/tenets/ directory"
-        elsif link.include?('/bindings/')
-          "Check if the binding file exists in docs/bindings/core/ or docs/bindings/categories/ directories"
-        else
-          "Verify the file path and ensure the referenced file exists"
-        end
-      else
-        "Link appears to reference a non-markdown file or directory"
-      end
+    next if file_exists?(file, link)
 
-      add_error(file, link, "Broken link - target file does not exist", suggestion)
-      file_errors += 1
-    end
+    suggestion = case link
+                 when /\.md$/
+                   if link.include?('/tenets/')
+                     'Check if the tenet file exists in docs/tenets/ directory'
+                   elsif link.include?('/bindings/')
+                     'Check if the binding file exists in docs/bindings/core/ or docs/bindings/categories/ directories'
+                   else
+                     'Verify the file path and ensure the referenced file exists'
+                   end
+                 else
+                   'Link appears to reference a non-markdown file or directory'
+                 end
+
+    add_error(file, link, 'Broken link - target file does not exist', suggestion)
+    file_errors += 1
   end
 
-  log_structured('file_validated', {
-    file: file,
-    total_links: links.size,
-    errors: file_errors,
-    external_links: links.count { |l| l[:link].match?(/^https?:\/\//) }
-  }) if $structured_logging
+  if $structured_logging
+    log_structured('file_validated', {
+                     file: file,
+                     total_links: links.size,
+                     errors: file_errors,
+                     external_links: links.count { |l| l[:link].match?(%r{^https?://}) }
+                   })
+  end
 
   file_errors
 end
@@ -149,9 +151,9 @@ end
 # Main validation process
 def validate_cross_references
   log_structured('validation_start', {
-    tool: 'validate_cross_references',
-    mode: 'cross_reference_integrity'
-  })
+                   tool: 'validate_cross_references',
+                   mode: 'cross_reference_integrity'
+                 })
 
   start_time = Time.now
   markdown_files = find_markdown_files
@@ -163,22 +165,20 @@ def validate_cross_references
     file_errors = validate_file_references(file)
     total_errors += file_errors
 
-    if file_errors > 0
-      puts "  [ERROR] #{file}: #{file_errors} broken link(s)"
-    end
+    puts "  [ERROR] #{file}: #{file_errors} broken link(s)" if file_errors > 0
   end
 
   duration = (Time.now - start_time).round(3)
 
   log_structured('validation_summary', {
-    duration_seconds: duration,
-    files_validated: markdown_files.size,
-    total_errors: total_errors,
-    files_with_errors: $errors.map { |e| e[:file] }.uniq.size
-  })
+                   duration_seconds: duration,
+                   files_validated: markdown_files.size,
+                   total_errors: total_errors,
+                   files_with_errors: $errors.map { |e| e[:file] }.uniq.size
+                 })
 
   if total_errors == 0
-    puts "✅ All cross-references validated successfully!"
+    puts '✅ All cross-references validated successfully!'
     puts "Checked #{markdown_files.size} files in #{duration}s"
   else
     puts "\n❌ Cross-reference validation failed!"
@@ -203,28 +203,28 @@ require 'optparse'
 
 options = {}
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: validate_cross_references.rb [options]"
-  opts.separator ""
-  opts.separator "This script validates that all cross-references in markdown files point to existing files."
-  opts.separator ""
-  opts.separator "Options:"
+  opts.banner = 'Usage: validate_cross_references.rb [options]'
+  opts.separator ''
+  opts.separator 'This script validates that all cross-references in markdown files point to existing files.'
+  opts.separator ''
+  opts.separator 'Options:'
 
-  opts.on("-v", "--verbose", "Show detailed validation progress") do
+  opts.on('-v', '--verbose', 'Show detailed validation progress') do
     options[:verbose] = true
   end
 
-  opts.on("-h", "--help", "Show this help message") do
+  opts.on('-h', '--help', 'Show this help message') do
     puts opts
     exit
   end
 
-  opts.separator ""
-  opts.separator "Environment Variables:"
-  opts.separator "  LEYLINE_STRUCTURED_LOGGING=true  Enable JSON structured logging to STDERR"
-  opts.separator ""
-  opts.separator "Exit Codes:"
-  opts.separator "  0 - All cross-references are valid"
-  opts.separator "  1 - Broken cross-references found"
+  opts.separator ''
+  opts.separator 'Environment Variables:'
+  opts.separator '  LEYLINE_STRUCTURED_LOGGING=true  Enable JSON structured logging to STDERR'
+  opts.separator ''
+  opts.separator 'Exit Codes:'
+  opts.separator '  0 - All cross-references are valid'
+  opts.separator '  1 - Broken cross-references found'
 end
 
 parser.parse!

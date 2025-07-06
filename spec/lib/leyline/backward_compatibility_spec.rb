@@ -78,7 +78,7 @@ RSpec.describe 'Backward compatibility validation' do
 
         # Verify original result structure is maintained
         expect(results).to be_a(Hash)
-        expect(results.keys).to match_array([:copied, :skipped, :errors])
+        expect(results.keys).to match_array(%i[copied skipped errors])
         expect(results[:copied]).to be_a(Array)
         expect(results[:skipped]).to be_a(Array)
         expect(results[:errors]).to be_a(Array)
@@ -107,7 +107,7 @@ RSpec.describe 'Backward compatibility validation' do
           cli.sync(temp_target_dir)
         end
 
-        expect(output).to include("Synchronizing leyline standards to:")
+        expect(output).to include('Synchronizing leyline standards to:')
         expect(output).to include(temp_target_dir)
       end
 
@@ -118,8 +118,8 @@ RSpec.describe 'Backward compatibility validation' do
           cli.sync
         end
 
-        expect(output).to include("Synchronizing leyline standards to:")
-        expect(output).to include("/docs/leyline")
+        expect(output).to include('Synchronizing leyline standards to:')
+        expect(output).to include('/docs/leyline')
       end
 
       it 'accepts original flags without new cache flags' do
@@ -129,17 +129,17 @@ RSpec.describe 'Backward compatibility validation' do
 
           # Simulate Thor options
           allow(cli).to receive(:options).and_return({
-            categories: ['typescript'],
-            force: true,
-            verbose: true,
-            dry_run: false
-          })
+                                                       categories: ['typescript'],
+                                                       force: true,
+                                                       verbose: true,
+                                                       dry_run: false
+                                                     })
 
           cli.sync(temp_target_dir)
         end
 
-        expect(output).to include("Categories: typescript")
-        expect(output).to include("Options: categories, force, verbose")
+        expect(output).to include('Categories: typescript')
+        expect(output).to include('Options: categories, force, verbose')
       end
     end
 
@@ -183,9 +183,7 @@ RSpec.describe 'Backward compatibility validation' do
           # Mock git operations to use local repo
           allow_any_instance_of(Leyline::Sync::GitClient).to receive(:fetch_version) do |instance|
             working_dir = instance.instance_variable_get(:@working_directory)
-            if working_dir && Dir.exist?(working_dir)
-              FileUtils.cp_r(File.join(git_repo, 'docs'), working_dir)
-            end
+            FileUtils.cp_r(File.join(git_repo, 'docs'), working_dir) if working_dir && Dir.exist?(working_dir)
           end
 
           # Run sync without any cache options

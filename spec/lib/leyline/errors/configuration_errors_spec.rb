@@ -15,13 +15,9 @@ RSpec.describe 'Configuration-specific errors' do
           def recovery_suggestions
             suggestions = []
 
-            if context[:key]
-              suggestions << "Check the value of '#{context[:key]}' in your configuration"
-            end
+            suggestions << "Check the value of '#{context[:key]}' in your configuration" if context[:key]
 
-            if context[:expected]
-              suggestions << "Expected: #{context[:expected]}"
-            end
+            suggestions << "Expected: #{context[:expected]}" if context[:expected]
 
             suggestions << 'Review leyline configuration documentation'
             suggestions << 'Use --verbose flag for detailed configuration validation'
