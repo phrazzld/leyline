@@ -30,10 +30,12 @@ writing guidelines and examples.
 
 Leyline enforces strict length limits to ensure documents remain tight, punchy, and focused on core value:
 
-**Tenets**: Maximum 150 lines
-**Bindings**: Maximum 400 lines
+**Tenets**: Maximum 100 lines (warning), 150 lines (failure)
+**Bindings**: Maximum 200 lines (warning), 300 lines (failure)
 
-These limits are automatically enforced through pre-commit hooks and CI validation. Documents exceeding these limits will be rejected until they meet conciseness standards.
+These limits are automatically enforced through CI validation using `tools/enforce_doc_limits.rb`. Documents exceeding these limits will be rejected until they meet conciseness standards. For details on the enforcement rules and exemption process, see:
+- [Document Length Enforcement](docs/document-length-enforcement.md)
+- [Enforcement Exemption Process](docs/enforcement-exemption-process.md)
 
 ### The One Example Rule
 

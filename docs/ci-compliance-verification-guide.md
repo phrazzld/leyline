@@ -6,7 +6,7 @@ This guide provides step-by-step instructions for verifying that your changes wi
 
 ```bash
 # 1. Document length compliance
-ruby tools/check_document_length.rb
+ruby tools/enforce_doc_limits.rb
 
 # 2. YAML front-matter validation
 ruby tools/validate_front_matter.rb
@@ -24,14 +24,17 @@ git reset HEAD~1  # Shows formatting issues that need fixing
 
 ### 1. Document Length Validation
 
-**Purpose**: Ensure all documents meet conciseness standards (≤150 lines for tenets, ≤400 lines for bindings)
+**Purpose**: Ensure all documents meet conciseness standards (≤100 lines for tenets, ≤200 lines for bindings)
 
 ```bash
 # Check all documents
-ruby tools/check_document_length.rb
+ruby tools/enforce_doc_limits.rb
 
 # Check specific document
-ruby tools/check_document_length.rb docs/bindings/core/api-design.md
+ruby tools/enforce_doc_limits.rb docs/bindings/core/api-design.md
+
+# Check with verbose output (shows all files)
+ruby tools/enforce_doc_limits.rb --verbose
 ```
 
 **Expected Output**:
@@ -40,10 +43,12 @@ ruby tools/check_document_length.rb docs/bindings/core/api-design.md
 
 **If Violations Found**:
 1. Review `docs/systematic-refactoring-process.md` for guidance
-2. Apply "one example rule" methodology
-3. Focus on condensing verbose rationale sections
-4. Convert prose rules to bullet points
-5. Reduce to single comprehensive examples
+2. Review `docs/document-length-enforcement.md` for specific limits and strategies
+3. Apply "one example rule" methodology
+4. Focus on condensing verbose rationale sections
+5. Convert prose rules to bullet points
+6. Reduce to single comprehensive examples
+7. Consider exemption process only as last resort
 
 ### 2. YAML Front-Matter Validation
 
@@ -129,17 +134,17 @@ git reset HEAD~1
 **Solution**: Apply systematic refactoring methodology
 
 ```bash
-# Get specific guidance for document
-ruby tools/analyze_verbosity_patterns.rb | grep "your-document.md"
-
-# Follow refactoring template
-cat tools/refactoring-template.md
+# Check exact overage
+ruby tools/enforce_doc_limits.rb docs/your-document.md
 
 # Apply proven techniques:
 # 1. Condense verbose rationale sections (most effective)
 # 2. Single comprehensive examples (highly effective)
 # 3. Convert prose rules to bullet points (effective)
 # 4. Streamline related bindings (essential)
+
+# If absolutely necessary, see exemption process:
+# docs/enforcement-exemption-process.md
 ```
 
 ### YAML Front-Matter Errors
@@ -206,7 +211,7 @@ git commit -m "your commit message"  # Commit with corrections
 ```bash
 # Daily development routine
 git status  # Check current changes
-ruby tools/check_document_length.rb  # Monitor document growth
+ruby tools/enforce_doc_limits.rb  # Monitor document growth
 ruby tools/validate_front_matter.rb  # Catch YAML issues early
 
 # Before committing
@@ -214,7 +219,7 @@ git add .
 git commit  # Let pre-commit hooks run and fix formatting
 
 # Before PR submission
-ruby tools/check_document_length.rb
+ruby tools/enforce_doc_limits.rb --verbose
 ruby tools/validate_front_matter.rb
 ruby tools/fix_cross_references.rb
 ruby tools/reindex.rb --strict
@@ -229,7 +234,7 @@ If CI fails after PR submission:
 git pull origin main
 
 # 2. Run full validation locally
-ruby tools/check_document_length.rb
+ruby tools/enforce_doc_limits.rb
 ruby tools/validate_front_matter.rb
 ruby tools/fix_cross_references.rb
 ruby tools/reindex.rb --strict
@@ -247,7 +252,7 @@ git push
 
 Your changes are ready for CI when:
 
-- ✅ `ruby tools/check_document_length.rb` shows no violations
+- ✅ `ruby tools/enforce_doc_limits.rb` shows no violations
 - ✅ `ruby tools/validate_front_matter.rb` passes without errors
 - ✅ `ruby tools/fix_cross_references.rb` completes successfully
 - ✅ `ruby tools/reindex.rb --strict` regenerates without issues
@@ -257,5 +262,6 @@ Your changes are ready for CI when:
 ## Related Documentation
 
 - [Systematic Refactoring Process](systematic-refactoring-process.md) - Complete methodology for document refactoring
+- [Document Length Enforcement](document-length-enforcement.md) - Detailed enforcement rules and strategies
+- [Enforcement Exemption Process](enforcement-exemption-process.md) - How to request exemptions when necessary
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - General contribution guidelines
-- [Conciseness Guide](../docs/CONCISENESS_GUIDE.md) - Writing guidelines for concise documentation
