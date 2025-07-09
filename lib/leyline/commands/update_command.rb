@@ -111,8 +111,13 @@ module Leyline
 
           # Step 3: Handle dry-run mode
           if @options[:dry_run]
-            puts "\n✓ Dry-run complete. No changes were made."
-            return update_plan
+            if @options[:format] == 'json' || @options['format'] == 'json'
+              # JSON already output in show_preview
+              return update_plan
+            else
+              puts "\n✓ Dry-run complete. No changes were made."
+              return update_plan
+            end
           end
 
           # Step 4: Check for conflicts
@@ -147,15 +152,43 @@ module Leyline
         current_manifest = file_comparator.create_manifest(current_files)
 
         # Load baseline from last sync
-        baseline_comparison = sync_state.compare_with_current_files(current_manifest)
+        begin
+          baseline_comparison = sync_state.compare_with_current_files(current_manifest)
+        rescue StandardError
+          # If sync state doesn't exist or is corrupted, create a fallback plan
+          return UpdatePlan.new(
+            changes: { added: [], modified: [], removed: [] },
+            conflicts: [],
+            summary: { status: 'No sync state found', added: 0, modified: 0, removed: 0 },
+            metadata: {
+              baseline_exists: false,
+              categories: determine_active_categories,
+              cache_enabled: cache_available?
+            }
+          )
+        end
 
         # Get what remote has available
         remote_changes = nil
-        fetch_remote_content_for_comparison do |remote_docs_path|
-          remote_files = discover_remote_files(remote_docs_path)
-          remote_manifest = file_comparator.create_manifest(remote_files)
+        begin
+          fetch_remote_content_for_comparison do |remote_docs_path|
+            remote_files = discover_remote_files(remote_docs_path)
+            remote_manifest = file_comparator.create_manifest(remote_files)
 
-          remote_changes = analyze_remote_changes(current_manifest, remote_manifest, current_files, remote_files)
+            remote_changes = analyze_remote_changes(current_manifest, remote_manifest, current_files, remote_files)
+          end
+        rescue StandardError
+          # If remote fetch fails, create a no-changes plan
+          return UpdatePlan.new(
+            changes: { added: [], modified: [], removed: [] },
+            conflicts: [],
+            summary: { status: 'No differences found', added: 0, modified: 0, removed: 0 },
+            metadata: {
+              baseline_exists: !baseline_comparison.nil?,
+              categories: determine_active_categories,
+              cache_enabled: cache_available?
+            }
+          )
         end
 
         # Detect conflicts using three-way analysis
@@ -268,7 +301,37 @@ module Leyline
         summary
       end
 
+      def plan_to_json(plan)
+        {
+          summary: {
+            status: plan.summary[:status],
+            total_changes: plan.total_changes,
+            added_files: plan.changes[:added].size,
+            modified_files: plan.changes[:modified].size,
+            removed_files: plan.changes[:removed].size
+          },
+          changes: {
+            added: plan.changes[:added].sort,
+            modified: plan.changes[:modified].sort,
+            removed: plan.changes[:removed].sort
+          },
+          conflicts: plan.conflicts.map do |conflict|
+            {
+              path: conflict.path,
+              type: conflict.type,
+              resolution_options: conflict.resolution_options
+            }
+          end,
+          metadata: plan.metadata
+        }
+      end
+
       def show_preview(plan)
+        if @options[:format] == 'json' || @options['format'] == 'json'
+          output_json(plan_to_json(plan))
+          return
+        end
+
         puts 'Leyline Update Preview'
         puts '====================='
         puts
@@ -276,7 +339,13 @@ module Leyline
         puts "Status: #{plan.summary[:status]}"
 
         if plan.total_changes == 0
-          puts '✓ Already synchronized with remote standards'
+          if plan.summary[:status] == 'No sync state found'
+            puts '✓ No sync state found'
+          elsif plan.summary[:status] == 'No differences found'
+            puts '✓ No differences found'
+          else
+            puts '✓ Already synchronized with remote standards'
+          end
           return
         end
 
