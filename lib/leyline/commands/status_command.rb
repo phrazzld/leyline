@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'digest'
+require_relative 'base_command'
 require_relative '../file_comparator'
 require_relative '../sync_state'
 require_relative '../discovery/metadata_cache'
@@ -12,7 +13,7 @@ module Leyline
     # Implements the 'leyline status' command to show current sync state
     # Displays locally modified files, available updates, and summary statistics
     # Supports JSON output and category filtering for transparency operations
-    class StatusCommand
+    class StatusCommand < BaseCommand
       class StatusError < Leyline::LeylineError
         def error_type
           :command
@@ -27,38 +28,61 @@ module Leyline
         end
       end
 
-      def initialize(options = {})
-        @options = options
-        @base_directory = @options[:directory] || Dir.pwd
-        @cache_dir = @options[:cache_dir] || ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
-        @cache_dir = File.expand_path(@cache_dir)
-      end
+      class CommandError < StatusError; end
 
       # Execute status command and return results
       # Returns hash with status information or nil on error
       def execute
-        start_time = Time.now
+        # Validate path
+        if @base_directory.start_with?('-')
+          error_and_exit("Invalid path '#{@base_directory}'. Path cannot start with a dash.\nDid you mean to use 'leyline help status' for help?")
+        end
+
+        # Validate parent directory exists
+        parent_dir = File.dirname(@base_directory)
+        unless Dir.exist?(parent_dir)
+          error_and_exit("Parent directory does not exist: #{parent_dir}\nPlease ensure the parent directory exists before running this command.")
+        end
 
         begin
-          status_data = gather_status_information
-          execution_time = ((Time.now - start_time) * 1000).round(2)
+          status_data, execution_time_ms = measure_time { gather_status_information }
 
           status_data[:performance] = {
-            execution_time_ms: execution_time,
+            execution_time_ms: execution_time_ms,
             cache_enabled: cache_available?
           }
 
-          if @options[:json]
-            output_json(status_data)
-          else
-            output_human_readable(status_data)
-          end
-
+          output_result(status_data)
           status_data
         rescue StandardError => e
           handle_error(e)
           nil
         end
+      end
+
+      protected
+
+      # Override BaseCommand's output_human_readable for status-specific formatting
+      def output_human_readable(status_data)
+        puts 'Leyline Status Report'
+        puts '===================='
+        puts
+
+        output_version_info(status_data)
+        puts
+
+        output_sync_state_info(status_data[:sync_state])
+        puts
+
+        output_local_changes_info(status_data[:local_changes])
+        puts
+
+        output_file_summary_info(status_data[:file_summary])
+
+        return unless verbose?
+
+        puts
+        output_performance_info(status_data[:performance])
       end
 
       private
@@ -71,7 +95,6 @@ module Leyline
         current_files = discover_current_files
 
         # Create manifest with relative paths for comparison
-        leyline_path = File.join(@base_directory, 'docs', 'leyline')
         current_manifest = {}
         current_files.each do |relative_path|
           full_path = File.join(leyline_path, relative_path)
@@ -82,7 +105,7 @@ module Leyline
             current_manifest[relative_path] = Digest::SHA256.hexdigest(content)
           rescue Errno::EACCES => e
             # Skip files we can't read but note in verbose mode
-            warn "Warning: Cannot read #{relative_path}: #{e.message}" if @options[:verbose]
+            warn "Warning: Cannot read #{relative_path}: #{e.message}" if verbose?
           rescue Encoding::InvalidByteSequenceError, Encoding::UndefinedConversionError
             # Handle encoding errors gracefully
             raise Leyline::ComparisonFailedError.new(
@@ -97,7 +120,7 @@ module Leyline
           state_comparison = sync_state.compare_with_current_files(current_manifest)
         rescue StandardError => e
           # If sync state comparison fails, continue with limited information
-          warn "Warning: Sync state comparison failed: #{e.message}" if @options[:verbose]
+          warn "Warning: Sync state comparison failed: #{e.message}" if verbose?
           state_comparison = nil
         end
 
@@ -203,9 +226,7 @@ module Leyline
 
       def discover_current_files
         return [] unless Dir.exist?(@base_directory)
-
-        leyline_path = File.join(@base_directory, 'docs', 'leyline')
-        return [] unless Dir.exist?(leyline_path)
+        return [] unless leyline_exists?
 
         files = []
         categories = @options[:categories] || determine_active_categories
@@ -262,49 +283,9 @@ module Leyline
         categories.sort
       end
 
-      def file_cache
-        return @file_cache if defined?(@file_cache)
-
-        begin
-          require_relative '../cache/file_cache'
-          @file_cache = Cache::FileCache.new(@cache_dir)
-        rescue StandardError => e
-          warn "Warning: Cache initialization failed: #{e.message}" if @options[:verbose]
-          @file_cache = nil
-        end
-
-        @file_cache
-      end
 
       def cache_available?
         !file_cache.nil?
-      end
-
-      def output_json(status_data)
-        require 'json'
-        puts JSON.pretty_generate(status_data)
-      end
-
-      def output_human_readable(status_data)
-        puts 'Leyline Status Report'
-        puts '===================='
-        puts
-
-        output_version_info(status_data)
-        puts
-
-        output_sync_state_info(status_data[:sync_state])
-        puts
-
-        output_local_changes_info(status_data[:local_changes])
-        puts
-
-        output_file_summary_info(status_data[:file_summary])
-
-        return unless @options[:verbose]
-
-        puts
-        output_performance_info(status_data[:performance])
       end
 
       def output_version_info(status_data)
@@ -393,84 +374,6 @@ module Leyline
           "#{(seconds / 3600).round}h"
         else
           "#{(seconds / 86_400).round}d"
-        end
-      end
-
-      def handle_error(error)
-        # Convert standard errors to Leyline errors with recovery guidance
-        leyline_error = case error
-                        when Leyline::LeylineError
-                          error
-                        when Errno::EACCES, Errno::EPERM
-                          path = nil
-                          begin
-                            path = error.message.match(/- (.+)$/)[1] if error.message
-                          rescue StandardError
-                            # Ignore extraction errors
-                          end
-
-                          Leyline::FileSystemError.new(
-                            'Permission denied accessing files',
-                            reason: :permission_denied,
-                            path: path
-                          )
-                        when Errno::ENOENT
-                          StatusError.new('Leyline directory not found')
-                        when Errno::ENOSPC
-                          Leyline::CacheOperationError.new(
-                            'No space left on device',
-                            operation: :disk_full,
-                            cache_dir: @cache_dir
-                          )
-                        when JSON::ParserError
-                          Leyline::InvalidSyncStateError.new(
-                            'Sync state file is corrupted',
-                            file: File.join(@cache_dir, 'sync_state.yaml'),
-                            platform: detect_platform
-                          )
-                        else
-                          StatusError.new(error.message)
-                        end
-
-        # Output error with recovery suggestions
-        output_error_with_recovery(leyline_error)
-      end
-
-      def output_error_with_recovery(error)
-        warn "Error: #{error.message}"
-
-        suggestions = error.recovery_suggestions
-        if suggestions.any?
-          warn "\nTo resolve this issue, try:"
-          suggestions.each_with_index do |suggestion, i|
-            warn "  #{i + 1}. #{suggestion}"
-          end
-        end
-
-        if @options[:verbose]
-          warn "\nDebug information:"
-          warn "  Error type: #{error.error_type}"
-          warn "  Context: #{error.context.inspect}" if error.context.any?
-          if error.respond_to?(:cause) && error.cause
-            warn "  Original error: #{error.cause.class} - #{error.cause.message}"
-            warn '  Backtrace:'
-            error.cause.backtrace.first(5).each { |line| warn "    #{line}" }
-          end
-        else
-          warn "\nRun with --verbose for more details"
-        end
-      end
-
-      def detect_platform
-        require_relative '../platform_helper'
-        if Leyline::PlatformHelper.windows?
-          'windows'
-        elsif Leyline::PlatformHelper.macos?
-          'macos'
-        elsif Leyline::PlatformHelper.linux?
-          'linux'
-        else
-          'unknown'
         end
       end
     end

@@ -67,7 +67,6 @@ module Leyline
 
       def validate_sync_options(options, path = nil)
         validate_categories(options[:categories])
-        validate_boolean_option(options[:force], 'force')
         validate_boolean_option(options[:dry_run], 'dry_run')
         validate_boolean_option(options[:verbose], 'verbose')
         validate_boolean_option(options[:no_cache], 'no_cache')

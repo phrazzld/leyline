@@ -3,6 +3,7 @@
 require 'yaml'
 require 'time'
 require 'fileutils'
+require 'set'
 require_relative 'cache/cache_error_handler'
 require_relative 'version'
 

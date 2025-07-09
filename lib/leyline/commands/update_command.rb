@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'base_command'
 require_relative '../file_comparator'
 require_relative '../sync_state'
 require_relative '../sync/file_syncer'
@@ -10,13 +11,14 @@ require 'tmpdir'
 require 'json'
 require 'net/http'
 require 'timeout'
+require 'set'
 
 module Leyline
   module Commands
     # Implements the 'leyline update' command for safe, preview-first updates
     # Shows pending changes, detects conflicts between local and remote updates
     # Provides clear resolution guidance with dry-run and force options
-    class UpdateCommand
+    class UpdateCommand < BaseCommand
       class UpdateError < Leyline::LeylineError
         def error_type
           :command
@@ -83,15 +85,21 @@ module Leyline
         end
       end
 
-      def initialize(options = {})
-        @options = options
-        @base_directory = @options[:directory] || Dir.pwd
-        @cache_dir = @options[:cache_dir] || ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
-        @cache_dir = File.expand_path(@cache_dir)
-      end
+      class CommandError < UpdateError; end
 
       # Execute update command with preview-first approach
       def execute
+        # Validate path
+        if @base_directory.start_with?('-')
+          error_and_exit("Invalid path '#{@base_directory}'. Path cannot start with a dash.\nDid you mean to use 'leyline help update' for help?")
+        end
+
+        # Validate parent directory exists
+        parent_dir = File.dirname(@base_directory)
+        unless Dir.exist?(parent_dir)
+          error_and_exit("Parent directory does not exist: #{parent_dir}\nPlease ensure the parent directory exists before running this command.")
+        end
+
         start_time = Time.now
 
         begin
@@ -566,83 +574,46 @@ module Leyline
         end
       end
 
-      def file_cache
-        return @file_cache if defined?(@file_cache)
-
-        begin
-          require_relative '../cache/file_cache'
-          @file_cache = Cache::FileCache.new(@cache_dir)
-        rescue StandardError => e
-          warn "Warning: Cache initialization failed: #{e.message}" if @options[:verbose]
-          @file_cache = nil
-        end
-
-        @file_cache
-      end
-
       def cache_available?
         !file_cache.nil?
       end
 
-      def handle_error(error)
-        # Convert standard errors to Leyline errors with recovery guidance
-        leyline_error = case error
-                        when Leyline::LeylineError
-                          error
-                        when ConflictDetectedError
-                          # Conflict errors are already handled in show_conflict_resolution
-                          return
-                        when Errno::EACCES, Errno::EPERM
-                          path = nil
-                          begin
-                            path = error.message.match(/- (.+)$/)[1] if error.message
-                          rescue StandardError
-                            # Ignore extraction errors
-                          end
+      # Override BaseCommand's normalize_error to handle UpdateCommand-specific errors
+      def normalize_error(error, context = {})
+        case error
+        when ConflictDetectedError
+          # Conflict errors are already handled in show_conflict_resolution
+          error
+        when Errno::ENOENT
+          UpdateError.new('Leyline directory not found')
+        when Errno::EROFS
+          Leyline::FileSystemError.new(
+            'Filesystem is read-only',
+            reason: :read_only_filesystem,
+            path: @base_directory
+          )
+        when Leyline::Sync::GitClient::GitNotAvailableError
+          Leyline::RemoteAccessError.new(
+            'Git binary not found',
+            reason: :git_not_installed
+          )
+        when Leyline::Sync::GitClient::GitCommandError
+          handle_git_command_error(error)
+        when Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
+          Leyline::RemoteAccessError.new(
+            'Network timeout while fetching updates',
+            reason: :network_timeout,
+            url: 'https://github.com/phrazzld/leyline.git'
+          )
+        else
+          super(error, context)
+        end
+      end
 
-                          Leyline::FileSystemError.new(
-                            'Permission denied during update',
-                            reason: :permission_denied,
-                            path: path
-                          )
-                        when Errno::ENOENT
-                          UpdateError.new('Leyline directory not found')
-                        when Errno::ENOSPC
-                          Leyline::CacheOperationError.new(
-                            'No space left on device for update operations',
-                            operation: :disk_full,
-                            cache_dir: @cache_dir
-                          )
-                        when Errno::EROFS
-                          Leyline::FileSystemError.new(
-                            'Filesystem is read-only',
-                            reason: :read_only_filesystem,
-                            path: @base_directory
-                          )
-                        when Leyline::Sync::GitClient::GitNotAvailableError
-                          Leyline::RemoteAccessError.new(
-                            'Git binary not found',
-                            reason: :git_not_installed
-                          )
-                        when Leyline::Sync::GitClient::GitCommandError
-                          handle_git_command_error(error)
-                        when Net::OpenTimeout, Net::ReadTimeout, Timeout::Error
-                          Leyline::RemoteAccessError.new(
-                            'Network timeout while fetching updates',
-                            reason: :network_timeout,
-                            url: 'https://github.com/phrazzld/leyline.git'
-                          )
-                        when Interrupt
-                          Leyline::LeylineError.new(
-                            'Update cancelled by user',
-                            signal: 'SIGINT'
-                          )
-                        else
-                          UpdateError.new(error.message)
-                        end
-
-        # Output error with recovery suggestions
-        output_error_with_recovery(leyline_error)
+      def handle_error(error, context = {})
+        # Special handling for ConflictDetectedError - already shown in show_conflict_resolution
+        return if error.is_a?(ConflictDetectedError)
+        super(error, context)
       end
 
       def handle_git_command_error(error)
@@ -677,53 +648,6 @@ module Leyline
         end
       end
 
-      def output_error_with_recovery(error)
-        warn "Error: #{error.message}"
-
-        suggestions = error.recovery_suggestions
-        if suggestions.any?
-          warn "\nTo resolve this issue, try:"
-          suggestions.each_with_index do |suggestion, i|
-            warn "  #{i + 1}. #{suggestion}"
-          end
-        end
-
-        # Platform-specific help
-        platform = detect_platform
-        if platform == 'windows' && error.error_type == :filesystem
-          warn "\nWindows-specific tips:"
-          warn '  - Run as Administrator if permission denied'
-          warn '  - Check if files are locked by another process'
-          warn '  - Disable antivirus temporarily if blocking'
-        end
-
-        if @options[:verbose]
-          warn "\nDebug information:"
-          warn "  Error type: #{error.error_type}"
-          warn "  Platform: #{platform}"
-          warn "  Context: #{error.context.inspect}" if error.context.any?
-          if error.respond_to?(:cause) && error.cause
-            warn "  Original error: #{error.cause.class} - #{error.cause.message}"
-            warn '  Backtrace:'
-            error.cause.backtrace.first(5).each { |line| warn "    #{line}" }
-          end
-        else
-          warn "\nRun with --verbose for more details"
-        end
-      end
-
-      def detect_platform
-        require_relative '../platform_helper'
-        if Leyline::PlatformHelper.windows?
-          'windows'
-        elsif Leyline::PlatformHelper.macos?
-          'macos'
-        elsif Leyline::PlatformHelper.linux?
-          'linux'
-        else
-          'unknown'
-        end
-      end
     end
   end
 end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'base_command'
 require_relative '../file_comparator'
 require_relative '../sync/git_client'
 require_relative '../version'
@@ -14,7 +15,7 @@ module Leyline
     # Implements the 'leyline diff' command to show what would change without syncing
     # Generates unified diff format output with file additions/deletions/modifications
     # Supports category filtering and format options (text, json)
-    class DiffCommand
+    class DiffCommand < BaseCommand
       class DiffError < Leyline::LeylineError
         def error_type
           :command
@@ -29,24 +30,27 @@ module Leyline
         end
       end
 
-      def initialize(options = {})
-        @options = options
-        @base_directory = @options[:directory] || Dir.pwd
-        @cache_dir = @options[:cache_dir] || ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
-        @cache_dir = File.expand_path(@cache_dir)
-      end
+      class CommandError < DiffError; end
 
       # Execute diff command and return results
       # Returns hash with diff information or nil on error
       def execute
-        start_time = Time.now
+        # Validate path
+        if @base_directory.start_with?('-')
+          error_and_exit("Invalid path '#{@base_directory}'. Path cannot start with a dash.\nDid you mean to use 'leyline help diff' for help?")
+        end
+
+        # Validate parent directory exists
+        parent_dir = File.dirname(@base_directory)
+        unless Dir.exist?(parent_dir)
+          error_and_exit("Parent directory does not exist: #{parent_dir}\nPlease ensure the parent directory exists before running this command.")
+        end
 
         begin
-          diff_data = gather_diff_information
-          execution_time = ((Time.now - start_time) * 1000).round(2)
+          diff_data, execution_time_ms = measure_time { gather_diff_information }
 
           diff_data[:performance] = {
-            execution_time_ms: execution_time,
+            execution_time_ms: execution_time_ms,
             cache_enabled: cache_available?
           }
 
@@ -76,7 +80,7 @@ module Leyline
           raise DiffError.new(
             'No leyline directory found to compare',
             context: {
-              path: File.join(@base_directory, 'docs', 'leyline'),
+              path: leyline_path,
               suggestion: 'Run leyline sync first'
             }
           )
@@ -215,7 +219,7 @@ module Leyline
             unified_diff = create_unified_diff(local_file, remote_file, relative_path)
             diffs[relative_path] = unified_diff if unified_diff
           rescue StandardError => e
-            warn "Warning: Could not generate diff for #{relative_path}: #{e.message}" if @options[:verbose]
+            warn "Warning: Could not generate diff for #{relative_path}: #{e.message}" if verbose?
           end
         end
 
@@ -281,9 +285,7 @@ module Leyline
 
       def discover_local_files
         return [] unless Dir.exist?(@base_directory)
-
-        leyline_path = File.join(@base_directory, 'docs', 'leyline')
-        return [] unless Dir.exist?(leyline_path)
+        return [] unless leyline_exists?
 
         files = []
         categories = determine_active_categories
@@ -355,7 +357,7 @@ module Leyline
 
       def discover_categories_from_files
         categories = ['core']
-        bindings_path = File.join(@base_directory, 'docs', 'leyline', 'bindings', 'categories')
+        bindings_path = File.join(leyline_path, 'bindings', 'categories')
 
         return categories unless Dir.exist?(bindings_path)
 
@@ -404,26 +406,8 @@ module Leyline
         map
       end
 
-      def file_cache
-        return @file_cache if defined?(@file_cache)
-
-        begin
-          require_relative '../cache/file_cache'
-          @file_cache = Cache::FileCache.new(@cache_dir)
-        rescue StandardError => e
-          warn "Warning: Cache initialization failed: #{e.message}" if @options[:verbose]
-          @file_cache = nil
-        end
-
-        @file_cache
-      end
-
       def cache_available?
         !file_cache.nil?
-      end
-
-      def output_json(diff_data)
-        puts JSON.pretty_generate(diff_data)
       end
 
       def output_unified_diff(diff_data)
@@ -442,7 +426,7 @@ module Leyline
 
         output_file_changes(diff_data[:changes])
 
-        return unless diff_data[:unified_diffs].any? && @options[:verbose]
+        return unless diff_data[:unified_diffs].any? && verbose?
 
         puts
         output_detailed_diffs(diff_data[:unified_diffs])
@@ -483,51 +467,25 @@ module Leyline
         end
       end
 
-      def handle_error(error)
-        # Convert standard errors to Leyline errors with recovery guidance
-        leyline_error = case error
-                        when Leyline::LeylineError
-                          error
-                        when Errno::EACCES, Errno::EPERM
-                          path = nil
-                          begin
-                            path = error.message.match(/- (.+)$/)[1] if error.message
-                          rescue StandardError
-                            # Ignore extraction errors
-                          end
-
-                          Leyline::FileSystemError.new(
-                            'Permission denied accessing files',
-                            reason: :permission_denied,
-                            path: path
-                          )
-                        when Errno::ENOENT
-                          DiffError.new('Leyline directory not found')
-                        when Errno::ENOSPC
-                          Leyline::CacheOperationError.new(
-                            'No space left on device for temporary diff operations',
-                            operation: :disk_full,
-                            cache_dir: @cache_dir
-                          )
-                        when Leyline::Sync::GitClient::GitNotAvailableError
-                          Leyline::RemoteAccessError.new(
-                            'Git binary not found',
-                            reason: :git_not_installed
-                          )
-                        when Leyline::Sync::GitClient::GitCommandError
-                          handle_git_command_error(error)
-                        when Net::OpenTimeout, Net::ReadTimeout
-                          Leyline::RemoteAccessError.new(
-                            'Network timeout while fetching remote content',
-                            reason: :network_timeout,
-                            url: 'https://github.com/phrazzld/leyline.git'
-                          )
-                        else
-                          DiffError.new(error.message)
-                        end
-
-        # Output error with recovery suggestions
-        output_error_with_recovery(leyline_error)
+      # Override BaseCommand's normalize_error to handle DiffCommand-specific errors
+      def normalize_error(error, context = {})
+        case error
+        when Leyline::Sync::GitClient::GitNotAvailableError
+          Leyline::RemoteAccessError.new(
+            'Git binary not found',
+            reason: :git_not_installed
+          )
+        when Leyline::Sync::GitClient::GitCommandError
+          handle_git_command_error(error)
+        when Net::OpenTimeout, Net::ReadTimeout
+          Leyline::RemoteAccessError.new(
+            'Network timeout while fetching remote content',
+            reason: :network_timeout,
+            url: 'https://github.com/phrazzld/leyline.git'
+          )
+        else
+          super(error, context)
+        end
       end
 
       def handle_git_command_error(error)
@@ -556,30 +514,6 @@ module Leyline
         end
       end
 
-      def output_error_with_recovery(error)
-        warn "Error: #{error.message}"
-
-        suggestions = error.recovery_suggestions
-        if suggestions.any?
-          warn "\nTo resolve this issue, try:"
-          suggestions.each_with_index do |suggestion, i|
-            warn "  #{i + 1}. #{suggestion}"
-          end
-        end
-
-        if @options[:verbose]
-          warn "\nDebug information:"
-          warn "  Error type: #{error.error_type}"
-          warn "  Context: #{error.context.inspect}" if error.context.any?
-          if error.respond_to?(:cause) && error.cause
-            warn "  Original error: #{error.cause.class} - #{error.cause.message}"
-            warn '  Backtrace:'
-            error.cause.backtrace.first(5).each { |line| warn "    #{line}" }
-          end
-        else
-          warn "\nRun with --verbose for more details"
-        end
-      end
     end
   end
 end
