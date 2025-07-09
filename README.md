@@ -65,23 +65,61 @@ The Leyline CLI provides the simplest way to sync standards to your project:
 gem install leyline
 
 # Sync TypeScript standards to your project
-leyline sync --categories typescript
+leyline sync -c typescript
 
 # Sync multiple categories
-leyline sync --categories go,rust
+leyline sync -c go,rust
 
 # See what would be synced (dry run)
-leyline sync --categories typescript --verbose
+leyline sync -c typescript --dry-run
 
-# Force overwrite local modifications
-leyline sync --categories typescript --force
+# Check sync status and local modifications
+leyline status
+
+# View differences without applying changes
+leyline diff
+
+# Preview and apply updates with conflict detection
+leyline update --dry-run
 ```
 
 The CLI will:
 - Fetch the latest Leyline standards from GitHub
 - Copy relevant tenets and bindings to `docs/leyline/` in your project
-- Skip files you've already modified (unless using --force)
+- Always rebuild from remote (no local caching conflicts)
 - Show clear output about what was synced
+- Provide transparency commands for change management
+
+**Discovery Commands:**
+```bash
+# Explore available categories
+leyline discovery categories
+
+# View documents in a specific category
+leyline discovery show typescript
+
+# Search for specific content
+leyline discovery search "error handling"
+
+# All commands support JSON output for automation
+leyline discovery categories --json
+leyline status --json
+leyline diff --format json
+```
+
+**Configuration File Support:**
+Create a `.leyline` file in your project root to configure default categories:
+```yaml
+# .leyline configuration file
+categories:
+  - typescript
+  - go
+  - core
+version: ">=2.0.0"
+docs_path: "docs/leyline"
+```
+
+With this configuration, simply run `leyline sync` without specifying categories.
 
 #### Option 2: GitHub Actions Workflow (Automated)
 
