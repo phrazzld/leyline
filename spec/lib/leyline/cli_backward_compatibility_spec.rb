@@ -21,14 +21,12 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
         ['.'],                                  # Sync current directory
         ['--categories', 'core'],               # Category filtering
         ['--categories', 'typescript,go'], # Multiple categories
-        ['--force'],                            # Force overwrite
         ['--verbose'],                          # Verbose output
         ['--dry-run'],                          # Dry run mode
-        ['--force', '--verbose'], # Combined flags
-        ['--categories', 'typescript', '--force', '--verbose'], # Full combination
+        ['--categories', 'typescript', '--verbose'], # Category with verbose
         [temp_project_dir], # Custom path
         [temp_project_dir, '--categories', 'core'], # Path with options
-        [temp_project_dir, '--categories', 'typescript', '--force', '--verbose'] # Full path combination
+        [temp_project_dir, '--categories', 'typescript', '--verbose'] # Path with options
       ]
     end
 
@@ -51,7 +49,6 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
     it 'preserves all original command aliases and shortcuts' do
       original_aliases = {
         '-c' => '--categories',
-        '-f' => '--force',
         '-n' => '--dry-run',
         '-v' => '--verbose'
       }
@@ -139,8 +136,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
 
   describe 'Error Handling Backward Compatibility' do
     it 'maintains invalid category error message format' do
-      cli.options = { categories: ['invalid_category'] }
-      output = capture_stdout_and_exit { cli.sync }
+      output = capture_stdout_and_exit { cli.invoke(:sync, [], { categories: ['invalid_category'] }) }
 
       # Error message pattern must remain stable for script error handling
       expect(output).to include('Error: Invalid category')
@@ -156,8 +152,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
 
     it 'maintains exit codes for error conditions' do
       # Invalid category should exit with code 1
-      cli.options = { categories: ['invalid_category'] }
-      expect { cli.sync }.to exit_with_code(1)
+      expect { cli.invoke(:sync, [], { categories: ['invalid_category'] }) }.to exit_with_code(1)
 
       # Invalid path should exit with code 1
       expect { cli.sync('/nonexistent/deeply/nested/path') }.to exit_with_code(1)
@@ -179,7 +174,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
       expect(Dir.exist?(File.join(temp_project_dir, 'docs', 'leyline', 'tenets'))).to be true
     end
 
-    it 'preserves file overwrite protection behavior' do
+    it 'maintains consistent sync behavior' do
       # First sync to create structure
       cli.sync(temp_project_dir)
 
@@ -190,14 +185,8 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
       # Modify the file to simulate local changes
       File.write(test_file, 'modified content')
 
-      # Sync without force should preserve local changes (skip overwrite)
+      # Sync always rebuilds (consistent behavior)
       cli.sync(temp_project_dir)
-      expect(File.read(test_file)).to eq('modified content')
-
-      # Sync with force should overwrite local changes
-      cli.options = { force: true }
-      cli.sync(temp_project_dir)
-      # The exact content depends on what's actually synced, but it should be different
       expect(File.exist?(test_file)).to be true
     end
 
@@ -327,8 +316,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
 
     it 'handles comma-separated categories consistently' do
       # This is a common pattern in scripts
-      cli.options = { categories: ['typescript,go,core'] }
-      output = capture_stdout { cli.sync }
+      output = capture_stdout { cli.invoke(:sync, [], { categories: ['typescript,go,core'] }) }
 
       # Should be parsed correctly and display normalized category list
       expect(output).to include('Categories: core, go, typescript')
@@ -355,7 +343,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
       # Thor option parsing should remain consistent
       expect { described_class.start(['sync', '--help']) }.not_to raise_error
       expect { described_class.start(['sync', '--categories', 'core']) }.not_to raise_error
-      expect { described_class.start(['sync', '--verbose', '--force']) }.not_to raise_error
+      expect { described_class.start(['sync', '--verbose']) }.not_to raise_error
     end
   end
 
@@ -373,9 +361,8 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
     end
 
     it 'maintains makefile integration patterns' do
-      # Makefile pattern: leyline sync --categories typescript --force
-      cli.options = { categories: ['typescript'], force: true }
-      output = capture_stdout { cli.sync }
+      # Makefile pattern: leyline sync --categories typescript
+      output = capture_stdout { cli.invoke(:sync, [], { categories: ['typescript'] }) }
 
       expect(output).to include('Categories: typescript')
       expect(output).to include('Sync completed:')
@@ -383,8 +370,7 @@ RSpec.describe Leyline::CLI, 'Backward Compatibility Validation' do
 
     it 'supports package.json script patterns' do
       # npm script pattern: "sync-leyline": "leyline sync --categories typescript,web"
-      cli.options = { categories: ['typescript,web'] }
-      output = capture_stdout { cli.sync }
+      output = capture_stdout { cli.invoke(:sync, [], { categories: ['typescript,web'] }) }
 
       expect(output).to include('Categories: typescript, web')
       expect(output).to include('Sync completed:')

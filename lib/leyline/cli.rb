@@ -9,6 +9,11 @@ module Leyline
   class CLI < Thor
     package_name 'leyline'
 
+    # Define exit behavior for Thor compatibility
+    def self.exit_on_failure?
+      true
+    end
+
     # Register discovery subcommand
     desc 'discovery SUBCOMMAND', 'Discover and explore leyline documents'
     subcommand 'discovery', Commands::DiscoveryCommand
@@ -25,14 +30,7 @@ module Leyline
                   aliases: '--json'
     def version
       require_relative 'commands/version_command'
-
-      # Thor's options are already a hash-like object, convert to plain hash
-      command_options = {
-        verbose: options[:verbose],
-        json: options[:json]
-      }
-
-      command = Commands::VersionCommand.new(command_options)
+      command = Commands::VersionCommand.new(options.to_h)
       command.execute
     end
 
@@ -56,10 +54,7 @@ module Leyline
                   aliases: '--json'
     def status(path = '.')
       require_relative 'commands/status_command'
-      command = Commands::StatusCommand.new(options.to_h.merge(
-                                              directory: File.expand_path(path),
-                                              cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
-                                            ))
+      command = Commands::StatusCommand.new(options.to_h.merge(directory: path))
       command.execute
     end
 
@@ -83,17 +78,8 @@ module Leyline
                   default: 'text',
                   enum: %w[text json]
     def diff(path = '.')
-      # Handle help flag specially to maintain backward compatibility
-      if path == '--help'
-        help('diff')
-        return
-      end
-
       require_relative 'commands/diff_command'
-      command = Commands::DiffCommand.new(options.to_h.merge(
-                                            directory: File.expand_path(path),
-                                            cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
-                                          ))
+      command = Commands::DiffCommand.new(options.to_h.merge(directory: path))
       command.execute
     end
 
@@ -121,10 +107,7 @@ module Leyline
                   aliases: '--stats'
     def update(path = '.')
       require_relative 'commands/update_command'
-      command = Commands::UpdateCommand.new(options.to_h.merge(
-                                              directory: File.expand_path(path),
-                                              cache_dir: ENV.fetch('LEYLINE_CACHE_DIR', '~/.cache/leyline')
-                                            ))
+      command = Commands::UpdateCommand.new(options.to_h.merge(directory: path))
       command.execute
     end
 
@@ -176,6 +159,69 @@ module Leyline
       else
         super(command)
       end
+    end
+
+    # Legacy commands for backward compatibility
+    desc 'categories', 'List available leyline categories (legacy - use discovery categories)'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed category information',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    method_option :json,
+                  type: :boolean,
+                  desc: 'Output categories as JSON',
+                  aliases: '--json'
+    def categories
+      require_relative 'commands/discovery/categories_command'
+      command = Commands::Discovery::CategoriesCommand.new(options.to_h)
+      command.execute
+    end
+
+    desc 'show CATEGORY', 'Show documents in a specific category (legacy - use discovery show)'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show additional document details',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    method_option :json,
+                  type: :boolean,
+                  desc: 'Output documents as JSON',
+                  aliases: '--json'
+    def show(category)
+      require_relative 'commands/discovery/show_command'
+      command = Commands::Discovery::ShowCommand.new(options.to_h.merge(category: category))
+      command.execute
+    end
+
+    desc 'search QUERY', 'Search leyline documents by content (legacy - use discovery search)'
+    method_option :limit,
+                  type: :numeric,
+                  desc: 'Maximum number of results to show',
+                  default: 10,
+                  aliases: '-l'
+    method_option :verbose,
+                  type: :boolean,
+                  desc: 'Show detailed search results',
+                  aliases: '-v'
+    method_option :stats,
+                  type: :boolean,
+                  desc: 'Show cache performance statistics',
+                  aliases: '--stats'
+    method_option :json,
+                  type: :boolean,
+                  desc: 'Output search results as JSON',
+                  aliases: '--json'
+    def search(query)
+      require_relative 'commands/discovery/search_command'
+      command = Commands::Discovery::SearchCommand.new(options.to_h.merge(query: query))
+      command.execute
     end
 
     default_task :sync
