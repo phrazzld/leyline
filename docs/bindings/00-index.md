@@ -218,10 +218,10 @@ _No frontend bindings defined yet._
 | ID | Version | Summary |
 |---|---|---|
 | [react-framework-selection](./categories/react/react-framework-selection.md) | 0.2.0 | This binding implements our simplicity tenet by eliminating the decision paralysis that comes from choosing between competing React meta-frameworks... |
-| [react-performance-standards](./categories/react/react-performance-standards.md) | 0.2.0 | This binding implements our automation tenet by establishing measurable performance standards that prevent the gradual performance degradation comm... |
+| [react-performance-standards](./categories/react/react-performance-standards.md) | 0.2.0 | This binding implements our automation tenet by establishing measurable performance standards that prevent gradual performance degradation in React... |
 | [react-routing-patterns](./categories/react/react-routing-patterns.md) | 0.2.0 | This binding implements our simplicity tenet by eliminating the complexity of manual route configuration while ensuring type safety and error resil... |
 | [server-first-architecture](./categories/react/server-first-architecture.md) | 0.2.0 | This binding implements our simplicity tenet by establishing a clear default execution environment for React components. Traditional React applicat... |
-| [spa-migration-strategy](./categories/react/spa-migration-strategy.md) | 0.2.0 | This binding implements our simplicity tenet by eliminating the complexity and risk of big-bang migrations. Traditional SPA-to-meta-framework migra... |
+| [spa-migration-strategy](./categories/react/spa-migration-strategy.md) | 0.2.0 | This binding implements our simplicity tenet by eliminating the complexity and risk of big-bang migrations. Component-by-component migration allows... |
 | [state-management](./categories/react/state-management.md) | 0.2.0 | This binding implements our simplicity tenet by preventing state management over-engineering. Global stores for all state create complexity, unpred... |
 
 ## Ruby Bindings

@@ -14,60 +14,45 @@ Use file-based routing with TypeScript for type-safe route definitions, integrat
 
 This binding implements our simplicity tenet by eliminating the complexity of manual route configuration while ensuring type safety and error resilience. File-based routing removes the cognitive overhead of maintaining separate route definitions, while TypeScript ensures URL parameters and navigation are type-safe at compile time.
 
-Traditional routing systems require maintaining route definitions in separate files, leading to synchronization issues between route declarations and actual components. File-based routing eliminates this by making the file system the source of truth for routing structure. When combined with TypeScript, this creates a self-documenting system where route parameters, query strings, and navigation are all type-checked.
-
-Error boundaries provide crucial fault tolerance by containing errors at the route level, preventing single component failures from crashing the entire application. Co-located data fetching ensures that data requirements are explicit and located near the components that use them, improving maintainability and enabling better performance optimizations.
+File-based routing makes the file system the source of truth for routing structure, eliminating synchronization issues between route declarations and components. Error boundaries provide fault tolerance by containing errors at the route level. Co-located data fetching ensures data requirements are explicit and improve maintainability.
 
 ## Rule Definition
 
-This rule applies to all React meta-framework applications using Next.js App Router or Remix. The rule specifically requires:
+This rule applies to all React meta-framework applications using Next.js App Router or Remix. The rule requires:
 
 **File-Based Routing Structure:**
 - **Route definitions** follow file system conventions (Next.js `app/` or Remix `routes/`)
 - **TypeScript interfaces** for all route parameters and search parameters
-- **Consistent naming** following framework conventions (page.tsx, route.tsx, etc.)
+- **Framework naming conventions** (page.tsx, route.tsx, error.tsx)
 - **Nested routing** using folder structures for layout hierarchies
 
 **Error Boundary Integration:**
 - **Route-level error boundaries** to contain failures and provide recovery
 - **Framework-specific error handling** (Next.js error.tsx, Remix ErrorBoundary)
-- **Error propagation strategy** from leaf components to appropriate boundary
 - **Fallback UI** for graceful degradation
 
 **Co-located Data Fetching:**
 - **Server Components** with direct data fetching (Next.js)
 - **Loader/Action patterns** for data and mutations (Remix)
 - **Layout data patterns** for shared data across routes
-- **Data dependency documentation** through TypeScript interfaces
 
 ## Practical Implementation
 
 **Type-Safe Route Parameters:**
 ```typescript
 // Next.js App Router: app/blog/[slug]/page.tsx
-interface BlogPostParams {
-  slug: string;
-}
-
-interface BlogPostSearchParams {
-  tab?: 'comments' | 'related' | 'author';
-  page?: string;
-}
-
 interface BlogPostProps {
-  params: BlogPostParams;
-  searchParams: BlogPostSearchParams;
+  params: { slug: string };
+  searchParams: { tab?: 'comments' | 'related' | 'author'; page?: string };
 }
 
-// Server Component with type-safe parameters
 async function BlogPost({ params, searchParams }: BlogPostProps) {
-  // Type-safe parameter access
   const post = await getPost(params.slug);
   const currentTab = searchParams.tab || 'comments';
   const currentPage = parseInt(searchParams.page || '1');
 
   if (!post) {
-    notFound(); // Next.js 404 handling
+    notFound();
   }
 
   return (
@@ -79,7 +64,6 @@ async function BlogPost({ params, searchParams }: BlogPostProps) {
   );
 }
 
-// Generate type-safe metadata
 export async function generateMetadata({ params }: BlogPostProps) {
   const post = await getPost(params.slug);
   return {
@@ -92,18 +76,6 @@ export async function generateMetadata({ params }: BlogPostProps) {
 **Remix Route Patterns:**
 ```typescript
 // Remix: app/routes/blog.$slug.tsx
-interface LoaderData {
-  post: Post;
-  comments: Comment[];
-}
-
-interface ActionData {
-  errors?: {
-    comment?: string;
-  };
-}
-
-// Type-safe loader with error handling
 export async function loader({ params }: LoaderArgs) {
   const { slug } = params;
 
@@ -118,18 +90,16 @@ export async function loader({ params }: LoaderArgs) {
   }
 
   const comments = await getComments(post.id);
-
-  return json<LoaderData>({ post, comments });
+  return json({ post, comments });
 }
 
-// Type-safe action for mutations
 export async function action({ request, params }: ActionArgs) {
   const { slug } = params;
   const formData = await request.formData();
   const comment = formData.get('comment');
 
   if (!comment || typeof comment !== 'string') {
-    return json<ActionData>({
+    return json({
       errors: { comment: 'Comment is required' }
     }, { status: 400 });
   }
@@ -138,7 +108,6 @@ export async function action({ request, params }: ActionArgs) {
   return redirect(`/blog/${slug}`);
 }
 
-// Route component with typed data
 export default function BlogPost() {
   const { post, comments } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -161,14 +130,14 @@ export default function BlogPost() {
 // Next.js: app/blog/error.tsx
 'use client';
 
-interface ErrorProps {
+export default function BlogError({
+  error,
+  reset
+}: {
   error: Error & { digest?: string };
   reset: () => void;
-}
-
-export default function BlogError({ error, reset }: ErrorProps) {
+}) {
   useEffect(() => {
-    // Log error to monitoring service
     console.error('Blog route error:', error);
   }, [error]);
 
@@ -182,7 +151,6 @@ export default function BlogError({ error, reset }: ErrorProps) {
   );
 }
 
-// Remix: Built-in ErrorBoundary export
 export function ErrorBoundary() {
   const error = useRouteError();
 
@@ -209,13 +177,7 @@ export function ErrorBoundary() {
 **Layout Data Patterns:**
 ```typescript
 // Next.js: app/dashboard/layout.tsx
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-// Layout with shared data fetching
-async function DashboardLayout({ children }: DashboardLayoutProps) {
-  // Fetch shared data at layout level
+async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   const navigation = await getNavigationItems(user.permissions);
 
@@ -230,11 +192,10 @@ async function DashboardLayout({ children }: DashboardLayoutProps) {
   );
 }
 
-// Remix: app/routes/dashboard.tsx (parent route)
+// Remix: app/routes/dashboard.tsx
 export async function loader({ request }: LoaderArgs) {
   const user = await getCurrentUser(request);
   const navigation = await getNavigationItems(user.permissions);
-
   return json({ user, navigation });
 }
 
@@ -255,60 +216,29 @@ export default function DashboardLayout() {
 
 **Type-Safe Navigation:**
 ```typescript
-// Type-safe navigation utilities
-interface AppRoutes {
-  home: '/';
-  blog: '/blog';
-  blogPost: (slug: string) => `/blog/${string}`;
-  dashboard: '/dashboard';
-  userProfile: (userId: string) => `/users/${string}`;
-}
-
-const routes: AppRoutes = {
+const routes = {
   home: '/',
   blog: '/blog',
-  blogPost: (slug) => `/blog/${slug}`,
+  blogPost: (slug: string) => `/blog/${slug}`,
   dashboard: '/dashboard',
-  userProfile: (userId) => `/users/${userId}`,
-};
+  userProfile: (userId: string) => `/users/${userId}`,
+} as const;
 
-// Type-safe navigation component
-function TypeSafeLink<T extends keyof AppRoutes>({
-  to,
-  params,
-  children,
-}: {
-  to: T;
-  params: AppRoutes[T] extends (...args: any[]) => any
-    ? Parameters<AppRoutes[T]>[0] extends string
-      ? { [K in Parameters<AppRoutes[T]>[0]]: string }
-      : never
-    : never;
-  children: React.ReactNode;
-}) {
-  const href = typeof routes[to] === 'function'
-    ? (routes[to] as Function)(params)
-    : routes[to];
-
-  return <Link href={href}>{children}</Link>;
-}
-
-// Usage with compile-time type checking
 function BlogPostList({ posts }: { posts: Post[] }) {
   return (
     <div>
       {posts.map(post => (
-        <TypeSafeLink
+        <Link
           key={post.id}
-          to="blogPost"
-          params={{ slug: post.slug }}
+          href={routes.blogPost(post.slug)}
         >
           {post.title}
-        </TypeSafeLink>
+        </Link>
       ))}
     </div>
   );
 }
+
 ```
 
 ## Examples
@@ -325,12 +255,10 @@ function BlogPost() {
   const [post, setPost] = useState(null);
 
   useEffect(() => {
-    // Client-side data fetching
     fetchPost(slug).then(setPost);
   }, [slug]);
 
   if (!post) return <div>Loading...</div>;
-
   return <div>{post.title}</div>;
 }
 ```
@@ -338,12 +266,7 @@ function BlogPost() {
 ```typescript
 // ✅ GOOD: File-based routing with type-safe parameters and server data fetching
 // app/blog/[slug]/page.tsx
-interface BlogPostProps {
-  params: { slug: string };
-}
-
-async function BlogPost({ params }: BlogPostProps) {
-  // Server-side data fetching with type safety
+async function BlogPost({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
 
   if (!post) {
@@ -364,7 +287,7 @@ async function BlogPost({ params }: BlogPostProps) {
 function BlogSection() {
   return (
     <div>
-      <BlogPost slug="invalid-slug" /> {/* Error propagates up */}
+      <BlogPost slug="invalid-slug" />
       <BlogSidebar />
     </div>
   );
@@ -392,11 +315,7 @@ export default function BlogError({ error, reset }: {
 // app/blog/[slug]/page.tsx
 async function BlogPost({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
-
-  if (!post) {
-    notFound(); // Proper 404 handling
-  }
-
+  if (!post) notFound();
   return <BlogContent post={post} />;
 }
 ```
@@ -408,12 +327,10 @@ function Dashboard() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    // Some data fetched client-side
     fetchUser().then(setUser);
   }, []);
 
   useEffect(() => {
-    // Some data fetched server-side elsewhere
     fetchStats().then(setStats);
   }, []);
 
@@ -425,7 +342,6 @@ function Dashboard() {
 // ✅ GOOD: Consistent server-first data fetching
 // app/dashboard/page.tsx
 async function Dashboard() {
-  // All data fetched server-side consistently
   const [user, stats] = await Promise.all([
     getCurrentUser(),
     getDashboardStats()
@@ -451,7 +367,5 @@ async function Dashboard() {
 - [type-safe-state-management](../typescript/type-safe-state-management.md): Route parameters and navigation state should follow the same type safety principles as application state, ensuring consistency across the application.
 
 - [modern-typescript-toolchain](../typescript/modern-typescript-toolchain.md): Type-safe routing requires proper TypeScript configuration and tooling to provide compile-time guarantees for route parameters and navigation.
-
-- [performance-testing-standards](../../core/performance-testing-standards.md): Routing patterns should be validated through performance testing to ensure route-level code splitting and data fetching don't create performance bottlenecks.
 
 - [input-validation-standards](../security/input-validation-standards.md): Route parameters and query strings represent untrusted input that must be validated according to security standards before processing.
