@@ -3,7 +3,7 @@ derived_from: modularity
 enforced_by: flake8-import-order & isort & code review & project templates
 id: package-structure
 last_modified: '2025-06-13'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Organize Code by Feature with Clear Module Boundaries
 

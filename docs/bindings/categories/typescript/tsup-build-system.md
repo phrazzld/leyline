@@ -1,7 +1,7 @@
 ---
 id: tsup-build-system
 last_modified: '2025-06-18'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: simplicity
 enforced_by: 'tsup configuration, build scripts, CI validation, output verification'
 ---

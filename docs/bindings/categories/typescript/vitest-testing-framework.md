@@ -1,7 +1,7 @@
 ---
 id: vitest-testing-framework
 last_modified: '2025-06-18'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: testability
 enforced_by: 'vitest configuration, coverage thresholds, CI pipeline, pre-commit hooks'
 ---

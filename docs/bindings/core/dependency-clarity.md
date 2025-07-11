@@ -64,50 +64,32 @@ By making dependencies explicit and minimal, we reduce both sources of complexit
 
 ```typescript
 // Bad: Hidden, circular, and unclear dependencies
-// File: services/OrderService.ts
-import { PaymentService } from './PaymentService';
-
 export class OrderService {
   async createOrder(items: Item[]): Promise<Order> {
     // Hidden dependency via singleton
     const inventory = InventoryManager.getInstance();
-
     // Circular dependency - PaymentService also depends on OrderService
     const payment = new PaymentService();
-
     // Reaching across layers
     const database = require('../infrastructure/database');
-
     // Global state dependency
     const user = global.currentUser;
-
     // Tight coupling to specific implementation
     const emailer = new SMTPEmailService('smtp.gmail.com', 587);
 
-    // Complex logic with intertwined dependencies
     if (inventory.checkAvailability(items)) {
-      const order = await database.orders.create({
-        userId: user.id,
-        items: items,
-        status: 'pending'
-      });
-
-      // PaymentService needs order, creating circular dependency
+      const order = await database.orders.create({ userId: user.id, items, status: 'pending' });
       const paymentResult = await payment.processOrderPayment(order);
-
       if (paymentResult.success) {
         await emailer.sendOrderConfirmation(user.email, order);
         await inventory.reserveItems(items, order.id);
       }
-
       return order;
     }
   }
 }
 
 // File: services/PaymentService.ts
-import { OrderService } from './OrderService';
-
 export class PaymentService {
   async processOrderPayment(order: Order): Promise<PaymentResult> {
     // Circular dependency back to OrderService
@@ -122,8 +104,6 @@ export class PaymentService {
 
 ```typescript
 // Good: Explicit, minimal, unidirectional dependencies
-
-// Clear dependency interfaces
 interface OrderRepository {
   create(order: NewOrder): Promise<Order>;
   findById(id: string): Promise<Order>;
@@ -149,66 +129,30 @@ export class OrderService {
     private inventoryService: InventoryService,
     private paymentProcessor: PaymentProcessor,
     private notificationService: NotificationService
-  ) {
-    // All dependencies explicit in constructor
-  }
+  ) {}
 
-  async createOrder(
-    customerId: string,
-    items: Item[],
-    paymentMethod: PaymentMethod
-  ): Promise<OrderResult> {
-    // Check inventory availability
+  async createOrder(customerId: string, items: Item[], paymentMethod: PaymentMethod): Promise<OrderResult> {
     const available = await this.inventoryService.checkAvailability(items);
-    if (!available) {
-      return { success: false, reason: 'Items not available' };
-    }
+    if (!available) return { success: false, reason: 'Items not available' };
 
-    // Calculate order total (pure business logic, no dependencies)
     const total = this.calculateOrderTotal(items);
+    const paymentResult = await this.paymentProcessor.processPayment(total, paymentMethod);
+    if (!paymentResult.success) return { success: false, reason: 'Payment failed', paymentError: paymentResult.error };
 
-    // Process payment through abstraction
-    const paymentResult = await this.paymentProcessor.processPayment(
-      total,
-      paymentMethod
-    );
-
-    if (!paymentResult.success) {
-      return {
-        success: false,
-        reason: 'Payment failed',
-        paymentError: paymentResult.error
-      };
-    }
-
-    // Create order through repository abstraction
     const order = await this.orderRepository.create({
-      customerId,
-      items,
-      total,
-      paymentId: paymentResult.transactionId,
-      status: OrderStatus.CONFIRMED
+      customerId, items, total, paymentId: paymentResult.transactionId, status: OrderStatus.CONFIRMED
     });
 
-    // Post-order operations (can be made async/eventual)
     await Promise.all([
       this.inventoryService.reserveItems(items, order.id),
-      this.notificationService.sendOrderConfirmation(
-        order.customerEmail,
-        order
-      )
+      this.notificationService.sendOrderConfirmation(order.customerEmail, order)
     ]);
 
     return { success: true, order };
   }
 
-  // Pure business logic with no external dependencies
   private calculateOrderTotal(items: Item[]): Money {
-    const subtotal = items.reduce(
-      (sum, item) => sum.add(item.price.multiply(item.quantity)),
-      Money.zero('USD')
-    );
-
+    const subtotal = items.reduce((sum, item) => sum.add(item.price.multiply(item.quantity)), Money.zero('USD'));
     return subtotal.add(this.calculateTax(subtotal));
   }
 }
@@ -218,18 +162,12 @@ export class PostgresOrderRepository implements OrderRepository {
   constructor(private db: Database) {}
 
   async create(order: NewOrder): Promise<Order> {
-    const result = await this.db.query(
-      'INSERT INTO orders (...) VALUES (...) RETURNING *',
-      order
-    );
+    const result = await this.db.query('INSERT INTO orders (...) VALUES (...) RETURNING *', order);
     return this.mapToOrder(result.rows[0]);
   }
 
   async findById(id: string): Promise<Order> {
-    const result = await this.db.query(
-      'SELECT * FROM orders WHERE id = $1',
-      [id]
-    );
+    const result = await this.db.query('SELECT * FROM orders WHERE id = $1', [id]);
     return this.mapToOrder(result.rows[0]);
   }
 
@@ -251,29 +189,13 @@ interface DependencyRule {
 
 class DependencyEnforcer {
   private rules: DependencyRule[] = [
-    {
-      source: 'domain/*',
-      allowed: [],  // Domain depends on nothing
-      forbidden: ['infrastructure/*', 'application/*']
-    },
-    {
-      source: 'application/*',
-      allowed: ['domain/*'],
-      forbidden: ['infrastructure/*']
-    },
-    {
-      source: 'infrastructure/*',
-      allowed: ['domain/*', 'application/*'],
-      forbidden: []
-    }
+    { source: 'domain/*', allowed: [], forbidden: ['infrastructure/*', 'application/*'] },
+    { source: 'application/*', allowed: ['domain/*'], forbidden: ['infrastructure/*'] },
+    { source: 'infrastructure/*', allowed: ['domain/*', 'application/*'], forbidden: [] }
   ];
 
-  validateDependencies(
-    filePath: string,
-    imports: string[]
-  ): ValidationResult {
+  validateDependencies(filePath: string, imports: string[]): ValidationResult {
     const violations = this.findViolations(filePath, imports);
-
     if (violations.length > 0) {
       return {
         valid: false,
@@ -285,21 +207,15 @@ class DependencyEnforcer {
         }))
       };
     }
-
     return { valid: true };
   }
 
   generateDependencyGraph(): DependencyGraph {
-    // Analyze codebase and create visual representation
     return {
       nodes: this.findAllModules(),
       edges: this.findAllDependencies(),
       violations: this.findAllViolations(),
-      metrics: {
-        coupling: this.calculateCoupling(),
-        cohesion: this.calculateCohesion(),
-        cycles: this.findCycles()
-      }
+      metrics: { coupling: this.calculateCoupling(), cohesion: this.calculateCohesion(), cycles: this.findCycles() }
     };
   }
 }
@@ -309,28 +225,22 @@ class DependencyEnforcer {
 
 ```typescript
 // Good: Wrapping external dependencies in stable interfaces
-// Domain interface (stable)
 interface EmailService {
   sendEmail(to: string, subject: string, body: string): Promise<void>;
 }
 
-// Infrastructure adapter (volatile)
+// Infrastructure adapters (volatile)
 class SmtpEmailAdapter implements EmailService {
   constructor(private config: SmtpConfig) {}
-
   async sendEmail(to: string, subject: string, body: string): Promise<void> {
-    // Implementation can change without affecting domain
     const transport = nodemailer.createTransport(this.config);
     await transport.sendMail({ to, subject, html: body });
   }
 }
 
-// Alternative implementation
 class SendGridEmailAdapter implements EmailService {
   constructor(private apiKey: string) {}
-
   async sendEmail(to: string, subject: string, body: string): Promise<void> {
-    // Different implementation, same interface
     const sg = new SendGrid(this.apiKey);
     await sg.send({ to, subject, html: body });
   }
@@ -339,9 +249,7 @@ class SendGridEmailAdapter implements EmailService {
 // Usage in domain remains unchanged
 class OrderNotificationService {
   constructor(private emailService: EmailService) {}
-
   async notifyOrderShipped(order: Order): Promise<void> {
-    // Domain logic doesn't know or care about email implementation
     await this.emailService.sendEmail(
       order.customerEmail,
       'Your order has shipped!',
@@ -357,16 +265,11 @@ Track and improve dependency health:
 
 ```typescript
 interface DependencyMetrics {
-  // Coupling metrics
   afferentCoupling: number;  // Number of classes that depend on this
   efferentCoupling: number;  // Number of classes this depends on
   instability: number;       // Ratio of efferent to total coupling
-
-  // Complexity metrics
   dependencyDepth: number;   // Max depth of dependency chain
   circularDependencies: number;  // Count of circular refs
-
-  // Architecture metrics
   layerViolations: number;   // Dependencies breaking layer rules
   abstractness: number;      // Ratio of interfaces to implementations
 }
@@ -374,7 +277,6 @@ interface DependencyMetrics {
 class DependencyAnalyzer {
   analyzeDependencyHealth(module: string): DependencyHealth {
     const metrics = this.calculateMetrics(module);
-
     return {
       score: this.calculateHealthScore(metrics),
       issues: this.identifyIssues(metrics),
@@ -390,11 +292,9 @@ class DependencyAnalyzer {
 **❌ God Objects**: Central classes that everything depends on
 **❌ Implicit Dependencies**: Hidden dependencies through static methods or globals
 **❌ Over-Abstraction**: Creating unnecessary layers that add complexity
-**❌ Framework Bleeding**: Letting framework concepts spread throughout domain
 
 ## Related Standards
 
 - [design-is-never-done](../../docs/tenets/design-is-never-done.md): Core principle that complexity comes from dependencies and obscurity
 - [dependency-injection](dependency-injection.md): Specific patterns for explicit dependency management
 - [modularity](../../docs/tenets/modularity.md): Creating well-bounded contexts with minimal dependencies
-- [hexagonal-architecture](hexagonal-architecture.md): Architectural pattern for managing dependencies

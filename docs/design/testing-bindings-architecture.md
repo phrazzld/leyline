@@ -155,7 +155,7 @@ This document establishes clear boundaries for 6 new testing bindings and maps t
 ---
 id: [unique-kebab-case-id]        # Must match filename without .md
 last_modified: '2025-12-15'       # ISO date format, quoted
-version: '0.1.0'                  # Must match VERSION file, quoted
+version: '0.2.0'                  # Must match VERSION file, quoted
 derived_from: [tenet-id]          # Must reference existing tenet (see matrix above)
 enforced_by: [enforcement-method] # Specific to each binding's implementation approach
 ---

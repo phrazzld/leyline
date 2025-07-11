@@ -3,7 +3,7 @@ derived_from: automation
 enforced_by: uv (primary) & alternative tools (poetry, pipenv, pip-tools) & CI lockfile validation
 id: python-dependency-management
 last_modified: '2025-06-15'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Use Isolated Virtual Environments and Pin Dependencies in Lockfiles
 

@@ -1,7 +1,7 @@
 ---
 id: regression-test-patterns
 last_modified: '2025-06-17'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: testability
 enforced_by: 'bug tracking, test coverage, code review'
 ---

@@ -3,7 +3,7 @@ derived_from: explicit-over-implicit
 enforced_by: code review & style guides
 id: api-design
 last_modified: '2025-05-14'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Design Clear, Explicit API Contracts
 

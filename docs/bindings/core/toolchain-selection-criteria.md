@@ -3,7 +3,7 @@ derived_from: simplicity
 enforced_by: architecture review & decision documentation
 id: toolchain-selection-criteria
 last_modified: '2025-06-14'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Evaluate Tools Through Total Cost of Ownership
 

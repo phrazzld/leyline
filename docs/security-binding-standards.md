@@ -18,7 +18,7 @@ Security bindings use the standard binding metadata format with **no additional 
 ---
 id: unique-security-binding-id
 last_modified: 'YYYY-MM-DD'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: relevant-tenet-id
 enforced_by: specific enforcement mechanism
 ---
@@ -41,7 +41,7 @@ For security bindings, the `enforced_by` field should specify concrete security 
 ---
 id: input-validation-standards
 last_modified: '2025-06-11'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: fail-fast-validation
 enforced_by: static analysis tools (semgrep, codeql) + security code review
 ---

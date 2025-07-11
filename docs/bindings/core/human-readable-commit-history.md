@@ -1,7 +1,7 @@
 ---
 id: human-readable-commit-history
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: joyful-version-control
 enforced_by: 'commit message templates, git hooks, PR review guidelines, team conventions'
 ---

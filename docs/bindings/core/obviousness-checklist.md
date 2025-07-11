@@ -46,16 +46,12 @@ Obscurity is a primary source of complexity. It manifests as hidden behaviors, u
 - Meaningful log messages at key points
 - Metrics for important operations
 - Health checks that explain status
-- Debugging aids built into the system
 
 ## Implementation Approach
 
 **Start with Names**: Refactor unclear names immediately when discovered.
-
 **Surface Hidden Logic**: Extract implicit behavior into explicit, named concepts.
-
 **Document Surprises**: When something isn't obvious, make it so through code or documentation.
-
 **Test Understanding**: New team members should navigate the codebase easily.
 
 ## Implementation Examples
@@ -69,20 +65,13 @@ class Proc {
   private readonly MAX = 100;
 
   handle(d: any): void {
-    // What does this do? Why 100?
-    if (this.c.size() > this.MAX) {
-      this.c.clear();
-    }
-
-    // Mysterious transformation
+    if (this.c.size() > this.MAX) { this.c.clear(); }
     const t = d.ts ? d.ts : Date.now();
     const k = `${d.id}_${t}`;
 
-    // Hidden side effects
     if (d.type === 1) {
       this.specialCase(d);
     } else if (d.type === 2) {
-      // Why is this different?
       setTimeout(() => this.handle(d), 1000);
       return;
     }
@@ -91,14 +80,8 @@ class Proc {
       this.c.set(k, d);
       this.doWork(d);
     } catch (e) {
-      // Swallowing errors silently
       console.log('error');
     }
-  }
-
-  private specialCase(d: any): void {
-    // What makes this special?
-    // Complex logic with no explanation
   }
 }
 ```
@@ -122,7 +105,6 @@ enum EventType {
 
 class EventProcessor {
   private static readonly CACHE_SIZE_LIMIT = 100;
-  private static readonly DEFERRED_DELAY_MS = 1000;
 
   constructor(
     private eventCache: EventCache,
@@ -131,17 +113,11 @@ class EventProcessor {
   ) {}
 
   async processEvent(event: EventData): Promise<void> {
-    this.logger.info('Processing event', {
-      eventId: event.id,
-      eventType: event.type
-    });
+    this.logger.info('Processing event', { eventId: event.id, eventType: event.type });
 
     // Prevent cache overflow by clearing when limit reached
     if (this.eventCache.size() > EventProcessor.CACHE_SIZE_LIMIT) {
-      this.logger.warn('Event cache full, clearing old entries', {
-        cacheSize: this.eventCache.size(),
-        limit: EventProcessor.CACHE_SIZE_LIMIT
-      });
+      this.logger.warn('Event cache full, clearing old entries');
       await this.eventCache.evictOldest();
     }
 
@@ -150,50 +126,33 @@ class EventProcessor {
       case EventType.IMMEDIATE:
         await this.processImmediately(event);
         break;
-
       case EventType.DEFERRED:
         await this.scheduleDeferredProcessing(event);
         break;
-
       case EventType.BATCH:
         await this.addToBatch(event);
         break;
-
       default:
         throw new UnknownEventTypeError(
-          `Unknown event type: ${event.type}. ` +
-          `Expected one of: ${Object.values(EventType).join(', ')}`
+          `Unknown event type: ${event.type}. Expected one of: ${Object.values(EventType).join(', ')}`
         );
     }
   }
 
   private async processImmediately(event: EventData): Promise<void> {
     const cacheKey = this.generateCacheKey(event);
-
     try {
       await this.eventCache.set(cacheKey, event);
       await this.eventHandler.handle(event);
-
-      this.logger.info('Event processed successfully', {
-        eventId: event.id
-      });
+      this.logger.info('Event processed successfully', { eventId: event.id });
     } catch (error) {
-      this.logger.error('Failed to process event', {
-        eventId: event.id,
-        error: error.message,
-        stack: error.stack
-      });
-
-      throw new EventProcessingError(
-        `Failed to process event ${event.id}: ${error.message}`,
-        { cause: error, eventId: event.id }
-      );
+      this.logger.error('Failed to process event', { eventId: event.id });
+      throw new EventProcessingError(`Failed to process event ${event.id}: ${error.message}`, { cause: error });
     }
   }
 
   private generateCacheKey(event: EventData): string {
-    const timestamp = event.timestamp || Date.now();
-    return `event_${event.id}_${timestamp}`;
+    return `event_${event.id}_${event.timestamp || Date.now()}`;
   }
 }
 ```
@@ -204,13 +163,9 @@ class EventProcessor {
 // Bad: Hidden dependencies
 class OrderService {
   processOrder(order: Order): void {
-    // Where do these come from?
     const validator = new OrderValidator();
     const inventory = InventorySystem.getInstance();
     const payment = global.paymentService;
-
-    // Hidden configuration
-    const config = require('../../../config/orders.json');
   }
 }
 
@@ -222,18 +177,15 @@ class OrderService {
     private paymentService: PaymentService,
     private config: OrderConfiguration
   ) {
-    // All dependencies visible in constructor
     this.validateConfiguration();
   }
 
   private validateConfiguration(): void {
     const required = ['maxOrderSize', 'timeoutSeconds', 'retryAttempts'];
     const missing = required.filter(key => !(key in this.config));
-
     if (missing.length > 0) {
       throw new ConfigurationError(
-        `Missing required configuration: ${missing.join(', ')}. ` +
-        `See docs/configuration/orders.md for setup instructions.`
+        `Missing required configuration: ${missing.join(', ')}. See docs/configuration/orders.md for setup instructions.`
       );
     }
   }
@@ -255,17 +207,11 @@ function parseDate(input: string): Date {
 // Good: Helpful, actionable errors
 function parseDate(input: string): Date {
   const date = new Date(input);
-
   if (isNaN(date.getTime())) {
     throw new DateParsingError(
-      `Cannot parse "${input}" as a date. ` +
-      `Expected formats: ISO 8601 (2024-07-10), ` +
-      `RFC 2822 (Mon, 10 Jul 2024), ` +
-      `or timestamp (1720627200000). ` +
-      `See https://docs.example.com/date-formats for more examples.`
+      `Cannot parse "${input}" as a date. Expected formats: ISO 8601 (2024-07-10), RFC 2822 (Mon, 10 Jul 2024), or timestamp (1720627200000).`
     );
   }
-
   return date;
 }
 ```
@@ -275,27 +221,15 @@ function parseDate(input: string): Date {
 ```typescript
 // Good: Built-in observability
 class DataPipeline {
-  constructor(
-    private metrics: MetricsCollector,
-    private logger: Logger
-  ) {}
+  constructor(private metrics: MetricsCollector, private logger: Logger) {}
 
   async processBatch(items: DataItem[]): Promise<BatchResult> {
     const batchId = generateBatchId();
     const startTime = Date.now();
 
-    this.logger.info('Starting batch processing', {
-      batchId,
-      itemCount: items.length,
-      firstItemId: items[0]?.id,
-      lastItemId: items[items.length - 1]?.id
-    });
+    this.logger.info('Starting batch processing', { batchId, itemCount: items.length });
 
-    const results = {
-      successful: 0,
-      failed: 0,
-      skipped: 0
-    };
+    const results = { successful: 0, failed: 0, skipped: 0 };
 
     for (const item of items) {
       try {
@@ -304,35 +238,18 @@ class DataPipeline {
       } catch (error) {
         if (error instanceof ValidationError) {
           results.skipped++;
-          this.logger.warn('Skipping invalid item', {
-            itemId: item.id,
-            reason: error.message
-          });
+          this.logger.warn('Skipping invalid item', { itemId: item.id });
         } else {
           results.failed++;
-          this.logger.error('Failed to process item', {
-            itemId: item.id,
-            error: error.message
-          });
+          this.logger.error('Failed to process item', { itemId: item.id });
         }
       }
     }
 
     const duration = Date.now() - startTime;
-
-    // Emit metrics for monitoring
-    this.metrics.record('batch_processing_duration', duration, { batchId });
+    this.metrics.record('batch_processing_duration', duration);
     this.metrics.record('batch_items_processed', results.successful);
-    this.metrics.record('batch_items_failed', results.failed);
-    this.metrics.record('batch_items_skipped', results.skipped);
-
-    this.logger.info('Batch processing complete', {
-      batchId,
-      duration,
-      results,
-      averageTimePerItem: duration / items.length
-    });
-
+    this.logger.info('Batch processing complete', { batchId, duration, results });
     return { batchId, ...results };
   }
 }
@@ -348,35 +265,23 @@ interface ObviousnessChecklist {
     functionsDescribeWhatNotHow: boolean;
     variablesRevealContent: boolean;
     classesMatchDomainConcepts: boolean;
-    noAbbreviationsOrAcronyms: boolean;
   };
-
   structure: {
     folderStructureMatchesArchitecture: boolean;
     relatedCodeLivesTogether: boolean;
-    clearLayerBoundaries: boolean;
     consistentPatterns: boolean;
   };
-
   dependencies: {
     allDependenciesExplicit: boolean;
     noHiddenGlobals: boolean;
-    configurationDocumented: boolean;
-    externalDepsVersioned: boolean;
   };
-
   behavior: {
     errorMessagesActionable: boolean;
     loggingAtKeyPoints: boolean;
-    metricsForImportantOps: boolean;
-    debuggingAidsAvailable: boolean;
   };
-
   understanding: {
     newDevCanNavigate: boolean;
     purposeClearWithoutDocs: boolean;
-    surprisesDocumented: boolean;
-    mentalModelMatches: boolean;
   };
 }
 ```
@@ -387,11 +292,9 @@ interface ObviousnessChecklist {
 **❌ Assumption Hiding**: Burying important assumptions in implementation details
 **❌ Inconsistent Patterns**: Using different approaches for similar problems
 **❌ Documentation as Excuse**: Using documentation to justify non-obvious code
-**❌ Performance Over Clarity**: Premature optimization that obscures intent
 
 ## Related Standards
 
 - [design-is-never-done](../../docs/tenets/design-is-never-done.md): The principle of avoiding unknown unknowns through obvious design
 - [explicit-over-implicit](../../docs/tenets/explicit-over-implicit.md): Making behavior and dependencies visible
 - [meaningful-naming](meaningful-naming.md): Specific naming conventions that support obviousness
-- [error-handling-standards](error-handling-standards.md): Creating helpful, actionable error messages

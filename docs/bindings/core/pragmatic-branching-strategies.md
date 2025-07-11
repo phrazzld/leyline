@@ -1,7 +1,7 @@
 ---
 id: pragmatic-branching-strategies
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: simplicity
 enforced_by: 'git workflows, branch protection rules, team agreements, automation'
 ---

@@ -3,7 +3,7 @@ derived_from: no-secret-suppression
 enforced_by: code review & custom linters
 id: no-lint-suppression
 last_modified: '2025-05-14'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Document Why You're Silencing Warnings
 

@@ -3,7 +3,7 @@ derived_from: testability
 enforced_by: pytest & pytest-cov & CI pipeline & code review
 id: testing-patterns
 last_modified: '2025-06-13'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Test Behavior with pytest, Not Implementation Details
 

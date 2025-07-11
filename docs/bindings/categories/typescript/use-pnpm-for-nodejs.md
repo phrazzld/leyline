@@ -1,7 +1,7 @@
 ---
 id: use-pnpm-for-nodejs
 last_modified: '2025-06-14'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: automation
 enforced_by: 'packageManager field in package.json, engines requirement, CI checks'
 ---

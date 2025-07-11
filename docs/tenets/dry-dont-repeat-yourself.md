@@ -1,7 +1,7 @@
 ---
 id: dry-dont-repeat-yourself
 last_modified: '2025-06-16'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Tenet: Every Piece of Knowledge Must Have a Single Source of Truth
 

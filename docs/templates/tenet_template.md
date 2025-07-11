@@ -7,7 +7,7 @@ last_modified: '2025-05-09'
 
 # Version of the repository when this tenet was last modified
 # This should match the current VERSION file. Update when making changes.
-version: '0.1.0'
+version: '0.2.0'
 ---
 
 <!-- Template instructions:

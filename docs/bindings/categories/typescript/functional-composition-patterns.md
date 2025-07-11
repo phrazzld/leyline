@@ -1,7 +1,7 @@
 ---
 id: functional-composition-patterns
 last_modified: '2025-06-03'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: dry-dont-repeat-yourself
 enforced_by: 'TypeScript compiler, functional programming libraries, code review'
 ---

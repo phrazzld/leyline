@@ -1,7 +1,7 @@
 ---
 id: flexible-architecture-patterns
 last_modified: '2025-06-02'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: adaptability-and-reversibility
 enforced_by: 'Architectural review, design patterns, refactoring practices'
 ---

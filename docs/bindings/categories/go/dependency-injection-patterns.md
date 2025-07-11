@@ -1,7 +1,7 @@
 ---
 id: dependency-injection-patterns
 last_modified: '2025-06-03'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: orthogonality
 enforced_by: 'Go interfaces, constructor functions, dependency injection frameworks, code review'
 ---

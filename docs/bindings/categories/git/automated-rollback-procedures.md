@@ -1,7 +1,7 @@
 ---
 id: automated-rollback-procedures
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: git-reliability-engineering
 enforced_by: 'deployment pipelines, rollback automation, git revert strategies, monitoring integration'
 ---

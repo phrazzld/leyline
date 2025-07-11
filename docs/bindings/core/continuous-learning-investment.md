@@ -1,7 +1,7 @@
 ---
 id: continuous-learning-investment
 last_modified: '2025-06-03'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: maintainability
 enforced_by: 'team learning plans & skill development tracking'
 ---

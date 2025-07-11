@@ -19,7 +19,7 @@ All tenet and binding documents must use YAML front-matter at the beginning of t
 ---
 id: tenet-id
 last_modified: '2025-05-08'
-version: '0.1.0'
+version: '0.2.0'
 ---
 
 # Document Title
@@ -93,7 +93,7 @@ id: modularity
 # Last modified date in ISO format with quotes
 last_modified: '2025-05-08'
 # Repository version when last modified
-version: '0.1.0'
+version: '0.2.0'
 ---
 
 # Tenet: Modularity
@@ -110,7 +110,7 @@ id: automate-changelog
 # Last modified date with quotes
 last_modified: '2025-05-08'
 # Repository version when last modified
-version: '0.1.0'
+version: '0.2.0'
 # The parent tenet for this binding
 derived_from: automation
 # How this binding is enforced

@@ -1,7 +1,7 @@
 ---
 id: rest-api-standards
 last_modified: '2025-06-14'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: simplicity
 enforced_by: API linting & code review
 ---

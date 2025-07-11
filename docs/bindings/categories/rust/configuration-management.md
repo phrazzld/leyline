@@ -1,7 +1,7 @@
 ---
 id: configuration-management
 last_modified: '2025-06-03'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: adaptability-and-reversibility
 enforced_by: 'Cargo features, serde configuration, environment validation, code review'
 ---

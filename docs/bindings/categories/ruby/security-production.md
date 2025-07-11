@@ -3,7 +3,7 @@ derived_from: maintainability
 enforced_by: Brakeman & code review
 id: ruby-security-production
 last_modified: '2025-07-01'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Ruby Security & Production
 

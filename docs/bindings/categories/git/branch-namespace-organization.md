@@ -1,7 +1,7 @@
 ---
 id: branch-namespace-organization
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: distributed-first
 enforced_by: 'git hooks, branch protection rules, CI validation'
 ---

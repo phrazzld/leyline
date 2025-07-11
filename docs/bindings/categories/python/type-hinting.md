@@ -3,7 +3,7 @@ derived_from: explicit-over-implicit
 enforced_by: mypy --strict & pyright & flake8-annotations
 id: type-hinting
 last_modified: '2025-06-14'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Use Explicit Type Hints for All Functions
 

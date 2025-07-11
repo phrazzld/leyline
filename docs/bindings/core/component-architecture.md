@@ -3,7 +3,7 @@ derived_from: modularity
 enforced_by: Code review, Storybook organization
 id: component-architecture
 last_modified: '2025-05-14'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Component Architecture
 

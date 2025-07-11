@@ -1,7 +1,7 @@
 ---
 id: secure-by-design-principles
 last_modified: '2025-06-11'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: explicit-over-implicit
 enforced_by: threat modeling process + security architecture review + design documentation requirements
 ---

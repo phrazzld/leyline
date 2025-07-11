@@ -3,7 +3,7 @@ derived_from: empathize-with-your-user
 enforced_by: user testing & review
 id: ruby-cli-tools
 last_modified: '2025-07-01'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Ruby CLI Tools
 
