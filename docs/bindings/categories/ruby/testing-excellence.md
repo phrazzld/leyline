@@ -3,7 +3,7 @@ derived_from: testability
 enforced_by: CI & code review
 id: ruby-testing-excellence
 last_modified: '2025-07-01'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Ruby Testing Excellence
 

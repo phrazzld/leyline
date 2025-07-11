@@ -2,7 +2,7 @@
 derived_from: no-secret-suppression
 id: external-configuration
 last_modified: '2025-05-14'
-version: '0.1.0'
+version: '0.2.0'
 enforced_by: code review & style guides
 ---
 

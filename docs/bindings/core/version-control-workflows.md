@@ -1,7 +1,7 @@
 ---
 id: version-control-workflows
 last_modified: '2025-06-09'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: automation
 enforced_by: 'git branch protection, automated merge policies, CI/CD integration, pull request templates'
 ---

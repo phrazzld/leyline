@@ -1,7 +1,7 @@
 ---
 id: git-hooks-automation
 last_modified: '2025-06-09'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: automation
 enforced_by: 'pre-commit hooks, git hooks, CI/CD pipelines, automated quality gates'
 ---

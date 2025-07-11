@@ -1,7 +1,7 @@
 ---
 id: extension-update-strategy
 last_modified: '2025-06-14'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: deliver-value-continuously
 enforced_by: update testing & user feedback monitoring
 ---

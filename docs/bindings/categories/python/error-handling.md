@@ -3,7 +3,7 @@ derived_from: explicit-over-implicit
 enforced_by: flake8-bugbear & pylint & bandit
 id: python-error-handling
 last_modified: '2025-06-13'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Handle Errors Explicitly with Specific Exception Types
 

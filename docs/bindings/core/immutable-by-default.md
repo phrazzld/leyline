@@ -3,7 +3,7 @@ derived_from: simplicity
 enforced_by: linters & code review
 id: immutable-by-default
 last_modified: '2025-05-14'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Treat All Data as Unchangeable by Default
 

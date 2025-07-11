@@ -1,7 +1,7 @@
 ---
 id: normalized-data-design
 last_modified: '2025-06-02'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: dry-dont-repeat-yourself
 enforced_by: 'Database design review, schema validation, data modeling tools'
 ---

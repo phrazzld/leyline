@@ -1,7 +1,7 @@
 ---
 id: quality-metrics-and-monitoring
 last_modified: '2025-06-15'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: automation
 enforced_by: 'Quality Dashboards, Automated Alerts, Code Quality Gates'
 ---

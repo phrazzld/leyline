@@ -1,7 +1,7 @@
 ---
 id: feature-flag-driven-development
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: distributed-git-workflows
 enforced_by: 'feature flag systems, deployment pipelines, monitoring dashboards, automated testing'
 ---

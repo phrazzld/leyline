@@ -1,7 +1,7 @@
 ---
 id: pattern-matching
 last_modified: '2025-07-01'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: simplicity
 enforced_by: 'Code review, .editorconfig style rules'
 ---

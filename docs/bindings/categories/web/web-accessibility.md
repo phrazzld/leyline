@@ -3,7 +3,7 @@ derived_from: explicit-over-implicit
 enforced_by: Code review, Automated a11y testing
 id: web-accessibility
 last_modified: '2025-05-14'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Web Accessibility
 

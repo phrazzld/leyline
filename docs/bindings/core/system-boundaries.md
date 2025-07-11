@@ -1,7 +1,7 @@
 ---
 id: system-boundaries
 last_modified: '2025-06-02'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: orthogonality
 enforced_by: 'Architectural review, module organization, build systems'
 ---

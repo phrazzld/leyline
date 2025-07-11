@@ -1,7 +1,7 @@
 ---
 id: complexity-detection-patterns
 last_modified: '2025-06-17'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: simplicity
 enforced_by: 'static analysis, code review, complexity metrics'
 ---

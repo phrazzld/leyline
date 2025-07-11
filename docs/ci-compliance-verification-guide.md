@@ -73,7 +73,7 @@ ruby tools/validate_front_matter.rb -f docs/bindings/core/api-design.md
 ---
 id: my-binding-name
 last_modified: '2025-06-17'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: modularity
 enforced_by: 'Code review, linting tools'
 ---
@@ -157,14 +157,14 @@ ruby tools/enforce_doc_limits.rb docs/your-document.md
 ---
 id: tenet-name
 last_modified: '2025-06-17'
-version: '0.1.0'
+version: '0.2.0'
 ---
 
 # For bindings
 ---
 id: binding-name
 last_modified: '2025-06-17'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: parent-tenet-name
 enforced_by: 'Enforcement mechanism description'
 ---

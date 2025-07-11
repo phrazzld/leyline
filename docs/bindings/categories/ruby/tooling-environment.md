@@ -3,7 +3,7 @@ derived_from: automation
 enforced_by: CI & team standards
 id: ruby-tooling-environment
 last_modified: '2025-07-01'
-version: '0.1.0'
+version: '0.2.0'
 ---
 # Binding: Ruby Tooling Environment
 

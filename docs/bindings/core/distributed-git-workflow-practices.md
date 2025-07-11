@@ -1,7 +1,7 @@
 ---
 id: distributed-git-workflow-practices
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: distributed-resilience
 enforced_by: 'git configuration, local tooling, workflow documentation, team practices'
 ---

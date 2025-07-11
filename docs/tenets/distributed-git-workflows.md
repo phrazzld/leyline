@@ -1,7 +1,7 @@
 ---
 id: distributed-git-workflows
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 ---
 
 # Tenet: Git as a Distributed System

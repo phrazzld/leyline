@@ -1,7 +1,7 @@
 ---
 id: ruff-code-quality
 last_modified: '2025-06-14'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: automation
 enforced_by: ruff check --no-fix & ruff format --check & CI pipeline validation
 ---

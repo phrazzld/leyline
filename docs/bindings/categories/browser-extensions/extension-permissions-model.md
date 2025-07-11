@@ -1,7 +1,7 @@
 ---
 id: extension-permissions-model
 last_modified: '2025-06-14'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: no-secret-suppression
 enforced_by: security review & user testing
 ---

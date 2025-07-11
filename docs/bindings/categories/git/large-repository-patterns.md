@@ -1,7 +1,7 @@
 ---
 id: large-repository-patterns
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: distributed-git-workflows
 enforced_by: 'git configuration, CI/CD optimizations, clone strategies, storage policies'
 ---

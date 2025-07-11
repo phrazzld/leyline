@@ -1,7 +1,7 @@
 ---
 id: pull-request-workflow
 last_modified: '2025-06-24'
-version: '0.1.0'
+version: '0.2.0'
 derived_from: git-workflow-conventions
 enforced_by: 'PR templates, CODEOWNERS, branch protection, automated checks'
 ---
