@@ -343,3 +343,9 @@ function ThemeToggle({ initialTheme }: { initialTheme: string }) {
 - [component-architecture](../../core/component-architecture.md): Server-first architecture extends component design principles by adding execution environment as a fundamental design consideration.
 
 - [react-performance-standards](react-performance-standards.md): Server-first architecture directly enables performance targets by reducing JavaScript bundle size and improving server-side rendering efficiency.
+
+- [no-any](../typescript/no-any.md): Server Components and data fetching patterns require strong typing to prevent runtime errors and ensure proper server-client boundaries.
+
+- [input-validation-standards](../security/input-validation-standards.md): Server-first architecture requires robust input validation since server components handle user input and external data directly on the server.
+
+- [authentication-authorization-patterns](../security/authentication-authorization-patterns.md): Server-first architecture enables secure-by-default authentication and authorization patterns through server-side session management and data access control.

@@ -604,3 +604,9 @@ function MonitoredMigration() {
 - [incremental-delivery](../../core/incremental-delivery.md): Migration strategy follows incremental delivery principles with small, reversible changes and continuous deployment throughout the migration process.
 
 - [continuous-refactoring](../../core/continuous-refactoring.md): Migration strategy applies continuous refactoring principles by improving code quality incrementally rather than through large, disruptive rewrites.
+
+- [modern-typescript-toolchain](../typescript/modern-typescript-toolchain.md): SPA migration requires consistent TypeScript tooling to maintain type safety while transitioning between different application architectures.
+
+- [quality-metrics-and-monitoring](../../core/quality-metrics-and-monitoring.md): Migration strategy requires comprehensive monitoring to track performance, errors, and user experience throughout the migration process.
+
+- [input-validation-standards](../security/input-validation-standards.md): SPA migration must maintain security standards for input validation as components transition from client-side to server-side execution.

@@ -36,7 +36,7 @@ This binding implements our simplicity tenet by preventing state management over
 
 **Comprehensive State Management Demonstrating All Approaches:**
 
-```jsx
+```tsx
 // 1. Local Component State for UI
 function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -121,7 +121,7 @@ function AuthStatus() {
 
 ## Examples
 
-```jsx
+```tsx
 // ❌ BAD: Everything in global state
 const store = createStore({
   // UI state that should be local
@@ -206,3 +206,7 @@ const useAuthStore = create((set) => ({
   management libraries is an important aspect of dependency management. This binding
   complements dependency management by providing guidance on when to introduce state
   management libraries versus using built-in React capabilities.
+
+- [type-safe-state-management](../typescript/type-safe-state-management.md): React state management should leverage TypeScript's type system to prevent runtime errors and ensure state consistency across the application.
+
+- [no-any](../typescript/no-any.md): State management patterns must avoid `any` types to maintain type safety and enable proper IDE support for state operations and transformations.

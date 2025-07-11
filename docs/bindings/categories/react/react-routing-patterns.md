@@ -451,3 +451,7 @@ async function Dashboard() {
 - [type-safe-state-management](../typescript/type-safe-state-management.md): Route parameters and navigation state should follow the same type safety principles as application state, ensuring consistency across the application.
 
 - [modern-typescript-toolchain](../typescript/modern-typescript-toolchain.md): Type-safe routing requires proper TypeScript configuration and tooling to provide compile-time guarantees for route parameters and navigation.
+
+- [performance-testing-standards](../../core/performance-testing-standards.md): Routing patterns should be validated through performance testing to ensure route-level code splitting and data fetching don't create performance bottlenecks.
+
+- [input-validation-standards](../security/input-validation-standards.md): Route parameters and query strings represent untrusted input that must be validated according to security standards before processing.

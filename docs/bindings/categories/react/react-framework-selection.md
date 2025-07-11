@@ -197,3 +197,7 @@ if (team.size > 5 && project.hasLegacyCode) {
 - [toolchain-selection-criteria](../../core/toolchain-selection-criteria.md): The measurable decision matrix approach builds on toolchain selection principles by applying objective criteria to framework selection rather than subjective preferences or trends.
 
 - [modern-typescript-toolchain](../typescript/modern-typescript-toolchain.md): Both Next.js and Remix integrate with the unified TypeScript toolchain, ensuring consistent development experience regardless of framework choice.
+
+- [performance-testing-standards](../../core/performance-testing-standards.md): Framework selection decisions should be validated through performance testing to ensure the chosen framework meets project requirements under real-world conditions.
+
+- [secure-by-design-principles](../security/secure-by-design-principles.md): Framework selection impacts security posture - both Next.js and Remix provide security-by-design features that should be considered in the selection criteria.

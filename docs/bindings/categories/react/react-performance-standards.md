@@ -281,8 +281,8 @@ jobs:
 ```
 
 **Lighthouse Configuration:**
-```javascript
-// lighthouse.config.js
+```typescript
+// lighthouse.config.ts
 module.exports = {
   ci: {
     assert: {
@@ -432,3 +432,7 @@ function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 - [react-framework-selection](react-framework-selection.md): Framework selection criteria include performance characteristics as key decision factors for choosing between Next.js and Remix.
 
 - [automated-quality-gates](../../core/automated-quality-gates.md): Performance targets integrate with automated quality gates to prevent performance regressions from reaching production.
+
+- [modern-typescript-toolchain](../typescript/modern-typescript-toolchain.md): TypeScript toolchain enables bundle analysis and type-safe performance monitoring, supporting the measurement and validation of performance standards.
+
+- [quality-metrics-and-monitoring](../../core/quality-metrics-and-monitoring.md): Performance standards require continuous monitoring and metrics collection to ensure targets are maintained in production environments.
