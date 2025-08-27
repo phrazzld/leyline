@@ -143,6 +143,17 @@ _No frontend bindings defined yet._
 | [use-pnpm-for-nodejs](./categories/typescript/use-pnpm-for-nodejs.md) | 0.2.0 | This binding implements our automation tenet by establishing a consistent, efficient package management foundation that eliminates "works on my mac... |
 | [vitest-testing-framework](./categories/typescript/vitest-testing-framework.md) | 0.2.0 | This binding implements our testability tenet by establishing a consistent, behavior-focused testing approach. A well-structured test pyramid catch... |
 
+## Ai Bindings
+
+| ID | Version | Summary |
+|---|---|---|
+| [compute-over-complexity](./categories/ai/compute-over-complexity.md) | 0.2.0 | Richard Sutton's Bitter Lesson reveals a pattern repeated throughout AI history: researchers spend years crafting clever domain-specific solutions,... |
+| [evaluation-driven-development](./categories/ai/evaluation-driven-development.md) | 0.2.0 | Without rigorous evaluation, AI development becomes guesswork. Teams waste weeks tweaking prompts based on hunches, only to discover they've made t... |
+| [general-over-specific](./categories/ai/general-over-specific.md) | 0.2.0 | Every domain-specific rule you encode becomes technical debt. When you hardcode industry jargon into prompts, build specialized parsers for your do... |
+| [no-unnecessary-parsing](./categories/ai/no-unnecessary-parsing.md) | 0.2.0 | Parsing logic is the most common and destructive anti-pattern in LLM development. When developers see LLM outputs, their instinct is to "clean", "v... |
+| [semantic-over-syntactic](./categories/ai/semantic-over-syntactic.md) | 0.2.0 | Syntactic validation is a relic of traditional programming where computers needed exact formats. LLMs operate in the realm of meaning and intent. W... |
+| [trust-language-understanding](./categories/ai/trust-language-understanding.md) | 0.2.0 | Large language models have been trained on trillions of tokens of human language. They understand dates, emails, phone numbers, addresses, names, s... |
+
 ## Api Bindings
 
 | ID | Version | Summary |
